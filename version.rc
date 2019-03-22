@@ -1,0 +1,26 @@
+#include "version.h"
+
+1 VERSIONINFO
+FILEVERSION      VULPES_VERSION_MAJOR,VULPES_VERSION_MINOR,VULPES_VERSION_PATCH,0
+PRODUCTVERSION   VULPES_VERSION_MAJOR,VULPES_VERSION_MINOR,VULPES_VERSION_PATCH,0
+#endif
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "Comments",         "A feature extension for Halo Custom Edition."
+            VALUE "CompanyName",      VULPES_AUTHOR
+            VALUE "FileDescription",  "Vulpes build " VULPES_BUILD_STRING
+            VALUE "FileVersion",      "Build " VULPES_BUILD_STRING
+            VALUE "InternalName",     "Vulpes"
+            VALUE "OriginalFilename", "Vulpes.dll"
+            VALUE "ProductName",      "Vulpes"
+            VALUE "ProductVersion",   "Build " VULPES_BUILD_STRING
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
