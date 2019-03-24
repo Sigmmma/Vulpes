@@ -2,40 +2,45 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <stdbool.h>
 
 #include <vector>
 
+uintptr_t LOWEST_PERMITTED_ADDRESS  = 0x400000; // Everything under this address is part of the stack.
+uintptr_t HIGHEST_PERMITTED_ADDRESS = 0x700000; // The address I have determined after which there is no code anymore on the executable.
+
+
 // A class for finding code inside of the Halo executable during runtime.
 class CodeSignature {
+    uintptr_t address = 0;
+    std::vector<int16_t> sig;
+    uintptr_t lowest_allowed = LOWEST_PERMITTED_ADDRESS;
+    uintptr_t highest_allowed = HIGHEST_PERMITTED_ADDRESS;
+    bool imperative = true;
+    bool already_tried = false;
 public:
     // Initializers
-    CodeSignature(bool required, int16_t signature[]);
-    CodeSignature(bool required, uintptr_t lowest_search_address, uintptr_t highest_search_address, int16_t signature[]);
+    CodeSignature(bool required, std::vector<int16_t> signature){
+        imperative = required; sig = signature; }
+    CodeSignature(bool required, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
+        imperative = required; lowest_allowed = lowest_search_address; highest_allowed = highest_search_address; sig = signature;}
 
     // Returns the address and does a search if it hasn't already.
     // Returns 0 if address is not found.
     uintptr_t get_address();
     uintptr_t get_address(bool recalculate);
+};
 
-private:
-    uintptr_t address;
-    std::vector<int16_t> sig;
-    size_t size;
-    uintptr_t lowest_allowed;
-    uintptr_t highest_allowed;
-    bool imperative;
-    bool already_tried;
+enum PatchTypes {
+    NOP_PATCH,  // NOPs out the code so it does nothing.
+    CALL_PATCH, // Makes a function call to redirect_to.
+    JMP_PATCH,  // Makes a jump to redirect_to.
+    SKIP_PATCH  // Puts a jmp at the start of the patch area which jumps to the end of the patch area. Pads the rest with NOPs.
 };
 
 // A class for patching code.
 class CodePatch {
 public:
-    enum PatchTypes {
-        NOP_PATCH,  // NOPs out the code so it does nothing.
-        CALL_PATCH, // Makes a function call to redirect_to.
-        JMP_PATCH,  // Makes a jump to redirect_to.
-        SKIP_PATCH  // Puts a jmp at the start of the patch area which jumps to the end of the patch area. Pads the rest with NOPs.
-    };
     // Initlializers.
     CodePatch(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
 
