@@ -1,6 +1,6 @@
 #include "incoming_packets.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include "shared_asm.hpp"
 #include "../network/message_delta_definitions.hpp"
 #include "hooker.hpp"
@@ -81,9 +81,7 @@ void hook_hud_chat_intercept(){
     );
 }
 
-const std::vector<int16_t> hud_chat_hook_signature_bytes = {
-    0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 };
-static CodeSignature hud_chat_hook_signature(true, hud_chat_hook_signature_bytes);
+static CodeSignature hud_chat_hook_signature(true, std::vector<int16_t>({0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 }));
 static CodePatch hud_chat_hook(
     hud_chat_hook_signature.get_address(), 8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
 
@@ -92,7 +90,7 @@ void init_hud_chat_hook(){
     hud_chat_hook.apply();
 }
 
-void teardown_hud_chat_hook(){
+void revert_hud_chat_hook(){
     hud_chat_hook.revert();
 }
 
@@ -104,10 +102,10 @@ const std::vector<int16_t> unit_kill_hook_signature_bytes = { 0x84, 0xC0, 0x0F, 
 const std::vector<int16_t> damage_dealt_hook_signature_bytes = { 0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8B, 0x44, 0x24, 0x08, 0x85, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8B, 0x15, -1, -1, -1, -1, 0x8B, 0x4A, 0x28, 0x8B, 0x3C, 0x81, 0x83, 0xFF, 0xFF, 0x0F, 0x84, -1, -1, -1, -1, 0x6A, 0x03 };
 
 
-void initialize_incoming_packet_hooks(){
-    init_hud_chat_hook()
+void init_incoming_packet_hooks(){
+    init_hud_chat_hook();
 }
 
-void teardown_incoming_packet_hooks(){
-    teardown_hud_chat_hook()
+void revert_incoming_packet_hooks(){
+    revert_hud_chat_hook();
 }
