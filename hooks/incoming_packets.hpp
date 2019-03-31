@@ -1,4 +1,4 @@
 #pragma once
 
-void initialize_incoming_packet_hooks();
-void teardown_incoming_packet_hooks();
+void init_incoming_packet_hooks();
+void revert_incoming_packet_hooks();
