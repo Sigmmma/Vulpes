@@ -6,7 +6,7 @@ LINKARGS= $(ARGS) -Wl,--exclude-all-symbols -s
 build:
 	mkdir -p bin
 	
-	windres version.rc -o bin/version.o
+	#windres version.rc -o bin/version.o
 	
 	g++ -c hooks/hooker.cpp $(ARGSDEF) -o bin/hooks__hooker.o
 	
