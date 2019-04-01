@@ -84,7 +84,7 @@ int32_t get_network_id_from_object(MemRef object){
     SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHandler*>(message_delta_object_index + 0x58);
     MemRef* network_translation_table = reinterpret_cast<MemRef*>(*translation_table_ptr + 0x28);
     for (int i=1; i < synced_objects->max_count; i++){
-        if (network_translation_table[network_id] == object.raw){
+        if (network_translation_table[network_id].raw == object.raw){
             return i;
         };
     };
