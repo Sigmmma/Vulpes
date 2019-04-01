@@ -35,8 +35,8 @@ uintptr_t process_hud_chat_message(HudChatType msg_type, int32_t player_id, uint
 ////// Hook code
 
 // HUD_CHAT = 0xF
-static uintptr_t jmp_hud_chat_original_code;
-static uintptr_t func_process_hud_chat_message = (uintptr_t)&process_hud_chat_message;
+uintptr_t jmp_hud_chat_original_code;
+uintptr_t func_process_hud_chat_message = (uintptr_t)&process_hud_chat_message;
 
 __attribute__((naked))
 void hook_hud_chat_intercept(){
@@ -81,9 +81,10 @@ void hook_hud_chat_intercept(){
     );
 }
 
-static CodeSignature hud_chat_hook_signature(true, std::vector<int16_t>({0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 }));
-static CodePatch hud_chat_hook(
-    hud_chat_hook_signature.get_address(), 8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
+Signature(true, hud_chat_hook_signature,
+    {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
+CodePatch hud_chat_hook(hud_chat_hook_signature.get_address(),
+    8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
 
 void init_hud_chat_hook(){
     jmp_hud_chat_original_code = hud_chat_hook.get_return_address();
