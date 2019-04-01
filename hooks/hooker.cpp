@@ -181,3 +181,11 @@ std::vector<uint8_t> CodePatch::get_patched_bytes(){
 uintptr_t CodePatch::get_return_address(){
     return return_address;
 }
+
+uintptr_t get_call_address(uintptr_t call_pointer){
+    uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
+    if (call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9){
+        return (*reinterpret_cast<uintptr_t*>(patch_adress + 1) + patch_adress + 5);
+    };
+    return 0;
+}

@@ -92,3 +92,5 @@ private:
 
     void write_patch(std::vector<uint8_t> patch_code);
 };
+
+uintptr_t get_call_address(uintptr_t call_pointer);
