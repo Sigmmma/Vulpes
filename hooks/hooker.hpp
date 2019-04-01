@@ -2,13 +2,15 @@
 
 #include <cstdint>
 #include <cstddef>
-#include <stdbool.h>
+#include <cstdbool>
 
 #include <vector>
 
+// Macro for CodeSignature, this is to make it so we don't have to repeat ourselves too much.
+#define Signature(required, name, ...) CodeSignature name(required, #name, std::vector<int16_t>(__VA_ARGS__))
+
 uintptr_t LOWEST_PERMITTED_ADDRESS  = 0x400000; // Everything under this address is part of the stack.
 uintptr_t HIGHEST_PERMITTED_ADDRESS = 0x700000; // The address I have determined after which there is no code anymore on the executable.
-
 
 // A class for finding code inside of the Halo executable during runtime.
 class CodeSignature {
@@ -18,12 +20,13 @@ class CodeSignature {
     uintptr_t highest_allowed = HIGHEST_PERMITTED_ADDRESS;
     bool imperative = true;
     bool already_tried = false;
+    std::string name;
 public:
     // Initializers
-    CodeSignature(bool required, std::vector<int16_t> signature){
-        imperative = required; sig = signature; }
-    CodeSignature(bool required, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
-        imperative = required; lowest_allowed = lowest_search_address; highest_allowed = highest_search_address; sig = signature;}
+    CodeSignature(bool required, std::string d_name, std::vector<int16_t> signature){
+            imperative = required; sig = signature; name = d_name;}
+    CodeSignature(bool required, std::string d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
+        imperative = required; lowest_allowed = lowest_search_address; highest_allowed = highest_search_address; sig = signature; name = d_name;}
 
     // Returns the address and does a search if it hasn't already.
     // Returns 0 if address is not found.
@@ -85,6 +88,7 @@ private:
     bool patch_is_built;
     bool applied;
     PatchTypes type;
+    std::string name;
 
     void write_patch(std::vector<uint8_t> patch_code);
 };

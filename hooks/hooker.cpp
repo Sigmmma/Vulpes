@@ -3,6 +3,7 @@
 #define WIN32_MEAN_AND_LEAN // Keeps the amount of windows.h includes to the bare minumum.
 #include <windows.h>
 #include <cassert>
+#include <string>
 
 uintptr_t CodeSignature::get_address(){
     if (address == 0 && !already_tried){
@@ -27,6 +28,12 @@ uintptr_t CodeSignature::get_address(){
                 address = current_address;
             };
             current_address++;
+        };
+    };
+    if (address == 0){
+        // Print an error
+        if (imperative){
+            // Crash
         };
     };
     return address;
