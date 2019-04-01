@@ -15,7 +15,6 @@ uintptr_t func_server_register_network_index = sig_func_server_register_network_
 uintptr_t func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.get_address();
 uintptr_t func_unregister_network_index = sig_func_unregister_network_index.get_address();
 typedef struct{
-public:
     uint32_t max_count;
     uint32_t int1;                  //0x4
     uint32_t int2;                  //0x8
