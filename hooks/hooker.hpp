@@ -8,24 +8,21 @@
 #include <vector>
 
 // Macro for CodeSignature, this is to make it so we don't have to repeat ourselves too much.
-#define Signature(required, name, ...) CodeSignature name(required, #name, LOWEST_PERMITTED_ADDRESS, HIGHEST_PERMITTED_ADDRESS, std::vector<int16_t>(__VA_ARGS__))
+#define Signature(required, name, ...) CodeSignature name(required, #name, 0, 0, std::vector<int16_t>(__VA_ARGS__))
 #define SignatureBounded(required, name, lowest_address, highest_address, ...) CodeSignature name(required, #name, lowest_address, highest_address, std::vector<int16_t>(__VA_ARGS__))
-
-//These are edited at startup to reflect safe bounds for CodeSignature to look in.
-static uintptr_t LOWEST_PERMITTED_ADDRESS  = 0x400000;
-static uintptr_t HIGHEST_PERMITTED_ADDRESS = 0x5DF000;
 
 // A class for finding code inside of the Halo executable during runtime.
 class CodeSignature {
     uintptr_t address = 0;
     std::vector<int16_t> sig;
-    uintptr_t lowest_allowed = LOWEST_PERMITTED_ADDRESS;
+    uintptr_t lowest_allowed;
     uintptr_t highest_allowed;
     bool imperative;
     bool already_tried = false;
     const char* name;
 public:
     // Initializers
+    // If lowest search address and/or highest_search address are 0 they default to the bounds above.
     CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
         imperative = required; lowest_allowed = lowest_search_address; highest_allowed = highest_search_address; sig = signature; name = d_name;}
 
@@ -95,3 +92,10 @@ private:
 };
 
 uintptr_t get_call_address(uintptr_t call_pointer);
+
+
+// These are initialization functions, these should rarely actually be called.
+uintptr_t get_lowest_permitted_address();
+uintptr_t get_highest_permitted_address();
+void set_lowest_permitted_address(uintptr_t new_address);
+void set_highest_permitted_address(uintptr_t new_address);

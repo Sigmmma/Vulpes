@@ -8,6 +8,12 @@
 
 uintptr_t CodeSignature::get_address(){
     if (address == 0 && !already_tried){
+        if (!lowest_allowed){
+            lowest_allowed = get_lowest_permitted_address();
+        };
+        if (!highest_allowed){
+            highest_allowed = get_highest_permitted_address();
+        };
         printf("Starting search for %s between %X and %X\n", name, lowest_allowed, highest_allowed);
         size_t size_of_block_to_find = sig.size();
         uintptr_t current_address = lowest_allowed;
@@ -54,7 +60,7 @@ uintptr_t CodeSignature::get_address(bool recalculate){
 ////////////
 
 CodePatch::CodePatch(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
-    assert(redirect_to >= LOWEST_PERMITTED_ADDRESS);
+    assert(redirect_to >= get_lowest_permitted_address());
     patch_address = p_address; size = p_size; type = p_type; redirect_address = redirect_to;
 
     applied = false;
@@ -192,4 +198,19 @@ uintptr_t get_call_address(uintptr_t call_pointer){
         return (*reinterpret_cast<uintptr_t*>(call_pointer + 1) + call_pointer + 5);
     };
     return 0;
+}
+
+static uintptr_t lowest_permitted_address = 0x400000;
+static uintptr_t highest_permitted_address = 0x5DF000;
+uintptr_t get_lowest_permitted_address(){
+    return lowest_permitted_address;
+}
+uintptr_t get_highest_permitted_address(){
+    return highest_permitted_address;
+}
+void set_lowest_permitted_address(uintptr_t new_address){
+    lowest_permitted_address = new_address;
+}
+void set_highest_permitted_address(uintptr_t new_address){
+    highest_permitted_address = new_address;
 }
