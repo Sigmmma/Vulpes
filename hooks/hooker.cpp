@@ -1,12 +1,14 @@
 #include "hooker.hpp"
 
 #define WIN32_MEAN_AND_LEAN // Keeps the amount of windows.h includes to the bare minumum.
-#include <windows.h>
+#include <Windows.h>
 #include <cassert>
 #include <string>
+#include <cstdio>
 
 uintptr_t CodeSignature::get_address(){
     if (address == 0 && !already_tried){
+        printf("Starting search for %s between %X and %X\n", name, lowest_allowed, highest_allowed);
         size_t size_of_block_to_find = sig.size();
         uintptr_t current_address = lowest_allowed;
         // Traverse from the lowest to highest address allowed searching for the set of bytes that we want.
@@ -31,11 +33,13 @@ uintptr_t CodeSignature::get_address(){
         };
     };
     if (address == 0){
-        // Print an error
+        printf("Couldn't find signature %s\n", name);
         if (imperative){
             // Crash
         };
-    };
+    }else{
+        printf("Found signature %s at %X\n", name, address);
+    }
     return address;
 }
 
@@ -185,7 +189,7 @@ uintptr_t CodePatch::get_return_address(){
 uintptr_t get_call_address(uintptr_t call_pointer){
     uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
     if (call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9){
-        return (*reinterpret_cast<uintptr_t*>(patch_adress + 1) + patch_adress + 5);
+        return (*reinterpret_cast<uintptr_t*>(call_pointer + 1) + call_pointer + 5);
     };
     return 0;
 }
