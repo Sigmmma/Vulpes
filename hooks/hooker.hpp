@@ -3,29 +3,30 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstdbool>
+#include <string>
 
 #include <vector>
 
 // Macro for CodeSignature, this is to make it so we don't have to repeat ourselves too much.
-#define Signature(required, name, ...) CodeSignature name(required, #name, std::vector<int16_t>(__VA_ARGS__))
+#define Signature(required, name, ...) CodeSignature name(required, #name, LOWEST_PERMITTED_ADDRESS, HIGHEST_PERMITTED_ADDRESS, std::vector<int16_t>(__VA_ARGS__))
+#define SignatureBounded(required, name, lowest_address, highest_address, ...) CodeSignature name(required, #name, lowest_address, highest_address, std::vector<int16_t>(__VA_ARGS__))
 
-uintptr_t LOWEST_PERMITTED_ADDRESS  = 0x400000; // Everything under this address is part of the stack.
-uintptr_t HIGHEST_PERMITTED_ADDRESS = 0x700000; // The address I have determined after which there is no code anymore on the executable.
+//These are edited at startup to reflect safe bounds for CodeSignature to look in.
+static uintptr_t LOWEST_PERMITTED_ADDRESS  = 0x400000;
+static uintptr_t HIGHEST_PERMITTED_ADDRESS = 0x5DF000;
 
 // A class for finding code inside of the Halo executable during runtime.
 class CodeSignature {
     uintptr_t address = 0;
     std::vector<int16_t> sig;
     uintptr_t lowest_allowed = LOWEST_PERMITTED_ADDRESS;
-    uintptr_t highest_allowed = HIGHEST_PERMITTED_ADDRESS;
-    bool imperative = true;
+    uintptr_t highest_allowed;
+    bool imperative;
     bool already_tried = false;
-    std::string name;
+    const char* name;
 public:
     // Initializers
-    CodeSignature(bool required, std::string d_name, std::vector<int16_t> signature){
-            imperative = required; sig = signature; name = d_name;}
-    CodeSignature(bool required, std::string d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
+    CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
         imperative = required; lowest_allowed = lowest_search_address; highest_allowed = highest_search_address; sig = signature; name = d_name;}
 
     // Returns the address and does a search if it hasn't already.
