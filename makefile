@@ -15,5 +15,5 @@ build:
 	
 	#g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
 	
-	g++ bin/*.o -shared -static-libgcc -lkernel32 -o "bin/vulpes.dll"
+	g++ bin/*.o -shared -static-libgcc -lkernel32 -o "bin/Vulpes.dll"
 	

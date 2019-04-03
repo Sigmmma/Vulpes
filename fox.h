@@ -1,7 +1,7 @@
 #ifndef FOX
 #define FOX
 
-const char* FOX =
+const char* _FOX =
 "_,-=._              /|_/|\n"
 "`-.}   `=._,.-=-._.,  @ @._,\n"
 "   `._ _,-.   )      _,.-'\n"

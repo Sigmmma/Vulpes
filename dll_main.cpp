@@ -20,14 +20,18 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     if(fdwReason == DLL_PROCESS_ATTACH && !loaded) {
         loaded = true;
         RedirectIOToConsole();
-        printf(FOX);
-        
+        printf(_FOX);
+
         // Get safe search bounds for CodeSignature
         SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
             {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
         ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.get_address());
-        HIGHEST_PERMITTED_ADDRESS = 0x400000 + header->size_of_segment + header->offset_to_segment;
-        printf("Signature search bounds are now %X and %X\n", LOWEST_PERMITTED_ADDRESS, HIGHEST_PERMITTED_ADDRESS);
+        set_lowest_permitted_address(0x400000 + header->offset_to_segment);
+        set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
+        printf("Signature search bounds are now %X and %X\n",
+            get_lowest_permitted_address(),
+            get_highest_permitted_address()
+        );
 
         // Check if the exe is a Server.
         Signature(false, server_sig,
