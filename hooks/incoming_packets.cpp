@@ -1,7 +1,6 @@
 #include "incoming_packets.hpp"
 
 #include <cstdint>
-#include "shared_asm.hpp"
 #include "../network/message_delta_definitions.hpp"
 #include "hooker.hpp"
 
@@ -45,7 +44,10 @@ void hook_hud_chat_intercept(){
         "test al, al;\n"
         "jz abort;\n"
         // Our own code starts here.
-        "call save_registers;\n"
+        "push eax;\n"
+        "push ebx;\n"
+        "push ecx;\n"
+        "push edx;\n"
         // Put the stack pointer into ebx before we start pushing.
         "mov ebx, esp;\n"
         // Call process_packet()
@@ -60,12 +62,15 @@ void hook_hud_chat_intercept(){
         // If it returns false, cancel the original function by returning.
         // If it returns true, go back to the original function.
         "cmp eax, 0;\n"
-        "jne revert_to_original_code;\n"
 
-        "call restore_registers;\n"
+        "pop edx;\n"
+        "pop ecx;\n"
+        "pop ebx;\n"
+        "pop eax;\n"
+        "jne revert_to_original_code;\n"
         // Copy of the original way the function aborts.
         // This is so we can abort the game's processing of this packet.
-        "abort:\n"
+    "abort:\n"
         "pop edi;\n"
         "pop esi;\n"
         "pop ebx;\n"
@@ -73,8 +78,8 @@ void hook_hud_chat_intercept(){
         "pop ebp;\n"
         "ret\n;"
         // Restore the original registers.
-        "revert_to_original_code:\n"
-        "call restore_registers;\n"
+    "revert_to_original_code:\n"
+        ///"call restore_registers;\n"
         "jmp %[hud_chat_original_code];\n"
         : [process_hud_chat_message] "+m" (func_process_hud_chat_message)
         : [hud_chat_original_code] "m" (jmp_hud_chat_original_code)

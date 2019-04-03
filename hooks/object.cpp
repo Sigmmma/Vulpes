@@ -11,7 +11,7 @@ uintptr_t array_object_full_ids = reinterpret_cast<uintptr_t>(object_full_ids);
 
 CodePatch patch_object_full_id_collection(patch_adress, 5, CALL_PATCH, func_object_header_new);
 
-__attribute__()(naked))
+__attribute__((naked))
 uint32_t object_header_new_wrapper(){
     asm(
         // Call original code to get the return value.
@@ -37,11 +37,13 @@ uint32_t object_header_new_wrapper(){
     );
 }
 
+// get sig of client address 56BDF3 to fix grenades dissapearing.
+
 void init_object_full_id_collection_hook(){
-    patch_object_full_id_collection.apply()
+    patch_object_full_id_collection.apply();
 }
 void revert_object_full_id_collection_hook(){
-    patch_object_full_id_collection.revert()
+    patch_object_full_id_collection.revert();
 }
 
 void init_object_hooks(){
