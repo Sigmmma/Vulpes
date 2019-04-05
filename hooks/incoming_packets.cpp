@@ -4,36 +4,21 @@
 #include "../network/message_delta_definitions.hpp"
 #include "hooker.hpp"
 #include <cstdio>
-// This file is going to be big, so let's talk about structure.
-// At the top level we're going to have our functions that call places outside of this source file.
-// These will be called by our hook assembly, so we need to keep track of their inputs and outputs.
-//
-// Below that we're going to have all of our code that actually hooks into the game.
-//      1. C variables used in the assembly code.
-//      2. The assembly code.
-//      3. The signature and code patch object.
-//
-// At the bottom will be our initialization code, this will run all the signature scans,
-// and populate return jump addresses, do any specific setup.
-//
-// We will also have our deinitialization code below that,
-// this will clean up any of our edits to the game's code.
-// Even if we don't expect that we'll need it.
 
-////// Connection functions.
-
+// HUD_CHAT = 0xF
 bool process_hud_chat_message(HudChat* packet){
     if (packet->msg_type == HudChatType::VULPES){
-        printf("Received a Vulpes packet!\n");
         return false;
+    };
+    // We don't want to touch these.
+    if (packet->msg_type == HudChatType::HAC ||
+        packet->msg_type == HudChatType::HCN){
+        return true;
     };
 
     return true;
 }
 
-////// Hook code
-
-// HUD_CHAT = 0xF
 static uintptr_t jmp_hud_chat_original_code;
 static uintptr_t func_process_hud_chat_message = (uintptr_t)&process_hud_chat_message;
 
@@ -55,7 +40,7 @@ void hook_hud_chat_intercept(){
         "add esp, 4;\n"
         // If it returns false, cancel the original function by returning.
         // If it returns true, go back to the original function.
-        "cmp eax, 0;\n"
+        "cmp al, 0;\n"
         "pop edx;\n"
         "pop ecx;\n"
         "pop ebx;\n"
@@ -80,7 +65,9 @@ void hook_hud_chat_intercept(){
 
 static Signature(true, hud_chat_hook_signature,
     {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
-static CodePatch hud_chat_hook;
+static Patch(hud_chat_hook);
+
+static bool has_been_initialized_before = false;
 
 void init_hud_chat_hook(){
     hud_chat_hook.build(hud_chat_hook_signature.get_address(), 8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
