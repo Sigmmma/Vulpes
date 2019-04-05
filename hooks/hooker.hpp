@@ -43,7 +43,7 @@ enum PatchTypes {
 class CodePatch {
 public:
     // Initlializers.
-    CodePatch(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
+    void build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
 
     ////// Main functions.
 
