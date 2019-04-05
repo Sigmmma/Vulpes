@@ -1,14 +1,11 @@
-#include <windows.h>
+#define WIN32_MEAN_AND_LEAN
+#include <Windows.h>
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <fcntl.h>
 
-#include <io.h>
-
 #include <iostream>
-
-#include <fstream>
 
 #ifndef _USE_OLD_IOSTREAMS
 
@@ -22,9 +19,7 @@ static const WORD MAX_CONSOLE_LINES = 500;
 
 
 
-void RedirectIOToConsole()
-
-{
+void RedirectIOToConsole(){
 
 int hConHandle;
 
