@@ -1,3 +1,4 @@
+#include "../memory/types.hpp"
 #include "../memory/player.hpp"
 
 // Probably not going to use these, but I spent time enumerating them.
@@ -78,7 +79,7 @@ struct ObjectUpdateHeader {
 };
 
 struct ObjectUpdateHeaderTimestamped : public ObjectUpdateHeader {
-    uint8_t pad;
+    uint8_t _pad;
     uint16_t timestamp; // I'm not sure what type this is yet.
 };
 
@@ -124,7 +125,7 @@ struct BipedUpdate {
 // Encode ObjectUpdateHeaderTimestamped before this
 struct VehicleUpdate {
     bool at_rest;
-    uint8_t pad[3];
+    uint8_t _pad[3];
     Vec3d position;
     Vec3d translational_velocity;
     Vec3d angular_velocity;
@@ -140,7 +141,7 @@ struct HudAdditem {
 
 struct PlayerCreate {
     uint8_t player_id;
-    uint8_t pad[3];
+    uint8_t _pad[3];
     int32_t raw_player_index;//?
     int32_t translated_player_index;
     int32_t team_index;
@@ -152,7 +153,7 @@ struct PlayerSpawn {
     int32_t team_index;
     int32_t parent_vehicle_network_id;
     int16_t vehicle_seat_index;
-    int16_t pad;
+    int16_t _pad;
     int32_t weapon_object_network_ids[4];
     int16_t desired_weapon_index;
     int16_t powerup_durations[2];
@@ -182,14 +183,47 @@ struct PlayerEffectStart {
     float total_damage;
 };
 
+struct UnitKill {
+    int32_t network_id;
+    bool should_cause_ping;
+    bool died;
+    bool feign_death;
+    bool died_flying;
+    bool ignore_hard_pings;
+    bool force_hard_pings;
+    bool should_allignment_vector_be_null;
+    uint8_t _pad;
+    int16_t damage_part;
+    int16_t _pad2;
+    float angle;
+    Vec2d allignment_vector;
+    int32_t respawn_timer;
+};
 
+struct ClientGameUpdateHeader {
+    int32_t update_id;
+};
 
+// Encode ClientGameUpdateHeader first
+struct ClientGameUpdate {
+    uint32_t ticks_to_apply_update_to[2]; //?
+    uint32_t control_flags; // figure out if these are the same
+    Vec2d desired_facing;
+    Vec2d digital_throttle;
+    float primary_trigger;
+    int16_t desired_weapon_id;
+    int16_t desired_grenade_id;
+    int16_t desired_zoom_level;
+};
 
-#pragma pack(pop)
+struct PlayerHandlePowerup {
+    int8_t player_id;
+    int8_t _pad[3];
+    int16_t powerup_time;
+    int16_t duration_in_ticks;
+};
 
-
-
-enum HudChatType : int8_t {
+enum class HudChatType : int8_t {
     NONE    = -1,
     ALL     = 0,
     TEAM    = 1,
@@ -200,3 +234,29 @@ enum HudChatType : int8_t {
     HCN     = 6, // Another mod uses this channel to communicate with hac2.
     VULPES  = 17  // The channel we use to communicate.
 };
+
+struct HudChat {
+    HudChatType msg_type;
+    int8_t _pad[3];
+    int8_t player_id;
+    int8_t _pad2[3];
+    wchar_t* message;
+};
+
+struct SlayerScoreArray {
+    struct SlayerScore{
+        int32_t score;
+        int32_t kills;
+        int32_t assists;
+        int32_t deaths;
+    }player[16]; // Todo, confirm order.
+};
+
+struct SlayerUpdate {
+    SlayerScoreArray team_score;
+    SlayerScoreArray individual_score;
+};
+
+
+
+#pragma pack(pop)
