@@ -39,14 +39,17 @@ enum PatchTypes {
     SKIP_PATCH  // Puts a jmp at the start of the patch area which jumps to the end of the patch area. Pads the rest with NOPs.
 };
 
+// A macro so we don't have to fill in the name twice.
+#define Patch(name) CodePatch name(#name)
+
 // A class for patching code.
 class CodePatch {
 public:
     // Initlializers.
-    void build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
+    CodePatch(const char * d_name){name = d_name;};
 
     ////// Main functions.
-
+    void build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.
