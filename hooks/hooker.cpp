@@ -59,7 +59,7 @@ uintptr_t CodeSignature::get_address(bool recalculate){
 
 ////////////
 
-CodePatch::CodePatch(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
+void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
     assert(redirect_to >= get_lowest_permitted_address());
     patch_address = p_address; size = p_size; type = p_type; redirect_address = redirect_to;
 
@@ -125,6 +125,7 @@ CodePatch::CodePatch(uintptr_t p_address, size_t p_size, PatchTypes p_type, uint
 }
 
 void CodePatch::write_patch(std::vector<uint8_t> patch_code){
+    assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
     DWORD prota, protb;
     VirtualProtect(reinterpret_cast<void*>(patch_address), size, PAGE_READWRITE, &prota);
@@ -135,16 +136,19 @@ void CodePatch::write_patch(std::vector<uint8_t> patch_code){
 }
 
 void CodePatch::apply(){
+    assert(patch_is_built);
     write_patch(patched_code);
     applied = true;
 }
 
 void CodePatch::revert(){
+    assert(patch_is_built);
     write_patch(original_code);
     applied = false;
 }
 
 bool CodePatch::check_integrity(){
+    assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
     std::vector<uint8_t> comparison_code;
 
@@ -164,14 +168,17 @@ bool CodePatch::check_integrity(){
 }
 
 bool CodePatch::is_applied(){
+    assert(patch_is_built);
     return applied;
 }
 
 size_t CodePatch::get_size(){
+    assert(patch_is_built);
     return size;
 }
 
 std::vector<uint8_t> CodePatch::get_bytes_from_patch_address(){
+    assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
     std::vector<uint8_t> found_code;
     for (int i = 0; i < size; i++){
@@ -181,14 +188,17 @@ std::vector<uint8_t> CodePatch::get_bytes_from_patch_address(){
 }
 
 std::vector<uint8_t> CodePatch::get_unpatched_bytes(){
+    assert(patch_is_built);
     return original_code;
 }
 
 std::vector<uint8_t> CodePatch::get_patched_bytes(){
+    assert(patch_is_built);
     return patched_code;
 }
 
 uintptr_t CodePatch::get_return_address(){
+    assert(patch_is_built);
     return return_address;
 }
 
