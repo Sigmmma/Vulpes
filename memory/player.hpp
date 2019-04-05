@@ -1,6 +1,6 @@
-#include <stdint.h>
+#include <cstdint>
 
-enum Team : int8_t {
+enum class Team : int8_t {
     RED         = 0,
     BLUE        = 1,
 
@@ -14,12 +14,7 @@ enum Team : int8_t {
     UNUSED_7    = 7
 };
 
-typedef struct {
-    int16_t id;
-    int16_t salt;
-}MemRef;
-
-enum InteractionType : uint16_t {
+enum class InteractionType : uint16_t {
     NONE                    = 0,
     PICKUP_POWERUP          = 1,
     SWAP_POWERUP            = 2,
@@ -36,7 +31,7 @@ enum InteractionType : uint16_t {
     FLIP_VEHICLE            = 11
 };
 
-enum NetworkColor : uint16_t {
+enum class NetworkColor : uint16_t {
     WHITE   = 0,
     BLACK   = 1,
     RED     = 2,
@@ -57,7 +52,7 @@ enum NetworkColor : uint16_t {
     SALMON  = 17
 };
 
-enum PlayerObjectiveMode : int32_t {
+enum class PlayerObjectiveMode : int32_t {
     RACE = 22,
     HILL = 34,
     JUGGERNAUT = 35,
@@ -66,31 +61,31 @@ enum PlayerObjectiveMode : int32_t {
 };
 
 union PlayerMultiplayerStatistics {
-    uint32_t[2] _pad;
+    uint32_t _pad[2];
 
     struct Ctf {
-        int16 flag_grabs;
-        int16 flag_returns;
-        int16 flag_scores;
+        int16_t flag_grabs;
+        int16_t flag_returns;
+        int16_t flag_scores;
     } ctf;
 
     struct Slayer {
     } slayer;
 
     struct Oddball {
-        int16 _unknown;
-        int16 target_kills;
-        int16 kills;
+        int16_t _unknown;
+        int16_t target_kills;
+        int16_t kills;
     } oddball;
 
     struct King {
-        int16 hill_score;
+        int16_t hill_score;
     } king;
 
     struct Race {
-        int16 time;
-        int16 laps;
-        int16 best_time;
+        int16_t time;
+        int16_t laps;
+        int16_t best_time;
     } race;
 }; static_assert(sizeof(PlayerMultiplayerStatistics) == 8);
 /*
@@ -129,10 +124,10 @@ class Player {
 public:
     int16_t      _id;                       // 0
     int16_t      host;                      // 2
-    int16_t      name[12];                      // 4
+    int16_t      name[12];                  // 4
     MemRef        _unknown;                 // 1C
     Team         team;                      // 20
-    int8_t       _pad[3];                      // color?
+    int8_t       _pad[3];                   // color?
     MemRef        interaction_obj;          // 24
     InteractionType interaction_obj_type;   // 28
     int16_t      interaction_obj_seat;      // 2A
@@ -177,7 +172,6 @@ public:
     int16_t      assists[4];                 // A4
     int16_t      betrayals;                  // AC
     int16_t      deaths;                     // AE
-    int16_t      _pad6;
     int16_t      suicides;                   // B0
     int16_t      _pad7;
     int32_t      _pad8[3];
