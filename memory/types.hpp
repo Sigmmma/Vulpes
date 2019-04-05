@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cstdint>
 // Class for references in Halo memory. Not the same as TagRef.
 class MemRef {
 public:
@@ -20,8 +20,7 @@ public:
     float x;
     float y;
 
-    //float get_magnitude();
-    //float scale_by(float factor);
+    float get_magnitude();
 };
 
 class Vec3d{
@@ -30,30 +29,36 @@ public:
     float y;
     float z;
 
-    //float get_magnitude();
-    //float scale_by(float factor);
+    float get_magnitude();
 };
 
 class Euler2d {
+public:
     float i;
     float j;
 
-    //void normalize();
+    void normalize();
 };
 
 class Euler3d {
+public:
     float i;
     float j;
     float k;
 
-    //void normalize();
+    void normalize();
 };
 
 class Quaternion {
+public:
     float i;
     float j;
     float k;
     float w;
 
-    //void normalize();
+    Quaternion(){
+        i=0.0;j=0.0;k=0.0;w=1.0;
+    }
+
+    void normalize();
 };
