@@ -1,10 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <cstddef>
-#include <cstdbool>
-#include <string>
-
 #include <vector>
 
 // Macro for CodeSignature, this is to make it so we don't have to repeat ourselves too much.
@@ -89,7 +85,7 @@ private:
     bool patch_is_built;
     bool applied;
     PatchTypes type;
-    std::string name;
+    const char* name;
 
     void write_patch(std::vector<uint8_t> patch_code);
 };
