@@ -9,11 +9,11 @@ build:
 	rm -f bin/vulpes.dll
 	#windres version.rc -o bin/version.o
 	g++ -c dll_main.cpp $(ARGS) -o bin/dll_main.o
-	g++ -c popout_console/guicon.cpp -m32 -o bin/popout_console__guicon.o
+	g++ -c popout_console/guicon.cpp -m32 -02 -o bin/popout_console__guicon.o
 	
 	g++ -c hooks/hooker.cpp $(ARGSDEF) -o bin/hooks__hooker.o
 	
-	#g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
+	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
 	
-	g++ bin/*.o -shared -static-libgcc -lkernel32 -o "bin/Vulpes.dll"
+	g++ bin/*.o -shared $(LINKARGS) -static-libgcc -o "bin/Vulpes.dll"
 	
