@@ -14,7 +14,7 @@ uintptr_t CodeSignature::get_address(){
         if (!highest_allowed){
             highest_allowed = get_highest_permitted_address();
         };
-        printf("Starting search for %s between %X and %X\n", name, lowest_allowed, highest_allowed);
+        printf("Searching for CodeSignature %s between %X and %X...", name, lowest_allowed, highest_allowed);
         size_t size_of_block_to_find = sig.size();
         uintptr_t current_address = lowest_allowed;
         // Traverse from the lowest to highest address allowed searching for the set of bytes that we want.
@@ -39,12 +39,12 @@ uintptr_t CodeSignature::get_address(){
         };
     };
     if (address == 0){
-        printf("Couldn't find signature %s\n", name);
+        printf("failed\n");
         if (imperative){
             // Crash
         };
     }else{
-        printf("Found signature %s at %X\n", name, address);
+        printf("success. Found at %X\n", address);
     }
     return address;
 }
@@ -60,6 +60,7 @@ uintptr_t CodeSignature::get_address(bool recalculate){
 ////////////
 
 void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
+    printf("Building CodePatch %s...", name);
     assert(redirect_to >= get_lowest_permitted_address());
     patch_address = p_address; size = p_size; type = p_type; redirect_address = redirect_to;
 
@@ -122,6 +123,7 @@ void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uin
         patched_code.push_back(NOP_BYTE);
     };
     patch_is_built = true;
+    printf("done\n");
 }
 
 void CodePatch::write_patch(std::vector<uint8_t> patch_code){
@@ -136,15 +138,19 @@ void CodePatch::write_patch(std::vector<uint8_t> patch_code){
 }
 
 void CodePatch::apply(){
+    printf("Applying CodePatch %s...", name);
     assert(patch_is_built);
     write_patch(patched_code);
     applied = true;
+    printf("done\n");
 }
 
 void CodePatch::revert(){
+    printf("Reverting CodePatch %s...", name);
     assert(patch_is_built);
     write_patch(original_code);
     applied = false;
+    printf("done\n");
 }
 
 bool CodePatch::check_integrity(){
