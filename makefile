@@ -16,5 +16,7 @@ build:
 	g++ -c hooks/hooker.cpp $(ARGSDEF) -o bin/hooks__hooker.o
 	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
 	
+	g++ -c memory/types.cpp $(ARGSFAST) -o bin/memory__types.o
+	
 	g++ bin/*.o -shared $(LINKARGS) -static-libgcc -o "bin/Vulpes.dll"
 	
