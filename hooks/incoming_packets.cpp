@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "../network/message_delta_definitions.hpp"
 #include "hooker.hpp"
-
+#include <cstdio>
 // This file is going to be big, so let's talk about structure.
 // At the top level we're going to have our functions that call places outside of this source file.
 // These will be called by our hook assembly, so we need to keep track of their inputs and outputs.
@@ -22,47 +22,40 @@
 
 ////// Connection functions.
 
-uintptr_t process_hud_chat_message(HudChatType msg_type, int32_t player_id, uint16_t* msg_text) {
-    bool return_to_original_code = true;
+bool process_hud_chat_message(HudChat* packet){
+    if (packet->msg_type == HudChatType::VULPES){
+        printf("Received a Vulpes packet!\n");
+        return false;
+    };
 
-    if (return_to_original_code){
-        return (uintptr_t)msg_text;
-    }
-    return 0;
+    return true;
 }
 
 ////// Hook code
 
 // HUD_CHAT = 0xF
-uintptr_t jmp_hud_chat_original_code;
-uintptr_t func_process_hud_chat_message = (uintptr_t)&process_hud_chat_message;
+static uintptr_t jmp_hud_chat_original_code;
+static uintptr_t func_process_hud_chat_message = (uintptr_t)&process_hud_chat_message;
 
 __attribute__((naked))
 void hook_hud_chat_intercept(){
     asm (
         // Copy original code behavior we are overwriting.
-        "test al, al;\n"
-        "jz abort;\n"
+        "cmp al, 0;\n"
+        "je abort;\n"
         // Our own code starts here.
         "push eax;\n"
         "push ebx;\n"
         "push ecx;\n"
         "push edx;\n"
-        // Put the stack pointer into ebx before we start pushing.
-        "mov ebx, esp;\n"
         // Call process_packet()
-        "push [ebx+0x10+0xC];\n" // text_pointer
-        "push [ebx+0x10+0x10];\n"// player_id
-        "push [ebx+0x10+0x14];\n"// message_type
+        "lea ebx, [esp+0x10+0xC];\n"
+        "push ebx;\n"
         "call %[process_hud_chat_message];\n"
-        // Move the possibly manipulated text_pointer into the address that halo will look for it in.
-        // DO NOT dynamically allocate a string for this. Only use staticly allocated ones.
-        "add esp, 12;\n"
-        "mov [esp+0x10+0xC], eax;\n"
+        "add esp, 4;\n"
         // If it returns false, cancel the original function by returning.
         // If it returns true, go back to the original function.
         "cmp eax, 0;\n"
-
         "pop edx;\n"
         "pop ecx;\n"
         "pop ebx;\n"
@@ -79,19 +72,18 @@ void hook_hud_chat_intercept(){
         "ret\n;"
         // Restore the original registers.
     "revert_to_original_code:\n"
-        ///"call restore_registers;\n"
         "jmp %[hud_chat_original_code];\n"
         : [process_hud_chat_message] "+m" (func_process_hud_chat_message)
         : [hud_chat_original_code] "m" (jmp_hud_chat_original_code)
     );
 }
 
-Signature(true, hud_chat_hook_signature,
+static Signature(true, hud_chat_hook_signature,
     {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
-CodePatch hud_chat_hook(hud_chat_hook_signature.get_address(),
-    8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
+static CodePatch hud_chat_hook;
 
 void init_hud_chat_hook(){
+    hud_chat_hook.build(hud_chat_hook_signature.get_address(), 8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
     jmp_hud_chat_original_code = hud_chat_hook.get_return_address();
     hud_chat_hook.apply();
 }
