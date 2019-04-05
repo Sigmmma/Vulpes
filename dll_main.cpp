@@ -3,7 +3,6 @@
 //#include "hooks/incoming_packets.hpp" // This is just for a quick test.
 #define WIN32_MEAN_AND_LEAN
 #include <Windows.h>
-#include <WinUser.h>
 #include "popout_console/guicon.hpp"
 #include <cstdio>
 
