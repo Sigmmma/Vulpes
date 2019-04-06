@@ -87,9 +87,7 @@ static BOOL load_dlls() {
         int_fn halo_type = (int_fn)GetProcAddress(loaded_dlls[0].module, "halo_type");
 
         // Make sure we have those functions
-        if(!instantiate_chimera || !destroy_chimera || !find_signatures || !signature_errors || !halo_type) {
-        }
-        else {
+        if(instantiate_chimera && destroy_chimera && find_signatures && signature_errors && halo_type) {
             instantiate_chimera();
             if(find_signatures() == 0) {
                 MessageBox(NULL, signature_errors(), "Error", MB_OK);
