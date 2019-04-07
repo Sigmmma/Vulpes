@@ -41,12 +41,8 @@ void init_file_handle_leak_fixes(){
 // I don't think it's worth it to be able to revert this patch.
 // But, I want to keep this standardized.
 void revert_file_handle_leak_fixes(){
-    if (file_handle_leak_patch1.is_applied()
-    &&  file_handle_leak_patch2.is_applied()
-    &&  file_handle_leak_patch3.is_applied()){
-        file_handle_leak_patch1.revert();
-        file_handle_leak_patch2.revert();
-        file_handle_leak_patch3.revert();
-    }
+    file_handle_leak_patch1.revert();
+    file_handle_leak_patch2.revert();
+    file_handle_leak_patch3.revert();
     applied = false;
 }
