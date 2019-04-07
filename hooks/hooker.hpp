@@ -32,7 +32,8 @@ enum PatchTypes {
     NOP_PATCH,  // NOPs out the code so it does nothing.
     CALL_PATCH, // Makes a function call to redirect_to.
     JMP_PATCH,  // Makes a jump to redirect_to.
-    SKIP_PATCH  // Puts a jmp at the start of the patch area which jumps to the end of the patch area. Pads the rest with NOPs.
+    SKIP_PATCH,  // Puts a jmp at the start of the patch area which jumps to the end of the patch area. Pads the rest with NOPs.
+    MANUAL_PATCH // Requires you to pass your own bytes to write at the given area.
 };
 
 // A macro so we don't have to fill in the name twice.
@@ -46,6 +47,9 @@ public:
 
     ////// Main functions.
     void build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
+    // Allows you to specify your own patch bytes,
+    // with -1 in the place of bytes you don't want changed by the patch.
+    void build_manual(uintptr_t p_address, std::vector<int16_t> patch_bytes);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.
@@ -64,11 +68,11 @@ public:
     // Returns the patch size.
     size_t get_size();
     // Returns the bytes that are currently at the patch address.
-    std::vector<uint8_t> get_bytes_from_patch_address();
-    // Returns the bytes that normally should be at the patch address.
-    std::vector<uint8_t> get_unpatched_bytes();
+    std::vector<int16_t> get_bytes_from_patch_address();
+    // Returns the bytes that were at the address at the time the patch was built.
+    std::vector<int16_t> get_unpatched_bytes();
     // Returns the bytes that the patch would put at the patch address.
-    std::vector<uint8_t> get_patched_bytes();
+    std::vector<int16_t> get_patched_bytes();
 private:
     enum InstructionBytes : uint8_t {
         NOP_BYTE  = 0x90,
@@ -79,15 +83,15 @@ private:
     uintptr_t patch_address;
     uintptr_t redirect_address;
     uintptr_t return_address;
-    std::vector<uint8_t> original_code;
-    std::vector<uint8_t> patched_code;
+    std::vector<int16_t> original_code;
+    std::vector<int16_t> patched_code;
     size_t size;
     bool patch_is_built;
     bool applied;
     PatchTypes type;
     const char* name;
 
-    void write_patch(std::vector<uint8_t> patch_code);
+    void write_patch(std::vector<int16_t> patch_code);
 };
 
 uintptr_t get_call_address(uintptr_t call_pointer);
