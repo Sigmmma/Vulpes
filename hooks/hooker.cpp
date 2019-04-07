@@ -59,6 +59,7 @@ uintptr_t CodeSignature::get_address(){
     }else{
         printf("success. Found at %X\n", address);
     }
+    already_tried = true;
     return address;
 }
 
@@ -67,6 +68,17 @@ uintptr_t CodeSignature::get_address(bool recalculate){
         address = 0;
         already_tried = false;
     };
+    return get_address();
+}
+
+uintptr_t CodeSignature::get_address(uintptr_t start_address){
+    lowest_allowed = start_address;
+    return get_address();
+}
+
+uintptr_t CodeSignature::get_address(uintptr_t start_address, uintptr_t end_address){
+    lowest_allowed = start_address;
+    highest_allowed = end_address;
     return get_address();
 }
 
@@ -174,6 +186,24 @@ void CodePatch::build_manual(uintptr_t p_address, std::vector<int16_t> patch_byt
     printf("done\n");
 }
 
+void CodePatch::build_int(uintptr_t p_address, uint32_t patch_int){
+    std::vector<int16_t> patch_bytes;
+    uint8_t* int_patch_bytes = reinterpret_cast<uint8_t*>(&patch_int);
+    for (int i = 0; i < 4; i++){
+        patch_bytes.push_back(int_patch_bytes[i]);
+    };
+    build_manual(p_address, patch_bytes);
+}
+
+void CodePatch::build_int(uintptr_t p_address, uint16_t patch_int){
+    std::vector<int16_t> patch_bytes;
+    uint8_t* int_patch_bytes = reinterpret_cast<uint8_t*>(&patch_int);
+    for (int i = 0; i < 2; i++){
+        patch_bytes.push_back(int_patch_bytes[i]);
+    };
+    build_manual(p_address, patch_bytes);
+}
+
 void CodePatch::write_patch(std::vector<int16_t> patch_code){
     assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
@@ -224,13 +254,16 @@ bool CodePatch::check_integrity(){
 }
 
 bool CodePatch::is_applied(){
-    assert(patch_is_built);
     return applied;
 }
 
 size_t CodePatch::get_size(){
     assert(patch_is_built);
     return size;
+}
+
+bool CodePatch::is_built(){
+    return patch_is_built;
 }
 
 std::vector<int16_t> CodePatch::get_bytes_from_patch_address(){
