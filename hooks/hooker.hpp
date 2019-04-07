@@ -19,8 +19,7 @@ class CodeSignature {
 public:
     // Initializers
     // If lowest search address and/or highest_search address are 0 they default to the bounds above.
-    CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
-        imperative = required; lowest_allowed = lowest_search_address; highest_allowed = highest_search_address; sig = signature; name = d_name;}
+    CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature);
 
     // Returns the address and does a search if it hasn't already.
     // Returns 0 if address is not found.
@@ -43,7 +42,7 @@ enum PatchTypes {
 class CodePatch {
 public:
     // Initlializers.
-    CodePatch(const char * d_name){name = d_name;};
+    CodePatch(const char * d_name);
 
     ////// Main functions.
     void build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
@@ -94,8 +93,8 @@ private:
     void write_patch(std::vector<int16_t> patch_code);
 };
 
+// Gets the direct pointer to whatever the instruction at this address CALLs or JUMPs to.
 uintptr_t get_call_address(uintptr_t call_pointer);
-
 
 // These are initialization functions, these should rarely actually be called.
 uintptr_t get_lowest_permitted_address();
