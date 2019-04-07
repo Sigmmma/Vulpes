@@ -15,11 +15,14 @@ void revert_hooks(){
 }
 
 #include "halo_bug_fixes/cpu_usage.hpp"
+#include "halo_bug_fixes/file_handle_leak.hpp"
 void init_halo_bug_fixes(){
     init_cpu_usage_fixes();
+    init_file_handle_leak_fixes();
 }
 void revert_halo_bug_fixes(){
     revert_cpu_usage_fixes();
+    revert_file_handle_leak_fixes();
 }
 
 #include "fox.h"
