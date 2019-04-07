@@ -77,10 +77,10 @@ void init_cpu_usage_fixes(){
 }
 
 void revert_cpu_usage_fixes(){
-    if (cpu_usage_fix_patch1.is_applied()) {cpu_usage_fix_patch1.revert();};
-    if (cpu_usage_fix_patch2.is_applied()) {cpu_usage_fix_patch2.revert();};
-    if (cpu_usage_fix_patch3.is_applied()) {cpu_usage_fix_patch3.revert();};
-    if (cpu_usage_fix_patch4.is_applied()) {cpu_usage_fix_patch4.revert();};
-    if (cpu_usage_fix_patch5.is_applied()) {cpu_usage_fix_patch5.revert();};
+    cpu_usage_fix_patch1.revert();
+    cpu_usage_fix_patch2.revert();
+    cpu_usage_fix_patch3.revert();
+    cpu_usage_fix_patch4.revert();
+    cpu_usage_fix_patch5.revert();
     applied = false;
 }
