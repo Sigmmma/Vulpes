@@ -36,6 +36,8 @@ struct ImageSectionHeader {
     uint32_t bullshit2[4];
 };
 
+static HMODULE sapp_strings = NULL;
+
 void init_vulpes(){
     // Get safe search bounds for CodeSignature.
     ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.get_address());
@@ -50,6 +52,16 @@ void init_vulpes(){
 
     init_hooks();
     init_halo_bug_fixes();
+
+    // This is temporary until we can properly replace sapp.
+    if (server){
+        sapp_strings = LoadLibrary("sapp_strings.dll");
+        if (sapp_strings){
+            printf("Loaded sapp_strings.dll. Use the 'load' command to load sapp.");
+        }else{
+            printf("Couldn't find sapp_strings.dll. You'll not be able to load sapp.");
+        };
+    };
 }
 
 void destruct_vulpes(){
@@ -59,4 +71,9 @@ void destruct_vulpes(){
 
     revert_hooks();
     revert_halo_bug_fixes();
+
+    // This is temporary until we can properly replace sapp.
+    if (server){
+        FreeLibrary(sapp_strings);
+    };
 }
