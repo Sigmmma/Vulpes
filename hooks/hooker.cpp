@@ -7,6 +7,18 @@
 #include <cstdio>
 #include <iostream>
 
+std::vector<CodeSignature*> instantiated_signatures;
+std::vector<CodePatch*> instantiated_patches;
+
+CodeSignature::CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
+    imperative = required;
+    lowest_allowed = lowest_search_address;
+    highest_allowed = highest_search_address;
+    sig = signature;
+    name = d_name;
+    instantiated_signatures.push_back(this);
+}
+
 uintptr_t CodeSignature::get_address(){
     if (address == 0 && !already_tried){
         if (!lowest_allowed){
@@ -59,6 +71,11 @@ uintptr_t CodeSignature::get_address(bool recalculate){
 }
 
 ////////////
+
+CodePatch::CodePatch(const char * d_name){
+    name = d_name;
+    instantiated_patches.push_back(this);
+};
 
 void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
     printf("Building CodePatch %s...", name);
