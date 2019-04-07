@@ -227,10 +227,17 @@ void CodePatch::apply(){
 
 void CodePatch::revert(){
     printf("Reverting CodePatch %s...", name);
-    assert(patch_is_built);
-    write_patch(original_code);
+    if (applied){
+        write_patch(original_code);
+        printf("done\n");
+    }else{
+        if (patch_is_built){
+            printf("wasn't needed.\n");
+        }else{
+            printf("wasn't built.\n");
+        };
+    };
     applied = false;
-    printf("done\n");
 }
 
 bool CodePatch::check_integrity(){
