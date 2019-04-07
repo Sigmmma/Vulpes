@@ -9,13 +9,6 @@
 
 // A class for finding code inside of the Halo executable during runtime.
 class CodeSignature {
-    uintptr_t address = 0;
-    std::vector<int16_t> sig;
-    uintptr_t lowest_allowed;
-    uintptr_t highest_allowed;
-    bool imperative;
-    bool already_tried = false;
-    const char* name;
 public:
     // Initializers
     // If lowest search address and/or highest_search address are 0 they default to the bounds above.
@@ -23,8 +16,19 @@ public:
 
     // Returns the address and does a search if it hasn't already.
     // Returns 0 if address is not found.
+    // Returns previously found value if it has already searched.
     uintptr_t get_address();
     uintptr_t get_address(bool recalculate);
+    uintptr_t get_address(uintptr_t start_address);
+    uintptr_t get_address(uintptr_t start_address, uintptr_t end_address);
+private:
+    uintptr_t address = 0;
+    std::vector<int16_t> sig;
+    uintptr_t lowest_allowed;
+    uintptr_t highest_allowed;
+    bool imperative;
+    bool already_tried = false;
+    const char* name;
 };
 
 enum PatchTypes {
@@ -49,6 +53,9 @@ public:
     // Allows you to specify your own patch bytes,
     // with -1 in the place of bytes you don't want changed by the patch.
     void build_manual(uintptr_t p_address, std::vector<int16_t> patch_bytes);
+    // A patch type that writes an int to a location
+    void build_int(uintptr_t p_address, uint32_t patch_int);
+    void build_int(uintptr_t p_address, uint16_t patch_int);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.
@@ -66,6 +73,8 @@ public:
     bool is_applied();
     // Returns the patch size.
     size_t get_size();
+    // Returns wether or not the patch has been built.
+    bool is_built();
     // Returns the bytes that are currently at the patch address.
     std::vector<int16_t> get_bytes_from_patch_address();
     // Returns the bytes that were at the address at the time the patch was built.
@@ -85,8 +94,8 @@ private:
     std::vector<int16_t> original_code;
     std::vector<int16_t> patched_code;
     size_t size;
-    bool patch_is_built;
-    bool applied;
+    bool patch_is_built = false;
+    bool applied = false;
     PatchTypes type;
     const char* name;
 
