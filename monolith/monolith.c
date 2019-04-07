@@ -58,7 +58,7 @@ static void unload_dlls() {
         return;
     }
 
-    for(int i = 0; i < dll_count; i++) {
+    for(int i = dll_count-1; i >= 0; i--) {
         FreeLibrary(loaded_dlls[i].module);
     }
 
