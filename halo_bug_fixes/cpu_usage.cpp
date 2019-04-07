@@ -2,6 +2,7 @@
 #include "../hooks/hooker.hpp"
 
 #include <Windows.h>
+#include <cstdint>
 
 uintptr_t sleep = reinterpret_cast<uintptr_t>(&Sleep);
 
@@ -66,20 +67,20 @@ void init_cpu_usage_fixes(){
         };
         already_initialized = true;
     }else{
-        cpu_usage_fix_patch1.apply();
-        cpu_usage_fix_patch2.apply();
-        cpu_usage_fix_patch3.apply();
-        cpu_usage_fix_patch4.apply();
-        cpu_usage_fix_patch5.apply();
+        if (cpu_usage_fix_patch1.is_built()) {cpu_usage_fix_patch1.apply();};
+        if (cpu_usage_fix_patch2.is_built()) {cpu_usage_fix_patch2.apply();};
+        if (cpu_usage_fix_patch3.is_built()) {cpu_usage_fix_patch3.apply();};
+        if (cpu_usage_fix_patch4.is_built()) {cpu_usage_fix_patch4.apply();};
+        if (cpu_usage_fix_patch5.is_built()) {cpu_usage_fix_patch5.apply();};
     };
     applied = true;
 }
 
 void revert_cpu_usage_fixes(){
-    cpu_usage_fix_patch1.revert();
-    cpu_usage_fix_patch2.revert();
-    cpu_usage_fix_patch3.revert();
-    cpu_usage_fix_patch4.revert();
-    cpu_usage_fix_patch5.revert();
+    if (cpu_usage_fix_patch1.is_applied()) {cpu_usage_fix_patch1.revert();};
+    if (cpu_usage_fix_patch2.is_applied()) {cpu_usage_fix_patch2.revert();};
+    if (cpu_usage_fix_patch3.is_applied()) {cpu_usage_fix_patch3.revert();};
+    if (cpu_usage_fix_patch4.is_applied()) {cpu_usage_fix_patch4.revert();};
+    if (cpu_usage_fix_patch5.is_applied()) {cpu_usage_fix_patch5.revert();};
     applied = false;
 }
