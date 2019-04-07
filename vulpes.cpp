@@ -14,6 +14,14 @@ void revert_hooks(){
     revert_incoming_packet_hooks();
 }
 
+#include "halo_bug_fixes/cpu_usage.hpp"
+void init_halo_bug_fixes(){
+    init_cpu_usage_fixes();
+}
+void revert_halo_bug_fixes(){
+    revert_cpu_usage_fixes();
+}
+
 #include "fox.h"
 #include "popout_console/guicon.hpp"
 
@@ -34,22 +42,21 @@ void init_vulpes(){
     set_lowest_permitted_address(0x400000 + header->offset_to_segment);
     set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
     // Check if we're a server.
-    if (sig_server.get_address()){
-        server = true;
-    }else{
+    server = sig_server.get_address() != 0;
+    if(!server){
         RedirectIOToConsole();
-        server = false;
     };
     printf(_FOX);
 
     init_hooks();
+    init_halo_bug_fixes();
 }
 
 void destruct_vulpes(){
-    if (server){
-
-    }else{
+    if (!server){
         FreeConsole();
     };
 
+    revert_hooks();
+    revert_halo_bug_fixes();
 }
