@@ -5,6 +5,7 @@
 #include <cassert>
 #include <string>
 #include <cstdio>
+#include <iostream>
 
 uintptr_t CodeSignature::get_address(){
     if (address == 0 && !already_tried){
@@ -97,12 +98,18 @@ void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uin
         case SKIP_PATCH :
             if (size < 5){
                 used_area = 0;
-            }else if (size < 128){
+            }else if(size < 128){
                 patched_code.push_back(JMP_SMALL_BYTE);
                 patched_code.push_back(uint8_t(size - 2));
                 used_area = 2;
             };
             write_pointer = false;
+            break;
+        case MANUAL_PATCH :
+            throw std::invalid_argument(
+                "Used invalid patch type for CodePatch::build().\n"
+                "MANUAL_PATCH should only be through CodePatch::build_manual()."
+            );
             break;
     };
 
@@ -126,13 +133,39 @@ void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uin
     printf("done\n");
 }
 
-void CodePatch::write_patch(std::vector<uint8_t> patch_code){
+void CodePatch::build_manual(uintptr_t p_address, std::vector<int16_t> patch_bytes){
+    printf("Building CodePatch %s...", name);
+    patch_address = p_address;
+    type = MANUAL_PATCH;
+    size = patch_bytes.size();
+
+    applied = false;
+    return_address = patch_address + size;
+
+    uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
+    // Make a copy of the old code
+    for (int i = 0; i < size; i++){
+        if (patch_bytes[i] != -1){
+            original_code.push_back(patch_address_bytes[i]);
+        }else{
+            original_code.push_back(-1);
+        };
+    };
+
+    patched_code = patch_bytes;
+    patch_is_built = true;
+    printf("done\n");
+}
+
+void CodePatch::write_patch(std::vector<int16_t> patch_code){
     assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
     DWORD prota, protb;
-    VirtualProtect(reinterpret_cast<void*>(patch_address), size, PAGE_READWRITE, &prota);
+    VirtualProtect(reinterpret_cast<void*>(patch_address), size, PAGE_EXECUTE_READWRITE, &prota);
     for (int i = 0; i < size; i++){
-        patch_address_bytes[i] = patch_code[i];
+        if (patch_code[i] != -1){
+            patch_address_bytes[i] = static_cast<uint8_t>(patch_code[i]);
+        };
     };
     VirtualProtect(reinterpret_cast<void*>(patch_address), size, prota, &protb);
 }
@@ -156,7 +189,7 @@ void CodePatch::revert(){
 bool CodePatch::check_integrity(){
     assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
-    std::vector<uint8_t> comparison_code;
+    std::vector<int16_t> comparison_code;
 
     if (applied) {comparison_code = patched_code;}
     else         {comparison_code = original_code;};
@@ -183,22 +216,22 @@ size_t CodePatch::get_size(){
     return size;
 }
 
-std::vector<uint8_t> CodePatch::get_bytes_from_patch_address(){
+std::vector<int16_t> CodePatch::get_bytes_from_patch_address(){
     assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
-    std::vector<uint8_t> found_code;
+    std::vector<int16_t> found_code;
     for (int i = 0; i < size; i++){
         found_code.push_back(patch_address_bytes[i]);
     };
     return found_code;
 }
 
-std::vector<uint8_t> CodePatch::get_unpatched_bytes(){
+std::vector<int16_t> CodePatch::get_unpatched_bytes(){
     assert(patch_is_built);
     return original_code;
 }
 
-std::vector<uint8_t> CodePatch::get_patched_bytes(){
+std::vector<int16_t> CodePatch::get_patched_bytes(){
     assert(patch_is_built);
     return patched_code;
 }
