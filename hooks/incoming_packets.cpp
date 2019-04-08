@@ -67,8 +67,6 @@ static Signature(true, hud_chat_hook_signature,
     {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
 static Patch(hud_chat_hook);
 
-static bool has_been_initialized_before = false;
-
 void init_hud_chat_hook(){
     hud_chat_hook.build(hud_chat_hook_signature.get_address(), 8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
     jmp_hud_chat_original_code = hud_chat_hook.get_return_address();

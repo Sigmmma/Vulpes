@@ -70,7 +70,6 @@ void unregister_network_index(MemRef object){
         "call %[unregister_network_index];\n"
         : [message_delta_object_index] "+m" (message_delta_object_index)
         : [local_object_id] "m" (object.raw),
-          [network_id] "m" (network_id),
           [unregister_network_index] "m" (func_unregister_network_index)
     );
 }

@@ -27,6 +27,7 @@ uintptr_t CodeSignature::get_address(){
         if (!highest_allowed){
             highest_allowed = get_highest_permitted_address();
         };
+        assert(lowest_allowed >= get_lowest_permitted_address());
         printf("Searching for CodeSignature %s between %X and %X...", name, lowest_allowed, highest_allowed);
         size_t size_of_block_to_find = sig.size();
         uintptr_t current_address = lowest_allowed;
@@ -87,7 +88,7 @@ uintptr_t CodeSignature::get_address(uintptr_t start_address, uintptr_t end_addr
 CodePatch::CodePatch(const char * d_name){
     name = d_name;
     instantiated_patches.push_back(this);
-};
+}
 
 void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
     printf("Building CodePatch %s...", name);
