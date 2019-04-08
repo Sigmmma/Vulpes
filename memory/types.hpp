@@ -1,5 +1,11 @@
 #pragma once
 #include <cstdint>
+
+#define CONCAT(x, y) x ## y
+#define CONCAT2(x, y) CONCAT(x, y)
+#define PAD(s) uint8_t CONCAT2(padding, __LINE__)[s]
+#define BITPAD(type,s) type CONCAT2(padding## __LINE__) : s
+
 // Class for references in Halo memory. Not the same as TagRef.
 class MemRef {
 public:
@@ -61,4 +67,17 @@ public:
     }
 
     void normalize();
+};
+
+class RGBFloat {
+    float red;
+    float green;
+    float blue;
+};
+
+class ARGBFloat {
+    float alpha;
+    float red;
+    float green;
+    float blue;
 };

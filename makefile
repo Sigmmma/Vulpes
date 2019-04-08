@@ -1,7 +1,8 @@
-ARGS= -std=c++17 -masm=intel -m32
+WARNS= -pedantic -Wunused-value
+ARGS= $(WARNS) -std=c++17 -masm=intel -msse3 -m32
 ARGSDEF= $(ARGS) -O2
-ARGSFAST= $(ARGS) -Ofast -msse3
-LINKARGS= -m32 -W
+ARGSFAST= $(ARGS) -Ofast
+LINKARGS= $(WARNS) -m32 -W
 #,--exclude-all-symbols -s
 
 build:
@@ -20,5 +21,6 @@ build:
 	g++ -c halo_bug_fixes/file_handle_leak.cpp $(ARGS) -o bin/halo_bug_fixes__file_handle_leak.o
 
 	g++ -c memory/types.cpp $(ARGSFAST) -o bin/memory__types.o
+	g++ -c memory/object.cpp $(ARGSDEF) -o bin/memory__object.o
 
 	g++ bin/*.o -shared $(LINKARGS) -static-libgcc -lkernel32 -o "bin/Vulpes.dll"

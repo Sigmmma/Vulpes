@@ -1,18 +1,7 @@
+#pragma once
+#include "object.hpp"
 #include <cstdint>
 
-enum class Team : int8_t {
-    RED         = 0,
-    BLUE        = 1,
-
-    NONE        = 0,
-    PLAYER      = 1,
-    HUMAN       = 2,
-    COVENANT    = 3,
-    FLOOD       = 4,
-    SENTINEL    = 5,
-    UNUSED_6    = 6,
-    UNUSED_7    = 7
-};
 
 enum class InteractionType : uint16_t {
     NONE                    = 0,
@@ -119,6 +108,7 @@ typedef struct {
     }
 } PlayerNetworkUpdateData;
 static_assert(sizeof(PlayerNetworkUpdateData) == 0x114);*/
+#pragma pack(push, 1)
 
 class Player {
 public:
@@ -127,17 +117,17 @@ public:
     int16_t      name[12];                  // 4
     MemRef        _unknown;                 // 1C
     Team         team;                      // 20
-    int8_t       _pad[3];                   // color?
+    PAD(3);                                 // color?
     MemRef        interaction_obj;          // 24
     InteractionType interaction_obj_type;   // 28
     int16_t      interaction_obj_seat;      // 2A
-    int16_t      respawn_time;              // 2C
-    int16_t      respawn_time_growth;       // 30
+    int32_t      respawn_time;              // 2C
+    int32_t      respawn_time_growth;       // 30
     MemRef       obj_id;                    // 34
     MemRef       prev_obj_id;               // 38
     int16_t      bsp_cluster_id;            // 3C
     bool         weapon_swap_result;        // 3E
-    int8_t       _pad1;
+    PAD(1);
     MemRef        auto_aim_target_obj;      // 40
     int32_t      last_fired_tick;           // 44
     int16_t      network_name[12];          // 48
@@ -146,7 +136,7 @@ public:
     int8_t       machine_id;                // 64
     int8_t       controller_id;             // 65
     Team         team2;                     // 66
-    int16_t      id;                        // 67
+    int8_t       id;                        // 67
     // End of client stuct? - it was a comment on one of my reference materials.
     int16_t      camo_time_left;            // 68
     int16_t      other_powerup_time_left;   // 6A
@@ -155,16 +145,16 @@ public:
 
     PlayerObjectiveMode objective_mode;      // 74
 
-    MemRef        objective_player;           // 78
+    MemRef       objective_player;           // 78
     // Used for rendering the name of the player you are targeting.
-    MemRef        target_player;              // 7C
+    MemRef       target_player;              // 7C
     int32_t      target_player_time;         // 80
     int32_t      last_death_tick;            // 84
-    MemRef        slayer_target_player;       // 88
+    MemRef       slayer_target_player;       // 88
     bool         odd_man_out;                // 8C
-    int8_t       _pad3[3];
-    int32_t      _pad4;                      // 90
-    int16_t      _pad5;
+    PAD(3);
+    PAD(4);                                  // 90
+    PAD(2);
     int16_t      killstreak;                 // 96
     int16_t      multikill;                  // 98
     int16_t      last_kill_tick;             // 9A
@@ -173,10 +163,10 @@ public:
     int16_t      betrayals;                  // AC
     int16_t      deaths;                     // AE
     int16_t      suicides;                   // B0
-    int16_t      _pad7;
-    int32_t      _pad8[3];
+    PAD(2);
+    PAD(3*4);
     int16_t      team_kills;                 // C0
-    int16_t      _pad9;
+    PAD(2);
 
     PlayerMultiplayerStatistics mp_stats;    // C4
 
@@ -184,8 +174,8 @@ public:
     int32_t      quit_at_tick;               // D0
     bool         telefrag_danger;            // D4
     bool         quit;                       // D5
-    int16_t      _pad10;
-    int32_t      _pad11;                     // D8
+    PAD(2);
+    PAD(4);                                  // D8
     int32_t      ping;                       // DC
     int32_t      team_kill_count;            // E0
     int32_t      team_kill_ticks_since_last; // E4
@@ -193,3 +183,5 @@ public:
     uint8_t      _network_data[ 0x200-0xE8 ]; // E8 - 200
 
 }; static_assert(sizeof(Player) == 0x200);
+
+#pragma pack(pop)
