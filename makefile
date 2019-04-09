@@ -21,5 +21,10 @@ build:
 
 	g++ -c memory/types.cpp $(ARGSDEF) -o bin/memory__types.o
 	g++ -c memory/object.cpp $(ARGSDEF) -o bin/memory__object.o
+	g++ -c memory/object_item.cpp $(ARGSDEF) -o bin/memory__object_item.o
+	g++ -c memory/object_device.cpp $(ARGSDEF) -o bin/memory__object_device.o
+	g++ -c memory/object_unit.cpp $(ARGSDEF) -o bin/memory__object_unit.o
+
+	ld -r -b binary meta_files/console_font.meta -o bin/meta_files__console_font.o
 
 	g++ bin/*.o -shared $(LINKARGS) -static-libgcc -lkernel32 -o "bin/Vulpes.dll"
