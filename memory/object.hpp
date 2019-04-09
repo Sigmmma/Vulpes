@@ -59,7 +59,6 @@ enum class ObjectAttachmentType : int8_t{
 
 enum ObjectSizes {
     SIZE_OBJECT          = 0x1F4,
-    SIZE_PROJECTILE      =  0xBC + SIZE_OBJECT,
     SIZE_SCENERY         =     4 + SIZE_OBJECT,
     SIZE_PLACEHOLDER     =     8 + SIZE_OBJECT,
     SIZE_SOUND_SCENERY   =     4 + SIZE_OBJECT,
@@ -73,6 +72,7 @@ enum ObjectSizes {
     SIZE_WEAPON          = 0x114 + SIZE_ITEM,
     SIZE_EQUIPMENT       =  0x68 + SIZE_ITEM,
     SIZE_GARBAGE         =  0x18 + SIZE_ITEM,
+    SIZE_PROJECTILE      =  0x84 + SIZE_ITEM,
 
     SIZE_UNIT            = 0x2D8 + SIZE_OBJECT,
     SIZE_BIPED           =  0x84 + SIZE_UNIT,
@@ -103,12 +103,13 @@ class Object {
 public:
     MemRef tag;
     // Multiplayer related stuff
-    ObjectNetworkRole network_role; // 4
-    bool _unknown;                  // 8
-    bool should_force_baseline_update;  // 9
-    PAD(2);
-    int32_t existence_time; // C
-
+    struct ObjectNetwork {
+        ObjectNetworkRole role; // 4
+        bool _unknown;                  // 8
+        bool should_force_baseline_update;  // 9
+        PAD(2);
+        int32_t existence_ticks; // C
+    } base_network;
     bool hidden : 1;// 10
     bool on_ground : 1;
     bool ignore_gravity : 1;
@@ -161,7 +162,7 @@ public:
         bool valid_timestamp;
         PAD(3);
         int32_t timestamp;
-    }network_delta; static_assert(sizeof(ObjectNetworkDelta) == 0x44);
+    } base_network_delta; static_assert(sizeof(ObjectNetworkDelta) == 0x44);
 
     Vec3d position;
     Vec3d transitional_velocity;
@@ -265,6 +266,20 @@ public:
       node_matrices_block;
 }; static_assert(sizeof(Object) == SIZE_OBJECT);
 
+class ObjectScenery : public Object {
+    PAD(4);
+}; static_assert(sizeof(ObjectScenery) == SIZE_SCENERY);
+
+class ObjectPlaceholder : public Object {
+    PAD(8);
+}; static_assert(sizeof(ObjectPlaceholder) == SIZE_PLACEHOLDER);
+
+class ObjectSoundScenery : public Object {
+    PAD(4);
+}; static_assert(sizeof(ObjectSoundScenery) == SIZE_SOUND_SCENERY);
+
+
+
 class ObjectHeader {
 public:
     int16_t salt_id;
@@ -283,8 +298,5 @@ public:
 
     void* object_data;
 }; static_assert(sizeof(ObjectHeader) == 12);
-
-
-
 
 #pragma pack(pop)
