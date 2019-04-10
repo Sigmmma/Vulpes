@@ -419,6 +419,56 @@ public:
     } network;
 }; static_assert(sizeof(UnitBiped) == SIZE_BIPED);
 
-
+class UnitVehicle : public ObjectUnit {
+public:
+    bool    _vehicle_unknown0 : 1;          // 4CC
+    bool    hovering : 1;
+    bool    crouched : 1;
+    bool    jumping : 1;
+    bool    _vehicle_unknown1 : 1;
+    bool    _vehicle_unknown2 : 3;
+    PAD(1);
+    PAD(2); // unknown int16
+    PAD(4); //unknown set of bytes          // 4D0
+    float   speed;                          // 4D4
+    float   slide;                          // 4D8
+    float   turn;                           // 4DC
+    float   tire_position;                  // 4E0
+    float   thread_position_left;           // 4E4
+    float   thread_position_right;          // 4E8
+    float   hover;                          // 4EC
+    float   thrust;                         // 4F0
+    int8_t  suspension_states[8];           // 4F4
+    Vec3d   hover_position;                 // 4FC
+    Vec3d   _vehicle_unknown3;              // 508
+    Vec3d   _vehicle_unknown4;              // 514
+    int32_t _vehicle_unknown5;              // 520
+    struct VehicleNetwork {
+        bool    time_valid;                 // 524
+        bool    baseline_valid;             // 525
+        int8_t  baseline_id;                // 526
+        int8_t  message_id;                 // 527
+        struct VehicleNetworkData {
+            bool    at_rest;
+            PAD(3);
+            Vec3d   position;
+            Vec3d   transitional_velocity;
+            Vec3d   angular_velocity;
+            Vec3d   forward;
+            Vec3d   up;
+        }; static_assert(sizeof(VehicleNetworkData) == 0x40);
+        VehicleNetworkData  update_baseline;// 528
+        bool    delta_valid; //? A comment reads 'unused'
+        PAD(3);
+        VehicleNetworkData  update_delta;   // 56C
+        int32_t last_moved_at_tick; // -1 if the vehicle is occupied  // 5AC
+        // For all gametypes except race this is the vehicle_block id
+        // For race this is the netgame_flag
+        int16_t scenario_respawn_id;        // 5B0
+        PAD(2);
+        // Only used to check if the vehicle should respawn it seems.
+        Vec3d   respawn_position; // unknown function. // 578
+    }network;
+}; static_assert(sizeof(UnitVehicle) == SIZE_VEHICLE);
 
 #pragma pack(pop)
