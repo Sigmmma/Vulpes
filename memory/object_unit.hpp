@@ -145,18 +145,18 @@ struct UnitControlBits {
 };
 
 struct UnitControlData {
-    int8_t animation_state;
-    int8_t aiming_speed;
+    int8_t      animation_state;
+    int8_t      aiming_speed;
     UnitControlBits bits;
-    int16_t weapon_index;
-    int16_t grenade_index;
-    int16_t zoom_index;
+    int16_t     weapon_index;
+    int16_t     grenade_index;
+    int16_t     zoom_index;
     PAD(2);
-    Vec3d throttle;
-    float primary_trigger;
-    Vec3d facing_vector;
-    Vec3d aiming_vector;
-    Vec3d looking_vector;
+    Vec3d       throttle;
+    float       primary_trigger;
+    Vec3d       facing_vector;
+    Vec3d       aiming_vector;
+    Vec3d       looking_vector;
 }; static_assert(sizeof(UnitControlData) == 0x40);
 
 struct AnimationState {
@@ -167,192 +167,196 @@ struct AnimationState {
 
 class ObjectUnit : public Object {
 public:
-    MemRef actor;
+    // functions:
+    void speak();
+
+    // members:
+    MemRef      actor;                          // 1F4
     struct {
-        MemRef actor;
-        MemRef next_unit;
-        MemRef prev_unit;
+        MemRef  actor;                          // 1F8
+        MemRef  next_unit;                      // 1FC
+        MemRef  prev_unit;                      // 200
     } swarm;
-    BITPAD(bool, 4); //unknown
-    bool powerup_on : 1;
-    bool powerup_additional : 1;
-    bool controllable : 1;
-    bool berserking : 1;
+    BITPAD(bool, 4); //unknown                  // 204
+    bool        powerup_on              : 1;
+    bool        powerup_additional      : 1;
+    bool        controllable            : 1;
+    bool        berserking              : 1;
     BITPAD(bool, 8); //unknown
     BITPAD(bool, 3); //unknown
-    bool unknown_bit19 : 1; // integrated_light_related
-    bool will_not_drop_items : 1;
-    bool unknown_bit21 : 1;
-    bool can_blink : 1;
-    bool impervious : 1; // prevents unit from being knocked around or playing ping animations
-    bool suspended : 1;
-    bool blind : 1;
-    bool unknown_bit26 : 1; // when this is on, the integrated NV power increases. rate is 2x the speed it leaks when on
+    bool        unknown_bit19           : 1; // integrated_light_related
+    bool        will_not_drop_items     : 1;
+    bool        unknown_bit21           : 1;
+    bool        can_blink               : 1;
+    bool        impervious              : 1; // prevents unit from being knocked around or playing ping animations
+    bool        suspended               : 1;
+    bool        blind                   : 1;
+    bool        unknown_bit26           : 1; // when this is on, the integrated NV power increases. rate is 2x the speed it leaks when on
     // Wtf is an NV??
-    bool possessed : 1;
-    bool desires_flashlight_on : 1;
-    bool desires_flashlight_off : 1;
+    bool        possessed               : 1;
+    bool        desires_flashlight_on   : 1;
+    bool        desires_flashlight_off  : 1;
     BITPAD(bool, 2);
-    UnitControlBits control_bits;
+    UnitControlBits control_bits;               // 208
     PAD(2);
-    PAD(2);
-    int8_t shield_sapping;
-    int8_t base_seat_id;
+    PAD(2);                                     // 20C
+    int8_t      shield_sapping;                 // 20E
+    int8_t      base_seat_id;                   // 20F
     struct {
-        int32_t ticks_remaining;
-        UnitControlBits bits;
+        int32_t         ticks_remaining;        // 210
+        UnitControlBits bits;                   // 214
         PAD(2);
-    } persistent_control;
-    MemRef controlling_player;
-    int16_t ai_effect_type; // enum
-    int16_t emotion_animation_id;
-    int32_t next_ai_effect_tick;
-    Vec3d desired_facing_vector;
-    Vec3d desired_aiming_vector;
-    Vec3d aiming_vector;
-    Vec3d aiming_velocity;
-    Euler3d looking_angles;
-    Vec3d looking_vector;
-    Vec3d looking_velocity;
-    Vec3d throttle;
-    float primary_trigger;
-    int8_t aiming_speed; // enum?
-    int8_t melee_state; // enum, guess
-    int8_t melee_timer; // guess
-    int8_t ticks_until_flame_to_death;
+    }           persistent_control;
+    MemRef      controlling_player;             // 218
+    int16_t     ai_effect_type; // enum         // 21C
+    int16_t     emotion_animation_id;           // 21E
+    int32_t     next_ai_effect_tick;            // 220
+    Vec3d       desired_facing_vector;          // 224
+    Vec3d       desired_aiming_vector;          // 230
+    Vec3d       aiming_vector;                  // 23C
+    Vec3d       aiming_velocity;                // 248
+    Euler3d     looking_angles;                 // 254
+    Vec3d       looking_vector;                 // 260
+    Vec3d       looking_velocity;               // 26C
+    Vec3d       throttle;                       // 278
+    float       primary_trigger;                // 284
+    int8_t      aiming_speed; // enum?          // 288
+    int8_t      melee_state; // enum, guess     // 289
+    int8_t      melee_timer; // guess           // 28A
+    int8_t      ticks_until_flame_to_death;     // 28B
     // also set to the same PersistentControlTicks value when an actor dies and they fire-wildely
-    int8_t ping_animation_ticks_left;
-    UnitThrowingGrenadeState grenade_state;
-    int16_t _unknown20;
-    int16_t _unknown21;
-    PAD(2);
-    int16_t grenade_projectile;
+    int8_t      ping_animation_ticks_left;      // 28C
+    UnitThrowingGrenadeState grenade_state;     // 28D
+    int16_t     _unknown20;                     // 28E
+    int16_t     _unknown21;                     // 290
+    PAD(2);                                     // 292
+    MemRef     grenade_projectile;              // 294
     struct UnitAnimationData {
-        bool animation_bit0_unknown : 1;
-        bool animation_bit1_unknown : 1;
-        bool animation_bit2_unknown : 1;
-        bool animation_bit3_unknown : 1;
+        bool    animation_bit0_unknown : 1;     // 298
+        bool    animation_bit1_unknown : 1;
+        bool    animation_bit2_unknown : 1;
+        bool    animation_bit3_unknown : 1;
         BITPAD(bool, 4);
         PAD(1);
-        int16_t _unknown_some_animation_index_maybe;
-        int16_t _unknown_some_animation_index;
-        PAD(2); // Only set on initialization, never read afterwards.
+        int16_t _unknown_some_animation_index_maybe; // 29A
+        int16_t _unknown_some_animation_index;       // 29C
+        PAD(2); // Only set on initialization, never read afterwards.//29C
         // animation graph unit indexes
-        int8_t seat_id;
-        int8_t seat_weapon_id;
-        int8_t weapon_type_id;
+        int8_t  seat_id;                             // 2A0
+        int8_t  seat_weapon_id;                      // 2A1
+        int8_t  weapon_type_id;                      // 2A2
 
-        UnitAnimationState state;
-        UnitReplacementAnimationState replacement_state;
-        UnitOverlayAnimationState overlay_state;
-        UnitAnimationState desired_state;
-        UnitBaseSeat base_seat;
-        int8_t emotion;
+        UnitAnimationState              state;              // 2A3
+        UnitReplacementAnimationState   replacement_state;  // 2A4
+        UnitOverlayAnimationState       overlay_state;      // 2A5
+        UnitAnimationState              desired_state;      // 2A6
+        UnitBaseSeat                    base_seat;          // 2A7
+        int8_t                          emotion;            // 2A8
         PAD(1);
-        AnimationState replacement_animation;
-        AnimationState overlay_state_animation;
-        AnimationState weapon_ik;
-        bool update_look;           // Set when bounds below change
-        bool update_aim;            //
-        Rectangle2d looking_bounds;
-        Rectangle2d aiming_bounds;
-        PAD(8);
+        AnimationState  replacement_animation;              // 2AA
+        AnimationState  overlay_state_animation;            // 2AE
+        AnimationState  weapon_ik;                          // 2B2
+        bool            update_look; // Set when bounds below change // 2B6
+        bool            update_aim;                         // 2B7
+        Rectangle2d     looking_bounds;                     // 2B8
+        Rectangle2d     aiming_bounds;                      // 2C8
+        PAD(8);                                             // 2D8
     } animation; static_assert(sizeof(UnitAnimationData) == 0x48);
 
-    float ambient;
-    float illumination;
-    float mouth_factor;
+    float       ambient;                            // 2E0
+    float       illumination;                       // 2E4
+    float       mouth_factor;                       // 2E8
     PAD(4);
-    int16_t vehicle_seat_id;
-    int16_t current_weapon_id;
-    int16_t next_weapon_id;
+    int16_t     vehicle_seat_id;                    // 2F0
+    int16_t     current_weapon_id;                  // 2F2
+    int16_t     next_weapon_id;                     // 2F4
     PAD(2);
-    MemRef weapons[4];
-    int32_t weapon_ready_ticks[4];
-    MemRef equipment_id;
-    int8_t current_grenade_id;
-    int8_t next_grenade_id;
-    uint8_t grenade_counts[2];
-    // Opensauce is weird and has this defined as a unit_control
+    MemRef      weapons[4];                         // 2F8
+    int32_t     weapon_ready_ticks[4];              // 308
+    MemRef      equipment_id;                       // 318
+    int8_t      current_grenade_id;                 // 31C
+    int8_t      next_grenade_id;                    // 31D
+    uint8_t     grenade_counts[2];                  // 31E
+    // Opensauce is weird and has this defined as a union
     // so it can be two extra grenade counts when unzoomed.
-    uint8_t zoom_level;
-    uint8_t desired_zoom_level;
+    uint8_t     zoom_level;                         // 320
+    uint8_t     desired_zoom_level;                 // 321
     // End of opensauce shenanigans
-    int8_t ticks_since_last_vehicle_speech;
-    uint8_t aiming_change;
-    MemRef powered_seats_riders[2];
+    int8_t      ticks_since_last_vehicle_speech;    // 322
+    uint8_t     aiming_change;                      // 323
+    MemRef      powered_seats_riders[2];            // 324
     // these are related
-    MemRef _unknown22;
-    int32_t _some_tick_time;
+    MemRef      _unknown22;                         // 32C
+    int32_t     _some_tick_time;                    // 330
     //
-    int16_t encounter_id;
-    int16_t squad_id;
-    float powered_seats_power[2];
-    float integrated_light_power;
-    float integrated_light_toggle_power; // minimum power for a toggle?
-    float integrated_night_vision_toggle_power;
-    Vec3d seat_related[4]; //unknown
-    float camo_power;
-    float full_spectrum_vision_power; // gets updated, but not used.
-    MemRef dialogue_definition;
-    struct {
+    int16_t     encounter_id;                       // 334
+    int16_t     squad_id;                           // 336
+    float       powered_seats_power[2];             // 338
+    float       integrated_light_power;             // 340
+    float       integrated_light_toggle_power;      // 344 // minimum power for a toggle?
+    float       integrated_night_vision_toggle_power;//348
+    Vec3d       seat_related[4]; //unknown          // 34C
+    float       camo_power;                         // 37C
+    float       full_spectrum_vision_power;         // 380 // gets updated, but not used.
+    MemRef      dialogue_definition;                // 384
+    struct UnitSpeechData {
         struct UnitSpeech {
-            UnitSpeechPriority priority;
-            UnitScreamType scream_type;
-            MemRef sound_tag;
-            int16_t ticks; //unknown
+            UnitSpeechPriority priority;            // 388 // 3B8
+            UnitScreamType  scream_type;            // 38A // 3BA
+            MemRef          sound_tag;              // 38C // 3BC
+            int16_t         ticks; //unknown        // 390 // 3A0
             PAD(2);
-            int32_t _unknown;
-            AiCommunicationPacket ai_communication_info;
+            int32_t         _unknown;               // 394 // 3A4
+            AiCommunicationPacket ai_communication_info;// 398 // 3A8
         }; static_assert(sizeof(UnitSpeech) == 0x30);
-        UnitSpeech current;
-        UnitSpeech next;
-        int16_t _unknown0;
-        int16_t _unknown1;
-        int16_t _unknown2;
-        int16_t _unknown3;
-        int32_t _unknown4;
-        bool _unknown6;
-        bool _unknown7;
-        bool _unknown8;
+        UnitSpeech  current;
+        UnitSpeech  next;
+        int16_t     _unknown0;                      // 3E8
+        int16_t     _unknown1;                      // 3EA
+        int16_t     _unknown2;                      // 3EC
+        int16_t     _unknown3;                      // 3EE
+        int32_t     _unknown4;                      // 3F0
+        bool        _unknown6;                      // 3F4
+        bool        _unknown7;                      // 3F5
+        bool        _unknown8;                      // 3F6
         PAD(1);
-        int16_t _unknown9;
-        int16_t _unknown10;
-        int16_t _unknown11;
-        int16_t _unknown12;
-        int32_t _unknown13;
-    } speech;
+        int16_t     _unknown9;                      // 3F8
+        int16_t     _unknown10;                     // 3FA
+        int16_t     _unknown11;                     // 3FC
+        int16_t     _unknown12;                     // 3FE
+        int32_t     _unknown13;                     // 400
+    } speech; static_assert(sizeof(speech) == sizeof(UnitSpeechData::UnitSpeech)*2 + 0x1C);
     struct {
-        DamageCategory catagory;
-        int16_t ai_ticks_until_handle;
-        float amount;
-        MemRef responsible_unit;
-    }damage_result;
-    MemRef object_flame_causer; // Object that caused flaming death
-    float _unknown23;
+        DamageCategory  catagory;                   // 404
+        int16_t         ai_ticks_until_handle;      // 406
+        float           amount;                     // 408
+        MemRef          responsible_unit;           // 40C
+    }           damage_result;
+    MemRef      object_flame_causer;                // 410 // Object that caused flaming death
+    float       _unknown23;                         // 414
     PAD(4);
-    int32_t died_at_tick;
-    int16_t feign_death_timer;
-    bool camo_regrowth;
+    int32_t     died_at_tick;                       // 41C
+    int16_t     feign_death_timer;                  // 420
+    bool        camo_regrowth;                      // 422
     PAD(1);
-    float stun;
-    int16_t stun_ticks;
-    int16_t spree_count;
-    int32_t spree_starting_time;
+    float       stun;                               // 424
+    int16_t     stun_ticks;                         // 428
+    int16_t     spree_count;                        // 42A
+    int32_t     spree_starting_time;                // 42C
     struct UnitRecentDamage {
-        int32_t tick;
-        float damage;
-        MemRef responsible_unit;
-        MemRef responsible_player;
+        int32_t tick;                               // 430 // 440 // 450 // 460
+        float   damage;                             // 434 // 444 // 454 // 464
+        MemRef  responsible_unit;                   // 438 // 448 // 458 // 468
+        MemRef  responsible_player;                 // 43C // 44C // 45C // 46C
     } recent_damage[4];
-    PAD(4);
-    PAD(2); //Unused network bools
-    uint8_t opensauce_zoom_level;
-    uint8_t opensauce_desired_zoom_level;
-    UnitControlData control_data;
-    bool last_completed_client_update_valid;
+    PAD(4);                                         // 470
+    PAD(2); //Unused network bools                  // 474
+    uint8_t     opensauce_zoom_level;               // 476
+    uint8_t     opensauce_desired_zoom_level;       // 477
+    UnitControlData control_data;                   // 478
+    bool        last_completed_client_update_valid; // 4B8
     PAD(3);
-    int32_t last_complted_client_update_id;
+    int32_t     last_completed_client_update_id;    // 4BC
     PAD(3*4);
 }; static_assert(sizeof(ObjectUnit) == SIZE_UNIT);
 
@@ -428,7 +432,7 @@ public:
     bool    _vehicle_unknown1 : 1;
     bool    _vehicle_unknown2 : 3;
     PAD(1);
-    PAD(2); // unknown int16
+    PAD(2); // unknown int16                // 4CD
     PAD(4); //unknown set of bytes          // 4D0
     float   speed;                          // 4D4
     float   slide;                          // 4D8
