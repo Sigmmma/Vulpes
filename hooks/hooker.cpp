@@ -92,7 +92,7 @@ CodePatch::CodePatch(const char * d_name){
 
 void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
     printf("Building CodePatch %s...", name);
-    assert(redirect_to >= get_lowest_permitted_address());
+    assert(p_address >= get_lowest_permitted_address());
     patch_address = p_address; size = p_size; type = p_type; redirect_address = redirect_to;
 
     applied = false;
