@@ -1,6 +1,6 @@
 #pragma once
 
-enum class DamageCategory {
+enum class DamageCategory : int16_t {
     NONE = 0,
     FALLING,
     BULLET,
