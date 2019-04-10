@@ -70,12 +70,14 @@ public:
 };
 
 class RGBFloat {
+public:
     float red;
     float green;
     float blue;
 };
 
 class ARGBFloat {
+public:
     float alpha;
     float red;
     float green;
@@ -83,8 +85,17 @@ class ARGBFloat {
 };
 
 class Rectangle2d {
+public:
     float t;
     float l;
     float b;
     float r;
+};
+
+class Plane3d {
+public:
+    float x;
+    float y;
+    float z;
+    float d;
 };
