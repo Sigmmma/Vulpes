@@ -364,56 +364,56 @@ enum class BipedMovementState : int8_t {
 
 class UnitBiped : public ObjectUnit {
 public:
-    bool airborne : 1;
-    bool slipping : 1;
-    bool absolute_movement : 1;
-    bool no_collision : 1;
-    bool passes_through_other_bipeds : 1;
-    bool limping2 : 1;
+    bool        airborne : 1;
+    bool        slipping : 1;
+    bool        absolute_movement : 1;
+    bool        no_collision : 1;
+    bool        passes_through_other_bipeds : 1;
+    bool        limping2 : 1;
     BITPAD(bool, 2); //unknown
     PAD(3); // unknown flags?
     // I expect these to be stun related
-    int8_t landing_timer; // counts up whe biped lands, gets higher depending on height.
-    int8_t landing_force; // instantly changes when landing. Depends on how hard the fall was.
+    int8_t      landing_timer; // counts up whe biped lands, gets higher depending on height.
+    int8_t      landing_force; // instantly changes when landing. Depends on how hard the fall was.
     BipedMovementState movement_state;
     PAD(1);
-    int32_t _biped_unknown3;
-    uint32_t action_flags; // Something to do with walking and jumping
+    int32_t     _biped_unknown3;
+    uint32_t    action_flags; // Something to do with walking and jumping
                     // maybe another set of control flags
-    int32_t _biped_unknown4;
-    Vec3d biped_position;
-    int32_t walking_counter; //? Counts up when moving
+    int32_t     _biped_unknown4;
+    Vec3d       biped_position;
+    int32_t     walking_counter; //? Counts up when moving
     PAD(3*4); //unknown
-    MemRef bump_object; //references the object that this biped last bumped into.
-    int8_t ticks_since_last_bump;
-    int8_t airborne_ticks;
-    int8_t slipping_ticks; // counts up when hit by nade
-    int8_t digital_throttle;
-    int8_t jump_ticks;
-    int8_t melee_ticks;
-    int8_t melee_inflict_ticks;
+    MemRef      bump_object; //references the object that this biped last bumped into.
+    int8_t      ticks_since_last_bump;
+    int8_t      airborne_ticks;
+    int8_t      slipping_ticks; // counts up when hit by nade
+    int8_t      digital_throttle;
+    int8_t      jump_ticks;
+    int8_t      melee_ticks;
+    int8_t      melee_inflict_ticks;
     PAD(1);
-    int16_t _biped_unknown2;
+    int16_t     _biped_unknown2;
     PAD(2);
-    float crouch_scale;
-    float _biped_unknown1;
-    Plane3d _biped_unknown_physics_related;
+    float       crouch_scale;
+    float       _biped_unknown1;
+    Plane3d     _biped_unknown_physics_related;
     PAD(2); //two unknown signed bytes
     struct BipedNetwork {
-        bool baseline_valid;
-        int8_t baseline_id;
-        int8_t message_id;
+        bool    baseline_valid;
+        int8_t  baseline_id;
+        int8_t  message_id;
         PAD(3);
         struct BipedNetworkDelta {
-            int8_t grenade_counts[2];
+            int8_t  grenade_counts[2];
             PAD(2);
-            float body_vitality;
-            float shield_vitality;
-            bool shield_stun_ticks_greater_than_zero;
+            float   body_vitality;
+            float   shield_vitality;
+            bool    shield_stun_ticks_greater_than_zero;
             PAD(3);
         }; static_assert(sizeof(BipedNetworkDelta) == 0x10);
         BipedNetworkDelta update_baseline;
-        bool delta_valid;
+        bool    delta_valid;
         PAD(3);
         BipedNetworkDelta update_delta;
     } network;
