@@ -164,11 +164,23 @@ struct AnimationState {
     int16_t frame_id;
 };
 
+struct UnitSpeech {
+    UnitSpeechPriority priority;            // 388 // 3B8
+    UnitScreamType  scream_type;            // 38A // 3BA
+    MemRef          sound_tag;              // 38C // 3BC
+    int16_t         ticks; //unknown        // 390 // 3A0
+    int16_t         _unknown2;              // 392 // 3A2
+    int32_t         _unknown;               // 394 // 3A4
+    AiCommunicationPacket ai_communication_info;// 398 // 3A8
+}; static_assert(sizeof(UnitSpeech) == 0x30);
 
 class ObjectUnit : public Object {
 public:
     // functions:
-    void speak();
+
+    void speak(AiCommunicationType type,
+               int16_t arg2,
+               UnitSpeech new_speech);
 
     // members:
     MemRef      actor;                          // 1F4
@@ -177,7 +189,8 @@ public:
         MemRef  next_unit;                      // 1FC
         MemRef  prev_unit;                      // 200
     } swarm;
-    BITPAD(bool, 4); //unknown                  // 204
+    bool        _unknown_bit487         : 1; // checked by biped_speech_update
+    BITPAD(bool, 3); //unknown                  // 204
     bool        powerup_on              : 1;
     bool        powerup_additional      : 1;
     bool        controllable            : 1;
@@ -300,20 +313,11 @@ public:
     float       full_spectrum_vision_power;         // 380 // gets updated, but not used.
     MemRef      dialogue_definition;                // 384
     struct UnitSpeechData {
-        struct UnitSpeech {
-            UnitSpeechPriority priority;            // 388 // 3B8
-            UnitScreamType  scream_type;            // 38A // 3BA
-            MemRef          sound_tag;              // 38C // 3BC
-            int16_t         ticks; //unknown        // 390 // 3A0
-            PAD(2);
-            int32_t         _unknown;               // 394 // 3A4
-            AiCommunicationPacket ai_communication_info;// 398 // 3A8
-        }; static_assert(sizeof(UnitSpeech) == 0x30);
         UnitSpeech  current;
         UnitSpeech  next;
-        int16_t     _unknown0;                      // 3E8
-        int16_t     _unknown1;                      // 3EA
-        int16_t     _unknown2;                      // 3EC
+        int16_t     _unknown0;                      // 3E8 speech_ticks_left?
+        int16_t     _unknown1;                      // 3EA speech_ticks_left?
+        int16_t     _unknown2;                      // 3EC speech_ticks_left?
         int16_t     _unknown3;                      // 3EE
         int32_t     _unknown4;                      // 3F0
         bool        _unknown6;                      // 3F4
@@ -322,10 +326,10 @@ public:
         PAD(1);
         int16_t     _unknown9;                      // 3F8
         int16_t     _unknown10;                     // 3FA
-        int16_t     _unknown11;                     // 3FC
+        int16_t     _unknown11;                     // 3FC copied from current._unknown2
         int16_t     _unknown12;                     // 3FE
-        int32_t     _unknown13;                     // 400
-    } speech; static_assert(sizeof(speech) == sizeof(UnitSpeechData::UnitSpeech)*2 + 0x1C);
+        int32_t     _unknown13;                     // 400 set to -1 if _unknown10 becomes 0
+    } speech; static_assert(sizeof(speech) == sizeof(UnitSpeech)*2 + 0x1C);
     struct {
         DamageCategory  catagory;                   // 404
         int16_t         ai_ticks_until_handle;      // 406
