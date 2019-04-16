@@ -6,6 +6,8 @@
 #define PAD(s) uint8_t CONCAT2(padding, __LINE__)[s]
 #define BITPAD(type,s) type CONCAT2(padding, __LINE__) : s
 
+#define NULL __null
+
 // Class for references in Halo memory. Not the same as TagRef.
 class MemRef {
 public:
