@@ -183,7 +183,7 @@ public:
     int16_t variant_id; // for region permuations.
     MemRef player;
     MemRef owner_object;
-    PAD(4);
+    MemRef self_ref; // Member added for Vulpes. Helps with calling Halo functions.
     struct ObjectAnimationData {
         MemRef tag;
         int16_t id;
