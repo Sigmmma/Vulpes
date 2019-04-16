@@ -1,0 +1,49 @@
+#include "bitstream.hpp"
+
+#include "../../hooks/hooker.hpp"
+
+Signature(true, sig_bitstream_write,
+    { 0x53, 0x55, 0x8B, 0x6C, 0x24, 0x0C, 0x85, 0xED, 0x56, 0x57, 0x8B, 0xF0, 0x8B, 0xD9, 0x8B, 0xFD, 0x7E });
+Signature(true, sig_bitstream_read,
+    { 0x53, 0x55, 0x8B, 0x6C, 0x24, 0x0C, 0x56, 0x8B, 0xF0, 0x33, 0xDB, 0x85, 0xF6, 0x57, 0x8B, 0xF9, 0x7E });
+
+static uintptr_t func_bitstream_write_ptr;
+static uintptr_t func_bitstream_read_ptr;
+
+
+__attribute__((naked))
+void bitstream_write(void* const iteration_header,
+                 uint32_t* const write_this,
+                         int32_t num_bits){
+    asm (
+        "mov ecx, [esp+4];\n"
+        "mov eax, [esp+8];\n"
+        "mov edx, [esp+0xC];\n"
+        "push edx;\n"
+        "call %0;\n"
+        "add esp, 4;\n"
+        "ret;\n"
+        : "+m" (func_bitstream_write_ptr)
+    );
+}
+
+__attribute__((naked))
+void bitstream_read(void* const iteration_header,
+                uint32_t* const write_here,
+                        int32_t num_bits){
+    asm (
+        "mov edx, [esp+4];\n"
+        "mov ecx, [esp+8];\n"
+        "mov eax, [esp+0xC];\n"
+        "push edx;\n"
+        "call %0;\n"
+        "add esp, 4;\n"
+        "ret;\n"
+        : "+m" (func_bitstream_read_ptr)
+    );
+}
+
+void init_bitstream(){
+    func_bitstream_write_ptr = sig_bitstream_write.get_address();
+    func_bitstream_read_ptr  = sig_bitstream_read.get_address();
+}

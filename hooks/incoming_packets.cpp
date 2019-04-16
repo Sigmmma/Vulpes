@@ -1,7 +1,7 @@
 #include "incoming_packets.hpp"
 
 #include <cstdint>
-#include "../network/message_delta_definitions.hpp"
+#include "../network/message_delta/unencoded_messages.hpp"
 #include "hooker.hpp"
 #include <cstdio>
 

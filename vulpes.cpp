@@ -16,13 +16,30 @@ void revert_hooks(){
 
 #include "halo_bug_fixes/cpu_usage.hpp"
 #include "halo_bug_fixes/file_handle_leak.hpp"
+#include "halo_bug_fixes/host_refusal.hpp"
 void init_halo_bug_fixes(){
     init_cpu_usage_fixes();
     init_file_handle_leak_fixes();
+    init_host_refusal_fixes();
 }
+
 void revert_halo_bug_fixes(){
     revert_cpu_usage_fixes();
     revert_file_handle_leak_fixes();
+    revert_host_refusal_fixes();
+}
+
+#include "memory/table.hpp"
+void init_memory(){
+    init_tables();
+}
+
+#include "network/message_delta/definition.hpp"
+#include "network/message_delta/bitstream.hpp"
+
+void init_network(){
+    init_new_definitions();
+    init_bitstream();
 }
 
 #include "fox.h"
@@ -55,6 +72,8 @@ void init_vulpes(){
 
     init_hooks();
     init_halo_bug_fixes();
+    //init_memory();
+    init_network();
 
     // This is temporary until we can properly replace sapp.
     if (server){
