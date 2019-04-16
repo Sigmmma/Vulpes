@@ -73,14 +73,14 @@ struct MessageDeltaDefinition {
     int32_t max_iterations = 1; // 14
     bool initialized = false; // 18
     PAD(3);
-    uintptr_t header_field_set = 0xA52228; // 1C // this is the sapien pointer
+    int32_t* header_field_set; // 1C // this is the sapien pointer
     struct {
         int32_t field_count; // 20
         int32_t max_data_size = -1; // 24
     }body_field_set;
 }; //static_assert(sizeof(MessageDeltaFieldPropertyDefinition) == 0x74);
-
+/*
 const uintptr_t header_field_set_ptr_client = 0x6225E0;
-//const uintptr_t header_field_set_ptr_server =;
-
+const uintptr_t header_field_set_ptr_server =;
+*/
 void init_new_definitions();

@@ -69,12 +69,16 @@ void case57(){
     );
 }*/
 
-void init_vulpes_message_delta(){
 
+int32_t header_field_set[10];
+
+
+void init_vulpes_message_delta(){
+    header_field_set[1] = -1;
     //vulpes_msg_def.header.name = "vulpes_message";
     vulpes_msg_def.header.type = 0x39;
     vulpes_msg_def.header.initialized = true;
-    vulpes_msg_def.header.header_field_set = header_field_set_ptr_client;
+    vulpes_msg_def.header.header_field_set = header_field_set;
     vulpes_msg_def.header.body_field_set.field_count = 1;
 
     char str_vulpes_message_data[] = "vulpes_message_data";
