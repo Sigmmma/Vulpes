@@ -125,6 +125,13 @@ void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uin
             used_area = 5;
             write_pointer = true;
             break;
+        case JA_PATCH :
+            assert(size >= 6);
+            patched_code.push_back(CONDJ_BYTE);
+            patched_code.push_back(JA_BYTE);
+            used_area = 6;
+            write_pointer = true;
+            break;
         case SKIP_PATCH :
             if (size < 5){
                 used_area = 0;
@@ -147,7 +154,7 @@ void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uin
     if (write_pointer){
         // The version of the call and jmp instructions we use jump to the address
         // relative to the start of the instruction + the size of the instruction.
-        uintptr_t relative_address_int = redirect_address - patch_address - 5;
+        uintptr_t relative_address_int = redirect_address - patch_address - used_area;
         // Get the bytes that make up the address in the order that they are stored in memory.
         uint8_t* relative_address_bytes = reinterpret_cast<uint8_t*>(&relative_address_int);
         for (int i = 0; i < 4; i++){
@@ -275,7 +282,6 @@ bool CodePatch::is_built(){
 }
 
 std::vector<int16_t> CodePatch::get_bytes_from_patch_address(){
-    assert(patch_is_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
     std::vector<int16_t> found_code;
     for (int i = 0; i < size; i++){
@@ -299,7 +305,7 @@ uintptr_t CodePatch::get_return_address(){
     return return_address;
 }
 
-uintptr_t get_call_address(uintptr_t call_pointer){
+uintptr_t get_call_address(intptr_t call_pointer){
     uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
     if (call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9){
         return (*reinterpret_cast<uintptr_t*>(call_pointer + 1) + call_pointer + 5);
