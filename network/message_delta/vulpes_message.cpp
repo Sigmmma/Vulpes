@@ -4,15 +4,15 @@
 
 #include <cstring>
 
-/*
+__attribute__((cdecl))
 void handle_vulpes_message(MessageDeltaHeader* header){
     VulpesMessage decoded_message;
 
-    if (mdp_decode_stateless_iterated(header, (void*)&decoded_message)){
-        process_vulpes_message(&decoded_message);
-    };
+    //if (mdp_decode_stateless_iterated(header, (void*)&decoded_message)){
+    //    process_vulpes_message(&decoded_message);
+    //};
 }
-*/
+
 __attribute__((cdecl))
 void encode_vulpes_message(const MessageDeltaFieldPropertyDefinition* const definition,
                            int32_t        bytes_left,
@@ -56,22 +56,8 @@ struct vulpes_message_definition {
     MessageDeltaDefinition header;
     MessageDeltaFieldReferenceDefinition body;
 } vulpes_msg_def;
-/*
-// our own insert into the jumptable
-__attribute__((naked))
-void case57(){
-    asm (
-        "call _handle_vulpes_message;\n"
-        "mov %0, 0;\n"
-        "pop esi;\n"
-        "ret;\n"
-        : "+m" (network_related_bool)
-    );
-}*/
-
 
 int32_t header_field_set[10];
-
 
 void init_vulpes_message_delta(){
     header_field_set[1] = -1;
