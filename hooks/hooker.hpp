@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "hooker_structs.hpp"
+
 // Macro for CodeSignature, this is to make it so we don't have to repeat ourselves too much.
 #define Signature(required, name, ...) CodeSignature name(required, #name, 0, 0, std::vector<int16_t>(__VA_ARGS__))
 #define SignatureBounded(required, name, lowest_address, highest_address, ...) CodeSignature name(required, #name, lowest_address, highest_address, std::vector<int16_t>(__VA_ARGS__))
@@ -12,7 +14,11 @@ class CodeSignature {
 public:
     // Initializers
     // If lowest search address and/or highest_search address are 0 they default to the bounds above.
-    CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature);
+    CodeSignature(bool required,
+                  const char* d_name,
+                  uintptr_t lowest_search_address,
+                  uintptr_t highest_search_address,
+                  std::vector<int16_t> signature);
 
     // Returns the address and does a search if it hasn't already.
     // Returns 0 if address is not found.
@@ -35,6 +41,7 @@ enum PatchTypes {
     NOP_PATCH,  // NOPs out the code so it does nothing.
     CALL_PATCH, // Makes a function call to redirect_to.
     JMP_PATCH,  // Makes a jump to redirect_to.
+    JA_PATCH,  // Makes a conditional jump to redirect_to.
     SKIP_PATCH,  // Puts a jmp at the start of the patch area which jumps to the end of the patch area. Pads the rest with NOPs.
     MANUAL_PATCH // Requires you to pass your own bytes to write at the given area.
 };
@@ -46,7 +53,7 @@ enum PatchTypes {
 class CodePatch {
 public:
     // Initlializers.
-    CodePatch(const char * d_name);
+    CodePatch(const char* d_name);
 
     ////// Main functions.
     void build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
@@ -82,12 +89,6 @@ public:
     // Returns the bytes that the patch would put at the patch address.
     std::vector<int16_t> get_patched_bytes();
 private:
-    enum InstructionBytes : uint8_t {
-        NOP_BYTE  = 0x90,
-        CALL_BYTE = 0xE8,
-        JMP_BYTE  = 0xE9,
-        JMP_SMALL_BYTE = 0xEB
-    };
     uintptr_t patch_address;
     uintptr_t redirect_address;
     uintptr_t return_address;
