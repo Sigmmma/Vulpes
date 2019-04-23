@@ -17,10 +17,13 @@ build:
 	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
 
 	g++ -c halo_functions/object_unit.cpp $(ARGS) -o bin/halo_functions__object_unit.o
+	g++ -c halo_functions/console.cpp $(ARGS) -o bin/halo_functions__console.o
+	g++ -c halo_functions/devmode.cpp $(ARGS) -o bin/halo_functions__devmode.o
 
 	g++ -c halo_bug_fixes/cpu_usage.cpp $(ARGS) -o bin/halo_bug_fixes__cpu_usage.o
 	g++ -c halo_bug_fixes/file_handle_leak.cpp $(ARGS) -o bin/halo_bug_fixes__file_handle_leak.o
 	g++ -c halo_bug_fixes/host_refusal.cpp $(ARGS) -o bin/halo_bug_fixes__host_refusal.o
+	g++ -c halo_bug_fixes/string_overflows.cpp $(ARGS) -o bin/halo_bug_fixes__string_overflows.o
 
 	g++ -c memory/types.cpp $(ARGSDEF) -o bin/memory__types.o
 	g++ -c memory/object.cpp $(ARGSDEF) -o bin/memory__object.o
