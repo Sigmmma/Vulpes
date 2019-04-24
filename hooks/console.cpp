@@ -33,7 +33,6 @@ void evaluate_command(const char** input){
     };
 }
 
-static intptr_t func_halo_strncpy;
 static intptr_t func_evaluate_command = (intptr_t)&evaluate_command;
 static intptr_t jmp_return_addr;
 static intptr_t jmp_return_cancel;
@@ -51,7 +50,6 @@ void console_in_hook(){
         "cmp si, bx;\n"
         "jle not_recognized_by_halo;\n"
     "loop:\n"
-        //"jmp %[j_return];\n"
         "movsx   ecx, si;\n"
         "mov     edx, [esp+ecx*4+0x104];\n"
         "push    edx;\n"
