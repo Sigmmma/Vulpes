@@ -7,11 +7,14 @@ static bool server;
 
 #include "hooks/hooker.hpp"
 #include "hooks/incoming_packets.hpp"
+#include "hooks/console.hpp"
 void init_hooks(){
     init_incoming_packet_hooks();
+    init_console_hooks();
 }
 void revert_hooks(){
     revert_incoming_packet_hooks();
+    revert_console_hooks();
 }
 
 #include "halo_bug_fixes/cpu_usage.hpp"
@@ -35,6 +38,9 @@ void revert_halo_bug_fixes(){
 #include "memory/table.hpp"
 void init_memory(){
     init_tables();
+}
+
+void init_halo_functions(){
 }
 
 #include "network/message_delta/definition.hpp"
@@ -75,6 +81,7 @@ void init_vulpes(){
 
     init_hooks();
     init_halo_bug_fixes();
+    init_halo_functions();
     //init_memory();
     init_network();
 
