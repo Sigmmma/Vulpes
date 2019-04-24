@@ -20,6 +20,7 @@ union {
 
     uint32_t raw;
 };
+    bool valid();
     // TODO: Implement functions to retrieve corresponding memory objects.
 };
 
@@ -80,10 +81,10 @@ public:
 
 class ARGBFloat {
 public:
-    float alpha;
-    float red;
-    float green;
-    float blue;
+    float alpha = 1.0;
+    float red = 1.0;
+    float green = 1.0;
+    float blue = 1.0;
 };
 
 class Rectangle2d {
