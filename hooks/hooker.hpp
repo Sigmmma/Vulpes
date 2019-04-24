@@ -104,7 +104,7 @@ private:
 };
 
 // Gets the direct pointer to whatever the instruction at this address CALLs or JUMPs to.
-uintptr_t get_call_address(uintptr_t call_pointer);
+uintptr_t get_call_address(intptr_t call_pointer);
 
 // These are initialization functions, these should rarely actually be called.
 uintptr_t get_lowest_permitted_address();
