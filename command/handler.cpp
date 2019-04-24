@@ -10,6 +10,6 @@ int16_t auto_complete(char** const buffer, int16_t current_index, const char* co
 
         buffer[current_index] = f;
         current_index++;
-    }
+    };
     return current_index;
 }
