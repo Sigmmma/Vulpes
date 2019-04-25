@@ -1,6 +1,6 @@
 #include "hooker.hpp"
 #include <cstdint>
-#include <string.h>
+#include <strings.h>
 #include "../halo_functions/console.hpp"
 #include "../command/handler.hpp"
 
@@ -26,7 +26,7 @@ void evaluate_command(const char** input){
     cancel_default_routine = false;
     printf("%s", input_str);
     // fooox
-    if (strncmp("fox", input_str, 0xFF) == 0){
+    if (strcasecmp("fox", input_str) == 0){
         printf("%s", "caught");
         console_out("EEEEEEEEP!");
         cancel_default_routine = true;
@@ -40,9 +40,12 @@ static intptr_t jmp_return_continue;
 static intptr_t console_input_ptr;
 // We wouldn't need a jump to whatever the fuck this is if kava didn't have such
 // an assinine cmd cancel
+static intptr_t func_stricmp = (intptr_t)&strcasecmp;
 static intptr_t whateverthefuck;
 
 // Blame Kavawuvi's chimera for making this overly complicated
+
+// TODO, rewrite most of this garbage in C++ so we don't have to look at it anymore
 __attribute__((naked))
 void console_in_hook(){
     asm (
@@ -55,6 +58,7 @@ void console_in_hook(){
         "push    edx;\n"
         "lea eax, [esp+0xC];\n"
         "push    eax;\n"
+        "call %[stricmp];\n"
         "add     esp, 8;\n"
         "test    eax, eax;\n"
         "jz whatever;\n"
@@ -66,6 +70,7 @@ void console_in_hook(){
         "push %[input];\n"
         "call %[eval_cmd];\n"
         "add esp, 4;\n"
+
         "cmp %[cancel], 0;\n"
         "jne ret_cancel;\n"
         "jmp %[j_return_continue];\n"
@@ -79,7 +84,8 @@ void console_in_hook(){
           [j_return_cancel] "m" (jmp_return_cancel),
           [j_return_continue] "m" (jmp_return_continue),
           [input] "m" (console_input_ptr),
-          [whatevertf] "m" (whateverthefuck)
+          [whatevertf] "m" (whateverthefuck),
+          [stricmp] "m" (func_stricmp)
     );
 }
 
