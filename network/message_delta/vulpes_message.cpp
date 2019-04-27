@@ -1,16 +1,16 @@
 #include "bitstream.hpp"
 #include "unencoded_messages.hpp"
 #include "definition.hpp"
-
+#include "message_delta_processor.hpp"
 #include <cstring>
 
 __attribute__((cdecl))
 void handle_vulpes_message(MessageDeltaHeader* header){
     VulpesMessage decoded_message;
 
-    //if (mdp_decode_stateless_iterated(header, (void*)&decoded_message)){
-    //    process_vulpes_message(&decoded_message);
-    //};
+    if (mdp_decode_stateless_iterated(header, (void*)&decoded_message)){
+        //process_vulpes_message(&decoded_message);
+    };
 }
 
 __attribute__((cdecl))
@@ -61,7 +61,6 @@ int32_t header_field_set[10];
 
 void init_vulpes_message_delta(){
     header_field_set[1] = -1;
-    //vulpes_msg_def.header.name = "vulpes_message";
     vulpes_msg_def.header.type = 0x39;
     vulpes_msg_def.header.initialized = true;
     vulpes_msg_def.header.header_field_set = header_field_set;
@@ -78,11 +77,8 @@ void init_vulpes_message_delta(){
     vulpes_msg_def.body.properties->parameters = &nothing;
     vulpes_msg_def.body.properties->max_size = 516;
     vulpes_msg_def.body.properties->initialized = false;
-
-
-
 }
-//004F019A
+
 uintptr_t get_vulpes_message_definition(){
     init_vulpes_message_delta();
     return reinterpret_cast<uintptr_t>(&vulpes_msg_def);
