@@ -13,10 +13,9 @@ BEGIN
         BEGIN
             VALUE "Comments",         "A feature extension mod for Halo Custom Edition."
             VALUE "CompanyName",      VULPES_AUTHOR
-            VALUE "FileDescription",  "Vulpes version "VULPES_BUILD_STRING
+            VALUE "FileDescription",  "Vulpes version " VULPES_BUILD_STRING
             VALUE "FileVersion",      "Build " VULPES_BUILD_STRING
             VALUE "InternalName",     "Vulpes"
-            VALUE "LegalCopyright",   "gbMichelle"
             VALUE "OriginalFilename", "Vulpes.dll"
             VALUE "ProductName",      "Vulpes"
             VALUE "ProductVersion",   "Build " VULPES_BUILD_STRING
