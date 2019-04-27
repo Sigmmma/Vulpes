@@ -35,6 +35,8 @@ build:
 	g++ -c memory/object_unit.cpp $(ARGSDEF) -o bin/memory__object_unit.o
 	g++ -c memory/table.cpp $(ARGSDEF) -o bin/memory__table.o
 
+	g++ -c network/network_globals.cpp $(ARGS) -o bin/network__network_globals.o
+	
 	g++ -c network/message_delta/bitstream.cpp $(ARGS) -o bin/network__message_delta__bitstream.o
 	g++ -c network/message_delta/message_delta_processor.cpp $(ARGS) -o bin/network__message_delta__message_delta_processor.o
 	g++ -c network/message_delta/definition.cpp $(ARGS) -o bin/network__message_delta__definition.o
