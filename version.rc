@@ -1,8 +1,10 @@
-#include "version.h"
+#define VULPES_AUTHOR "gbMichelle"
+#define VULPES_VERSION 0,0,0
+#define VULPES_BUILD_STRING "0.0.0"
 
 1 VERSIONINFO
-FILEVERSION      VULPES_VERSION_MAJOR,VULPES_VERSION_MINOR,VULPES_VERSION_PATCH,0
-PRODUCTVERSION   VULPES_VERSION_MAJOR,VULPES_VERSION_MINOR,VULPES_VERSION_PATCH,0
+FILEVERSION      VULPES_VERSION,0
+PRODUCTVERSION   VULPES_VERSION,0
 
 BEGIN
     BLOCK "StringFileInfo"
@@ -11,9 +13,10 @@ BEGIN
         BEGIN
             VALUE "Comments",         "A feature extension mod for Halo Custom Edition."
             VALUE "CompanyName",      VULPES_AUTHOR
-            VALUE "FileDescription",  "Vulpes build " VULPES_BUILD_STRING
+            VALUE "FileDescription",  "Vulpes version "VULPES_BUILD_STRING
             VALUE "FileVersion",      "Build " VULPES_BUILD_STRING
             VALUE "InternalName",     "Vulpes"
+            VALUE "LegalCopyright",   "gbMichelle"
             VALUE "OriginalFilename", "Vulpes.dll"
             VALUE "ProductName",      "Vulpes"
             VALUE "ProductVersion",   "Build " VULPES_BUILD_STRING
