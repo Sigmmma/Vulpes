@@ -8,7 +8,7 @@
 using namespace std;
 
 static vector<char*> commands;
-regex command_split("([^ \"]+)|\"([^\"]*)\"|\"([^\"]*)");
+regex command_split("([^[:space:]\"]+)|\"([^\"]*)\"|\"([^\"]*)");
 
 // Adds Vulpes results to an already constructed autocomplete list.
 __attribute__((cdecl))
