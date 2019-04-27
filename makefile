@@ -13,7 +13,7 @@ build:
 	g++ -c vulpes.cpp $(ARGSDEF) -o bin/vulpes.o
 	g++ -c popout_console/guicon.cpp -m32 -O2 -o bin/popout_console__guicon.o
 
-	g++ -c command/handler.cpp $(ARGSDEF) -o bin/command__handler.o 
+	g++ -c command/handler.cpp $(ARGSDEF) -o bin/command__handler.o
 
 	g++ -c hooks/hooker.cpp $(ARGSDEF) -o bin/hooks__hooker.o
 	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
