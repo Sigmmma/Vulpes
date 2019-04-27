@@ -7,15 +7,22 @@
 Signature(true, sig_console_input_hook,
     {0x8A, 0x07, 0x81, 0xEC, 0x00, 0x05, 0x00, 0x00});
 Patch(console_in_hook_patch);
+Patch(rcon_in_hook_patch);
 
+uintptr_t rcon_dword_ptr;
 uintptr_t prcs_cmd = (uintptr_t)&process_command;
 uintptr_t return_to_halo_con_in;
 __attribute__((naked))
 void new_console_in_hook(){
     asm (
+        "mov eax, 0xFFFFFFFF;\n" // No network owner
+    "console_in:"
+        "push eax;\n"
         "push edi;\n"
         "call %0;\n"
         "pop edi;\n"
+        "add esp, 4;\n"
+
         "cmp al, 0;\n"
         "jne continue_to_halo_con_in;\n"
         "xor al, al;\n"
@@ -28,17 +35,43 @@ void new_console_in_hook(){
     );
 }
 
+__attribute__((naked))
+void rcon_in_hook(){
+    asm (
+        // Emulate default behavior of moving eax (player_network_id) into this dword.
+        "push ebx;" // protect ebx
+        "mov ebx, %0;\n"
+        "mov DWORD PTR ds:[ebx], eax;\n"
+
+        "push 0;\n"
+        "call console_in;\n"
+        "add esp, 4;\n"
+
+        // Emulate default behavior of making this dword -1.
+        "mov ebx, %0;\n"
+        "mov DWORD PTR ds:[ebx], 0xFFFFFFFF;\n"
+
+        "pop ebx;\n" // return ebx to its former glory
+        "ret;\n"
+        : "+m" (rcon_dword_ptr)
+    );
+}
+
 void init_console_input_hook(){
     if(!console_in_hook_patch.is_built()){
         uintptr_t sig_addr = sig_console_input_hook.get_address();
         return_to_halo_con_in = sig_addr+0x1E + 5;
         console_in_hook_patch.build(sig_addr, 8, JMP_PATCH, (uintptr_t)&new_console_in_hook);
+        rcon_dword_ptr = *(intptr_t*)(sig_addr - 32 + 3);
+        rcon_in_hook_patch.build(sig_addr-32, 7+8+10, JMP_PATCH, (uintptr_t)&rcon_in_hook);
     };
     console_in_hook_patch.apply();
+    rcon_in_hook_patch.apply();
 }
 
 void revert_console_input_hook(){
     console_in_hook_patch.revert();
+    rcon_in_hook_patch.revert();
 }
 
 static Signature(false, sig_auto_complete_hook,
@@ -103,6 +136,13 @@ void init_command_auto_complete_hook(){
 void revert_command_auto_complete_hook(){
     auto_complete_patch.revert();
 }
+
+// Potential command suggestion hook location 0x44CD20
+// Block autocomplete print for command suggestion hook 0x4CA00F
+// v_sv_execute_file 0x4C9820
+//
+// execute from rcon
+// 6A 00 A3 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 04 C7 05 ?? ?? ?? ?? FF FF FF FF C3
 
 void init_console_hooks(){
     init_console_input_hook();
