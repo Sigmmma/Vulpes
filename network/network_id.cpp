@@ -27,11 +27,11 @@ typedef struct{
 
     uint32_t pointer8;              //0x20
     uint32_t last_used_slot;        //0x24
-    //MemRef* translation_index;      //0x28 // same as network_translation_table
+    MemRef* translation_index;      //0x28 // same as network_translation_table
 }SyncedObjectHeader;
 
 int32_t server_register_network_index(MemRef object){
-    SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHandler*>(message_delta_object_index + 0x58);
+    SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHeader*>(message_delta_object_index + 0x58);
     if (synced_objects->count >= synced_objects->max_count){
         // Just don't even try if we're at max capacity.
         return -1;
