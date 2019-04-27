@@ -10,18 +10,19 @@ Signature(true, sig_bitstream_read,
 static uintptr_t func_bitstream_write_ptr;
 static uintptr_t func_bitstream_read_ptr;
 
-
 __attribute__((naked))
 void bitstream_write(void* const iteration_header,
                  uint32_t* const write_this,
                          int32_t num_bits){
     asm (
-        "mov ecx, [esp+4];\n"
-        "mov eax, [esp+8];\n"
-        "mov edx, [esp+0xC];\n"
+        "pushad;\n"
+        "mov ecx, [esp+0x20+4];\n"
+        "mov eax, [esp+0x20+8];\n"
+        "mov edx, [esp+0x20+0xC];\n"
         "push edx;\n"
         "call %0;\n"
         "add esp, 4;\n"
+        "popad;\n"
         "ret;\n"
         : "+m" (func_bitstream_write_ptr)
     );
@@ -32,12 +33,14 @@ void bitstream_read(void* const iteration_header,
                 uint32_t* const write_here,
                         int32_t num_bits){
     asm (
-        "mov edx, [esp+4];\n"
-        "mov ecx, [esp+8];\n"
-        "mov eax, [esp+0xC];\n"
+        "pushad;\n"
+        "mov edx, [esp+0x20+4];\n"
+        "mov ecx, [esp+0x20+8];\n"
+        "mov eax, [esp+0x20+0xC];\n"
         "push edx;\n"
         "call %0;\n"
         "add esp, 4;\n"
+        "popad;\n"
         "ret;\n"
         : "+m" (func_bitstream_read_ptr)
     );
