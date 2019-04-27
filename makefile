@@ -8,7 +8,9 @@ build:
 	mkdir -p bin
 	rm -f bin/*.o
 	rm -f bin/vulpes.dll
-	#windres version.rc -o bin/version.o
+
+	windres version.rc -o bin/version.o
+
 	g++ -c dll_main.cpp $(ARGSDEF) -o bin/dll_main.o
 	g++ -c vulpes.cpp $(ARGSDEF) -o bin/vulpes.o
 	g++ -c popout_console/guicon.cpp -m32 -O2 -o bin/popout_console__guicon.o
