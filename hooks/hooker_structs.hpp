@@ -11,11 +11,14 @@ enum InstructionBytes : uint8_t {
     PUSHAD_BYTE = 0x60,
     POPFD_BYTE  = 0x91,
     POPAD_BYTE  = 0x61,
+    PUSH_EDI_BYTE = 0x57,
 
     // 2 byte conditional jumps
     CONDJ_BYTE = 0x0F, // first byte
-    
+
     JA_BYTE    = 0x87
+
+
 };
 
 #pragma pack(push, 1)
