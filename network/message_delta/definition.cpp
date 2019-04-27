@@ -19,6 +19,11 @@ static uintptr_t old_list_end_ptr;
 static uintptr_t message_definitions[0x40];
 static uintptr_t new_list_end_ptr = reinterpret_cast<uintptr_t>(&message_definitions) + NEW_MESSAGE_TYPE_COUNT * 4;
 
+// TODO:
+// Store the original address of the definitions list
+// Store a list of pointers to all locations that were changed.
+// Make a revert function using the two points above.
+
 void init_new_definitions(){
     message_definitions[VULPES_MSG] = get_vulpes_message_definition();
     func_mdpi_encode_ptr = sig_mdpi_encode.get_address();
