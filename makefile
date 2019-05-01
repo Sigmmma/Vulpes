@@ -1,7 +1,7 @@
 WARNS= -pedantic -Wunused-value
-ARGS= $(WARNS) -std=c++17 -masm=intel -msse3 -m32
+ARGS= $(WARNS) -std=c++17 -masm=intel -msse2 -m32
 ARGSDEF= $(ARGS) -O2
-LINKARGS= $(WARNS) -m32 -W
+LINKARGS= -m32 -W
 #,--exclude-all-symbols -s
 
 build:
