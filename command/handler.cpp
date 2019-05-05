@@ -102,9 +102,9 @@ bool process_command(char* input, int32_t network_machine_id){
         bool success = true;
         try {
             parsed_args = matching_cmd->parse_args(matches, &success);
-        }catch (...){
+        }catch (exception& e){
             console_out_error("Couldn't parse command.");
-            //console_out_error(e.what());
+            console_out_error(e.what());
             return false;
         };
         if (success){
