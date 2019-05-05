@@ -2,16 +2,16 @@
 #include "../hooks/hooker.hpp"
 
 // These are the values from config.txt
-float* DecalZBiasValue;
-float* DecalSlopeZBiasValue;
-float* TransparentDecalZBiasValue;
-float* TransparentDecalSlopeZBiasValue;
+//float* DecalZBiasValue;
+//float* DecalSlopeZBiasValue;
+//float* TransparentDecalZBiasValue;
+//float* TransparentDecalSlopeZBiasValue;
 
 const float val_DecalZBiasValue = -0.000055;
 const float val_DecalSlopeZBiasValue = -2.0;
 
-static Signature(false, sig_shader_trans_zfighting1,
-    {0x33, 0xC0, 0xC7, 0x05, -1, -1, -1, -1, 0x00, 0x10, 0x00, 0x00});
+//static Signature(false, sig_shader_trans_zfighting1,
+//    {0x33, 0xC0, 0xC7, 0x05, -1, -1, -1, -1, 0x00, 0x10, 0x00, 0x00});
 
 static Signature(false, sig_shader_trans_zfighting2,
     {0xE8, -1, -1, -1, -1, 0x84, 0xC0, 0x74, -1, 0xE8,
@@ -31,7 +31,7 @@ static Signature(false, sig_shader_trans_zfighting3b,
 // Patch 2 makes it so that non-decal transparents are also affected.
 
 // This patch makes it so the default values for these config settings are never set.
-static Patch(patch_shader_trans_zfighting1_fix);
+//static Patch(patch_shader_trans_zfighting1_fix);
 // This patch makes it so that all shader transparent types are rendered with
 // these bias values. Essentually as if all of them have the 'decal' flag set.
 static Patch(patch_shader_trans_zfighting2_fix);
@@ -91,7 +91,7 @@ void init_shdr_trans_zfighting_fixes(){
 }
 
 void revert_shdr_trans_zfighting_fixes(){
-    patch_shader_trans_zfighting1_fix.revert();
+    //patch_shader_trans_zfighting1_fix.revert();
     patch_shader_trans_zfighting2_fix.revert();
     patch_shader_trans_zfighting3a_fix.revert();
     patch_shader_trans_zfighting3b_fix.revert();
