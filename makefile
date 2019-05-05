@@ -16,6 +16,7 @@ build:
 	g++ -c popout_console/guicon.cpp -m32 -O2 -o bin/popout_console__guicon.o
 
 	g++ -c command/handler.cpp $(ARGSDEF) -o bin/command__handler.o
+	g++ -c command/test.cpp $(ARGSDEF) -o bin/command__test.o
 
 	g++ -c hooks/hooker.cpp $(ARGSDEF) -o bin/hooks__hooker.o
 	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
@@ -26,9 +27,10 @@ build:
 	g++ -c halo_functions/devmode.cpp $(ARGS) -o bin/halo_functions__devmode.o
 
 	g++ -c halo_bug_fixes/cpu_usage.cpp $(ARGS) -o bin/halo_bug_fixes__cpu_usage.o
-	g++ -c halo_bug_fixes/file_handle_leak.cpp $(ARGS) -o bin/halo_bug_fixes__file_handle_leak.o
-	g++ -c halo_bug_fixes/host_refusal.cpp $(ARGS) -o bin/halo_bug_fixes__host_refusal.o
+	g++ -c halo_bug_fixes/file_handle_leak.cpp $(ARGSDEF) -o bin/halo_bug_fixes__file_handle_leak.o
+	g++ -c halo_bug_fixes/host_refusal.cpp $(ARGSDEF) -o bin/halo_bug_fixes__host_refusal.o
 	g++ -c halo_bug_fixes/string_overflows.cpp $(ARGS) -o bin/halo_bug_fixes__string_overflows.o
+	g++ -c halo_bug_fixes/shdr_trans_zfighting.cpp $(ARGSDEF) -o bin/halo_bug_fixes__shdr_trans_zfighting.o
 
 	g++ -c memory/types.cpp $(ARGSDEF) -o bin/memory__types.o
 	g++ -c memory/object.cpp $(ARGSDEF) -o bin/memory__object.o
