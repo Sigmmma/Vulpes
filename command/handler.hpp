@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <stdarg.h>
-#include <math.h>
 
 // These functions are and should only be called by the game.
 __attribute__((cdecl))
