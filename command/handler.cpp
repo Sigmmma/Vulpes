@@ -340,8 +340,8 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
     switch (type){
             case STRING :
             strout = definition->parse_str(input);
-            output = true;
             leftover = (char*)&nullstr;
+            output = true;
             break;
         case LONG :
         case SHORT :
@@ -355,6 +355,7 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
             break;
         case BOOL :
             boolout = definition->parse_bool(input);
+            leftover = (char*)&nullstr;
             output = true;
             break;
         case TIME :
