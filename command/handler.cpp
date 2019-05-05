@@ -78,6 +78,8 @@ bool process_command(char* input, int32_t network_machine_id){
             matches.push_back(arg_match[2]);
         }else if(arg_match[3] != ""){
             matches.push_back(arg_match[3]);
+        }else {
+            matches.push_back("");
         };
         search_start = arg_match.suffix().first;
     };
