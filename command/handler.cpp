@@ -21,7 +21,7 @@ class VulpesCommandException_UnparsableArg : public exception {
 } unparsable_arg_exception;
 
 static vector<VulpesCommand*> commands;
-regex command_split("([^[:space:]\"]+)|\"([^\"]*)\"|\"([^\"]*)");
+regex command_split("([^\\s\"]+)|\"([^\"]*)\"|\"([^\"]*)");
 
 // Adds Vulpes results to an already constructed autocomplete list.
 __attribute__((cdecl))
