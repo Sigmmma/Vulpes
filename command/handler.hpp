@@ -35,6 +35,7 @@ public:
     int32_t parse_int(std::string input, char** leftover);
     float parse_flt(std::string input, char** leftover);
     bool parse_bool(std::string input);
+    int parse_time(std::string input, bool* success);
 
     std::string name;
     std::string display_name;

@@ -4,6 +4,7 @@
 #include <cassert>
 #include <algorithm>
 #include <exception>
+#include <ctype.h>
 
 using namespace std;
 
@@ -274,6 +275,167 @@ bool VulpesArgDef::parse_bool(string input){
     };
 }
 
+enum class Time {
+    TICKS,
+    SECONDS,
+    MINUTES,
+    HOURS,
+    DAYS,
+    TBD
+};
+
+regex time_split("([\\d:]+)\\s*([a-zA-Z]+)");
+regex colon_split("([^:]+)");
+
+int VulpesArgDef::parse_time(string input, bool* success){
+    int64_t output = 0;
+
+    // Check if we got anything parsable.
+    const char* input_a = input.data();
+    bool has_alpha_chars = false;
+    bool has_digit_chars = false;
+    int i = 0;
+    while (input_a[i]){
+        if (isalpha(input_a[i])){
+            has_alpha_chars = true;
+        }else if (isdigit(input_a[i])){
+            has_digit_chars = true;
+        };
+        i++;
+    };
+
+    // Throw a fit if our input can't be valid.
+    char error_str[80];
+    if (!has_digit_chars && !has_alpha_chars){
+        printf("Nothing.");
+        snprintf(error_str, 80,
+                "Couldn't parse input \"%s\" for %s. What!?",
+                input.data(), name.data());
+        console_out_error(error_str);
+        *success = false;
+        return 0;
+    }else if (!has_digit_chars){
+        printf("All letters.");
+        snprintf(error_str, 80,
+                "Couldn't parse input \"%s\" for %s. Numbers please?",
+                input.data(), name.data());
+        console_out_error(error_str);
+        *success = false;
+        return 0;
+    };
+
+    // Split the input into numbers and units if we got both digits and alphabetics.
+    vector<string> n;
+    vector<string> a;
+    if (has_alpha_chars && has_digit_chars){
+        printf("Digits and Alphabetics.");
+        smatch time_match;
+        string::const_iterator search_start(input.cbegin());
+        while(regex_search(search_start, input.cend(), time_match, time_split)){
+            n.push_back(time_match[1]);
+            a.push_back(time_match[2]);
+
+            search_start = time_match.suffix().first;
+        };
+    }else if (has_digit_chars){
+        printf("Just digits.");
+        n.push_back(input);
+        a.push_back(string(""));
+    };
+    // Throw more fits if the splitting failed.
+    if (!n.size()){
+        snprintf(error_str, 80,
+                "Couldn't parse input \"%s\" for %s. I got nothing.",
+                input.data(), name.data());
+        console_out(error_str);
+        *success = false;
+        return 0;
+    };
+    // Get all integers in each string in n.
+    vector<vector<int>> n_int;
+    for (i = 0; i < n.size(); i++){
+        vector<int> numbers;
+        string num_str = n[i];
+        smatch num_match;
+        string::const_iterator search_start(num_str.cbegin());
+        while(regex_search(search_start, num_str.cend(), num_match, colon_split)){
+            char* dummy;
+            numbers.push_back(strtol(string(num_match[1]).data(), &dummy, 10));
+            search_start = num_match.suffix().first;
+        };
+        n_int.push_back(numbers);
+    };
+    // Turn all our intergers into their appropriate tick counts.
+    for (i = 0; i < n_int.size() && i < a.size(); i++){
+        transform(a[i].begin(), a[i].end(), a[i].begin(), ::tolower);
+        Time unit;
+        if (a[i] == ""){
+            if (n_int[i].size() == 1){
+                unit = Time::SECONDS;
+            } else if(n_int[i].size() == 2){
+                unit = Time::MINUTES;
+            } else if(n_int[i].size() == 3){
+                unit = Time::HOURS;
+            } else if(n_int[i].size() == 4){
+                unit = Time::DAYS;
+            } else {
+                snprintf(error_str, 80,
+                        "Couldn't parse input \"%s\" for %s. Too few or too many units.",
+                        input.data(), name.data());
+                console_out_error(error_str);
+                *success = false;
+                return 0;
+            };
+        } else if (a[i] == "t" || a[i] == "tick" || a[i] == "ticks"){
+            unit = Time::TICKS;
+        } else if (a[i] == "s" || a[i] == "sec" || a[i] == "secs"
+                || a[i] == "second" || a[i] == "seconds"){
+            unit = Time::SECONDS;
+        } else if (a[i] == "s" || a[i] == "sec" || a[i] == "secs"
+                || a[i] == "second" || a[i] == "seconds"){
+            unit = Time::MINUTES;
+        } else if (a[i] == "h" || a[i] == "hour" || a[i] == "hours"){
+            unit = Time::HOURS;
+        } else if (a[i] == "d" || a[i] == "day" || a[i] == "days"){
+            unit = Time::DAYS;
+        } else {
+            snprintf(error_str, 80,
+                    "Couldn't parse input \"%s\" for %s. %s is not an accepted time unit.",
+                    input.data(), name.data(), a[i].data());
+            console_out_error(error_str);
+            *success = false;
+            return 0;
+        };
+        vector<int> current_set = n_int[i];
+        for (int j=0; j < current_set.size(); j++){
+            // Lower the unit for the next parse.
+            switch (unit){
+                case Time::DAYS :
+                    output += current_set[j] * 24 * 60 * 60 * 30;
+                    unit = Time::HOURS;
+                    break;
+                case Time::HOURS :
+                    output += current_set[j] * 60 * 60 * 30;
+                    unit = Time::MINUTES;
+                    break;
+                case Time::MINUTES :
+                    output += current_set[j] * 60 * 30;
+                    unit = Time::SECONDS;
+                    break;
+                case Time::SECONDS :
+                    output += current_set[j] * 30;
+                    unit = Time::TICKS;
+                    break;
+                case Time::TICKS :
+                    output += current_set[j];
+                    break;
+            };
+        };
+    };
+    *success = true;
+    return static_cast<int>(output);
+}
+
 void VulpesArgDef::set_display_name(){
     if (optional){
         display_name = name + "[";
@@ -360,8 +522,8 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
             output = true;
             break;
         case TIME :
-            //intout = parse_time(input);
-            output = false;
+            intout = definition->parse_time(input, success);
+            output = true;
             break;
     };
 }
