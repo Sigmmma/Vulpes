@@ -33,8 +33,8 @@ public:
     VulpesArgDef(std::string arg_name, bool is_optional, VulpesArgType arg_type, float min, float max);
 
     std::string parse_str(std::string input);
-    int32_t parse_int(std::string input);
-    float parse_flt(std::string input);
+    int32_t parse_int(std::string input, char** leftover);
+    float parse_flt(std::string input, char** leftover);
     bool parse_bool(std::string input);
 
     std::string name;
@@ -44,8 +44,8 @@ public:
     bool optional;
     int64_t imax;
     int64_t imin;
-    float fmin = -INFINITY;
-    float fmax = INFINITY;
+    float fmin = -16777216;
+    float fmax = 16777216;
     int max_characters;
 private:
     void set_display_name();
@@ -53,7 +53,7 @@ private:
 
 class VulpesArg {
 public:
-    VulpesArg(VulpesArgDef def, std::string in);
+    VulpesArg(VulpesArgDef def, std::string in, bool* success);
 
     int         int_out();
     float       flt_out();
@@ -83,7 +83,7 @@ public:
     ~VulpesCommand();
     std::string get_name();
     std::vector<VulpesArgDef> get_arg_defs();
-    std::vector<VulpesArg> parse_args(std::vector<std::string> arg_strings);
+    std::vector<VulpesArg> parse_args(std::vector<std::string> arg_strings, bool* success);
 
     bool execute(std::vector<VulpesArg> parsed_args);
 
