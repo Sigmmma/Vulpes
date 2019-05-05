@@ -183,8 +183,6 @@ VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_
     set_display_name();
 }
 
-const char nullstr[] = "";
-
 string VulpesArgDef::parse_str(string input){
     if (max_characters && input.size() > max_characters){
         return input.substr(0, max_characters);
@@ -339,7 +337,6 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
     switch (type){
             case STRING :
             strout = definition->parse_str(input);
-            leftover = (char*)&nullstr;
             output = true;
             break;
         case LONG :
@@ -347,23 +344,25 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
         case CHAR :
             intout = definition->parse_int(input, &leftover);
             output = true;
+            if (*leftover != '\0'){
+                *success = false;
+            };
             break;
         case FLOAT :
             fltout = definition->parse_flt(input, &leftover);
             output = true;
+            if (*leftover != '\0'){
+                *success = false;
+            };
             break;
         case BOOL :
             boolout = definition->parse_bool(input);
-            leftover = (char*)&nullstr;
             output = true;
             break;
         case TIME :
             //intout = parse_time(input);
             output = false;
             break;
-    };
-    if (*leftover != '\0'){
-        *success = false;
     };
 }
 
