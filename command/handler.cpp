@@ -4,7 +4,6 @@
 #include <cassert>
 #include <algorithm>
 #include <exception>
-#include <stdlib.h>
 
 using namespace std;
 
