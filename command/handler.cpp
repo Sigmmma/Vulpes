@@ -4,6 +4,7 @@
 #include <cassert>
 #include <algorithm>
 #include <exception>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -80,7 +81,7 @@ bool process_command(char* input, int32_t network_machine_id){
         };
         search_start = arg_match.suffix().first;
     };
-    printf("%s\n", "Got past split stage.");
+
     string cmd_to_find = matches[0];
     matches.erase(matches.begin());
     transform(cmd_to_find.begin(), cmd_to_find.end(), cmd_to_find.begin(), ::tolower);
@@ -88,29 +89,29 @@ bool process_command(char* input, int32_t network_machine_id){
     VulpesCommand* matching_cmd;
     bool found_match = false; // this is used because checking if the pointer
                               // for matching_cmd !=0 has weird behavior.
-    printf("Starting search for %s\n", cmd_to_find.data());
+
     for (int i=0; i<commands.size(); i++){
         if (commands[i]->get_name() == cmd_to_find){
             matching_cmd = commands[i];
             found_match = true;
-            printf("Broke out of search stage because of match %s\n", commands[i]->get_name().data());
             break;
         };
-    }; printf("%s\n", "Got past search stage.");
+    };
     if (found_match){
-        printf("%s\n", "Found a match.");
         vector<VulpesArg> parsed_args;
+        bool success = true;
         try {
-            parsed_args = matching_cmd->parse_args(matches);
-        }catch (exception& e){
-            console_out_error("Couldn't execute command.");
-            console_out_error(e.what());
+            parsed_args = matching_cmd->parse_args(matches, &success);
+        }catch (...){
+            console_out_error("Couldn't parse command.");
+            //console_out_error(e.what());
             return false;
         };
-        matching_cmd->execute(parsed_args);
+        if (success){
+            matching_cmd->execute(parsed_args);
+        };
         return false;
     };
-    printf("%s\n", "Got past everything.");
     return true;
 }
 
@@ -183,28 +184,28 @@ VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_
     set_display_name();
 }
 
+const char nullstr[] = "";
+
 string VulpesArgDef::parse_str(string input){
-    if (max_characters){
+    if (max_characters && input.size() > max_characters){
         return input.substr(0, max_characters);
     };
     return input;
 }
 
-int64_t parse_to_integer(string input){
+int64_t parse_to_integer(string input, char** leftover){
     int64_t output;
-    printf("parsing int\n");
     if(input.find("0x") == 0){
-        output = stoi(input.substr(2, input.size()), 0, 16);
+        output = strtol(input.substr(2, input.size()).data(), leftover, 16);
     }else{
-        output = stoi(input);
+        output = strtol(input.data(), leftover, 10);
     };
-    printf("parsed int\n");
     return output;
 }
 
-int32_t VulpesArgDef::parse_int(string input){
+int32_t VulpesArgDef::parse_int(string input, char** leftover){
     int32_t output;
-    int64_t parsed = parse_to_integer(input);
+    int64_t parsed = parse_to_integer(input, leftover);
     char error_str[80];
     if(parsed > imax){
         snprintf(error_str, 80,
@@ -232,8 +233,8 @@ int32_t VulpesArgDef::parse_int(string input){
     return output;
 }
 
-float VulpesArgDef::parse_flt(string input){
-    float output = stof(input);
+float VulpesArgDef::parse_flt(string input, char** leftover){
+    float output = strtof(input.data(), leftover);
     char error_str[80];
     if(output > fmax){
         snprintf(error_str, 80,
@@ -278,91 +279,91 @@ bool VulpesArgDef::parse_bool(string input){
 
 void VulpesArgDef::set_display_name(){
     if (optional){
-        name = name + "[";
+        display_name = name + "[";
     }else{
-        name = name + "<";
+        display_name = name + "<";
     };
 
     switch (type){
         case STRING :
-            name = name + "string";
+            display_name = display_name + "string";
             goto end;
         case LONG :
-            name = name + "long";
+            display_name = display_name + "long";
             goto integer;
         case SHORT :
-            name = name + "short";
+            display_name = display_name + "short";
             goto integer;
         case CHAR :
-            name = name + "byte";
+            display_name = display_name + "byte";
             goto integer;
         case FLOAT :
-            name = name + "float";
+            display_name = display_name + "float";
             goto floating_point;
         case BOOL :
-            name = name + "on-off";
+            display_name = display_name + "on-off";
             goto end;
         case TIME :
-            name = name + "time";
+            display_name = display_name + "time";
             goto end;
     };
 
     integer:
     if (min_max){
-        name = name + "(" + to_string(imin) + "-" + to_string(imax) + ")";
+        display_name = display_name + "(" + to_string(imin) + "-" + to_string(imax) + ")";
     };
     goto end;
 
     floating_point:
     if (min_max){
-        name = name + "(" + to_string(fmin) + "-" + to_string(fmax) + ")";
+        display_name = display_name + "(" + to_string(fmin) + "-" + to_string(fmax) + ")";
     };
 
     end:
     if (optional){
-        name = name + "]";
+        display_name = display_name + "]";
     }else{
-        name = name + ">";
+        display_name = display_name + ">";
     };
 }
 
-VulpesArg::VulpesArg(VulpesArgDef def, std::string in){
+VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
     definition = &def;
     input = in;
-
     VulpesArgType type = definition->type;
 
     if (type != STRING && input == ""){
         output = false;
         return;
     };
-    try {
-        switch (type){
+    char* leftover;
+    switch (type){
             case STRING :
-                strout = definition->parse_str(input);
-                output = true;
-                break;
-            case LONG :
-            case SHORT :
-            case CHAR :
-                intout = definition->parse_int(input);
-                output = true;
-                break;
-            case FLOAT :
-                fltout = definition->parse_flt(input);
-                output = true;
-                break;
-            case BOOL :
-                boolout = definition->parse_bool(input);
-                output = true;
-                break;
-            case TIME :
-                //intout = parse_time(input);
-                output = false;
-                break;
-        };
-    }catch (exception& e){
-        throw unparsable_arg_exception;
+            strout = definition->parse_str(input);
+            output = true;
+            leftover = (char*)&nullstr;
+            break;
+        case LONG :
+        case SHORT :
+        case CHAR :
+            intout = definition->parse_int(input, &leftover);
+            output = true;
+            break;
+        case FLOAT :
+            fltout = definition->parse_flt(input, &leftover);
+            output = true;
+            break;
+        case BOOL :
+            boolout = definition->parse_bool(input);
+            output = true;
+            break;
+        case TIME :
+            //intout = parse_time(input);
+            output = false;
+            break;
+    };
+    if (*leftover != '\0'){
+        *success = false;
     };
 }
 
@@ -400,7 +401,7 @@ VulpesCommand::VulpesCommand(string cmd_name,
     };
     va_end(va_args);
     commands.push_back(this);
-    printf("Command %s added on index %d\n\n",
+    printf("Command %s added at index %d\n",
            commands[commands.size()-1]->get_name().data(), commands.size()-1);
 }
 
@@ -424,7 +425,7 @@ vector<VulpesArgDef> VulpesCommand::get_arg_defs(){
     return args;
 }
 
-vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings){
+vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings, bool* success){
     char error_str[80];
     int required_args;
     for (required_args = 0; required_args<args.size(); required_args++){
@@ -447,7 +448,15 @@ vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings){
     };
     vector<VulpesArg> parsed_args;
     for (int i=0; i<arg_strings.size(); i++){
-        parsed_args.push_back(VulpesArg(args[i], arg_strings[i]));
+        parsed_args.push_back(VulpesArg(args[i], arg_strings[i], success));
+        if (!*success){
+            snprintf(error_str, 80,
+                    "Couldn't parse arg #%d %s",
+                    i+1, args[i].display_name.data());
+            console_out_error(error_str);
+            *success = false;
+            break;
+        };
     };
     return parsed_args;
 }
