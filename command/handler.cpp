@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <exception>
 #include <ctype.h>
+#include "../halo_functions/devmode.hpp"
 
 using namespace std;
 
@@ -28,14 +29,17 @@ __attribute__((cdecl))
 void auto_complete(char* buffer[], uint16_t* current_index, const char* input){
     string input_str(input);
 
+    uint8_t developer_mode = developer_mode_level();
+
     int i = 0;
     int j = *current_index;
     while (i < commands.size() && *current_index < 256){
         string cmp_str = commands[i]->get_name();
         if (input_str.size() <= cmp_str.size()){
             cmp_str.resize(input_str.size());
-            if (input_str == cmp_str){
-                buffer[j] = commands[i]->get_name().data();
+            if (input_str == cmp_str
+            && developer_mode >= commands[i]->get_dev_level()){
+                buffer[j] = commands[i]->get_name_chars();
                 j++;
             };
         };
@@ -84,6 +88,8 @@ bool process_command(char* input, int32_t network_machine_id){
         search_start = arg_match.suffix().first;
     };
 
+    uint8_t devmode = developer_mode_level();
+
     string cmd_to_find = matches[0];
     matches.erase(matches.begin());
     transform(cmd_to_find.begin(), cmd_to_find.end(), cmd_to_find.begin(), ::tolower);
@@ -93,7 +99,8 @@ bool process_command(char* input, int32_t network_machine_id){
                               // for matching_cmd !=0 has weird behavior.
 
     for (int i=0; i<commands.size(); i++){
-        if (commands[i]->get_name() == cmd_to_find){
+        if (commands[i]->get_name() == cmd_to_find
+        && devmode >= developer_mode_level()){
             matching_cmd = commands[i];
             found_match = true;
             break;
@@ -117,22 +124,22 @@ bool process_command(char* input, int32_t network_machine_id){
     return true;
 }
 
-VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_type){
+VulpesArgDef::VulpesArgDef(string arg_name, bool required, VulpesArgType arg_type){
     type = arg_type;
     name = arg_name;
-    optional = is_optional;
+    optional = (!required);
     min_max = false;
 
-    if (arg_type==LONG){
+    if (arg_type==A_LONG){
         imin = -2147483647;
         imax = 2147483647;
-    } else if(arg_type==SHORT){
+    } else if(arg_type==A_SHORT){
         imin = -32767;
         imax = 32767;
-    } else if(arg_type==CHAR){
+    } else if(arg_type==A_CHAR){
         imin = -127;
         imax = 127;
-    } else if(arg_type==TIME){
+    } else if(arg_type==A_TIME){
         imin = 0;
         imax = 2147483647;
     };
@@ -140,31 +147,31 @@ VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_
     set_display_name();
 }
 
-VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_type, int max_char){
-    assert(arg_type==STRING);
+VulpesArgDef::VulpesArgDef(string arg_name, bool required, VulpesArgType arg_type, int max_char){
+    assert(arg_type==A_STRING);
     type = arg_type;
     name = arg_name;
-    optional = is_optional;
+    optional = (!required);
     max_characters = max_char;
     min_max = false;
 
     set_display_name();
 }
 
-VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_type, int64_t min, int64_t max){
-    assert(arg_type==LONG || arg_type==SHORT || arg_type==CHAR || arg_type==TIME);
+VulpesArgDef::VulpesArgDef(string arg_name, bool required, VulpesArgType arg_type, int64_t min, int64_t max){
+    assert(arg_type==A_LONG || arg_type==A_SHORT || arg_type==A_CHAR || arg_type==A_TIME);
     type = arg_type;
     name = arg_name;
-    optional = is_optional;
+    optional = (!required);
     min_max = true;
 
-    if (type==LONG){
+    if (type==A_LONG){
         assert(min >= -2147483647);
         assert(max <= 2147483647);
-    } else if (type==SHORT){
+    } else if (type==A_SHORT){
         assert(min >= -32767);
         assert(max <= 32767);
-    } else if (type==CHAR){
+    } else if (type==A_CHAR){
         assert(min >= -127);
         assert(max <= 127);
     };
@@ -174,11 +181,11 @@ VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_
     set_display_name();
 }
 
-VulpesArgDef::VulpesArgDef(string arg_name, bool is_optional, VulpesArgType arg_type, float min, float max){
-    assert(arg_type==FLOAT);
+VulpesArgDef::VulpesArgDef(string arg_name, bool required, VulpesArgType arg_type, float min, float max){
+    assert(arg_type==A_FLOAT);
     type = arg_type;
     name = arg_name;
-    optional = is_optional;
+    optional = (!required);
     min_max = true;
     fmin = min;
     fmax = max;
@@ -446,25 +453,25 @@ void VulpesArgDef::set_display_name(){
     };
 
     switch (type){
-        case STRING :
+        case A_STRING :
             display_name = display_name + "string";
             goto end;
-        case LONG :
+        case A_LONG :
             display_name = display_name + "long";
             goto integer;
-        case SHORT :
+        case A_SHORT :
             display_name = display_name + "short";
             goto integer;
-        case CHAR :
+        case A_CHAR :
             display_name = display_name + "byte";
             goto integer;
-        case FLOAT :
+        case A_FLOAT :
             display_name = display_name + "float";
             goto floating_point;
-        case BOOL :
+        case A_BOOL :
             display_name = display_name + "on-off";
             goto end;
-        case TIME :
+        case A_TIME :
             display_name = display_name + "time";
             goto end;
     };
@@ -493,37 +500,37 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
     input = in;
     VulpesArgType type = definition->type;
 
-    if (type != STRING && input == ""){
+    if (type != A_STRING && input == ""){
         output = false;
         return;
     };
     char* leftover;
     switch (type){
-            case STRING :
+            case A_STRING :
             strout = definition->parse_str(input);
             output = true;
             break;
-        case LONG :
-        case SHORT :
-        case CHAR :
+        case A_LONG :
+        case A_SHORT :
+        case A_CHAR :
             intout = definition->parse_int(input, &leftover);
             output = true;
             if (*leftover != '\0'){
                 *success = false;
             };
             break;
-        case FLOAT :
+        case A_FLOAT :
             fltout = definition->parse_flt(input, &leftover);
             output = true;
             if (*leftover != '\0'){
                 *success = false;
             };
             break;
-        case BOOL :
+        case A_BOOL :
             boolout = definition->parse_bool(input);
             output = true;
             break;
-        case TIME :
+        case A_TIME :
             intout = definition->parse_time(input, success);
             output = true;
             break;
@@ -554,8 +561,9 @@ bool VulpesArg::has_output(){
 
 VulpesCommand::VulpesCommand(string cmd_name,
                              bool (*function_to_exec)(vector<VulpesArg>),
-                             int num_args, ...){
+                             uint8_t min_dev_level, int num_args, ...){
     name = cmd_name;
+    strncpy(name_chars, name.data(), 32);
     cmd_func = function_to_exec;
     va_list va_args;
     va_start(va_args, num_args);
@@ -583,6 +591,10 @@ VulpesCommand::~VulpesCommand(){
 string VulpesCommand::get_name(){
     return name;
 }
+char* VulpesCommand::get_name_chars(){
+    return (char*)&name_chars;
+}
+
 
 vector<VulpesArgDef> VulpesCommand::get_arg_defs(){
     return args;
@@ -622,6 +634,10 @@ vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings, bool* su
         };
     };
     return parsed_args;
+}
+
+uint8_t VulpesCommand::get_dev_level(){
+    return developer_level;
 }
 
 bool VulpesCommand::execute(vector<VulpesArg> parsed_args){

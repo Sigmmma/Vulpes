@@ -13,23 +13,23 @@ bool process_command(char* input, int32_t network_machine_id);
 // Interface for registering commands.
 
 enum VulpesArgType {
-    STRING,
+    A_STRING,
 
-    LONG,
-    SHORT,
-    CHAR,
+    A_LONG,
+    A_SHORT,
+    A_CHAR,
 
-    FLOAT,
-    BOOL,
-    TIME
+    A_FLOAT,
+    A_BOOL,
+    A_TIME
 };
 
 class VulpesArgDef {
 public:
-    VulpesArgDef(std::string arg_name, bool is_optional, VulpesArgType arg_type);
-    VulpesArgDef(std::string arg_name, bool is_optional, VulpesArgType arg_type, int max_char);
-    VulpesArgDef(std::string arg_name, bool is_optional, VulpesArgType arg_type, int64_t min, int64_t max);
-    VulpesArgDef(std::string arg_name, bool is_optional, VulpesArgType arg_type, float min, float max);
+    VulpesArgDef(std::string arg_name, bool required, VulpesArgType arg_type);
+    VulpesArgDef(std::string arg_name, bool required, VulpesArgType arg_type, int max_char);
+    VulpesArgDef(std::string arg_name, bool required, VulpesArgType arg_type, int64_t min, int64_t max);
+    VulpesArgDef(std::string arg_name, bool required, VulpesArgType arg_type, float min, float max);
 
     std::string parse_str(std::string input);
     int32_t parse_int(std::string input, char** leftover);
@@ -79,16 +79,19 @@ class VulpesCommand {
 public:
     VulpesCommand(std::string cmd_name,
                   bool (*function_to_exec)(std::vector<VulpesArg>),
-                  int num_args, ...);
+                  uint8_t min_dev_level, int num_args, ...);
     ~VulpesCommand();
     std::string get_name();
+    char* get_name_chars();
     std::vector<VulpesArgDef> get_arg_defs();
     std::vector<VulpesArg> parse_args(std::vector<std::string> arg_strings, bool* success);
-
+    uint8_t get_dev_level();
     bool execute(std::vector<VulpesArg> parsed_args);
 
 private:
+    char name_chars[32];
     std::string name;
     std::vector<VulpesArgDef> args;
     bool (*cmd_func)(std::vector<VulpesArg>);
+    uint8_t developer_level;
 };
