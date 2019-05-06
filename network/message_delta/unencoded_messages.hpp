@@ -186,6 +186,58 @@ struct SlayerUpdate {
     SlayerScoreArray individual_score;
 };
 
+struct CtfUpdateHeader {
+    uint32_t flag_swap_timer;
+};
+
+struct CtfUpdate {
+    int32_t team_score[2];
+    int32_t team_with_flag;
+};
+
+// This one leaves me uncertain.
+struct OddballUpdate {
+    PAD(4);
+    int32_t team_score[16];
+    int32_t player_score[16];
+    PAD(64);
+    int32_t is_holding_ball[16];
+};
+
+struct KingUpdate {
+    PAD(0x1A4); // king score array?
+    int32_t hill_id;
+};
+
+struct RaceUpdate {
+    int32_t lap_completed_val;
+    int32_t first_flag[16];
+    int32_t lap_bit_vector[16];
+    int32_t rally_flag;
+    int32_t team_laps;
+};
+
+struct PlayerScoreUpdateHeader {
+    int32_t player_id;
+};
+
+struct PlayerScoreUpdate {
+    int16_t kills[4];
+    int16_t assists[4];
+    int16_t friendly_fire_kills;
+    int16_t deaths;
+    int16_t suicides;
+    int16_t flag_grabs;
+    int16_t flag_returns;
+    int16_t flag_scores;
+    int32_t special;
+    bool is_odd_man_out;
+    PAD(3);
+    float speed_multiplier;
+};
+
+
+
 struct VulpesMessage {
     uint32_t payload_size;
     union {
