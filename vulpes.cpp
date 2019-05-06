@@ -17,6 +17,11 @@ void revert_hooks(){
     revert_console_hooks();
 }
 
+#include "command/debug.hpp"
+void init_commands(){
+    init_debug_commands();
+}
+
 #include "halo_bug_fixes/cpu_usage.hpp"
 #include "halo_bug_fixes/file_handle_leak.hpp"
 #include "halo_bug_fixes/host_refusal.hpp"
@@ -85,6 +90,7 @@ void init_vulpes(){
     init_halo_functions();
     //init_memory();
     init_network();
+    init_commands();
 }
 
 void destruct_vulpes(){
