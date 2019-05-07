@@ -49,4 +49,4 @@ build:
 
 	#ld -r -b binary binary/console_font.bin -o bin/console_font.o
 
-	g++ bin/*.o -shared $(LINKARGS) -static-libgcc -lkernel32 -o "bin/Vulpes.dll"
+	g++ bin/*.o -shared $(LINKARGS) -static-libgcc -static-libstdc++ -lkernel32 -o "bin/Vulpes.dll"
