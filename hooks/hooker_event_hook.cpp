@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string.h>
+#include <cassert>
 
 // A little background. The sane way to hook into an event would be to
 // overwrite a call to a function that we want to wrap. Problem is, everyone
@@ -31,24 +32,30 @@ const uint8_t code_cave_template[] = {
     0x61,
     // before function.
     0x60,
-    0xe8, 0x00, 0x00, 0x00, 0x00, // call write offset 0xC
+    0x54, // Push esp and increment the pushed value by 24
+    0x3e, 0x83, 0x04, 0x24, 0x24,
+    0xe8, 0x00, 0x00, 0x00, 0x00, // call write offset 0xC+0x6
+    0x83, 0xc4, 0x04,
     0x61,
     // remove original return address from stack.
     0x83, 0xc4, 0x04,
     // push the address after the next jump onto the stack,
     // so the function will return here and finish.
-    0x68, 0x00, 0x00, 0x00, 0x00, // return write offset 0x16
+    0x68, 0x00, 0x00, 0x00, 0x00, // return write offset 0x16+0x9
     // execute the portion we overwrote.
-    0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, // original code write offset 0x1A
+    0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, // original code write offset 0x1A+0x9
     // jump to the function we're hooking into.
-    0xe9, 0x00, 0x00, 0x00, 0x00, // execute original func write offset 0x2A
+    0xe9, 0x00, 0x00, 0x00, 0x00, // execute original func write offset 0x2A+0x9
     // make space for a return address.
     0x6a, 0x00,
     // execute after function.
     0x60,
-    0xe8, 0x00, 0x00, 0x00, 0x00, // call write offset 0x32
+    0x54, // Push esp and increment the pushed value by 24
+    0x3e, 0x83, 0x04, 0x24, 0x24,
+    0xe8, 0x00, 0x00, 0x00, 0x00, // call write offset 0x32+0x9+0x6
+    0x83, 0xc4, 0x04,
     // get return address and put it into our allocated spot.
-    0xe8, 0x00, 0x00, 0x00, 0x00, // call write offset 0x37
+    0xe8, 0x00, 0x00, 0x00, 0x00, // call write offset 0x37+0x9+0x9
     0x89, 0x44, 0x24, 0x20,
     0x61,
     // return to whatever place called the original function.
@@ -150,11 +157,11 @@ intptr_t prepare_code_cave(){
 
     memcpy((void*)curr_cave, code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
     set_call_address(curr_cave+0x5,  (intptr_t)&register_return_address); // register original return address
-    set_call_address(curr_cave+0x37, (intptr_t)&unregister_return_address); // retrieve original return address
-    *(intptr_t*)(curr_cave+0x16)  =  (intptr_t)curr_cave+0x2F; // Return address
-    set_call_address(curr_cave+0xC,  (intptr_t)&null_func); // before function placeholder
-    set_call_address(curr_cave+0x32, (intptr_t)&null_func); // after function placeholder
-    set_call_address(curr_cave+0x2A, (intptr_t)&null_func); // jump placeholder
+    set_call_address(curr_cave+0x37+0x9+0x9, (intptr_t)&unregister_return_address); // retrieve original return address
+    *(intptr_t*)(curr_cave+0x16+0x9)  =  (intptr_t)curr_cave+0x2F+0x9; // Return address
+    set_call_address(curr_cave+0xC+0x6,  (intptr_t)&null_func); // before function placeholder
+    set_call_address(curr_cave+0x32+0x9+0x6, (intptr_t)&null_func); // after function placeholder
+    set_call_address(curr_cave+0x2A+0x9, (intptr_t)&null_func); // jump placeholder
     return curr_cave;
 }
 
@@ -166,18 +173,22 @@ EventHook::EventHook(const char* h_name, void* before, void* after){
 }
 
 void EventHook::build(uintptr_t p_address, size_t p_size){
+    assert(p_size <= 16);
     printf("Building EventHook %s...", name);
     cave_address = (intptr_t)prepare_code_cave();
     code_patch.build(p_address, p_size, JMP_PATCH, cave_address);
-    set_call_address(cave_address+0xC,  before_func);
-    set_call_address(cave_address+0x32, after_func);
-    set_call_address(cave_address+0x2A, code_patch.get_return_address());
-    uint8_t* original_code_cpy = (uint8_t*)cave_address+0x1A;
+    set_call_address(cave_address+0xC+0x6,  before_func);
+    set_call_address(cave_address+0x32+0x9+0x6, after_func);
+    uint8_t* original_code_cpy = (uint8_t*)cave_address+0x1A+0x9;
     std::vector<int16_t> original_code = code_patch.get_unpatched_bytes();
     for (int i = 0; i<original_code.size(); i++){
         original_code_cpy[i] = (uint8_t)original_code[i];
     };
-    printf("done.");
+    // Went off the original plan for a bit here,
+    // I'm doing this to avoid executing some NOPs.
+    original_code_cpy[original_code.size()] = 0xE9;
+    set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.get_return_address());
+    printf("done.\n");
 }
 
 void EventHook::apply(){
