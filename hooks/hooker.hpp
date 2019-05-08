@@ -103,11 +103,33 @@ private:
     void write_patch(std::vector<int16_t> patch_code);
 };
 
+#define Hook(name, before, after) EventHook name(#name, before, after)
+
+class EventHook {
+public:
+    EventHook(const char* h_name, void* before, void* after);
+    void build(uintptr_t p_address, size_t p_size);
+    void apply();
+    void revert();
+
+private:
+    intptr_t before_func;
+    intptr_t func_continue;
+    intptr_t after_func;
+    intptr_t cave_address;
+    const char* name;
+    CodePatch code_patch = CodePatch("");
+};
+
 // Gets the direct pointer to whatever the instruction at this address CALLs or JUMPs to.
 uintptr_t get_call_address(intptr_t call_pointer);
+void      set_call_address(intptr_t call_pointer, intptr_t point_to);
+
 
 // These are initialization functions, these should rarely actually be called.
 uintptr_t get_lowest_permitted_address();
 uintptr_t get_highest_permitted_address();
 void set_lowest_permitted_address(uintptr_t new_address);
 void set_highest_permitted_address(uintptr_t new_address);
+void init_event_hooker();
+void revert_event_hooker();

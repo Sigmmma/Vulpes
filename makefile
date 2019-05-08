@@ -19,6 +19,7 @@ build:
 	g++ -c command/debug.cpp $(ARGSDEF) -o bin/command__debug.o
 
 	g++ -c hooks/hooker.cpp $(ARGSDEF) -o bin/hooks__hooker.o
+	g++ -c hooks/hooker_event_hook.cpp $(ARGSDEF) -o bin/hooks__hooker_event_hook.o
 	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
 	g++ -c hooks/console.cpp $(ARGS) -o bin/hooks__console.o
 

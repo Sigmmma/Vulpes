@@ -8,11 +8,16 @@ static bool server;
 #include "hooks/hooker.hpp"
 #include "hooks/incoming_packets.hpp"
 #include "hooks/console.hpp"
+#include "hooks/tick.hpp"
 void init_hooks(){
+    init_event_hooker();
+
     init_incoming_packet_hooks();
     init_console_hooks();
 }
 void revert_hooks(){
+    revert_event_hooker();
+
     revert_incoming_packet_hooks();
     revert_console_hooks();
 }
