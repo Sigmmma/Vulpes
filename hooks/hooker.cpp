@@ -307,10 +307,23 @@ uintptr_t CodePatch::get_return_address(){
 
 uintptr_t get_call_address(intptr_t call_pointer){
     uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
+    assert(call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9);
     if (call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9){
         return (*reinterpret_cast<uintptr_t*>(call_pointer + 1) + call_pointer + 5);
     };
     return 0;
+}
+
+void set_call_address(intptr_t call_pointer, intptr_t point_to){
+    DWORD prota, protb;
+    uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
+    assert(call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9);
+    if (call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9){
+        VirtualProtect(reinterpret_cast<void*>(call_pointer), 5, PAGE_EXECUTE_READWRITE, &prota);
+        *reinterpret_cast<intptr_t*>(call_pointer + 1) = point_to - 5 - call_pointer;
+        VirtualProtect(reinterpret_cast<void*>(call_pointer), 5, prota, &protb);
+    };
+    
 }
 
 static uintptr_t lowest_permitted_address = 0x400000;
