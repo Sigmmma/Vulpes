@@ -2,7 +2,7 @@
 #include <cstdint>
 
 Signature(false, sig_developer_mode_address,
-    {-1, -1, -1, -1, 0x81, 0xEC, 0x1C, 0x02, 0x00, 0x00, 0x3C, 0x03, 0x0F, 0x82, -1, -1, -1, -1, 0xA0});
+    {-1, -1, -1, -1, 0x04, 0x72, -1, 0x8D, 0x54, 0x24, 0x0C, 0x52});
 
 uint8_t developer_mode_level(){
     static uint8_t* developer_mode = (uint8_t*)*(uintptr_t*)sig_developer_mode_address.get_address();
