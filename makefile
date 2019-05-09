@@ -22,6 +22,7 @@ build:
 	g++ -c hooks/hooker_event_hook.cpp $(ARGSDEF) -o bin/hooks__hooker_event_hook.o
 	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
 	g++ -c hooks/console.cpp $(ARGS) -o bin/hooks__console.o
+	g++ -c hooks/tick.cpp $(ARGS) -o bin/hooks__tick.o
 
 	g++ -c halo_functions/object_unit.cpp $(ARGS) -o bin/halo_functions__object_unit.o
 	g++ -c halo_functions/console.cpp $(ARGS) -o bin/halo_functions__console.o
