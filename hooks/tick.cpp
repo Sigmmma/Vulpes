@@ -24,7 +24,7 @@ Signature(true, sig_tick,
     {0x51, 0x53, 0x68, 0xFF, 0xFF, 0x0F, 0x00, 0x68, 0x1F, 0x00, 0x09,
      0x00, 0xC6, 0x05, -1, -1, -1, -1, 0x01});
 
-static Hook(tick_hook, (void*)&before_tick, (void*)&after_tick);
+static Cave(tick_hook, (void*)&before_tick, (void*)&after_tick);
 
 void init_tick_hook(){
     static uintptr_t sig_addr = sig_tick.get_address();
