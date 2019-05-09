@@ -103,11 +103,11 @@ private:
     void write_patch(std::vector<int16_t> patch_code);
 };
 
-#define Hook(name, before, after) EventHook name(#name, before, after)
+#define Cave(name, before, after) CodeCave name(#name, before, after)
 
-class EventHook {
+class CodeCave {
 public:
-    EventHook(const char* h_name, void* before, void* after);
+    CodeCave(const char* h_name, void* before, void* after);
     void build(uintptr_t p_address, size_t p_size);
     void apply();
     void revert();
