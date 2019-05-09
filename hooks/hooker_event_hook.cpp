@@ -36,6 +36,8 @@ const uint8_t code_cave_template[] = {
     0x3e, 0x83, 0x04, 0x24, 0x24,
     0xe8, 0x00, 0x00, 0x00, 0x00, // call write offset 0xC+0x6
     0x83, 0xc4, 0x04,
+    0x84, 0xc0,
+    0x74, 0x2F,
     0x61,
     // remove original return address from stack.
     0x83, 0xc4, 0x04,
@@ -157,11 +159,11 @@ intptr_t prepare_code_cave(){
 
     memcpy((void*)curr_cave, code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
     set_call_address(curr_cave+0x5,  (intptr_t)&register_return_address); // register original return address
-    set_call_address(curr_cave+0x37+0x9+0x9, (intptr_t)&unregister_return_address); // retrieve original return address
-    *(intptr_t*)(curr_cave+0x16+0x9)  =  (intptr_t)curr_cave+0x2F+0x9; // Return address
+    set_call_address(curr_cave+0x37+0x9+0x9+0x4, (intptr_t)&unregister_return_address); // retrieve original return address
+    *(intptr_t*)(curr_cave+0x16+0x9+0x4)  =  (intptr_t)curr_cave+0x2F+0x9+0x4; // Return address
     set_call_address(curr_cave+0xC+0x6,  (intptr_t)&null_func); // before function placeholder
-    set_call_address(curr_cave+0x32+0x9+0x6, (intptr_t)&null_func); // after function placeholder
-    set_call_address(curr_cave+0x2A+0x9, (intptr_t)&null_func); // jump placeholder
+    set_call_address(curr_cave+0x32+0x9+0x6+0x4, (intptr_t)&null_func); // after function placeholder
+    set_call_address(curr_cave+0x2A+0x9+0x4, (intptr_t)&null_func); // jump placeholder
     return curr_cave;
 }
 
@@ -178,8 +180,8 @@ void EventHook::build(uintptr_t p_address, size_t p_size){
     cave_address = (intptr_t)prepare_code_cave();
     code_patch.build(p_address, p_size, JMP_PATCH, cave_address);
     set_call_address(cave_address+0xC+0x6,  before_func);
-    set_call_address(cave_address+0x32+0x9+0x6, after_func);
-    uint8_t* original_code_cpy = (uint8_t*)cave_address+0x1A+0x9;
+    set_call_address(cave_address+0x32+0x9+0x6+0x4, after_func);
+    uint8_t* original_code_cpy = (uint8_t*)cave_address+0x1A+0x9+0x4;
     std::vector<int16_t> original_code = code_patch.get_unpatched_bytes();
     for (int i = 0; i<original_code.size(); i++){
         original_code_cpy[i] = (uint8_t)original_code[i];
