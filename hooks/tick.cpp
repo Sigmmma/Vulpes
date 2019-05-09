@@ -2,13 +2,18 @@
 #include "hooker.hpp"
 #include <cstdio>
 
+static std::vector<Event<EVENT_PRE_TICK>> pre_events;
 static std::vector<Event<EVENT_TICK>> events;
-
+std::vector<Event<EVENT_PRE_TICK>>* EVENT_PRE_TICK_list(){
+    return &events;
+}
 std::vector<Event<EVENT_TICK>>* EVENT_TICK_list(){
     return &events;
 }
 
-void before_tick(intptr_t original_args_ptr){
+bool before_tick(intptr_t original_args_ptr){
+    call_in_order(pre_events);
+    return true;
 }
 
 void after_tick(intptr_t original_args_ptr){
