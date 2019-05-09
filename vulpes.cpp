@@ -14,12 +14,14 @@ void init_hooks(){
 
     init_incoming_packet_hooks();
     init_console_hooks();
+    init_tick_hook();
 }
 void revert_hooks(){
     revert_event_hooker();
 
     revert_incoming_packet_hooks();
     revert_console_hooks();
+    revert_tick_hook();
 }
 
 #include "command/debug.hpp"
