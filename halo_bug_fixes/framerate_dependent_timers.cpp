@@ -1,7 +1,6 @@
 #include "framerate_dependent_timers.hpp"
 #include "../hooks/hooker.hpp"
 #include "../hooks/tick.hpp"
-#include <cstdio>
 
 Signature(false, sig_death_timer_framerate_dep,
     {0x38, 0x1D, -1, -1, -1, -1, 0x74, 0x33, 0xA1, -1, -1, -1, -1, 0x38, 0x58,
@@ -14,9 +13,7 @@ int32_t* player_respawn_timer;
 
 void increment_respawn_timer(){
     if (*player_dead){
-        printf("increment.\n");
-        int32_t time = *player_respawn_timer + 1;
-        *player_respawn_timer = time;
+        *player_respawn_timer = *player_respawn_timer + 1;
     };
 }
 
