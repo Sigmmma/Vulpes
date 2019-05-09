@@ -33,6 +33,7 @@ build:
 	g++ -c halo_bug_fixes/host_refusal.cpp $(ARGSDEF) -o bin/halo_bug_fixes__host_refusal.o
 	g++ -c halo_bug_fixes/string_overflows.cpp $(ARGS) -o bin/halo_bug_fixes__string_overflows.o
 	g++ -c halo_bug_fixes/shdr_trans_zfighting.cpp $(ARGSDEF) -o bin/halo_bug_fixes__shdr_trans_zfighting.o
+	g++ -c halo_bug_fixes/framerate_dependent_timers.cpp $(ARGSDEF) -o bin/halo_bug_fixes__framerate_dependent_timers.o
 
 	g++ -c memory/types.cpp $(ARGSDEF) -o bin/memory__types.o
 	g++ -c memory/object.cpp $(ARGSDEF) -o bin/memory__object.o
