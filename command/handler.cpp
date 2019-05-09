@@ -565,6 +565,7 @@ VulpesCommand::VulpesCommand(string cmd_name,
     name = cmd_name;
     strncpy(name_chars, name.data(), 32);
     cmd_func = function_to_exec;
+    developer_level = min_dev_level;
     va_list va_args;
     va_start(va_args, num_args);
     for (int i=0; i<num_args; i++){
