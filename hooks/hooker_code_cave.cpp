@@ -167,16 +167,16 @@ intptr_t prepare_code_cave(){
     return curr_cave;
 }
 
-EventHook::EventHook(const char* h_name, void* before, void* after){
+CodeCave::CodeCave(const char* h_name, void* before, void* after){
     code_patch = CodePatch(h_name);
     name = h_name;
     before_func = (intptr_t)before;
     after_func = (intptr_t)after;
 }
 
-void EventHook::build(uintptr_t p_address, size_t p_size){
+void CodeCave::build(uintptr_t p_address, size_t p_size){
     assert(p_size <= 16);
-    printf("Building EventHook %s...", name);
+    printf("Building CodeCave %s...", name);
     cave_address = (intptr_t)prepare_code_cave();
     code_patch.build(p_address, p_size, JMP_PATCH, cave_address);
     set_call_address(cave_address+0xC+0x6,  before_func);
@@ -193,10 +193,10 @@ void EventHook::build(uintptr_t p_address, size_t p_size){
     printf("done.\n");
 }
 
-void EventHook::apply(){
+void CodeCave::apply(){
     code_patch.apply();
 }
 
-void EventHook::revert(){
+void CodeCave::revert(){
     code_patch.revert();
 }
