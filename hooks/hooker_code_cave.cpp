@@ -127,7 +127,7 @@ static size_t address_of_next_cave = 0;
 const size_t SIZE_OF_CODE_CAVE_MEMORY = 16384;
 static uint8_t* code_cave_memory;
 
-void init_event_hooker(){
+void init_code_caves(){
     for (int i = 0; i < 200; i++){
         t_pairs[i].thread_id = 0;
         t_pairs[i].ret_addr = 0;
@@ -143,7 +143,7 @@ void init_event_hooker(){
     };
 }
 
-void revert_event_hooker(){
+void revert_code_caves(){
     if (code_cave_memory != NULL){
         free(code_cave_memory);
     };

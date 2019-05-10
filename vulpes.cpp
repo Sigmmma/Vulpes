@@ -10,14 +10,14 @@ static bool server;
 #include "hooks/console.hpp"
 #include "hooks/tick.hpp"
 void init_hooks(){
-    init_event_hooker();
+    init_code_caves();
 
     init_incoming_packet_hooks();
     init_console_hooks();
     init_tick_hook();
 }
 void revert_hooks(){
-    revert_event_hooker();
+    revert_code_caves();
 
     revert_incoming_packet_hooks();
     revert_console_hooks();

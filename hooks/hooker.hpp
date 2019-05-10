@@ -131,5 +131,5 @@ uintptr_t get_lowest_permitted_address();
 uintptr_t get_highest_permitted_address();
 void set_lowest_permitted_address(uintptr_t new_address);
 void set_highest_permitted_address(uintptr_t new_address);
-void init_event_hooker();
-void revert_event_hooker();
+void init_code_caves();
+void revert_code_caves();
