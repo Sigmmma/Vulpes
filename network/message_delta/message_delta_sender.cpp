@@ -34,6 +34,7 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
             "push %2;\n"
             "push %4;\n"
             "mov ecx, %1;\n"
+            "mov ecx, [ecx];\n"
             "mov eax, %3;\n"
             "call %0;\n"
             "add esp, 0x18;\n"
@@ -42,7 +43,7 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
             "pop ecx;\n"
             : "+m" (func_send_message_to_all)   // 0
             : "m" (socket_ready),               // 1
-              "m" ((uint32_t)message),          // 2
+              "m" (message),                    // 2
               "m" (message_size),               // 3
               "m" (bool_ingame_only),           // 4
               "m" (bool_write_to_local_connection),//5
@@ -78,6 +79,7 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
             "push %2;\n"
             "push %4;\n"
             "mov esi, %1;\n"
+            "mov esi, [esi];\n"
             "mov eax, %9;\n"
             "call %0;\n"
             "add esp, 0x1C;\n"
