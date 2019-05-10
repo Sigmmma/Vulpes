@@ -20,9 +20,9 @@ void increment_respawn_timer(){
 void init_framerate_dependent_timer_fixes(){
     intptr_t sig_addr = sig_death_timer_framerate_dep.get_address();
     if (sig_addr && !death_timer_framerate_dep_fix.is_built()){
-        death_timer_framerate_dep_fix.build(sig_addr+6+2+5+3+2+6+3, 2, NOP_PATCH, 0);
+        death_timer_framerate_dep_fix.build(sig_addr+27, 2, NOP_PATCH, 0);
         player_dead = (bool*)*(uintptr_t*)(sig_addr+2);
-        player_respawn_timer = (int32_t*)*(uintptr_t*)(sig_addr+6+2+5+3+2+2);
+        player_respawn_timer = (int32_t*)*(uintptr_t*)(sig_addr+20);
     };
     if (death_timer_framerate_dep_fix.is_built()){
         death_timer_framerate_dep_fix.apply();
