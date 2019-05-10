@@ -40,7 +40,7 @@ void init_halo_bug_fixes(){
     init_file_handle_leak_fixes();
     init_host_refusal_fixes();
     init_string_overflow_fixes();
-    init_shdr_trans_zfighting_fixes();
+    //init_shdr_trans_zfighting_fixes();
     init_framerate_dependent_timer_fixes();
 }
 
@@ -49,7 +49,7 @@ void revert_halo_bug_fixes(){
     revert_file_handle_leak_fixes();
     revert_host_refusal_fixes();
     revert_string_overflow_fixes();
-    revert_shdr_trans_zfighting_fixes();
+    //revert_shdr_trans_zfighting_fixes();
     revert_framerate_dependent_timer_fixes();
 }
 
