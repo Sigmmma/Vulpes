@@ -1,5 +1,5 @@
 #pragma once
-
+#include "definition.hpp"
 #include "enums.hpp"
 
 // Do not use this until all args are named.
@@ -10,6 +10,6 @@ uint32_t mdp_encode_stateless_iterated(
 uint32_t mdp_encode_stateless_iterated(
     void* output_buffer, MessageDeltaType type, void* unencoded_message);
 
-bool mdp_decode_stateless_iterated(void* destination, void* message_header);
+bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header);
 
-bool mdp_discard_iteration_body(void* message_header);
+void mdp_discard_iteration_body(MessageDeltaHeader* message_header);

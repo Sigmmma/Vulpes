@@ -11,14 +11,22 @@ Signature(true, sig_mdp_encode_stateless_iterated,
 Signature(true, sig_mdp_discard_iteration_body,
     {0x81, 0xEC, 0x00, 0x08, 0x00, 0x00, 0x56, 0x57, 0x8B, 0x38, 0x8B, 0x37});
 
+//static func_mdp_encode
+
 uint32_t mdp_encode_stateless_iterated(
     void* output_buffer, int32_t arg1, MessageDeltaType type,
     uint32_t arg3, void* unencoded_message, uint32_t arg5, uint32_t arg6, uint32_t arg7){
 
     uint32_t output_size;
+    // Protective pushad and popad. I found that if I don't do this it usually
+    // ends up crashing when it needs to retrieve this address.
+    asm ("pushad;");
     static uintptr_t func_mdp_encode = sig_mdp_encode_stateless_iterated.get_address();
-    int32_t type_int = static_cast<int32_t>(type);
+    asm ("popad;");
+    int32_t type_int = type;
+    void** ptr_to_ptr = &unencoded_message;
     asm (
+        "pushad;\n"
         "push %8;\n"
         "push %7;\n"
         "push %6;\n"
@@ -31,12 +39,13 @@ uint32_t mdp_encode_stateless_iterated(
         "call %0;\n"
         "add esp, 0x1C;\n"
         "mov %9, eax;\n"
+        "popad;\n"
         : "+m" (func_mdp_encode)
-        : "m" ((uint32_t)output_buffer),
+        : "m" (output_buffer),
           "m" (arg1),
           "m" (type_int),
           "m" (arg3),
-          "m" ((uint32_t)unencoded_message),
+          "m" (ptr_to_ptr),
           "m" (arg5),
           "m" (arg6),
           "m" (arg7),
@@ -51,9 +60,9 @@ uint32_t mdp_encode_stateless_iterated(
     return mdp_encode_stateless_iterated(output_buffer, 0, type, 0, unencoded_message, 0, 1, 0);
 }
 
-bool mdp_decode_stateless_iterated(void* destination, void* message_header){
-    bool success;
+bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header){
     static uintptr_t func_mdp_decode = sig_mdp_decode_stateless_iterated.get_address();
+    bool success;
     asm (
         "mov ecx, %1;\n"
         "mov eax, %2;\n"
@@ -61,22 +70,20 @@ bool mdp_decode_stateless_iterated(void* destination, void* message_header){
         "mov %3, al;\n"
         : "+m" (func_mdp_decode)
         : "m" (destination),
-          "m" (message_header),
+          "m" ((void*)message_header),
           "m" (success)
     );
     return success;
 }
 
-bool mdp_discard_iteration_body(void* message_header){
-    bool success;
+void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
     static uintptr_t func_mdp_discard = sig_mdp_discard_iteration_body.get_address();
     asm (
+        "pushad;"
         "mov eax, %1\n"
         "call %0;\n"
-        "mov %2, al;\n"
+        "popad;"
         : "+m" (func_mdp_discard)
-        : "m" (message_header),
-          "m" (success)
+        : "m" ((void*)message_header)
     );
-    return success;
 }
