@@ -17,7 +17,7 @@ void bitstream_write(void* const iteration_header,
     asm (
         "pushad;\n"
         "mov ecx, [esp+0x20+4];\n"
-        "mov eax, [esp+0x20+8];\n"
+        "lea eax, [esp+0x20+8];\n"
         "mov edx, [esp+0x20+0xC];\n"
         "push edx;\n"
         "call %0;\n"
