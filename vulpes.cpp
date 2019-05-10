@@ -43,7 +43,7 @@ void init_halo_bug_fixes(){
     init_string_overflow_fixes();
     //init_shdr_trans_zfighting_fixes();
     init_framerate_dependent_timer_fixes();
-    init_animation_bug_fixes();
+    //init_animation_bug_fixes();
 }
 
 void revert_halo_bug_fixes(){
@@ -53,7 +53,7 @@ void revert_halo_bug_fixes(){
     revert_string_overflow_fixes();
     //revert_shdr_trans_zfighting_fixes();
     revert_framerate_dependent_timer_fixes();
-    revert_animation_bug_fixes();
+    //revert_animation_bug_fixes();
 }
 
 #include "memory/table.hpp"
