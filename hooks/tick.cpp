@@ -1,14 +1,8 @@
 #include "tick.hpp"
 #include "hooker.hpp"
 
-static std::vector<Event<EVENT_PRE_TICK>> pre_events;
-static std::vector<Event<EVENT_TICK>> events;
-std::vector<Event<EVENT_PRE_TICK>>* EVENT_PRE_TICK_list(){
-    return &pre_events;
-}
-std::vector<Event<EVENT_TICK>>* EVENT_TICK_list(){
-    return &events;
-}
+DEFINE_EVENT_HOOK_LIST(EVENT_PRE_TICK, pre_events);
+DEFINE_EVENT_HOOK_LIST(EVENT_TICK, events);
 
 bool before_tick(intptr_t original_args_ptr){
     call_in_order(pre_events);
