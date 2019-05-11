@@ -9,12 +9,14 @@ static bool server;
 #include "hooks/incoming_packets.hpp"
 #include "hooks/console.hpp"
 #include "hooks/tick.hpp"
+#include "hooks/map.hpp"
 void init_hooks(){
     init_code_caves();
 
     init_incoming_packet_hooks();
     init_console_hooks();
     init_tick_hook();
+    init_map_hooks();
 }
 void revert_hooks(){
     revert_code_caves();
@@ -22,6 +24,7 @@ void revert_hooks(){
     revert_incoming_packet_hooks();
     revert_console_hooks();
     revert_tick_hook();
+    revert_map_hooks();
 }
 
 #include "command/debug.hpp"
