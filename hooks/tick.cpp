@@ -4,7 +4,7 @@
 static std::vector<Event<EVENT_PRE_TICK>> pre_events;
 static std::vector<Event<EVENT_TICK>> events;
 std::vector<Event<EVENT_PRE_TICK>>* EVENT_PRE_TICK_list(){
-    return &events;
+    return &pre_events;
 }
 std::vector<Event<EVENT_TICK>>* EVENT_TICK_list(){
     return &events;
