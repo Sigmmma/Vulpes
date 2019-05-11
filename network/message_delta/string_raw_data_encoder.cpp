@@ -1,9 +1,4 @@
 #include "string_raw_data_encoder.hpp"
-#include <cassert>
-#include <cstdio>
-
-// Temporarily giving up on not using chat packets
-// I have now resorted to writing this.
 
 const uint16_t MASKS16[] = {
     1,
