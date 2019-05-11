@@ -1,5 +1,4 @@
 #include "table.hpp"
-#include <cstdio>
 
 #include "../hooks/hooker.hpp"
 

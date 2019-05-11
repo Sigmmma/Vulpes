@@ -1,6 +1,4 @@
 #include "hooker.hpp"
-#include <cstdint>
-#include <strings.h>
 #include "../halo_functions/console.hpp"
 #include "../command/handler.hpp"
 

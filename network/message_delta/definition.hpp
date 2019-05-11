@@ -1,7 +1,6 @@
 #pragma once
 #include "enums.hpp"
 #include "../../memory/types.hpp"
-#include <cstdint>
 
 struct MessageDeltaHeader {
     //MessageDeltaDecodingInfo* decoding_information;
