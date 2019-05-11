@@ -83,4 +83,4 @@ struct MessageDeltaDefinition {
 const uintptr_t header_field_set_ptr_client = 0x6225E0;
 const uintptr_t header_field_set_ptr_server =;
 */
-void init_new_definitions();
+//void init_new_definitions();

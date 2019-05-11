@@ -11,18 +11,15 @@ Signature(true, sig_mdp_encode_stateless_iterated,
 Signature(true, sig_mdp_discard_iteration_body,
     {0x81, 0xEC, 0x00, 0x08, 0x00, 0x00, 0x56, 0x57, 0x8B, 0x38, 0x8B, 0x37});
 
-//static func_mdp_encode
+static uintptr_t func_mdp_encode;
+static uintptr_t func_mdp_decode;
+static uintptr_t func_mdp_discard;
 
 uint32_t mdp_encode_stateless_iterated(
     void* output_buffer, int32_t arg1, MessageDeltaType type,
     uint32_t arg3, void* unencoded_message, uint32_t arg5, uint32_t arg6, uint32_t arg7){
 
     uint32_t output_size;
-    // Protective pushad and popad. I found that if I don't do this it usually
-    // ends up crashing when it needs to retrieve this address.
-    asm ("pushad;");
-    static uintptr_t func_mdp_encode = sig_mdp_encode_stateless_iterated.get_address();
-    asm ("popad;");
     int32_t type_int = type;
     void** ptr_to_ptr = &unencoded_message;
     asm (
@@ -61,7 +58,6 @@ uint32_t mdp_encode_stateless_iterated(
 }
 
 bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header){
-    static uintptr_t func_mdp_decode = sig_mdp_decode_stateless_iterated.get_address();
     bool success;
     asm (
         "mov ecx, %1;\n"
@@ -77,7 +73,6 @@ bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* messag
 }
 
 void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
-    static uintptr_t func_mdp_discard = sig_mdp_discard_iteration_body.get_address();
     asm (
         "pushad;"
         "mov eax, %1\n"
@@ -86,4 +81,10 @@ void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
         : "+m" (func_mdp_discard)
         : "m" ((void*)message_header)
     );
+}
+
+void init_message_delta_processor(){
+    func_mdp_encode = sig_mdp_encode_stateless_iterated.get_address();
+    func_mdp_decode = sig_mdp_decode_stateless_iterated.get_address();
+    func_mdp_discard = sig_mdp_discard_iteration_body.get_address();
 }
