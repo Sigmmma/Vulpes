@@ -13,3 +13,5 @@ uint32_t mdp_encode_stateless_iterated(
 bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header);
 
 void mdp_discard_iteration_body(MessageDeltaHeader* message_header);
+
+void init_message_delta_processor();

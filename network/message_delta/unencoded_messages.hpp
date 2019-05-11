@@ -236,14 +236,13 @@ struct PlayerScoreUpdate {
     float speed_multiplier;
 };
 
-
-
 struct VulpesMessage {
-    uint32_t payload_size;
+    uint16_t payload_size;
     union {
-        uint8_t  payload8[1024];
-        uint32_t payload32[256];
+        uint8_t  payload8[1000];
+        uint16_t payload16[500];
+        uint32_t payload32[250];
     };
-}; static_assert(sizeof(VulpesMessage) == 1028);
+}; static_assert(sizeof(VulpesMessage) == 1002);
 
 #pragma pack(pop)

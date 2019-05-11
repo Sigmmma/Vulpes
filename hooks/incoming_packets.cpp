@@ -9,6 +9,8 @@
 // HUD_CHAT = 0xF
 bool process_hud_chat_message(HudChat* packet){
     if (packet->msg_type == HudChatType::VULPES){
+        printf("Vulpes message received\n");
+        handle_hud_chat_vulpes_message(packet->message);
         return false;
     };
     // We don't want to touch these.
@@ -78,7 +80,7 @@ void init_hud_chat_hook(){
 void revert_hud_chat_hook(){
     hud_chat_hook.revert();
 }
-
+/*
 static intptr_t func_handle_vulpes_message = (intptr_t)&handle_vulpes_message;
 static intptr_t network_related_bool_ptr;
 
@@ -124,14 +126,14 @@ const std::vector<int16_t> equipment_new_hook_signature_bytes = { 0x3C, 0x01, 0x
 const std::vector<int16_t> weapon_new_hook_signature_bytes = { 0x3C, 0x01, 0x0F, 0x85, -1, -1, -1, -1, 0x8D, 0x54, 0x24, 0x34 };
 const std::vector<int16_t> unit_kill_hook_signature_bytes = { 0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8B, 0x44, 0x24, 0x08, 0x85, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8B, 0x15, -1, -1, -1, -1, 0x8B, 0x4A, 0x28, 0x8B, 0x3C, 0x81, 0x83, 0xFF, 0xFF, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x54, 0x24, 0x12 };
 const std::vector<int16_t> damage_dealt_hook_signature_bytes = { 0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8B, 0x44, 0x24, 0x08, 0x85, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8B, 0x15, -1, -1, -1, -1, 0x8B, 0x4A, 0x28, 0x8B, 0x3C, 0x81, 0x83, 0xFF, 0xFF, 0x0F, 0x84, -1, -1, -1, -1, 0x6A, 0x03 };
-
+*/
 
 void init_incoming_packet_hooks(){
     init_hud_chat_hook();
-    init_vulpes_message_hook();
+    //init_vulpes_message_hook();
 }
 
 void revert_incoming_packet_hooks(){
     revert_hud_chat_hook();
-    revert_vulpes_message_hook();
+    //revert_vulpes_message_hook();
 }

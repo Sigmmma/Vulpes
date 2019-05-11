@@ -64,12 +64,15 @@ void init_memory(){
 void init_halo_functions(){
 }
 
-#include "network/message_delta/definition.hpp"
+//#include "network/message_delta/definition.hpp"
 #include "network/message_delta/bitstream.hpp"
-
+#include "network/message_delta/message_delta_processor.hpp"
+#include "network/message_delta/message_delta_sender.hpp"
 void init_network(){
-    init_new_definitions();
+    //init_new_definitions();
     init_bitstream();
+    init_message_delta_processor();
+    init_message_delta_sender();
 }
 
 #include "fox.h"

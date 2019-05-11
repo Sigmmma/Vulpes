@@ -50,6 +50,7 @@ build:
 	g++ -c network/message_delta/definition.cpp $(ARGS) -o bin/network__message_delta__definition.o
 	g++ -c network/message_delta/vulpes_message.cpp $(ARGS) -o bin/network__message_delta__vulpes_message.o
 	g++ -c network/message_delta/message_delta_sender.cpp $(ARGS) -o bin/network__message_delta__message_delta_sender.o
+	g++ -c network/message_delta/string_raw_data_encoder.cpp $(ARGSDEF) -o bin/network__message_delta__string_raw_data_encoder.o
 
 	#ld -r -b binary binary/console_font.bin -o bin/console_font.o
 
