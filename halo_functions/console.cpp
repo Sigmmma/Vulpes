@@ -1,6 +1,5 @@
 #include "../hooks/hooker.hpp"
 #include "console.hpp"
-#include <cstdint>
 /*
 * Copied and edited from the Chimera 2017 repo. MIT License
 */

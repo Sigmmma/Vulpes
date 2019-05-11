@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include "types.hpp"
 
 #include "object.hpp"
@@ -372,7 +371,7 @@ enum class BipedMovementState : int8_t {
 
 class UnitBiped : public ObjectUnit {
 public:
-    bool        airborne : 1;
+    bool        airborne : 1; // 4CC
     bool        slipping : 1;
     bool        absolute_movement : 1;
     bool        no_collision : 1;

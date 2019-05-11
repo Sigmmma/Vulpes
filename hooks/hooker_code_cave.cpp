@@ -3,7 +3,7 @@
 #include "windows.h"
 #include <cstdlib>
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <cassert>
 
 // A little background. The sane way to hook into an event would be to

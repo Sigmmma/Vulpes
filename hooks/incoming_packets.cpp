@@ -1,15 +1,11 @@
 #include "incoming_packets.hpp"
-
-#include <cstdint>
+#include "hooker.hpp"
 #include "../network/message_delta/unencoded_messages.hpp"
 #include "../network/message_delta/vulpes_message.hpp"
-#include "hooker.hpp"
-#include <cstdio>
 
 // HUD_CHAT = 0xF
 bool process_hud_chat_message(HudChat* packet){
     if (packet->msg_type == HudChatType::VULPES){
-        printf("Vulpes message received\n");
         handle_hud_chat_vulpes_message(packet->message);
         return false;
     };
