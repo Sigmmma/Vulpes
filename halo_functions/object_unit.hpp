@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../memory/object_unit.hpp"
 
 __attribute__((regparm(3)))

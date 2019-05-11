@@ -1,6 +1,4 @@
 #pragma once
-
-#include <cstdint>
 #include <vector>
 
 #include "hooker_structs.hpp"

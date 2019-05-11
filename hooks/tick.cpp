@@ -1,6 +1,5 @@
 #include "tick.hpp"
 #include "hooker.hpp"
-#include <cstdio>
 
 static std::vector<Event<EVENT_PRE_TICK>> pre_events;
 static std::vector<Event<EVENT_TICK>> events;

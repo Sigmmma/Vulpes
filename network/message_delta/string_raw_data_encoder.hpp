@@ -1,6 +1,6 @@
 #pragma once
 
-#include "string.h"
+#include <cstring>
 #include <cstdint>
 
 // Encodes an array of 16 bit ints with the size len into a wchar_t array.

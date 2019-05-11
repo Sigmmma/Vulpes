@@ -1,9 +1,6 @@
 #include "object_unit.hpp"
-#include <cstdint>
-
 #include "../hooks/hooker.hpp"
 #include "../memory/object_unit.hpp"
-
 
 // Avoid calling these if you aren't sure about what you're doing.
 // A LOT of these functions don't have any checks to see if you gave them valid input.
