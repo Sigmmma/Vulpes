@@ -11,7 +11,7 @@
 
 Signature(true, sig_mdpi_encode,
     {0x81, 0xEC, 0xA4, 0x00, 0x00, 0x00, 0x53, 0x55, 0x8B, 0xAC, 0x24, 0xBC, 0x00, 0x00, 0x00, 0x33, 0xDB, 0x56});
-
+/*
 static uintptr_t func_mdpi_encode_ptr;
 static uintptr_t old_list_ptr;
 static uintptr_t old_list_end_ptr;
@@ -59,4 +59,4 @@ void init_new_definitions(){
         VirtualProtect((void*)addr, 4, prota, &protb);
         addr = sig_mdp_list_ends.get_address(true);
     };
-}
+}*/

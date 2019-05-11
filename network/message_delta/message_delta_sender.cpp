@@ -10,12 +10,13 @@ Signature(true, sig_send_message_to_player,
 Signature(true, sig_send_message_socket_ready,
     {-1, -1, -1, -1, 0x3B, 0xC3, 0x74, 0x1A, 0x83, 0xC0, 0x08, 0x3B, 0xC3, 0x74, 0x13});
 
+static uintptr_t* socket_ready;
+static uintptr_t func_send_message_to_all;
+static uintptr_t func_send_message_to_player;
+
 void send_delta_message_to_all(void* message, uint32_t message_size,
     bool ingame_only, bool write_to_local_connection,
     bool flush_queue, bool unbuffered, int32_t buffer_priority){
-
-    static uintptr_t* socket_ready = (uintptr_t*)*(uintptr_t*)(sig_send_message_socket_ready.get_address());
-    static uintptr_t func_send_message_to_all = sig_send_message_to_all.get_address() - 56;
 
     if(*socket_ready){
         int32_t bool_ingame_only = ingame_only;
@@ -57,9 +58,6 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
 void send_delta_message_to_player(int32_t player_id, void* message, uint32_t message_size,
     bool ingame_only, bool write_to_local_connection,
     bool flush_queue, bool unbuffered, int32_t buffer_priority){
-
-    static uintptr_t* socket_ready = (uintptr_t*)*(uintptr_t*)(sig_send_message_socket_ready.get_address());
-    static uintptr_t func_send_message_to_player = sig_send_message_to_player.get_address();
 
     if(*socket_ready){
         int32_t bool_ingame_only = ingame_only;
@@ -111,4 +109,10 @@ void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t
                 flush_queue, unbuffered, buffer_priority);
         };
     };
+}
+
+void init_message_delta_sender(){
+    socket_ready = (uintptr_t*)*(uintptr_t*)(sig_send_message_socket_ready.get_address());
+    func_send_message_to_all = sig_send_message_to_all.get_address() - 56;
+    func_send_message_to_player = sig_send_message_to_player.get_address();
 }
