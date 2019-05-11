@@ -1,4 +1,4 @@
-WARNS= -pedantic -Wunused-value
+WARNS= -Wunused-value
 ARGS= $(WARNS) -std=c++17 -masm=intel -msse2 -m32
 ARGSDEF= $(ARGS) -O2
 LINKARGS= -m32 -W
@@ -23,6 +23,7 @@ build:
 	g++ -c hooks/incoming_packets.cpp $(ARGS) -o bin/hooks__incoming_packets.o
 	g++ -c hooks/console.cpp $(ARGS) -o bin/hooks__console.o
 	g++ -c hooks/tick.cpp $(ARGS) -o bin/hooks__tick.o
+	g++ -c hooks/map.cpp $(ARGS) -o bin/hooks__map.o
 
 	g++ -c halo_functions/object_unit.cpp $(ARGS) -o bin/halo_functions__object_unit.o
 	g++ -c halo_functions/console.cpp $(ARGS) -o bin/halo_functions__console.o

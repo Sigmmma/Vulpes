@@ -1,7 +1,8 @@
 #include "incoming_packets.hpp"
 #include "hooker.hpp"
-#include "../network/message_delta/unencoded_messages.hpp"
 #include "../network/message_delta/vulpes_message.hpp"
+
+DEFINE_EVENT_HOOK_LIST(EVENT_RECEIVE_CHAT_MESSAGE, hud_chat_events);
 
 // HUD_CHAT = 0xF
 bool process_hud_chat_message(HudChat* packet){
@@ -14,8 +15,9 @@ bool process_hud_chat_message(HudChat* packet){
         packet->msg_type == HudChatType::HCN){
         return true;
     };
-
-    return true;
+    bool allow = true;
+    call_in_order_allow(hud_chat_events, allow, packet);
+    return allow;
 }
 
 static uintptr_t jmp_hud_chat_original_code;
