@@ -56,7 +56,7 @@ bool before_mp(){
         call_in_order(pre_map, &dummy_string[0]);
         call_in_order(pre_mp, &dummy_string[0]);
     };
-    return false;
+    return true;
 }
 
 void after_mp(){
