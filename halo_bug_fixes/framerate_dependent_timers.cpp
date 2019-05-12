@@ -92,12 +92,53 @@ void revert_scoreboard_fix(){
     patch_ruleboard_intro_nop.revert();
 }
 
+Signature(false, sig_console_fade_call,
+    {0x8B, 0x15, -1, -1, -1, -1, 0x83, 0xFA, 0xFF, 0x74});
+Signature(false, sig_console_framerate_dep,
+    {-1, -1, -1, 0x00, 0x75, 0x05, 0xE8, -1, -1, -1, 0xFF,
+     0xe8, -1, -1, -1, 0xFF});
+
+static bool console_initialized = false;
+
+static bool* console_open;
+static void (*fade_console_halo)();
+
+Patch(patch_console_framerate_dep);
+
+void fade_console(){
+    if (!*console_open){
+        fade_console_halo();
+    };
+}
+
+void init_console_fix(){
+    static intptr_t sig_addr1 = sig_console_fade_call.get_address();
+    static intptr_t sig_addr2 = sig_console_framerate_dep.get_address();
+    if (!console_initialized && sig_addr1 && sig_addr2){
+        fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
+        console_open = (bool*)*(uintptr_t*)sig_addr2;
+        patch_console_framerate_dep.build(sig_addr2+6, 5, NOP_PATCH, 0);
+        console_initialized = true;
+    };
+    if (console_initialized){
+        patch_console_framerate_dep.apply();
+        ADD_EVENT(EVENT_TICK, fade_console);
+    };
+}
+
+void revert_console_fix(){
+    patch_console_framerate_dep.revert();
+    DEL_EVENT(EVENT_TICK, fade_console);
+}
+
 void init_framerate_dependent_timer_fixes(){
     init_checkpoint_revert_fix();
     init_scoreboard_fix();
+    init_console_fix();
 }
 
 void revert_framerate_dependent_timer_fixes(){
     revert_checkpoint_revert_fix();
     revert_scoreboard_fix();
+    revert_console_fix();
 }
