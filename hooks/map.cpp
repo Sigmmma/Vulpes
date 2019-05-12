@@ -75,7 +75,8 @@ Cave(map_load_mp_hook, (void*)&before_mp, (void*)&after_mp);
 void init_map_hooks(){
     map_load_ui_sp_hook.build(sig_map_load_ui_sp.get_address(), 5);
     map_load_mp_hook.build(sig_map_load_mp.get_address(), 6);
-    map_name = (char*)*(uintptr_t*)sig_map_name.get_address();
+    mp_map_name = (char*)*(uintptr_t*)sig_map_name.get_address();
+    sp_map_name = (char*)*(uintptr_t*)sig_sp_map_name.get_address();
     map_load_ui_sp_hook.apply();
     map_load_mp_hook.apply();
 }
