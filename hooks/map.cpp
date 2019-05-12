@@ -22,9 +22,10 @@ static Signature(true, sig_map_name,
 
 char* map_name;
 
-void before_sp(){
+bool before_sp(){
     call_in_order(pre_map, map_name);
     call_in_order(pre_sp, map_name);
+    return true;
 }
 
 void after_sp(){
@@ -32,9 +33,10 @@ void after_sp(){
     call_in_order(post_sp, map_name);
 }
 
-void before_mp(){
+bool before_mp(){
     call_in_order(pre_map, map_name);
     call_in_order(pre_mp, map_name);
+    return true;
 }
 
 void after_mp(){
