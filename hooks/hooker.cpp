@@ -203,7 +203,7 @@ void CodePatch::build_int(uintptr_t p_address, uint32_t patch_int){
     build_manual(p_address, patch_bytes);
 }
 
-void CodePatch::build_int(uintptr_t p_address, uint16_t patch_int){
+void CodePatch::build_int16(uintptr_t p_address, uint16_t patch_int){
     std::vector<int16_t> patch_bytes;
     uint8_t* int_patch_bytes = reinterpret_cast<uint8_t*>(&patch_int);
     for (int i = 0; i < 2; i++){

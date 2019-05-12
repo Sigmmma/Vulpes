@@ -60,7 +60,7 @@ public:
     void build_manual(uintptr_t p_address, std::vector<int16_t> patch_bytes);
     // A patch type that writes an int to a location
     void build_int(uintptr_t p_address, uint32_t patch_int);
-    void build_int(uintptr_t p_address, uint16_t patch_int);
+    void build_int16(uintptr_t p_address, uint16_t patch_int);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.
