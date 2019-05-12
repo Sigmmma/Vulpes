@@ -2,7 +2,7 @@ WARNS= -Wunused-value
 ARGS= $(WARNS) -std=c++17 -masm=intel -msse2 -m32
 ARGSDEF= $(ARGS) -O2
 LINKARGS= -m32 -W
-#,--exclude-all-symbols -s
+#-s
 
 build:
 	mkdir -p bin
@@ -47,7 +47,6 @@ build:
 
 	g++ -c network/network_globals.cpp $(ARGS) -o bin/network__network_globals.o
 
-	g++ -c network/message_delta/bitstream.cpp $(ARGS) -o bin/network__message_delta__bitstream.o
 	g++ -c network/message_delta/message_delta_processor.cpp $(ARGS) -o bin/network__message_delta__message_delta_processor.o
 	g++ -c network/message_delta/vulpes_message.cpp $(ARGS) -o bin/network__message_delta__vulpes_message.o
 	g++ -c network/message_delta/message_delta_sender.cpp $(ARGS) -o bin/network__message_delta__message_delta_sender.o
