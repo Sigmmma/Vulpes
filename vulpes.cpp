@@ -40,6 +40,7 @@ void init_commands(){
 #include "halo_bug_fixes/framerate_dependent_timers.hpp"
 #include "halo_bug_fixes/animation_bugs.hpp"
 #include "halo_bug_fixes/loading_screen.hpp"
+#include "halo_bug_fixes/tweaks.hpp"
 void init_halo_bug_fixes(){
     init_cpu_usage_fixes();
     init_file_handle_leak_fixes();
@@ -50,7 +51,8 @@ void init_halo_bug_fixes(){
         init_framerate_dependent_timer_fixes();
         ADD_EVENT(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
         init_loading_screen_fixes();
-    }
+        init_tweaks();
+    };
 }
 
 void revert_halo_bug_fixes(){
@@ -62,6 +64,7 @@ void revert_halo_bug_fixes(){
     revert_framerate_dependent_timer_fixes();
     revert_animation_bug_fixes();
     revert_loading_screen_fixes();
+    revert_tweaks();
 }
 
 #include "memory/table.hpp"
