@@ -37,6 +37,7 @@ build:
 	g++ -c halo_bug_fixes/framerate_dependent_timers.cpp $(ARGSDEF) -o bin/halo_bug_fixes__framerate_dependent_timers.o
 	g++ -c halo_bug_fixes/animation_bugs.cpp $(ARGSDEF) -o bin/halo_bug_fixes__animation_bugs.o
 	g++ -c halo_bug_fixes/loading_screen.cpp $(ARGSDEF) -o bin/halo_bug_fixes__loading_screen.o
+	g++ -c halo_bug_fixes/tweaks.cpp $(ARGSDEF) -o bin/halo_bug_fixes__tweaks.o
 
 	g++ -c memory/types.cpp $(ARGSDEF) -o bin/memory__types.o
 	g++ -c memory/object.cpp $(ARGSDEF) -o bin/memory__object.o
