@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstdint>
 
-static bool server;
+static bool server = false;
 
 #include "hooks/hooker.hpp"
 #include "hooks/incoming_packets.hpp"
@@ -45,11 +45,12 @@ void init_halo_bug_fixes(){
     init_file_handle_leak_fixes();
     init_host_refusal_fixes();
     init_string_overflow_fixes();
-    //init_shdr_trans_zfighting_fixes();
-    init_framerate_dependent_timer_fixes();
-    ADD_EVENT(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
     ADD_EVENT(EVENT_MAP_LOAD_MP, revert_animation_bug_fixes_e);
-    init_loading_screen_fixes();
+    if (!server){
+        init_framerate_dependent_timer_fixes();
+        ADD_EVENT(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
+        init_loading_screen_fixes();
+    }
 }
 
 void revert_halo_bug_fixes(){
@@ -72,12 +73,12 @@ void init_halo_functions(){
 }
 
 //#include "network/message_delta/definition.hpp"
-#include "network/message_delta/bitstream.hpp"
+//#include "network/message_delta/bitstream.hpp"
 #include "network/message_delta/message_delta_processor.hpp"
 #include "network/message_delta/message_delta_sender.hpp"
 void init_network(){
     //init_new_definitions();
-    init_bitstream();
+    //init_bitstream();
     init_message_delta_processor();
     init_message_delta_sender();
 }
