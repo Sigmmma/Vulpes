@@ -1,8 +1,7 @@
 #include "cpu_usage.hpp"
 #include "../hooks/hooker.hpp"
-
+#define WIN32_MEAN_AND_LEAN
 #include <Windows.h>
-#include <cstdint>
 
 uintptr_t sleep = reinterpret_cast<uintptr_t>(&Sleep);
 
@@ -38,7 +37,7 @@ void init_cpu_usage_fixes(){
         uintptr_t addr1 = sig_cpu_usage_fix_pattern1.get_address(true);
         if (addr1){
             cpu_usage_fix_patch1.build(addr1,
-            PATTERN1_PATCH_LEN, CALL_PATCH, reinterpret_cast<uintptr_t>(&replacement_function));
+                PATTERN1_PATCH_LEN, CALL_PATCH, reinterpret_cast<uintptr_t>(&replacement_function));
             cpu_usage_fix_patch1.apply();
         };
         uintptr_t addr2 = sig_cpu_usage_fix_pattern1.get_address(true);
