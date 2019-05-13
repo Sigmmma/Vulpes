@@ -67,9 +67,7 @@ void revert_halo_bug_fixes(){
     revert_tweaks();
 }
 
-#include "memory/table.hpp"
 void init_memory(){
-    init_tables();
 }
 
 void init_halo_functions(){
