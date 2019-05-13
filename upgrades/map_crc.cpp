@@ -20,6 +20,10 @@ static Signature(true, sig_get_crc_from_table,
     {0x8B, 0x15,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
      0x51, 0x89, 0x8C, 0x24, 0xAC, 0x00, 0x00, 0x00});
 
+// Server map CRC
+static Signature(true, sig_server_map_crc,
+    {0xA1, -1, -1, -1, -1, 0xC1, 0xE1, 0x04, 0x8B, 0x44, 0x01, 0x0C, 0xC3, 0xCC});
+
 // I think this can be used for adding maps to the table
 static Signature(true, sig_add_map_to_list,
     {0x8B, 0x0D, -1, -1, -1, -1, 0x81, 0xEC, 0x00, 0x08, 0x00, 0x00});
@@ -210,12 +214,28 @@ bool get_map_crc(MapListEntry* entry){
             return false;
         }
     };
+    printf("Map name: %s, crc: %X\n", entry->name, entry->crc);
     return true;
 }
 
 static uintptr_t func_get_map_crc = (intptr_t)&get_map_crc;
 static uintptr_t* multiplayer_maps_list_ptr;
 static uintptr_t* jmp_skip_chimera;
+
+__attribute__((naked))
+void get_map_crc_wrapper_server(){
+    asm(
+        "shl ecx, 4;"
+        "pushad;"
+        "add eax, ecx;"
+        "call %0;"
+        "popad;"
+        "mov eax, [eax+ecx+0xC];"
+        "ret;"
+        :
+        :"m" (func_get_map_crc)
+    );
+}
 
 __attribute__((naked))
 void get_map_crc_wrapper(){
@@ -247,6 +267,8 @@ static bool map_upgrades_initialized = false;
 static Patch(patch_read_map_file_header_replacement);
 static Patch(patch_startup_crc_calc_nop);
 static Patch(patch_get_map_crc);
+static Patch(patch_get_map_crc_server);
+
 
 void init_map_crc_upgrades(bool server){
     is_server = server;
@@ -274,6 +296,13 @@ void init_map_crc_upgrades(bool server){
     };
     if (patch_get_map_crc.is_built()){
         patch_get_map_crc.apply();
+    };
+    static intptr_t sig_addr4 = sig_server_map_crc.get_address();
+    if (sig_addr4 && !map_upgrades_initialized){
+        patch_get_map_crc_server.build(sig_addr4+5, 7, CALL_PATCH, (intptr_t)&get_map_crc_wrapper_server);
+    };
+    if (patch_get_map_crc_server.is_built()){
+        patch_get_map_crc_server.apply();
         // This patch depends on the patch above for
         // it to not break server joining.
         if (patch_startup_crc_calc_nop.is_built()){
