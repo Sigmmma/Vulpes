@@ -67,6 +67,15 @@ void revert_halo_bug_fixes(){
     revert_tweaks();
 }
 
+#include "upgrades/map_crc.hpp"
+void init_upgrades(){
+    init_map_crc_upgrades(server);
+}
+
+void revert_upgrades(){
+    revert_map_crc_upgrades();
+}
+
 void init_memory(){
 }
 
@@ -116,6 +125,7 @@ void init_vulpes(){
 
     init_hooks();
     init_halo_bug_fixes();
+    init_upgrades();
     init_halo_functions();
     //init_memory();
     init_network();
@@ -129,4 +139,5 @@ void destruct_vulpes(){
 
     revert_hooks();
     revert_halo_bug_fixes();
+    revert_upgrades();
 }
