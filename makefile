@@ -29,6 +29,8 @@ build:
 	g++ -c halo_functions/console.cpp $(ARGS) -o bin/halo_functions__console.o
 	g++ -c halo_functions/devmode.cpp $(ARGSDEF) -o bin/halo_functions__devmode.o
 
+	g++ -c upgrades/map_crc.cpp $(ARGSDEF) -o bin/upgrades__map_crc.o
+
 	g++ -c halo_bug_fixes/cpu_usage.cpp $(ARGSDEF) -o bin/halo_bug_fixes__cpu_usage.o
 	g++ -c halo_bug_fixes/file_handle_leak.cpp $(ARGSDEF) -o bin/halo_bug_fixes__file_handle_leak.o
 	g++ -c halo_bug_fixes/host_refusal.cpp $(ARGSDEF) -o bin/halo_bug_fixes__host_refusal.o
@@ -53,6 +55,7 @@ build:
 	g++ -c network/message_delta/message_delta_sender.cpp $(ARGS) -o bin/network__message_delta__message_delta_sender.o
 	g++ -c network/message_delta/string_raw_data_encoder.cpp $(ARGSDEF) -o bin/network__message_delta__string_raw_data_encoder.o
 
+	gcc -c includes/crc32.c -m32 -O3 -o bin/includes__crc32.o
 	#ld -r -b binary binary/console_font.bin -o bin/console_font.o
 
 	g++ bin/*.o -shared $(LINKARGS) -static-libgcc -static-libstdc++ -lkernel32 -o "bin/Vulpes.dll"
