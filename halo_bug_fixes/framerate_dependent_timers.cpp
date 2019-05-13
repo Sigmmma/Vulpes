@@ -69,7 +69,7 @@ void init_scoreboard_fix(){
         patch_scoreboard_framerate_dep2a.build_int(sig_addr2+2, (int32_t)&fade);
         patch_scoreboard_framerate_dep3a.build_int(sig_addr3+2, (int32_t)&fade);
         patch_scoreboard_framerate_dep3b.build_int(sig_addr3+14,(int32_t)&fade);
-        patch_ruleboard_intro_nop.build(sig_addr4, 10, NOP_PATCH, 0);
+        patch_ruleboard_intro_nop.build_int(sig_addr4+6, 0);
 
         scoreboard_initialized = true;
     };
