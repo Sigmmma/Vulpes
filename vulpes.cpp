@@ -16,7 +16,7 @@ void init_hooks(){
     init_incoming_packet_hooks();
     init_console_hooks();
     init_tick_hook();
-    init_map_hooks();
+    init_map_hooks(server);
 }
 void revert_hooks(){
     revert_code_caves();
@@ -127,7 +127,6 @@ void init_vulpes(){
     init_halo_bug_fixes();
     init_upgrades();
     init_halo_functions();
-    //init_memory();
     init_network();
     init_commands();
 }
@@ -140,4 +139,5 @@ void destruct_vulpes(){
     revert_hooks();
     revert_halo_bug_fixes();
     revert_upgrades();
+    revert_halo_bug_fixes();
 }
