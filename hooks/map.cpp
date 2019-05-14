@@ -23,6 +23,8 @@ static Signature(false, sig_sp_map_name,
     {-1,-1,-1,-1, 0xC6, 0x05,-1,-1,-1,-1, 0x00, 0xE8,-1,-1,-1,-1,
      0x8A, 0x44, 0x24, 0x1F});
 
+Signature(true, sig_event_map_reset_hook, {0x5B, 0x68, -1, -1, -1, -1, 0x33, 0xC0});
+
 char dummy_string[256] = "";
 char* mp_map_name = 0;
 char* sp_map_name = 0;
