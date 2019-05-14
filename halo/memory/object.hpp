@@ -127,7 +127,7 @@ public:
     bool is_elevator2 : 1;
     bool not_garbage : 1; // Prevents it from being cleaned up in garbage collection.
     bool _unknown_bit17 : 1;
-    bool does_not_shadow : 1;
+    bool does_not_cast_shadow : 1;
     bool delete_at_deactivation : 1;
     bool do_not_reactivate : 1;
     bool out_of_bounds : 1;
