@@ -46,10 +46,10 @@ void init_halo_bug_fixes(){
     init_file_handle_leak_fixes();
     init_host_refusal_fixes();
     init_string_overflow_fixes();
-    ADD_EVENT(EVENT_MAP_LOAD_MP, revert_animation_bug_fixes_e);
+    ADD_CALLBACK(EVENT_MAP_LOAD_MP, revert_animation_bug_fixes_e);
     if (!server){
         init_framerate_dependent_timer_fixes();
-        ADD_EVENT(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
+        ADD_CALLBACK(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
         init_loading_screen_fixes();
         init_tweaks();
     };

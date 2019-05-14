@@ -26,7 +26,7 @@ void init_checkpoint_revert_fix(){
     };
     if (death_timer_framerate_dep_fix.is_built()){
         death_timer_framerate_dep_fix.apply();
-        ADD_EVENT(EVENT_TICK, increment_respawn_timer);
+        ADD_CALLBACK(EVENT_TICK, increment_respawn_timer);
     };
 }
 
@@ -122,7 +122,7 @@ void init_console_fix(){
     };
     if (console_initialized){
         patch_console_framerate_dep.apply();
-        ADD_EVENT(EVENT_TICK, fade_console);
+        ADD_CALLBACK(EVENT_TICK, fade_console);
     };
 }
 
