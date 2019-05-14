@@ -1,0 +1,4 @@
+
+// NOP out all 6 bytes for devmode
+Signature(false, sig_enabled_devmode,
+    {0x74, 0x18, 0x85, 0xC0, 0x7E, 0x39});
