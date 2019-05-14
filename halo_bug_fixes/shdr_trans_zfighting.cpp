@@ -9,6 +9,8 @@
 
 const float val_DecalZBiasValue = -0.000055;
 const float val_DecalSlopeZBiasValue = -2.0;
+const float val_TransZBiasValue = -0.000005;
+const float val_TransSlopeZBiasValue = -1.0;
 
 //static Signature(false, sig_shader_trans_zfighting1,
 //    {0x33, 0xC0, 0xC7, 0x05, -1, -1, -1, -1, 0x00, 0x10, 0x00, 0x00});
