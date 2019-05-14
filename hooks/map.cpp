@@ -34,6 +34,7 @@ bool before_sp(){
     }else{
         call_in_order(pre_map, &dummy_string[0]);
         call_in_order(pre_sp, &dummy_string[0]);
+        dummy_string[0] = 0;
     };
     return true;
 }
@@ -45,6 +46,7 @@ void after_sp(){
     }else{
         call_in_order(post_map, &dummy_string[0]);
         call_in_order(post_sp, &dummy_string[0]);
+        dummy_string[0] = 0;
     };
 }
 
@@ -55,6 +57,7 @@ bool before_mp(){
     }else{
         call_in_order(pre_map, &dummy_string[0]);
         call_in_order(pre_mp, &dummy_string[0]);
+        dummy_string[0] = 0;
     };
     return true;
 }
@@ -66,6 +69,7 @@ void after_mp(){
     }else{
         call_in_order(post_map, &dummy_string[0]);
         call_in_order(post_mp, &dummy_string[0]);
+        dummy_string[0] = 0;
     };
 }
 
