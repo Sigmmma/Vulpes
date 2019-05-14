@@ -35,16 +35,16 @@ void revert_checkpoint_revert_fix(){
     DEL_EVENT(EVENT_TICK, increment_respawn_timer);
 }
 
-static Signature(false, sig_scoreboard_framerate_dep,
+Signature(false, sig_scoreboard_framerate_dep,
     {0xD8, 0x25, -1, -1, -1, -1, 0xEB, 0x06, 0xD8, 0x05});
 
-static Signature(false, sig_scoreboard_framerate_dep2,
+Signature(false, sig_scoreboard_framerate_dep2,
     {0xD8, 0x05, -1, -1, -1, -1, 0xEB, 0x42});
 
-static Signature(false, sig_scoreboard_framerate_dep3,
+Signature(false, sig_scoreboard_framerate_dep3,
     {0xD8, 0x05, -1, -1, -1, -1, 0xEB, 0x0A, 0xD9, 0x44, 0x24, 0x14, 0xD8, 0x25});
 
-static Signature(false, sig_scoreboard_ruleboard_intro_nop,
+Signature(false, sig_scoreboard_ruleboard_intro_nop,
     {0xC7, 0x05, -1, -1, -1, 0x00, 0x96, 0x00, 0x00, 0x00, 0x5B});
 
 const float fade = 1.0;

@@ -73,14 +73,14 @@ void revert_console_input_hook(){
     rcon_in_hook_patch.revert();
 }
 
-static Signature(false, sig_auto_complete_hook,
+Signature(false, sig_auto_complete_hook,
     {0x0F, 0xBF, 0x15, -1, -1, -1, -1, 0x68, -1, -1, -1, -1, 0x6A, 0x04, 0x52, 0x55, 0xE8});
-static Signature(false, sig_auto_complete_collected_list,
+Signature(false, sig_auto_complete_collected_list,
     {-1, -1, -1, -1, 0x0F, 0xBF, 0xC8, 0x66, 0x40, 0x89, 0x34, 0x8A, 0x66, 0xA3,
      -1, -1, -1, -1, 0x83, 0xC3, 0x04, 0x4D, 0x75, 0x98, 0x5F});
-static Signature(false, sig_console_input,
+Signature(false, sig_console_input,
     {-1, -1, -1, -1, 0x8B, 0xC2, 0x8D, 0x78, 0x01, 0xEB, 0x03, 0x8D, 0x49, 0x00});
-static Patch(auto_complete_patch);
+Patch(auto_complete_patch);
 
 static intptr_t func_auto_complete = (intptr_t)&auto_complete;
 static intptr_t console_input_ptr;

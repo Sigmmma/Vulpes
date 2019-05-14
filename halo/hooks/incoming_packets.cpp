@@ -64,9 +64,9 @@ void hook_hud_chat_intercept(){
     );
 }
 
-static Signature(true, hud_chat_hook_signature,
+Signature(true, hud_chat_hook_signature,
     {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
-static Patch(hud_chat_hook);
+Patch(hud_chat_hook);
 
 void init_hud_chat_hook(){
     hud_chat_hook.build(hud_chat_hook_signature.get_address(),
@@ -101,11 +101,11 @@ void case57(){
     );
 }
 
-static Signature(true, sig_vulpes_packet_receive_hook,
+Signature(true, sig_vulpes_packet_receive_hook,
     {0x8B, 0x08, 0x88, 0x15, -1, -1, -1, -1, 0x8B, 0x51, 0x04, 0x83, 0xFA, 0x38, 0x0F, 0x87});
-static Signature(true, sig_network_related_bool,
+Signature(true, sig_network_related_bool,
     {-1, -1, -1, -1, 0x00, 0x5E, 0xC3, 0x56, 0xE8, -1, -1, -1, -1, 0x83, 0xC4, 0x04, 0xC6, 0x05});
-static Patch(vulpes_packet_receive);
+Patch(vulpes_packet_receive);
 
 void init_vulpes_message_hook(){
     vulpes_packet_receive.build(sig_vulpes_packet_receive_hook.get_address()+0xE,

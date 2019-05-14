@@ -17,17 +17,17 @@ void replacement_function(){
 }
 
 // Used for fix 1 and 2
-static Signature(false, sig_cpu_usage_fix_pattern1, {0xFF, 0xD6, 0x8A, 0x44, 0x24, 0x13, 0x84, 0xC0, 0x74});
+Signature(false, sig_cpu_usage_fix_pattern1, {0xFF, 0xD6, 0x8A, 0x44, 0x24, 0x13, 0x84, 0xC0, 0x74});
 const int PATTERN1_PATCH_LEN = 6;
 // Used for fix 3, 4, 5
-static Signature(false, sig_cpu_usage_fix_pattern2, {0xFF, 0x15, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x13, 0x84, 0xC0, 0x74});
+Signature(false, sig_cpu_usage_fix_pattern2, {0xFF, 0x15, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x13, 0x84, 0xC0, 0x74});
 const int PATTERN2_PATCH_LEN = 10;
 
-static Patch(cpu_usage_fix_patch1);
-static Patch(cpu_usage_fix_patch2);
-static Patch(cpu_usage_fix_patch3);
-static Patch(cpu_usage_fix_patch4);
-static Patch(cpu_usage_fix_patch5);
+Patch(cpu_usage_fix_patch1);
+Patch(cpu_usage_fix_patch2);
+Patch(cpu_usage_fix_patch3);
+Patch(cpu_usage_fix_patch4);
+Patch(cpu_usage_fix_patch5);
 
 static bool applied = false;
 

@@ -10,16 +10,16 @@ DEFINE_EVENT_HOOK_LIST(EVENT_MAP_LOAD_MP, post_mp);
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_MAP_LOAD_SP_UI, pre_sp);
 DEFINE_EVENT_HOOK_LIST(EVENT_MAP_LOAD_SP_UI, post_sp);
 
-static Signature(true, sig_map_load_ui_sp,
+Signature(true, sig_map_load_ui_sp,
     {0x83, 0xEC, 0x0C, 0x53, 0x55, 0x56, 0x57, 0x8B, 0xF0, 0xE8});
 
-static Signature(true, sig_map_load_mp,
+Signature(true, sig_map_load_mp,
     {0x81, 0xEC, 0x10, 0x01, 0x00, 0x00, 0x53, 0x55, 0x8B, 0xAC,
      0x24, 0x1C, 0x01, 0x00, 0x00});
 
-static Signature(true, sig_map_name,
+Signature(true, sig_map_name,
     {-1,-1,-1,-1, 0xE8,-1,-1,-1,-1, 0x32, 0xC9, 0x83, 0xF8, 0x13, 0x7D});
-static Signature(false, sig_sp_map_name,
+Signature(false, sig_sp_map_name,
     {-1,-1,-1,-1, 0xC6, 0x05,-1,-1,-1,-1, 0x00, 0xE8,-1,-1,-1,-1,
      0x8A, 0x44, 0x24, 0x1F});
 

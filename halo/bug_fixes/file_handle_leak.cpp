@@ -5,13 +5,13 @@
 
 const uint32_t NEW_ALLOCATION_SIZE = 0x24000000;
 
-static Signature(false, sig_file_handle_leak1, {0x05, 0x00, 0x00, 0x00, 0x08});
-static Signature(false, sig_file_handle_leak2, {0x81, 0xC1, 0x00, 0x00, 0x00, 0x08});
-static Signature(false, sig_file_handle_leak3, {0x05, 0x00, 0x00, 0x00, 0x08});
+Signature(false, sig_file_handle_leak1, {0x05, 0x00, 0x00, 0x00, 0x08});
+Signature(false, sig_file_handle_leak2, {0x81, 0xC1, 0x00, 0x00, 0x00, 0x08});
+Signature(false, sig_file_handle_leak3, {0x05, 0x00, 0x00, 0x00, 0x08});
 
-static Patch(file_handle_leak_patch1);
-static Patch(file_handle_leak_patch2);
-static Patch(file_handle_leak_patch3);
+Patch(file_handle_leak_patch1);
+Patch(file_handle_leak_patch2);
+Patch(file_handle_leak_patch3);
 
 static bool applied = false;
 

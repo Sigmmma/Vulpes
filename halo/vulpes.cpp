@@ -96,9 +96,9 @@ void init_network(){
 #include "fox.h"
 #include "popout_console/guicon.hpp"
 
-static SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
+SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
-static Signature(false, sig_server,
+Signature(false, sig_server,
     { 0x75, 0x2D, 0x68, -1, -1, -1, -1, 0xE8, -1, -1, -1, -1,
       0x68, -1, -1, -1, -1, 0x68, -1, -1, -1, -1, 0xE8, -1, -1, -1, -1,
       0x68, -1, -1, -1, -1, 0x68, -1, -1, -1, -1, 0x33, 0xC0,

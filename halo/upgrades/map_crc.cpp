@@ -10,33 +10,33 @@
 static bool is_server;
 
 // NOP this call if other sigs are found
-static Signature(false, sig_game_startup_crc_call,
+Signature(false, sig_game_startup_crc_call,
     {0xE8, -1, -1, -1, 0xFF, 0x83, 0xC4, -1, 0xFF, 0x05, -1, -1, -1, -1,
      0x81, 0xC4, 0x00, 0x08, 0x00, 0x00, 0xC3});
 
 // Put our little hook in here that intercepts it when halo asks for a crc
 // (Watch out for chimera!)
-static Signature(true, sig_get_crc_from_table,
+Signature(true, sig_get_crc_from_table,
     {0x8B, 0x15,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
      0x51, 0x89, 0x8C, 0x24, 0xAC, 0x00, 0x00, 0x00});
 
 // Server map CRC
-static Signature(true, sig_server_map_crc,
+Signature(true, sig_server_map_crc,
     {0xA1, -1, -1, -1, -1, 0xC1, 0xE1, 0x04, 0x8B, 0x44, 0x01, 0x0C, 0xC3, 0xCC});
 
 // I think this can be used for adding maps to the table
-static Signature(true, sig_add_map_to_list,
+Signature(true, sig_add_map_to_list,
     {0x8B, 0x0D, -1, -1, -1, -1, 0x81, 0xEC, 0x00, 0x08, 0x00, 0x00});
 
 // Returns -1 if not found
-static Signature(true, sig_get_map_from_maps_list,
+Signature(true, sig_get_map_from_maps_list,
     {0x56, 0x33, 0xF6, 0xEB, 0x0B, 0x8D, 0xA4, 0x24, 0x00,
      0x00, 0x00, 0x00, 0x8D, 0x64, 0x24, 0x00});
 
 // Replace this function
 // This function could be the key to an alternative way
 // to fix file handle leaks.
-static Signature(true, sig_read_map_file_header,
+Signature(true, sig_read_map_file_header,
     {0x81, 0xEC, 0x04, 0x01, 0x00, 0x00, 0x53, 0x57});
 
 std::vector<std::string> map_folders;
@@ -264,10 +264,10 @@ void get_map_crc_wrapper(){
 }
 
 static bool map_upgrades_initialized = false;
-static Patch(patch_read_map_file_header_replacement);
-static Patch(patch_startup_crc_calc_nop);
-static Patch(patch_get_map_crc);
-static Patch(patch_get_map_crc_server);
+Patch(patch_read_map_file_header_replacement);
+Patch(patch_startup_crc_calc_nop);
+Patch(patch_get_map_crc);
+Patch(patch_get_map_crc_server);
 
 
 void init_map_crc_upgrades(bool server){
