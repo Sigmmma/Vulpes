@@ -178,18 +178,30 @@ void CodeCave::build(uintptr_t p_address, size_t p_size){
     assert(p_size <= 16);
     printf("Building CodeCave %s...", name);
     cave_address = (intptr_t)prepare_code_cave();
-    code_patch.build(p_address, p_size, JMP_PATCH, cave_address);
+    bool is_call_hook = false;
+    if (*(uint8_t*)p_address == 0xE8){
+        is_call_hook = true;
+        code_patch.build(p_address, p_size, CALL_PATCH, cave_address);
+    }else{
+        code_patch.build(p_address, p_size, JMP_PATCH, cave_address);
+    };
     set_call_address(cave_address+0x12, before_func);
     set_call_address(cave_address+0x45, after_func);
     uint8_t* original_code_cpy = (uint8_t*)cave_address+0x27;
     std::vector<int16_t> original_code = code_patch.get_unpatched_bytes();
-    for (int i = 0; i<original_code.size(); i++){
-        original_code_cpy[i] = (uint8_t)original_code[i];
+    if (!is_call_hook){
+        for (int i = 0; i<original_code.size(); i++){
+            original_code_cpy[i] = (uint8_t)original_code[i];
+        };
+        original_code_cpy[original_code.size()] = 0xE9;
+        set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.get_return_address());
+    }else{
+        original_code_cpy[0] = 0xE9;
+        set_call_address((intptr_t)&original_code_cpy[0], get_call_address(p_address));
     };
     // Went off the original plan for a bit here,
     // I'm doing this to avoid executing some NOPs.
-    original_code_cpy[original_code.size()] = 0xE9;
-    set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.get_return_address());
+
     printf("done.\n");
 }
 
