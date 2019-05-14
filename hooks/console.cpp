@@ -3,7 +3,7 @@
 #include "../command/handler.hpp"
 
 Signature(true, sig_console_input_hook,
-    {0x8A, 0x07, 0x81, 0xEC, 0x00, 0x05, 0x00, 0x00});
+    {0x3C, 0x23, 0x74, 0x0A, 0x3C, 0x2F, 0x75, 0x0F});
 Patch(console_in_hook_patch);
 Patch(rcon_in_hook_patch);
 
@@ -13,6 +13,7 @@ uintptr_t return_to_halo_con_in;
 __attribute__((naked))
 void new_console_in_hook(){
     asm (
+        "add esp, 0x500;\n"
         "mov eax, 0xFFFFFFFF;\n" // No network owner
     "console_in:"
         "push eax;\n"
@@ -58,10 +59,10 @@ void rcon_in_hook(){
 void init_console_input_hook(){
     if(!console_in_hook_patch.is_built()){
         uintptr_t sig_addr = sig_console_input_hook.get_address();
-        return_to_halo_con_in = sig_addr+0x1E + 5;
-        console_in_hook_patch.build(sig_addr, 8, JMP_PATCH, (uintptr_t)&new_console_in_hook);
+        return_to_halo_con_in = sig_addr+0x1E + 5 - 12;
+        console_in_hook_patch.build(sig_addr, 6, JMP_PATCH, (uintptr_t)&new_console_in_hook);
         rcon_dword_ptr = *(intptr_t*)(sig_addr - 32 + 3);
-        rcon_in_hook_patch.build(sig_addr-32, 7+8+10, JMP_PATCH, (uintptr_t)&rcon_in_hook);
+        rcon_in_hook_patch.build(sig_addr-32-12, 7+8+10, JMP_PATCH, (uintptr_t)&rcon_in_hook);
     };
     console_in_hook_patch.apply();
     rcon_in_hook_patch.apply();
