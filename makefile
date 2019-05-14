@@ -1,5 +1,5 @@
 WARNS= -Wunused-value
-ARGS= $(WARNS) -std=c++17 -masm=intel -msse2 -m32
+ARGS= $(WARNS) -std=c++17 -masm=intel -msse2 -m32 -mfpmath=387+sse
 ARGSDEF= $(ARGS) -O2
 LINKARGS= -m32 -W
 #-s
