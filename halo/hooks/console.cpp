@@ -1,5 +1,5 @@
-#include "hooker.hpp"
-#include "../halo_functions/console.hpp"
+#include "../../hooker/hooker.hpp"
+#include "../functions/console.hpp"
 #include "../command/handler.hpp"
 
 Signature(true, sig_console_input_hook,
@@ -13,22 +13,22 @@ uintptr_t return_to_halo_con_in;
 __attribute__((naked))
 void new_console_in_hook(){
     asm (
-        "add esp, 0x500;\n"
-        "mov eax, 0xFFFFFFFF;\n" // No network owner
+        "add esp, 0x500;"
+        "mov eax, 0xFFFFFFFF;" // No network owner
     "console_in:"
-        "push eax;\n"
-        "push edi;\n"
-        "call %0;\n"
-        "pop edi;\n"
-        "add esp, 4;\n"
+        "push eax;"
+        "push edi;"
+        "call %0;"
+        "pop edi;"
+        "add esp, 4;"
 
-        "cmp al, 0;\n"
-        "jne continue_to_halo_con_in;\n"
-        "xor al, al;\n"
-        "ret;\n"
-    "continue_to_halo_con_in:\n"
-        "sub esp, 0x500;\n"
-        "jmp %1;\n"
+        "cmp al, 0;"
+        "jne continue_to_halo_con_in;"
+        "xor al, al;"
+        "ret;"
+    "continue_to_halo_con_in:"
+        "sub esp, 0x500;"
+        "jmp %1;"
         : "+m" (prcs_cmd)
         : "m" (return_to_halo_con_in)
     );
@@ -39,19 +39,19 @@ void rcon_in_hook(){
     asm (
         // Emulate default behavior of moving eax (player_network_id) into this dword.
         "push ebx;" // protect ebx
-        "mov ebx, %0;\n"
-        "mov DWORD PTR ds:[ebx], eax;\n"
+        "mov ebx, %0;"
+        "mov DWORD PTR ds:[ebx], eax;"
 
-        "push 0;\n"
-        "call console_in;\n"
-        "add esp, 4;\n"
+        "push 0;"
+        "call console_in;"
+        "add esp, 4;"
 
         // Emulate default behavior of making this dword -1.
-        "mov ebx, %0;\n"
-        "mov DWORD PTR ds:[ebx], 0xFFFFFFFF;\n"
+        "mov ebx, %0;"
+        "mov DWORD PTR ds:[ebx], 0xFFFFFFFF;"
 
-        "pop ebx;\n" // return ebx to its former glory
-        "ret;\n"
+        "pop ebx;" // return ebx to its former glory
+        "ret;"
         : "+m" (rcon_dword_ptr)
     );
 }
@@ -91,22 +91,22 @@ __attribute__((naked))
 void auto_complete_hook(){
     asm (
         // Get the address of the list of matching char*s
-        "mov edx, %2;\n"
-        "mov edx, [edx];\n"
+        "mov edx, %2;"
+        "mov edx, [edx];"
         // Get the pointer to the console input text.
-        "mov ebx, %1;\n"
-        "mov ebx, [ebx];\n"
+        "mov ebx, %1;"
+        "mov ebx, [ebx];"
         // Shove all of this data into our autocomplete function
-        "push ebx;\n"
-        "push %3;\n"
-        "push edx;\n"
-        "call %0;\n"
-        "add esp, 12;\n"
+        "push ebx;"
+        "push %3;"
+        "push edx;"
+        "call %0;"
+        "add esp, 12;"
         // move the output count to where the code expects it to be
-        "mov edx, %3;\n"
-        "movsx edx, WORD PTR ds:[edx];\n"
-        //"dec edx;\n"
-        "ret;\n"
+        "mov edx, %3;"
+        "movsx edx, WORD PTR ds:[edx];"
+        //"dec edx;"
+        "ret;"
         : "+m" (func_auto_complete)
         : "m" (console_input_ptr),
           "m" (results_ptr),

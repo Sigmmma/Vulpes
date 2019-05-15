@@ -27,38 +27,38 @@ __attribute__((naked))
 void hook_hud_chat_intercept(){
     asm (
         // Copy original code behavior we are overwriting.
-        "cmp al, 0;\n"
-        "je abort;\n"
+        "cmp al, 0;"
+        "je abort;"
         // Our own code starts here.
-        "push eax;\n"
-        "push ebx;\n"
-        "push ecx;\n"
-        "push edx;\n"
+        "push eax;"
+        "push ebx;"
+        "push ecx;"
+        "push edx;"
         // Call process_packet()
-        "lea ebx, [esp+0x10+0xC];\n"
-        "push ebx;\n"
-        "call %[process_hud_chat_message];\n"
-        "add esp, 4;\n"
+        "lea ebx, [esp+0x10+0xC];"
+        "push ebx;"
+        "call %[process_hud_chat_message];"
+        "add esp, 4;"
         // If it returns false, cancel the original function by returning.
         // If it returns true, go back to the original function.
-        "cmp al, 0;\n"
-        "pop edx;\n"
-        "pop ecx;\n"
-        "pop ebx;\n"
-        "pop eax;\n"
-        "jne revert_to_original_code;\n"
+        "cmp al, 0;"
+        "pop edx;"
+        "pop ecx;"
+        "pop ebx;"
+        "pop eax;"
+        "jne revert_to_original_code;"
         // Copy of the original way the function aborts.
         // This is so we can abort the game's processing of this packet.
-    "abort:\n"
-        "pop edi;\n"
-        "pop esi;\n"
-        "pop ebx;\n"
-        "mov esp, ebp;\n"
-        "pop ebp;\n"
-        "ret\n;"
+    "abort:"
+        "pop edi;"
+        "pop esi;"
+        "pop ebx;"
+        "mov esp, ebp;"
+        "pop ebp;"
+        "ret;"
         // Restore the original registers.
-    "revert_to_original_code:\n"
-        "jmp %[hud_chat_original_code];\n"
+    "revert_to_original_code:"
+        "jmp %[hud_chat_original_code];"
         : [process_hud_chat_message] "+m" (func_process_hud_chat_message)
         : [hud_chat_original_code] "m" (jmp_hud_chat_original_code)
     );
@@ -86,16 +86,16 @@ static intptr_t network_related_bool_ptr;
 __attribute__((naked))
 void case57(){
     asm (
-        "cmp edx, 57;\n"
-        "jne not_vulpes\n"
-        "push esi;\n"
-        "call %[handle_vulpes_message];\n"
-        "add esp, 4;\n"
-    "not_vulpes:\n"
-        "mov esi, %[network_related_bool_ptr];\n"
-        "mov BYTE PTR ds:[esi], 0;\n"
-        "pop esi;\n"
-        "ret;\n"
+        "cmp edx, 57;"
+        "jne not_vulpes"
+        "push esi;"
+        "call %[handle_vulpes_message];"
+        "add esp, 4;"
+    "not_vulpes:"
+        "mov esi, %[network_related_bool_ptr];"
+        "mov BYTE PTR ds:[esi], 0;"
+        "pop esi;"
+        "ret;"
         : [network_related_bool_ptr] "+m" (network_related_bool_ptr)
         : [handle_vulpes_message] "m" (func_handle_vulpes_message)
     );

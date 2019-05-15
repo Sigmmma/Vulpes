@@ -23,20 +23,20 @@ uint32_t mdp_encode_stateless_iterated(
     int32_t type_int = type;
     void** ptr_to_ptr = &unencoded_message;
     asm (
-        "pushad;\n"
-        "push %8;\n"
-        "push %7;\n"
-        "push %6;\n"
-        "push %5;\n"
-        "push %4;\n"
-        "push %3;\n"
-        "push %2;\n"
-        "mov edx, 0x7FF8;\n"
-        "mov eax, %1;\n"
-        "call %0;\n"
-        "add esp, 0x1C;\n"
-        "mov %9, eax;\n"
-        "popad;\n"
+        "pushad;"
+        "push %8;"
+        "push %7;"
+        "push %6;"
+        "push %5;"
+        "push %4;"
+        "push %3;"
+        "push %2;"
+        "mov edx, 0x7FF8;"
+        "mov eax, %1;"
+        "call %0;"
+        "add esp, 0x1C;"
+        "mov %9, eax;"
+        "popad;"
         : "+m" (func_mdp_encode)
         : "m" (output_buffer),
           "m" (arg1),
@@ -60,10 +60,10 @@ uint32_t mdp_encode_stateless_iterated(
 bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header){
     bool success;
     asm (
-        "mov ecx, %1;\n"
-        "mov eax, %2;\n"
-        "call %0;\n"
-        "mov %3, al;\n"
+        "mov ecx, %1;"
+        "mov eax, %2;"
+        "call %0;"
+        "mov %3, al;"
         : "+m" (func_mdp_decode)
         : "m" (destination),
           "m" ((void*)message_header),
@@ -75,8 +75,8 @@ bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* messag
 void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
     asm (
         "pushad;"
-        "mov eax, %1\n"
-        "call %0;\n"
+        "mov eax, %1"
+        "call %0;"
         "popad;"
         : "+m" (func_mdp_discard)
         : "m" ((void*)message_header)
@@ -113,23 +113,23 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
         int32_t bool_unbuffered = unbuffered;
 
         asm (
-            "push ecx;\n"
-            "push eax;\n"
+            "push ecx;"
+            "push eax;"
 
-            "push %8;\n"
-            "push %7;\n"
-            "push %6;\n"
-            "push %5;\n"
-            "push %2;\n"
-            "push %4;\n"
-            "mov ecx, %1;\n"
-            "mov ecx, [ecx];\n"
-            "mov eax, %3;\n"
-            "call %0;\n"
-            "add esp, 0x18;\n"
+            "push %8;"
+            "push %7;"
+            "push %6;"
+            "push %5;"
+            "push %2;"
+            "push %4;"
+            "mov ecx, %1;"
+            "mov ecx, [ecx];"
+            "mov eax, %3;"
+            "call %0;"
+            "add esp, 0x18;"
 
-            "pop eax;\n"
-            "pop ecx;\n"
+            "pop eax;"
+            "pop ecx;"
             : "+m" (func_send_message_to_all)   // 0
             : "m" (socket_ready),               // 1
               "m" (message),                    // 2
@@ -154,24 +154,24 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
         int32_t bool_unbuffered = unbuffered;
 
         asm (
-            "push esi;\n"
-            "push eax;\n"
+            "push esi;"
+            "push eax;"
 
-            "push %8;\n"
-            "push %7;\n"
-            "push %6;\n"
-            "push %5;\n"
-            "push %3;\n"
-            "push %2;\n"
-            "push %4;\n"
-            "mov esi, %1;\n"
-            "mov esi, [esi];\n"
-            "mov eax, %9;\n"
-            "call %0;\n"
-            "add esp, 0x1C;\n"
+            "push %8;"
+            "push %7;"
+            "push %6;"
+            "push %5;"
+            "push %3;"
+            "push %2;"
+            "push %4;"
+            "mov esi, %1;"
+            "mov esi, [esi];"
+            "mov eax, %9;"
+            "call %0;"
+            "add esp, 0x1C;"
 
-            "pop eax;\n"
-            "pop esi;\n"
+            "pop eax;"
+            "pop esi;"
             : "+m" (func_send_message_to_player)// 0
             : "m" (socket_ready),               // 1
               "m" ((uint32_t)message),          // 2

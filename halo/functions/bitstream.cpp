@@ -16,15 +16,15 @@ void bitstream_write(void* const iteration_header,
                  uint32_t* const write_this,
                          int32_t num_bits){
     asm (
-        "pushad;\n"
-        "mov ecx, [esp+0x20+4];\n"
-        "lea eax, [esp+0x20+8];\n"
-        "mov edx, [esp+0x20+0xC];\n"
-        "push edx;\n"
-        "call %0;\n"
-        "add esp, 4;\n"
-        "popad;\n"
-        "ret;\n"
+        "pushad;"
+        "mov ecx, [esp+0x20+4];"
+        "lea eax, [esp+0x20+8];"
+        "mov edx, [esp+0x20+0xC];"
+        "push edx;"
+        "call %0;"
+        "add esp, 4;"
+        "popad;"
+        "ret;"
         : "+m" (func_bitstream_write_ptr)
     );
 }
@@ -34,15 +34,15 @@ void bitstream_read(void* const iteration_header,
                 uint32_t* const write_here,
                         int32_t num_bits){
     asm (
-        "pushad;\n"
-        "mov edx, [esp+0x20+4];\n"
-        "mov ecx, [esp+0x20+8];\n"
-        "mov eax, [esp+0x20+0xC];\n"
-        "push edx;\n"
-        "call %0;\n"
-        "add esp, 4;\n"
-        "popad;\n"
-        "ret;\n"
+        "pushad;"
+        "mov edx, [esp+0x20+4];"
+        "mov ecx, [esp+0x20+8];"
+        "mov eax, [esp+0x20+0xC];"
+        "push edx;"
+        "call %0;"
+        "add esp, 4;"
+        "popad;"
+        "ret;"
         : "+m" (func_bitstream_read_ptr)
     );
 }
