@@ -33,12 +33,7 @@ void console_out(const std::string &text, const ARGBFloat &color) noexcept {
 }
 
 void console_out_warning(const char *text) noexcept {
-    ARGBFloat color;
-    color.alpha = 1.0;
-    color.red = 0.94;
-    color.green = 0.75;
-    color.blue = 0.098;
-    console_out(text, color);
+    console_out(text, ARGBFloat(1.0, 0.94, 0.75, 0.098));
 }
 
 void console_out_warning(const std::string &text) noexcept {
@@ -46,14 +41,9 @@ void console_out_warning(const std::string &text) noexcept {
 }
 
 void console_out_error(const char *text) noexcept {
-    ARGBFloat color;
-    color.alpha = 1.0;
-    color.red = 1.0;
-    color.green = 0.2;
-    color.blue = 0.2;
     bool already_silent = silence_all_messages;
     silence_all_messages = false;
-    console_out(text, color);
+    console_out(text, ARGBFloat(1.0, 1.0, 0.2, 0.2));
     silence_all_messages = already_silent;
 }
 
