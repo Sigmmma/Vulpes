@@ -77,14 +77,18 @@ public:
     float red;
     float green;
     float blue;
+
+    RGBFloat(float r = 1.0, float g = 1.0, float b = 1.0){red=r;green=g;blue=b;}
 };
 
 class ARGBFloat {
 public:
-    float alpha = 1.0;
-    float red = 1.0;
-    float green = 1.0;
-    float blue = 1.0;
+    float alpha;
+    float red;
+    float green;
+    float blue;
+
+    ARGBFloat(float a = 1.0, float r = 1.0, float g = 1.0, float b = 1.0){alpha=a;red=r;green=g;blue=b;}
 };
 
 class Rectangle2d {
