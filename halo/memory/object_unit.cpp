@@ -1,7 +1,5 @@
 #include "object_unit.hpp"
-
 #include "actor.hpp"
-
 #include "../functions/object_unit.hpp"
 
 void ObjectUnit::speak(

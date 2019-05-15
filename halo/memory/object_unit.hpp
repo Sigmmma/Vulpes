@@ -1,6 +1,5 @@
 #pragma once
 #include "types.hpp"
-
 #include "object.hpp"
 #include "actor.hpp"
 #include "damage_effect.hpp"

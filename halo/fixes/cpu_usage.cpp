@@ -3,7 +3,7 @@
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 
-uintptr_t sleep = reinterpret_cast<uintptr_t>(&Sleep);
+const uintptr_t sleep = reinterpret_cast<uintptr_t>(&Sleep);
 
 __attribute__((naked))
 void replacement_function(){

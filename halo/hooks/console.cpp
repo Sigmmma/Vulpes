@@ -8,7 +8,7 @@ Patch(console_in_hook_patch);
 Patch(rcon_in_hook_patch);
 
 uintptr_t rcon_dword_ptr;
-uintptr_t prcs_cmd = (uintptr_t)&process_command;
+const uintptr_t prcs_cmd = (uintptr_t)&process_command;
 uintptr_t return_to_halo_con_in;
 __attribute__((naked))
 void new_console_in_hook(){

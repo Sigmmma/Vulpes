@@ -1,6 +1,5 @@
 #pragma once
 #include "types.hpp"
-
 #include "object.hpp"
 
 #pragma pack(push, 1)

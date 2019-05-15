@@ -1,6 +1,6 @@
 #include "../../functions/message_delta.hpp"
-#include <cstring>
 #include "../../../includes/string_raw_data_encoder.hpp"
+#include <cstring>
 
 void send_vulpes_message(VulpesMessage* msg){
     HudChat message;
