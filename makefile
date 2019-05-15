@@ -1,5 +1,5 @@
 WARNS= -Wunused-value
-ARCH= -masm=intel -msse2 -m32 -mfpmath=387+sse
+ARCH= -masm=intel -msse2 -m32 -mfpmath=sse
 ARGS= $(WARNS) $(ARCH) -std=c++17
 ARGSDEF= $(ARGS) -O2
 ARGSFAST= $(ARGS) -O3
