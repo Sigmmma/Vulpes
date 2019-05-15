@@ -1,5 +1,5 @@
-#include "message_delta_processor.hpp"
-#include "../../hooks/hooker.hpp"
+#include "message_delta.hpp"
+#include "../../hooker/hooker.hpp"
 
 Signature(true, sig_mdp_decode_stateless_iterated,
     {0x57, 0x8B, 0x38, 0x51, 0x83, 0xC0, 0x04, 0x6A, 0x00, 0x50, 0xE8});
@@ -75,7 +75,7 @@ bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* messag
 void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
     asm (
         "pushad;"
-        "mov eax, %1"
+        "mov eax, %1;"
         "call %0;"
         "popad;"
         : "+m" (func_mdp_discard)

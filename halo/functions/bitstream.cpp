@@ -1,5 +1,5 @@
 #include "bitstream.hpp"
-#include "../../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 
 Signature(true, sig_bitstream_write,
     { 0x53, 0x55, 0x8B, 0x6C, 0x24, 0x0C, 0x85, 0xED, 0x56, 0x57, 0x8B,

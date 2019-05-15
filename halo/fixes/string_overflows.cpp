@@ -1,8 +1,7 @@
 #include "string_overflows.hpp"
-#include "../hooks/hooker.hpp"
-#include <cstdint>
-#include "../halo_functions/console.hpp"
-#include "../halo_functions/devmode.hpp"
+#include "../../hooker/hooker.hpp"
+#include "../functions/console.hpp"
+#include "../functions/devmode.hpp"
 
 // HSC has a print function which does not accept extra arguments like a format print would.
 // Problem is that the string gets funnelled into a console function that does use a format string.

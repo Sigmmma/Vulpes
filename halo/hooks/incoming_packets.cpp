@@ -1,6 +1,6 @@
 #include "incoming_packets.hpp"
-#include "hooker.hpp"
-#include "../network/message_delta/vulpes_message.hpp"
+#include "../../hooker/hooker.hpp"
+#include "../network/foxnet/vulpes_message.hpp"
 
 DEFINE_EVENT_HOOK_LIST(EVENT_RECEIVE_CHAT_MESSAGE, hud_chat_events);
 

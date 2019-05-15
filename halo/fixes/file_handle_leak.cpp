@@ -1,7 +1,5 @@
 #include "file_handle_leak.hpp"
-#include "../hooks/hooker.hpp"
-
-#include <cstdint>
+#include "../../hooker/hooker.hpp"
 
 const uint32_t NEW_ALLOCATION_SIZE = 0x24000000;
 

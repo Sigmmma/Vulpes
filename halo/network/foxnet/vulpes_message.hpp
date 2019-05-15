@@ -1,6 +1,5 @@
 #pragma once
-#include "definition.hpp"
-#include "unencoded_messages.hpp"
+#include "../../memory/message_delta.hpp"
 
 void send_vulpes_message(VulpesMessage* msg);
 

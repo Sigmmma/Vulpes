@@ -1,15 +1,15 @@
 #define WIN32_MEAN_AND_LEAN
-#include <Windows.h>
+#include <windows.h>
 #include <cstdio>
 #include <cstdint>
 
 static bool server = false;
 
-#include "hooks/hooker.hpp"
-#include "hooks/incoming_packets.hpp"
-#include "hooks/console.hpp"
-#include "hooks/tick.hpp"
-#include "hooks/map.hpp"
+#include "hooker/hooker.hpp"
+#include "halo/hooks/incoming_packets.hpp"
+#include "halo/hooks/console.hpp"
+#include "halo/hooks/tick.hpp"
+#include "halo/hooks/map.hpp"
 void init_hooks(){
     init_code_caves();
 
@@ -32,15 +32,15 @@ void init_commands(){
     init_debug_commands();
 }
 
-#include "halo_bug_fixes/cpu_usage.hpp"
-#include "halo_bug_fixes/file_handle_leak.hpp"
-#include "halo_bug_fixes/host_refusal.hpp"
-#include "halo_bug_fixes/string_overflows.hpp"
-#include "halo_bug_fixes/shdr_trans_zfighting.hpp"
-#include "halo_bug_fixes/framerate_dependent_timers.hpp"
-#include "halo_bug_fixes/animation_bugs.hpp"
-#include "halo_bug_fixes/loading_screen.hpp"
-#include "halo_bug_fixes/tweaks.hpp"
+#include "halo/fixes/cpu_usage.hpp"
+#include "halo/fixes/file_handle_leak.hpp"
+#include "halo/fixes/host_refusal.hpp"
+#include "halo/fixes/string_overflows.hpp"
+#include "halo/fixes/shdr_trans_zfighting.hpp"
+#include "halo/fixes/framerate_dependent_timers.hpp"
+#include "halo/fixes/animation.hpp"
+#include "halo/tweaks/loading_screen.hpp"
+#include "halo/tweaks/tweaks.hpp"
 void init_halo_bug_fixes(){
     init_cpu_usage_fixes();
     init_file_handle_leak_fixes();
@@ -67,7 +67,7 @@ void revert_halo_bug_fixes(){
     revert_tweaks();
 }
 
-#include "upgrades/map_crc.hpp"
+#include "halo/upgrades/map.hpp"
 void init_upgrades(){
     init_map_crc_upgrades(server);
 }
@@ -79,22 +79,18 @@ void revert_upgrades(){
 void init_memory(){
 }
 
+#include "halo/functions/message_delta.hpp"
 void init_halo_functions(){
-}
-
-//#include "network/message_delta/definition.hpp"
-//#include "network/message_delta/bitstream.hpp"
-#include "network/message_delta/message_delta_processor.hpp"
-#include "network/message_delta/message_delta_sender.hpp"
-void init_network(){
-    //init_new_definitions();
-    //init_bitstream();
     init_message_delta_processor();
     init_message_delta_sender();
 }
 
-#include "fox.h"
-#include "popout_console/guicon.hpp"
+
+void init_network(){
+}
+
+#include "includes/fox.hpp"
+#include "includes/guicon.hpp"
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});

@@ -1,5 +1,5 @@
 #include "host_refusal.hpp"
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 
 Signature(false, sig_host_refusal1, {0x88, 0x5C, 0x24, 0x2A, 0xE8, -1, -1, -1, -1, 0x50, 0xE8});
 const size_t HOST_REFUSAL_CLIENT1_LEN = 5;

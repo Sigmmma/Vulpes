@@ -1,5 +1,5 @@
 #include "shdr_trans_zfighting.hpp"
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 
 // These are the values from config.txt
 //float* DecalZBiasValue;

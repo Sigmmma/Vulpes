@@ -1,5 +1,5 @@
 #include "tweaks.hpp"
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 #include "../hooks/tick.hpp"
 
 Signature(false, sig_console_enabled,
@@ -9,7 +9,7 @@ bool* console_enabled;
 
 void enable_console(){
     *console_enabled = true;
-    DEL_EVENT(EVENT_TICK, enable_console);
+    DEL_CALLBACK(EVENT_TICK, enable_console);
 }
 
 void init_tweaks(){

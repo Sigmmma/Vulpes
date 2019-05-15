@@ -1,6 +1,6 @@
 #pragma once
-#include "definition.hpp"
-#include "enums.hpp"
+#include "../memory/message_delta_meta.hpp"
+#include "../memory/message_delta.hpp"
 
 // Do not use this until all args are named.
 uint32_t mdp_encode_stateless_iterated(

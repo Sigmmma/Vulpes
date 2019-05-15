@@ -1,11 +1,11 @@
 #include "handler.hpp"
-#include "../halo_functions/console.hpp"
+#include "../halo/functions/console.hpp"
 #include <regex>
 #include <cassert>
 #include <algorithm>
 #include <exception>
 #include <ctype.h>
-#include "../halo_functions/devmode.hpp"
+#include "../halo/functions/devmode.hpp"
 
 using namespace std;
 

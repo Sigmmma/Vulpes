@@ -1,7 +1,7 @@
 #include "hooker.hpp"
 
 #define WIN32_MEAN_AND_LEAN // Keeps the amount of windows.h includes to the bare minumum.
-#include <Windows.h>
+#include <windows.h>
 #include <cassert>
 #include <string>
 #include <cstdio>

@@ -1,5 +1,4 @@
-#include <cstdint>
-#include "hooker.hpp"
+#include "../../hooker/hooker.hpp"
 #include "../memory/object.hpp"
 
 intptr_t projectile_spawn_from_weapon = 0x4C87DB;

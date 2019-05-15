@@ -1,7 +1,5 @@
 #pragma once
 #include "object.hpp"
-#include <cstdint>
-
 
 enum class InteractionType : uint16_t {
     NONE                    = 0,

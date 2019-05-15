@@ -1,5 +1,5 @@
 #pragma once
-#include "event.hpp"
+#include "../event.hpp"
 
 DEFINE_EVENT_HOOK(EVENT_PRE_MAP_LOAD, void, char*);
 DEFINE_EVENT_HOOK(EVENT_MAP_LOAD, void, char*);

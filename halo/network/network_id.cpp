@@ -1,4 +1,4 @@
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 
 Signature(true, sig_message_delta_object_index, {0x8B, 0x44, 0x24, 0x14, 0x50, 0x8B, 0xCF, 0xB8, -1, -1, -1, -1, 0xE8});
 
@@ -38,10 +38,10 @@ int32_t server_register_network_index(MemRef object){
     };
     int32_t network_id;
     asm (
-        "mov eax, %[message_delta_object_index];\n"
-        "push %[local_object_id];\n"
-        "call %[server_register_network_index];\n"
-        "mov %[network_id], eax;\n"
+        "mov eax, %[message_delta_object_index];"
+        "push %[local_object_id];"
+        "call %[server_register_network_index];"
+        "mov %[network_id], eax;"
         : [message_delta_object_index] "+m" (message_delta_object_index)
         : [network_id] "m" (network_id),
           [local_object_id] "m" (object.raw),
@@ -52,10 +52,10 @@ int32_t server_register_network_index(MemRef object){
 
 void register_network_index_from_remote(int32_t network_id, MemRef object){
     asm (
-        "mov eax, %[message_delta_object_index];\n"
-        "mov ecx, %[local_object_id];\n"
-        "push %[network_id];\n"
-        "call %[client_register_network_index_from_remote];\n"
+        "mov eax, %[message_delta_object_index];"
+        "mov ecx, %[local_object_id];"
+        "push %[network_id];"
+        "call %[client_register_network_index_from_remote];"
         : [message_delta_object_index] "+m" (message_delta_object_index)
         : [local_object_id] "m" (object.raw),
           [network_id] "m" (network_id),
@@ -65,9 +65,9 @@ void register_network_index_from_remote(int32_t network_id, MemRef object){
 
 void unregister_network_index(MemRef object){
     asm (
-        "mov eax, %[message_delta_object_index];\n"
-        "mov esi, %[local_object_id];\n"
-        "call %[unregister_network_index];\n"
+        "mov eax, %[message_delta_object_index];"
+        "mov esi, %[local_object_id];"
+        "call %[unregister_network_index];"
         : [message_delta_object_index] "+m" (message_delta_object_index)
         : [local_object_id] "m" (object.raw),
           [unregister_network_index] "m" (func_unregister_network_index)

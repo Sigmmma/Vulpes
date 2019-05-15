@@ -2,7 +2,7 @@
 
 #include "actor.hpp"
 
-#include "../halo_functions/object_unit.hpp"
+#include "../functions/object_unit.hpp"
 
 void ObjectUnit::speak(
     AiCommunicationType type,

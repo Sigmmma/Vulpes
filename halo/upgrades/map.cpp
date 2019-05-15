@@ -1,13 +1,13 @@
-#include "map_crc.hpp"
-#include "../hooks/hooker.hpp"
+#include "map.hpp"
+#include "../../hooker/hooker.hpp"
 #include "../memory/types.hpp"
-#include "../includes/crc32.h"
+#include "../../includes/crc32.hpp"
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #include <cstdio>
 #include <fstream>
 
-static bool is_server;
+static bool is_server = false;
 
 // NOP this call if other sigs are found
 Signature(false, sig_game_startup_crc_call,

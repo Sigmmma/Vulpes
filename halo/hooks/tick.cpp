@@ -1,5 +1,5 @@
 #include "tick.hpp"
-#include "hooker.hpp"
+#include "../../hooker/hooker.hpp"
 
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_TICK, pre_events);
 DEFINE_EVENT_HOOK_LIST(EVENT_TICK, events);

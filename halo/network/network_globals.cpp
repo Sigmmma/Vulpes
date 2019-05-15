@@ -1,5 +1,5 @@
 #include "network_globals.hpp"
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 
 Signature(true, sig_connection_type,
     {0x66, 0x83, 0x3D, -1, -1, -1, -1, 0x02, 0x75, -1, 0x8B});

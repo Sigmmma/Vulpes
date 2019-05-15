@@ -1,5 +1,5 @@
 #include "map.hpp"
-#include "hooker.hpp"
+#include "../../hooker/hooker.hpp"
 
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_MAP_LOAD, pre_map);
 DEFINE_EVENT_HOOK_LIST(EVENT_MAP_LOAD, post_map);

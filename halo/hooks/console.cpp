@@ -1,6 +1,6 @@
 #include "../../hooker/hooker.hpp"
 #include "../functions/console.hpp"
-#include "../command/handler.hpp"
+#include "../../command/handler.hpp"
 
 Signature(true, sig_console_input_hook,
     {0x3C, 0x23, 0x74, 0x0A, 0x3C, 0x2F, 0x75, 0x0F});

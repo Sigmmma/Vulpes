@@ -1,5 +1,5 @@
 #define WIN32_MEAN_AND_LEAN
-#include <Windows.h>
+#include <windows.h>
 
 #include <cstdio>
 
@@ -17,74 +17,72 @@ using namespace std;
 
 static const WORD MAX_CONSOLE_LINES = 500;
 
-
-
 void RedirectIOToConsole(){
 
-int hConHandle;
+    int hConHandle;
 
-long lStdHandle;
+    long lStdHandle;
 
-CONSOLE_SCREEN_BUFFER_INFO coninfo;
+    CONSOLE_SCREEN_BUFFER_INFO coninfo;
 
-FILE *fp;
+    FILE *fp;
 
-// allocate a console for this app
+    // allocate a console for this app
 
-AllocConsole();
+    AllocConsole();
 
-// set the screen buffer to be big enough to let us scroll text
+    // set the screen buffer to be big enough to let us scroll text
 
-GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
 
-&coninfo);
+    &coninfo);
 
-coninfo.dwSize.Y = MAX_CONSOLE_LINES;
+    coninfo.dwSize.Y = MAX_CONSOLE_LINES;
 
-SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),
+    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),
 
-coninfo.dwSize);
+    coninfo.dwSize);
 
-// redirect unbuffered STDOUT to the console
+    // redirect unbuffered STDOUT to the console
 
-lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+    lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
 
-hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
 
-fp = _fdopen( hConHandle, "w" );
+    fp = _fdopen( hConHandle, "w" );
 
-*stdout = *fp;
+    *stdout = *fp;
 
-setvbuf( stdout, NULL, _IONBF, 0 );
+    setvbuf( stdout, NULL, _IONBF, 0 );
 
-// redirect unbuffered STDIN to the console
+    // redirect unbuffered STDIN to the console
 
-lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
+    lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
 
-hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
 
-fp = _fdopen( hConHandle, "r" );
+    fp = _fdopen( hConHandle, "r" );
 
-*stdin = *fp;
+    *stdin = *fp;
 
-setvbuf( stdin, NULL, _IONBF, 0 );
+    setvbuf( stdin, NULL, _IONBF, 0 );
 
-// redirect unbuffered STDERR to the console
+    // redirect unbuffered STDERR to the console
 
-lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
+    lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
 
-hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
 
-fp = _fdopen( hConHandle, "w" );
+    fp = _fdopen( hConHandle, "w" );
 
-*stderr = *fp;
+    *stderr = *fp;
 
-setvbuf( stderr, NULL, _IONBF, 0 );
+    setvbuf( stderr, NULL, _IONBF, 0 );
 
-// make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
+    // make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
 
-// point to console as well
+    // point to console as well
 
-ios::sync_with_stdio();
+    ios::sync_with_stdio();
 
 }

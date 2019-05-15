@@ -1,4 +1,4 @@
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 #include "console.hpp"
 /*
 * Copied and edited from the Chimera 2017 repo. MIT License

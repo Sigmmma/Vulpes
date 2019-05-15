@@ -1,17 +1,17 @@
 #include "cpu_usage.hpp"
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 #define WIN32_MEAN_AND_LEAN
-#include <Windows.h>
+#include <windows.h>
 
 uintptr_t sleep = reinterpret_cast<uintptr_t>(&Sleep);
 
 __attribute__((naked))
 void replacement_function(){
     asm (
-        "push 1;\n"
-        "call %0;\n"
-        "mov al, BYTE PTR ss:[esp+0x1b];\n"
-        "ret 4;\n"
+        "push 1;"
+        "call %0;"
+        "mov al, BYTE PTR ss:[esp+0x1b];"
+        "ret 4;"
         : "+m" (sleep)
     );
 }

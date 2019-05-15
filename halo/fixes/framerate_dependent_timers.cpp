@@ -1,5 +1,5 @@
 #include "framerate_dependent_timers.hpp"
-#include "../hooks/hooker.hpp"
+#include "../../hooker/hooker.hpp"
 #include "../hooks/tick.hpp"
 
 Signature(false, sig_death_timer_framerate_dep,
@@ -32,7 +32,7 @@ void init_checkpoint_revert_fix(){
 
 void revert_checkpoint_revert_fix(){
     death_timer_framerate_dep_fix.revert();
-    DEL_EVENT(EVENT_TICK, increment_respawn_timer);
+    DEL_CALLBACK(EVENT_TICK, increment_respawn_timer);
 }
 
 Signature(false, sig_scoreboard_framerate_dep,
@@ -128,7 +128,7 @@ void init_console_fix(){
 
 void revert_console_fix(){
     patch_console_framerate_dep.revert();
-    DEL_EVENT(EVENT_TICK, fade_console);
+    DEL_CALLBACK(EVENT_TICK, fade_console);
 }
 
 void init_framerate_dependent_timer_fixes(){

@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
-
-#include "hooker_structs.hpp"
+#include "resource.hpp"
 
 // Macro for CodeSignature, this is to make it so we don't have to repeat ourselves too much.
 #define Signature(required, name, ...) CodeSignature name(required, #name, 0, 0, std::vector<int16_t>(__VA_ARGS__))

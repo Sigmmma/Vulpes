@@ -1,5 +1,5 @@
-#include "animation_bugs.hpp"
-#include "../hooks/hooker.hpp"
+#include "animation.hpp"
+#include "../../hooker/hooker.hpp"
 
 Signature(false, sig_player_jump_turn_fix,
     {0xF6, 0x85, 0xF4, 0x02, 0x00, 0x00, 0x01, 0x0F, 0x85});

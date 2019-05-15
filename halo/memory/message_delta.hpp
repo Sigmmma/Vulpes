@@ -1,6 +1,6 @@
 #pragma once
-#include "../../memory/types.hpp"
-#include "../../memory/player.hpp"
+#include "types.hpp"
+#include "player.hpp"
 
 enum MessageDeltaType : int8_t {
     OBJECT_DELETION                    = 0,
