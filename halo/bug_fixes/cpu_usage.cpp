@@ -66,11 +66,11 @@ void init_cpu_usage_fixes(){
         };
         already_initialized = true;
     }else{
-        if (cpu_usage_fix_patch1.is_built()) {cpu_usage_fix_patch1.apply();};
-        if (cpu_usage_fix_patch2.is_built()) {cpu_usage_fix_patch2.apply();};
-        if (cpu_usage_fix_patch3.is_built()) {cpu_usage_fix_patch3.apply();};
-        if (cpu_usage_fix_patch4.is_built()) {cpu_usage_fix_patch4.apply();};
-        if (cpu_usage_fix_patch5.is_built()) {cpu_usage_fix_patch5.apply();};
+        if (cpu_usage_fix_patch1.is_built()) cpu_usage_fix_patch1.apply();
+        if (cpu_usage_fix_patch2.is_built()) cpu_usage_fix_patch2.apply();
+        if (cpu_usage_fix_patch3.is_built()) cpu_usage_fix_patch3.apply();
+        if (cpu_usage_fix_patch4.is_built()) cpu_usage_fix_patch4.apply();
+        if (cpu_usage_fix_patch5.is_built()) cpu_usage_fix_patch5.apply();
     };
     applied = true;
 }

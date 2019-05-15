@@ -12,9 +12,6 @@ const float val_DecalSlopeZBiasValue = -2.0;
 const float val_TransZBiasValue = -0.000005;
 const float val_TransSlopeZBiasValue = -1.0;
 
-//Signature(false, sig_shader_trans_zfighting1,
-//    {0x33, 0xC0, 0xC7, 0x05, -1, -1, -1, -1, 0x00, 0x10, 0x00, 0x00});
-
 Signature(false, sig_shader_trans_zfighting2,
     {0xE8, -1, -1, -1, -1, 0x84, 0xC0, 0x74, -1, 0xE8,
      -1, -1, -1, -1, 0x33, 0xC0, 0x89, 0x44, 0x24, 0x34, 0xEB});
@@ -45,26 +42,9 @@ Patch(patch_shader_trans_zfighting3c_fix);
 Patch(patch_shader_trans_zfighting3d_fix);
 
 void init_shdr_trans_zfighting_fixes(){
-    //static uintptr_t sig_addr1 = sig_shader_trans_zfighting1.get_address();
     static uintptr_t sig_addr2 = sig_shader_trans_zfighting2.get_address();
     static uintptr_t sig_addr3 = sig_shader_trans_zfighting3.get_address();
     static uintptr_t sig_addr4 = sig_shader_trans_zfighting3b.get_address(sig_addr3+1);
-/* // I'm doing something wrong here getting the address, I bet it's because I'm using C style casts
-   // But this fix was only for redundancy anyway, so fuck it.
-    if (!patch_shader_trans_zfighting1_fix.is_built() && sig_addr1){
-        patch_shader_trans_zfighting1_fix.build(sig_addr1+0x7A, 30, NOP_PATCH, 0);
-        DecalZBiasValue                 = (float*)*(uintptr_t*)(sig_addr1 + 0x7A + 2);
-        DecalSlopeZBiasValue            = (float*)*(uintptr_t*)(sig_addr1 + 0x7A + 11);
-        TransparentDecalZBiasValue      = (float*)*(uintptr_t*)(sig_addr2 + 0x7A + 17);
-        TransparentDecalSlopeZBiasValue = (float*)*(uintptr_t*)(sig_addr2 + 0x7A + 26);
-    };
-    if (patch_shader_trans_zfighting1_fix.is_built()){
-        patch_shader_trans_zfighting1_fix.apply();
-        *DecalZBiasValue                 = val_DecalZBiasValue;
-        *DecalSlopeZBiasValue            = val_DecalSlopeZBiasValue;
-        *TransparentDecalZBiasValue      = val_DecalZBiasValue;
-        *TransparentDecalSlopeZBiasValue = val_DecalSlopeZBiasValue;
-    };*/
     if (!patch_shader_trans_zfighting2_fix.is_built() && sig_addr2){
         patch_shader_trans_zfighting2_fix.build(sig_addr2, 9, NOP_PATCH, 0);
     };
@@ -93,7 +73,6 @@ void init_shdr_trans_zfighting_fixes(){
 }
 
 void revert_shdr_trans_zfighting_fixes(){
-    //patch_shader_trans_zfighting1_fix.revert();
     patch_shader_trans_zfighting2_fix.revert();
     patch_shader_trans_zfighting3a_fix.revert();
     patch_shader_trans_zfighting3b_fix.revert();
