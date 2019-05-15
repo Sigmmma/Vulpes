@@ -190,8 +190,8 @@ bool read_map_file_header_wrapper(){
         "call %0;"
         "pop edx;"
         "ret;"
-        : "+m" (func_read_map_file_header_from_file)
-        : "m" (is_server)
+        :
+        : "m" (func_read_map_file_header_from_file), "m" (is_server)
     );
 }
 

@@ -59,8 +59,9 @@ void hook_hud_chat_intercept(){
         // Restore the original registers.
     "revert_to_original_code:"
         "jmp %[hud_chat_original_code];"
-        : [process_hud_chat_message] "+m" (func_process_hud_chat_message)
-        : [hud_chat_original_code] "m" (jmp_hud_chat_original_code)
+        :
+        : [process_hud_chat_message] "m" (func_process_hud_chat_message),
+          [hud_chat_original_code] "m" (jmp_hud_chat_original_code)
     );
 }
 

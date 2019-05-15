@@ -78,8 +78,8 @@ void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
         "mov eax, %1;"
         "call %0;"
         "popad;"
-        : "+m" (func_mdp_discard)
-        : "m" ((void*)message_header)
+        :
+        : "m" (func_mdp_discard), "m" ((void*)message_header)
     );
 }
 
@@ -130,8 +130,9 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
 
             "pop eax;"
             "pop ecx;"
-            : "+m" (func_send_message_to_all)   // 0
-            : "m" (socket_ready),               // 1
+            :
+            : "m" (func_send_message_to_all),   // 0
+              "m" (socket_ready),               // 1
               "m" (message),                    // 2
               "m" (message_size),               // 3
               "m" (bool_ingame_only),           // 4

@@ -21,8 +21,8 @@ void player_biped_mid_air_turn_fix_code(){
         "jmp %0;"
     "back_to_original_code:"
         "jmp %1;"
-        : "+m" (jmp_no_turn_anim)
-        : "m"  (jmp_original_code)
+        :
+        : "m" (jmp_no_turn_anim), "m"  (jmp_original_code)
     );
 }
 

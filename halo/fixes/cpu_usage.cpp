@@ -12,7 +12,8 @@ void replacement_function(){
         "call %0;"
         "mov al, BYTE PTR ss:[esp+0x1b];"
         "ret 4;"
-        : "+m" (sleep)
+        :
+        : "m" (sleep)
     );
 }
 

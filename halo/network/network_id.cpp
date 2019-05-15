@@ -42,8 +42,9 @@ int32_t server_register_network_index(MemRef object){
         "push %[local_object_id];"
         "call %[server_register_network_index];"
         "mov %[network_id], eax;"
-        : [message_delta_object_index] "+m" (message_delta_object_index)
-        : [network_id] "m" (network_id),
+        :
+        : [message_delta_object_index] "m" (message_delta_object_index),
+          [network_id] "m" (network_id),
           [local_object_id] "m" (object.raw),
           [server_register_network_index] "m" (func_server_register_network_index)
     );
@@ -56,8 +57,9 @@ void register_network_index_from_remote(int32_t network_id, MemRef object){
         "mov ecx, %[local_object_id];"
         "push %[network_id];"
         "call %[client_register_network_index_from_remote];"
-        : [message_delta_object_index] "+m" (message_delta_object_index)
-        : [local_object_id] "m" (object.raw),
+        :
+        : [message_delta_object_index] "m" (message_delta_object_index),
+          [local_object_id] "m" (object.raw),
           [network_id] "m" (network_id),
           [client_register_network_index_from_remote] "m" (func_client_register_network_index_from_remote)
     );
@@ -68,8 +70,9 @@ void unregister_network_index(MemRef object){
         "mov eax, %[message_delta_object_index];"
         "mov esi, %[local_object_id];"
         "call %[unregister_network_index];"
-        : [message_delta_object_index] "+m" (message_delta_object_index)
-        : [local_object_id] "m" (object.raw),
+        :
+        : [message_delta_object_index] "+m" (message_delta_object_index),
+          [local_object_id] "m" (object.raw),
           [unregister_network_index] "m" (func_unregister_network_index)
     );
 }

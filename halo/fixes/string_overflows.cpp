@@ -14,12 +14,7 @@ Patch(hs_print_overflow_fix);
 __attribute__((fastcall))
 void hs_print_cleanser(char* string){
     if (developer_mode_level() >= 4){
-        ARGBFloat color;
-        color.alpha = 1;
-        color.red = 0;
-        color.green = 1;
-        color.blue = 0;
-        console_out(string, color);
+        console_out(string, ARGBFloat(1.0, 0.0, 1.0, 0.0));
     };
 }
 

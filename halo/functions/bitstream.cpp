@@ -25,7 +25,8 @@ void bitstream_write(void* const iteration_header,
         "add esp, 4;"
         "popad;"
         "ret;"
-        : "+m" (func_bitstream_write_ptr)
+        :
+        : "m" (func_bitstream_write_ptr)
     );
 }
 
@@ -43,7 +44,8 @@ void bitstream_read(void* const iteration_header,
         "add esp, 4;"
         "popad;"
         "ret;"
-        : "+m" (func_bitstream_read_ptr)
+        :
+        : "m" (func_bitstream_read_ptr)
     );
 }
 

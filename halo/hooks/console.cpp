@@ -29,8 +29,8 @@ void new_console_in_hook(){
     "continue_to_halo_con_in:"
         "sub esp, 0x500;"
         "jmp %1;"
-        : "+m" (prcs_cmd)
-        : "m" (return_to_halo_con_in)
+        :
+        : "m" (prcs_cmd), "m" (return_to_halo_con_in)
     );
 }
 
