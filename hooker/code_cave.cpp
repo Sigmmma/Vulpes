@@ -166,43 +166,66 @@ intptr_t prepare_code_cave(){
     set_call_address(curr_cave+0x37, (intptr_t)&null_func); // jump placeholder
     return curr_cave;
 }
-
-CodeCave::CodeCave(const char* h_name, void* before, void* after){
+/*
+CodeCave::CodeCave(const char* h_name, uintptr_t p_address, size_t p_size, void* before, void* after){
     code_patch = CodePatch(h_name);
     name = h_name;
     before_func = (intptr_t)before;
     after_func = (intptr_t)after;
 }
-
-void CodeCave::build_old(uintptr_t p_address, size_t p_size){
-    assert(p_size <= 16);
-    printf("Building CodeCave %s...", name);
-    cave_address = (intptr_t)prepare_code_cave();
-    bool is_call_hook = false;
-    if (*(uint8_t*)p_address == 0xE8){
-        is_call_hook = true;
-        code_patch.build_old(p_address, p_size, CALL_PATCH, cave_address);
-    }else{
-        code_patch.build_old(p_address, p_size, JMP_PATCH, cave_address);
-    };
-    set_call_address(cave_address+0x12, before_func);
-    set_call_address(cave_address+0x45, after_func);
-    uint8_t* original_code_cpy = (uint8_t*)cave_address+0x27;
-    std::vector<int16_t> original_code = code_patch.get_unpatched_bytes();
-    if (!is_call_hook){
-        for (int i = 0; i<original_code.size(); i++){
-            original_code_cpy[i] = (uint8_t)original_code[i];
+*/
+bool CodeCave::build(intptr_t p_address){
+    if (!code_patch.is_built()){
+        printf("Building CodeCave %s...", name);
+        // We only have 16 bytes allocated for instruction copies.
+        assert(patch_size <= 16);
+        // If we got passed a patch address, use it.
+        if (p_address) patch_address = p_address;
+        // If the patch address == 0 we're likely just using a signature.
+        if (!patch_address) patch_address = sig.address() + patch_offset;
+        // Fail condition.
+        if (patch_address - patch_offset <= 0){
+            printf("failed.");
+            return false;
         };
-        original_code_cpy[original_code.size()] = 0xE9;
-        set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.get_return_address());
-    }else{
-        original_code_cpy[0] = 0xE9;
-        set_call_address((intptr_t)&original_code_cpy[0], get_call_address(p_address));
-    };
-    // Went off the original plan for a bit here,
-    // I'm doing this to avoid executing some NOPs.
+        // Allocate and pregenerate a cave.
+        cave_address = (intptr_t)prepare_code_cave();
+        // Determine if our hook is placed on a call instruction.
+        // Build the patch accordingly.
+        bool is_call_hook = false;
+        if (*(uint8_t*)patch_address == CALL_BYTE){
+            is_call_hook = true;
+            code_patch = CodePatch(name,patch_address,patch_size,CALL_PATCH,cave_address);
+        }else{
+            code_patch = CodePatch(name,patch_address,patch_size,JMP_PATCH,cave_address);
+        };
 
-    printf("done.\n");
+        if (code_patch.build()){
+            // Write the before and after calls to the appropriate spots in the cave.
+            set_call_address(cave_address+0x12, before_func);
+            set_call_address(cave_address+0x45, after_func);
+            // Make a copy of the original code we're overwriting.
+            uint8_t* original_code_cpy = (uint8_t*)cave_address+0x27;
+            std::vector<int16_t> original_code = code_patch.get_unpatched_bytes();
+            // If we're not a call hook then we can in most cases (except for jumps) just copy the code.
+            if (!is_call_hook){
+                for (int i = 0; i<original_code.size(); i++){
+                    original_code_cpy[i] = (uint8_t)original_code[i];
+                };
+                original_code_cpy[original_code.size()] = JMP_BYTE;
+                set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.get_return_address());
+            }else{ // If it is a call we'll need to regenerate the offset to be correct for our cave.
+                original_code_cpy[0] = JMP_BYTE;
+                set_call_address((intptr_t)&original_code_cpy[0], get_call_address(patch_address));
+            };
+            printf("done.\n");
+        };
+    };
+    if (!code_patch.is_built()){
+        printf("failed.");
+        return false;
+    };
+    return true;
 }
 
 void CodeCave::apply(){

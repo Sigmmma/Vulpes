@@ -132,22 +132,42 @@ private:
     void write_patch(std::vector<int16_t> patch_code);
 };
 
-#define Cave(name, before, after) CodeCave name(#name, before, after)
+#define Cave(name, ...) CodeCave name(#name, __VA_ARGS__)
 
 class CodeCave {
 public:
-    CodeCave(const char* h_name, void* before, void* after);
-    void build_old(uintptr_t p_address, size_t p_size);
+    template<typename T, typename T2>
+    CodeCave(const char* h_name,
+             CodeSignature& p_sig, int p_sig_offset, size_t p_size,
+             T before, T2 after){
+        name = h_name; patch_size = p_size;
+        sig = p_sig; patch_offset = p_sig_offset;
+        before_func = reinterpret_cast<intptr_t>(before);
+        after_func = reinterpret_cast<intptr_t>(after);
+    };
+    template<typename T, typename T2>
+    CodeCave(const char* h_name,
+             uintptr_t p_address, size_t p_size,
+             T before, T2 after){
+        name = h_name; patch_size = p_size; patch_address = p_address;
+        before_func = reinterpret_cast<intptr_t>(before);
+        after_func = reinterpret_cast<intptr_t>(after);
+    };
+    bool build(intptr_t p_address = 0);
     void apply();
     void revert();
 
 private:
+    CodeSignature sig = CodeSignature(false,"",0,0,{});
     intptr_t before_func;
     intptr_t func_continue;
     intptr_t after_func;
     intptr_t cave_address;
+    intptr_t patch_address = 0;
+    size_t patch_size = 0;
+    int patch_offset = 0;
     const char* name;
-    CodePatch code_patch = CodePatch("");
+    CodePatch code_patch = CodePatch("",0,0,NOP_PATCH,0);
 };
 
 // Gets the direct pointer to whatever the instruction at this address CALLs or JUMPs to.

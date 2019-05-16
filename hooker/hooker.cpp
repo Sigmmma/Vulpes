@@ -20,18 +20,10 @@ CodeSignature::CodeSignature(bool required,
 
 uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address){
     if (found_address == 0 && !already_tried){
-        if (start_address){
-            lowest_allowed = start_address;
-        };
-        if (end_address){
-            highest_allowed = end_address;
-        };
-        if (!lowest_allowed){
-            lowest_allowed = get_lowest_permitted_address();
-        };
-        if (!highest_allowed){
-            highest_allowed = get_highest_permitted_address();
-        };
+        if (start_address) lowest_allowed = start_address;
+        if (end_address) highest_allowed = end_address;
+        if (!lowest_allowed) lowest_allowed = get_lowest_permitted_address();
+        if (!highest_allowed) highest_allowed = get_highest_permitted_address();
         assert(lowest_allowed >= get_lowest_permitted_address());
         printf("Searching for CodeSignature %s...", name);
         size_t size_of_block_to_find = sig.size();
@@ -51,9 +43,7 @@ uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address)
                 break;
             };
             // If there was no mismatch then we have succesfully found the address and we can go home.
-            if (!mismatch){
-                found_address = current_address;
-            };
+            if (!mismatch) found_address = current_address;
             current_address++;
         };
     };
@@ -115,19 +105,11 @@ void CodePatch::setup_internal(size_t p_size, PatchTypes p_type, void* content, 
 }
 
 bool CodePatch::build(intptr_t p_address){
-    if (patch_is_built){
-        return true;
-    };
+    if (patch_is_built) return true;
     printf("Building CodePatch %s...", name);
-    if (p_address && !patch_is_built){
-        patch_address = p_address;
-    };
-    if (!patch_address && !patch_is_built){
-        patch_address = sig.address() + offset;
-    };
-    if (patch_address - offset <= 0){
-        return false;
-    };
+    if (p_address && !patch_is_built) patch_address = p_address;
+    if (!patch_address && !patch_is_built) patch_address = sig.address() + offset;
+    if (patch_address - offset <= 0) return false;
     assert(patch_address >= get_lowest_permitted_address());
 
     return_address = patch_address + size;
