@@ -18,7 +18,7 @@ CodeSignature::CodeSignature(bool required,
     name = d_name;
 }
 
-uintptr_t CodeSignature::get_address(){
+uintptr_t CodeSignature::address(){
     if (address == 0 && !already_tried){
         if (!lowest_allowed){
             lowest_allowed = get_lowest_permitted_address();
@@ -63,23 +63,23 @@ uintptr_t CodeSignature::get_address(){
     return address;
 }
 
-uintptr_t CodeSignature::get_address(bool recalculate){
+uintptr_t CodeSignature::address(bool recalculate){
     if (recalculate){
         address = 0;
         already_tried = false;
     };
-    return get_address();
+    return address();
 }
 
-uintptr_t CodeSignature::get_address(uintptr_t start_address){
+uintptr_t CodeSignature::address(uintptr_t start_address){
     lowest_allowed = start_address;
-    return get_address();
+    return address();
 }
 
-uintptr_t CodeSignature::get_address(uintptr_t start_address, uintptr_t end_address){
+uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address){
     lowest_allowed = start_address;
     highest_allowed = end_address;
-    return get_address();
+    return address();
 }
 
 ////////////
@@ -128,7 +128,7 @@ bool CodePatch::build(intptr_t p_address){
         patch_address = p_address;
     };
     if (!patch_address && !patch_is_built){
-        patch_address = sig.get_address() + offset;
+        patch_address = sig.address() + offset;
     };
     if (!patch_address){
         return false;

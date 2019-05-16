@@ -24,7 +24,7 @@ static uintptr_t new_list_end_ptr = reinterpret_cast<uintptr_t>(&message_definit
 
 void init_new_definitions(){
     message_definitions[VULPES_MSG] = get_vulpes_message_definition();
-    func_mdpi_encode_ptr = sig_mdpi_encode.get_address();
+    func_mdpi_encode_ptr = sig_mdpi_encode.address();
     old_list_ptr = *reinterpret_cast<uintptr_t*>(func_mdpi_encode_ptr+0x30);
     old_list_end_ptr = old_list_ptr + DEFAULT_MESSAGE_TYPE_COUNT * 4;
     uintptr_t* old_messages_array = reinterpret_cast<uintptr_t*>(old_list_ptr);
@@ -41,20 +41,20 @@ void init_new_definitions(){
     CodeSignature sig_mdp_lists(false, "sig_mdp_lists",0,0, ptr_bytes);
     CodeSignature sig_mdp_list_ends(false, "sig_mdp_list_ends",0,0, end_ptr_bytes);
 
-    uintptr_t addr = sig_mdp_lists.get_address();
+    uintptr_t addr = sig_mdp_lists.address();
     while (addr != 0){
         DWORD prota, protb;
         VirtualProtect((void*)addr, 4, PAGE_EXECUTE_READWRITE, &prota);
         *reinterpret_cast<uintptr_t*>(addr) = reinterpret_cast<uintptr_t>(&message_definitions);
         VirtualProtect((void*)addr, 4, prota, &protb);
-        addr = sig_mdp_lists.get_address(true);
+        addr = sig_mdp_lists.address(true);
     };
-    addr = sig_mdp_list_ends.get_address();
+    addr = sig_mdp_list_ends.address();
     while (addr != 0){
         DWORD prota, protb;
         VirtualProtect((void*)addr, 4, PAGE_EXECUTE_READWRITE, &prota);
         *reinterpret_cast<uintptr_t*>(addr) = new_list_end_ptr;
         VirtualProtect((void*)addr, 4, prota, &protb);
-        addr = sig_mdp_list_ends.get_address(true);
+        addr = sig_mdp_list_ends.address(true);
     };
 }*/

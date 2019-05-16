@@ -12,7 +12,7 @@ Signature(true, sig_weather_particle_table,
 uintptr_t* effect_ptrs_lst;
 
 uintptr_t* effect_ptrs(){
-    static uintptr_t sig_addr1 = sig_weather_particle_table.get_address();
+    static uintptr_t sig_addr1 = sig_weather_particle_table.address();
     if (!effect_ptrs_lst){
         effect_ptrs_lst = (uintptr_t*)sig_addr1;
     };
@@ -65,6 +65,6 @@ Table* device_groups_table(){
 }
 
 ObjectTable* object_table(){
-    static uintptr_t* object_table_ptr = (uintptr_t*)sig_object_table.get_address();
+    static uintptr_t* object_table_ptr = (uintptr_t*)sig_object_table.address();
     return (ObjectTable*)object_table_ptr[0];
 }

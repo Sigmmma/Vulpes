@@ -15,16 +15,16 @@ Patch(host_refusal_fix2);
 Patch(client_refusal_fix);
 
 void init_host_refusal_fixes(){
-    if (sig_host_refusal1.get_address() && sig_host_refusal2.get_address()){
+    if (sig_host_refusal1.address() && sig_host_refusal2.address()){
         host_refusal_fix1.build_old(
-            sig_host_refusal1.get_address()+HOST_REFUSAL_CLIENT1_OFFSET,
+            sig_host_refusal1.address()+HOST_REFUSAL_CLIENT1_OFFSET,
             HOST_REFUSAL_CLIENT1_LEN, NOP_PATCH, 0);
         host_refusal_fix2.build_manual(
-            sig_host_refusal2.get_address()+HOST_REFUSAL_CLIENT2_OFFSET, {0xEB});
+            sig_host_refusal2.address()+HOST_REFUSAL_CLIENT2_OFFSET, {0xEB});
     };
-    if (sig_client_refusal.get_address()){
+    if (sig_client_refusal.address()){
         client_refusal_fix.build_manual(
-            sig_client_refusal.get_address(), {0xEB, 0x13});
+            sig_client_refusal.address(), {0xEB, 0x13});
     };
 
     if (host_refusal_fix1.is_built() && host_refusal_fix2.is_built()){

@@ -50,6 +50,6 @@ void bitstream_read(void* const iteration_header,
 }
 
 void init_bitstream(){
-    func_bitstream_write_ptr = sig_bitstream_write.get_address();
-    func_bitstream_read_ptr  = sig_bitstream_read.get_address();
+    func_bitstream_write_ptr = sig_bitstream_write.address();
+    func_bitstream_read_ptr  = sig_bitstream_read.address();
 }

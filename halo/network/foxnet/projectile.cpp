@@ -7,6 +7,6 @@ static bool* allow_client_side_projectiles;
 
 void init_foxnet_projectile(){
     allow_client_side_projectiles =
-        (bool*)*(uintptr_t*)sig_bool_allow_client_side_projectiles.get_address();
+        (bool*)*(uintptr_t*)sig_bool_allow_client_side_projectiles.address();
 
 }

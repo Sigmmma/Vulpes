@@ -70,7 +70,7 @@ Signature(true, hud_chat_hook_signature,
 Patch(hud_chat_hook);
 
 void init_hud_chat_hook(){
-    hud_chat_hook.build_old(hud_chat_hook_signature.get_address(),
+    hud_chat_hook.build_old(hud_chat_hook_signature.address(),
         8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
     jmp_hud_chat_original_code = hud_chat_hook.get_return_address();
     hud_chat_hook.apply();
@@ -109,10 +109,10 @@ Signature(true, sig_network_related_bool,
 Patch(vulpes_packet_receive);
 
 void init_vulpes_message_hook(){
-    vulpes_packet_receive.build_old(sig_vulpes_packet_receive_hook.get_address()+0xE,
+    vulpes_packet_receive.build_old(sig_vulpes_packet_receive_hook.address()+0xE,
         6, JA_PATCH, reinterpret_cast<uintptr_t>(&case57));
     vulpes_packet_receive.apply();
-    network_related_bool_ptr = *reinterpret_cast<int32_t*>(sig_network_related_bool.get_address());
+    network_related_bool_ptr = *reinterpret_cast<int32_t*>(sig_network_related_bool.address());
 }
 
 void revert_vulpes_message_hook(){

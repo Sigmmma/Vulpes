@@ -84,9 +84,9 @@ void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
 }
 
 void init_message_delta_processor(){
-    func_mdp_encode = sig_mdp_encode_stateless_iterated.get_address();
-    func_mdp_decode = sig_mdp_decode_stateless_iterated.get_address();
-    func_mdp_discard = sig_mdp_discard_iteration_body.get_address();
+    func_mdp_encode = sig_mdp_encode_stateless_iterated.address();
+    func_mdp_decode = sig_mdp_decode_stateless_iterated.address();
+    func_mdp_discard = sig_mdp_discard_iteration_body.address();
 }
 
 Signature(true, sig_send_message_to_all,
@@ -201,7 +201,7 @@ void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t
 }
 
 void init_message_delta_sender(){
-    socket_ready = (uintptr_t*)*(uintptr_t*)(sig_send_message_socket_ready.get_address());
-    func_send_message_to_all = sig_send_message_to_all.get_address() - 56;
-    func_send_message_to_player = sig_send_message_to_player.get_address();
+    socket_ready = (uintptr_t*)*(uintptr_t*)(sig_send_message_socket_ready.address());
+    func_send_message_to_all = sig_send_message_to_all.address() - 56;
+    func_send_message_to_player = sig_send_message_to_player.address();
 }

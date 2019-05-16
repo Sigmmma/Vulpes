@@ -20,10 +20,10 @@ public:
     // Returns the address and does a search if it hasn't already.
     // Returns 0 if address is not found.
     // Returns previously found value if it has already searched.
-    uintptr_t get_address();
-    uintptr_t get_address(bool recalculate);
-    uintptr_t get_address(uintptr_t start_address);
-    uintptr_t get_address(uintptr_t start_address, uintptr_t end_address);
+    uintptr_t address();
+    uintptr_t address(bool recalculate);
+    uintptr_t address(uintptr_t start_address);
+    uintptr_t address(uintptr_t start_address, uintptr_t end_address);
 private:
     uintptr_t address = 0;
     std::vector<int16_t> sig;

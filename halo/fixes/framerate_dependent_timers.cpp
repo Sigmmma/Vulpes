@@ -18,7 +18,7 @@ void increment_respawn_timer(){
 }
 
 void init_checkpoint_revert_fix(){
-    intptr_t sig_addr = sig_death_timer_framerate_dep.get_address();
+    intptr_t sig_addr = sig_death_timer_framerate_dep.address();
     if (sig_addr && !death_timer_framerate_dep_fix.is_built()){
         death_timer_framerate_dep_fix.build_old(sig_addr+27, 2, NOP_PATCH, 0);
         player_dead = *(bool**)(sig_addr+2);
@@ -59,10 +59,10 @@ Patch(patch_scoreboard_framerate_dep3b);
 Patch(patch_ruleboard_intro_nop);
 
 void init_scoreboard_fix(){
-    static intptr_t sig_addr1 = sig_scoreboard_framerate_dep.get_address();
-    static intptr_t sig_addr2 = sig_scoreboard_framerate_dep2.get_address();
-    static intptr_t sig_addr3 = sig_scoreboard_framerate_dep3.get_address();
-    static intptr_t sig_addr4 = sig_scoreboard_ruleboard_intro_nop.get_address();
+    static intptr_t sig_addr1 = sig_scoreboard_framerate_dep.address();
+    static intptr_t sig_addr2 = sig_scoreboard_framerate_dep2.address();
+    static intptr_t sig_addr3 = sig_scoreboard_framerate_dep3.address();
+    static intptr_t sig_addr4 = sig_scoreboard_ruleboard_intro_nop.address();
     if (!scoreboard_initialized && sig_addr1 && sig_addr2 && sig_addr3 && sig_addr4){
         patch_scoreboard_framerate_dep1a.build_int(sig_addr1+2, (int32_t)&fade);
         patch_scoreboard_framerate_dep1b.build_int(sig_addr1+10,(int32_t)&fade);
@@ -112,8 +112,8 @@ void fade_console(){
 }
 
 void init_console_fix(){
-    static intptr_t sig_addr1 = sig_console_fade_call.get_address();
-    static intptr_t sig_addr2 = sig_console_framerate_dep.get_address();
+    static intptr_t sig_addr1 = sig_console_fade_call.address();
+    static intptr_t sig_addr2 = sig_console_framerate_dep.address();
     if (!console_initialized && sig_addr1 && sig_addr2){
         fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
         console_open = (bool*)*(uintptr_t*)sig_addr2;

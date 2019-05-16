@@ -20,7 +20,7 @@ void hs_print_cleanser(char* string){
 
 void init_string_overflow_fixes(){
     if (!hs_print_overflow_fix.is_built()){
-        hs_print_overflow_fix.build_old(sig_hs_print_overflow_fix.get_address()+15, 5,
+        hs_print_overflow_fix.build_old(sig_hs_print_overflow_fix.address()+15, 5,
             CALL_PATCH, (uintptr_t)&hs_print_cleanser);
     };
     hs_print_overflow_fix.apply();

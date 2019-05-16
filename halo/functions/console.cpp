@@ -14,7 +14,7 @@ const char *current_command = nullptr;
 void console_out(const char *text, const ARGBFloat &color) noexcept {
     if(silence_all_messages) return;
     std::string formatted_output = current_command ? (std::string(current_command) + ": " + text) : text;
-    static intptr_t console_out_address = sig_console_out.get_address();
+    static intptr_t console_out_address = sig_console_out.address();
     asm (
         "pushad;"
         "mov eax, %0;"

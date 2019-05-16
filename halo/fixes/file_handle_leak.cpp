@@ -16,14 +16,14 @@ static bool applied = false;
 void init_file_handle_leak_fixes(){
     static bool already_initialized = false;
     if (!already_initialized){
-        if (sig_file_handle_leak1.get_address()){
-            file_handle_leak_patch1.build_int(sig_file_handle_leak1.get_address()+1, NEW_ALLOCATION_SIZE);
+        if (sig_file_handle_leak1.address()){
+            file_handle_leak_patch1.build_int(sig_file_handle_leak1.address()+1, NEW_ALLOCATION_SIZE);
         };
-        if (sig_file_handle_leak2.get_address()){
-            file_handle_leak_patch2.build_int(sig_file_handle_leak2.get_address()+2, NEW_ALLOCATION_SIZE);
+        if (sig_file_handle_leak2.address()){
+            file_handle_leak_patch2.build_int(sig_file_handle_leak2.address()+2, NEW_ALLOCATION_SIZE);
         };
-        if (sig_file_handle_leak1.get_address() && sig_file_handle_leak3.get_address(sig_file_handle_leak1.get_address()+5)){
-            file_handle_leak_patch3.build_int(sig_file_handle_leak3.get_address()+1, NEW_ALLOCATION_SIZE);
+        if (sig_file_handle_leak1.address() && sig_file_handle_leak3.address(sig_file_handle_leak1.address()+5)){
+            file_handle_leak_patch3.build_int(sig_file_handle_leak3.address()+1, NEW_ALLOCATION_SIZE);
         };
     };
     if (file_handle_leak_patch1.is_built()

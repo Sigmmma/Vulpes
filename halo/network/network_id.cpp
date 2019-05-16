@@ -10,10 +10,10 @@ Signature(true, sig_func_unregister_network_index, {0x53, 0x57, 0x8B, 0x78, 0x58
 
 Signature(true, sig_translation_table_ptr, {-1, -1, -1, -1, 0x8B, 0x52, 0x28, 0x8B, 0x34, 0x8A});
 
-uintptr_t message_delta_object_index = *reinterpret_cast<uintptr_t*>(sig_message_delta_object_index.get_address() + 8);
-uintptr_t func_server_register_network_index = sig_func_server_register_network_index.get_address();
-uintptr_t func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.get_address();
-uintptr_t func_unregister_network_index = sig_func_unregister_network_index.get_address();
+uintptr_t message_delta_object_index = *reinterpret_cast<uintptr_t*>(sig_message_delta_object_index.address() + 8);
+uintptr_t func_server_register_network_index = sig_func_server_register_network_index.address();
+uintptr_t func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.address();
+uintptr_t func_unregister_network_index = sig_func_unregister_network_index.address();
 typedef struct{
     uint32_t max_count;
     uint32_t int1;                  //0x4

@@ -13,7 +13,7 @@ void enable_console(){
 }
 
 void init_tweaks(){
-    static intptr_t sig_addr1 = sig_console_enabled.get_address();
+    static intptr_t sig_addr1 = sig_console_enabled.address();
     if (sig_addr1){
         console_enabled = *(bool**)(sig_addr1+1);
         ADD_CALLBACK(EVENT_TICK, enable_console);
