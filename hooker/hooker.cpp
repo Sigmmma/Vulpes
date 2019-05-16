@@ -125,7 +125,7 @@ bool CodePatch::build(intptr_t p_address){
     if (!patch_address && !patch_is_built){
         patch_address = sig.address() + offset;
     };
-    if (!patch_address){
+    if (patch_address - offset <= 0){
         return false;
     };
     assert(patch_address >= get_lowest_permitted_address());
