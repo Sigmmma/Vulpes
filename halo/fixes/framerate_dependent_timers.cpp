@@ -6,7 +6,7 @@ Signature(false, sig_death_timer_framerate_dep,
     {0x38, 0x1D, -1, -1, -1, -1, 0x74, 0x33, 0xA1, -1, -1, -1, -1, 0x38, 0x58,
      0x02, 0x75, 0x29, 0x66, 0xA1, -1, -1, -1, -1, 0x66, 0x8B, 0xC8, 0x66, 0x40});
 
-Patch(death_timer_framerate_dep_fix);
+PatchNew(death_timer_framerate_dep_fix, 0, 2, NOP_PATCH, 0);
 
 bool*    player_dead;
 int32_t* player_respawn_timer;
@@ -17,14 +17,17 @@ void increment_respawn_timer(){
     };
 }
 
+static bool initialized = false;
+
 void init_checkpoint_revert_fix(){
-    intptr_t sig_addr = sig_death_timer_framerate_dep.address();
-    if (sig_addr && !death_timer_framerate_dep_fix.is_built()){
-        death_timer_framerate_dep_fix.build_old(sig_addr+27, 2, NOP_PATCH, 0);
+    static intptr_t sig_addr = sig_death_timer_framerate_dep.address();
+    if (!initialized && sig_addr){
+        death_timer_framerate_dep_fix.build(sig_addr+27);
         player_dead = *(bool**)(sig_addr+2);
         player_respawn_timer = *(int32_t**)(sig_addr+20);
+        initialized = true;
     };
-    if (death_timer_framerate_dep_fix.is_built()){
+    if (initialized){
         death_timer_framerate_dep_fix.apply();
         ADD_CALLBACK(EVENT_TICK, increment_respawn_timer);
     };
@@ -49,38 +52,26 @@ Signature(false, sig_scoreboard_ruleboard_intro_nop,
 
 const float fade = 1.0;
 
-static bool scoreboard_initialized = false;
-
-Patch(patch_scoreboard_framerate_dep1a);
-Patch(patch_scoreboard_framerate_dep1b);
-Patch(patch_scoreboard_framerate_dep2a);
-Patch(patch_scoreboard_framerate_dep3a);
-Patch(patch_scoreboard_framerate_dep3b);
-Patch(patch_ruleboard_intro_nop);
+PatchNew(patch_scoreboard_framerate_dep1a, sig_scoreboard_framerate_dep,   2, 4, INT_PATCH, &fade);
+PatchNew(patch_scoreboard_framerate_dep1b, sig_scoreboard_framerate_dep,  10, 4, INT_PATCH, &fade);
+PatchNew(patch_scoreboard_framerate_dep2a, sig_scoreboard_framerate_dep2,  2, 4, INT_PATCH, &fade);
+PatchNew(patch_scoreboard_framerate_dep3a, sig_scoreboard_framerate_dep3,  2, 4, INT_PATCH, &fade);
+PatchNew(patch_scoreboard_framerate_dep3b, sig_scoreboard_framerate_dep3, 14, 4, INT_PATCH, &fade);
+PatchNew(patch_ruleboard_intro_nop, sig_scoreboard_ruleboard_intro_nop,    6, 4, INT_PATCH, 0);
 
 void init_scoreboard_fix(){
-    static intptr_t sig_addr1 = sig_scoreboard_framerate_dep.address();
-    static intptr_t sig_addr2 = sig_scoreboard_framerate_dep2.address();
-    static intptr_t sig_addr3 = sig_scoreboard_framerate_dep3.address();
-    static intptr_t sig_addr4 = sig_scoreboard_ruleboard_intro_nop.address();
-    if (!scoreboard_initialized && sig_addr1 && sig_addr2 && sig_addr3 && sig_addr4){
-        patch_scoreboard_framerate_dep1a.build_int(sig_addr1+2, (int32_t)&fade);
-        patch_scoreboard_framerate_dep1b.build_int(sig_addr1+10,(int32_t)&fade);
-        patch_scoreboard_framerate_dep2a.build_int(sig_addr2+2, (int32_t)&fade);
-        patch_scoreboard_framerate_dep3a.build_int(sig_addr3+2, (int32_t)&fade);
-        patch_scoreboard_framerate_dep3b.build_int(sig_addr3+14,(int32_t)&fade);
-        patch_ruleboard_intro_nop.build_int(sig_addr4+6, 0);
-
-        scoreboard_initialized = true;
-    };
-    if (scoreboard_initialized){
+    if (patch_scoreboard_framerate_dep1a.build()
+    &&  patch_scoreboard_framerate_dep1b.build()
+    &&  patch_scoreboard_framerate_dep2a.build()
+    &&  patch_scoreboard_framerate_dep3a.build()
+    &&  patch_scoreboard_framerate_dep3b.build()){
         patch_scoreboard_framerate_dep1a.apply();
         patch_scoreboard_framerate_dep1b.apply();
         patch_scoreboard_framerate_dep2a.apply();
         patch_scoreboard_framerate_dep3a.apply();
         patch_scoreboard_framerate_dep3b.apply();
-        patch_ruleboard_intro_nop.apply();
     };
+    if (patch_ruleboard_intro_nop.build()) patch_ruleboard_intro_nop.apply();
 }
 
 void revert_scoreboard_fix(){
@@ -103,7 +94,7 @@ static bool console_initialized = false;
 static bool* console_open;
 static void (*fade_console_halo)();
 
-Patch(patch_console_framerate_dep);
+PatchNew(patch_console_framerate_dep, sig_console_framerate_dep, 6, 5, NOP_PATCH, 0);
 
 void fade_console(){
     if (!*console_open){
@@ -113,14 +104,9 @@ void fade_console(){
 
 void init_console_fix(){
     static intptr_t sig_addr1 = sig_console_fade_call.address();
-    static intptr_t sig_addr2 = sig_console_framerate_dep.address();
-    if (!console_initialized && sig_addr1 && sig_addr2){
+    if (sig_addr1 && patch_console_framerate_dep.build()){
         fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
-        console_open = (bool*)*(uintptr_t*)sig_addr2;
-        patch_console_framerate_dep.build_old(sig_addr2+6, 5, NOP_PATCH, 0);
-        console_initialized = true;
-    };
-    if (console_initialized){
+        console_open = *(bool**)(patch_console_framerate_dep.address()-6);
         patch_console_framerate_dep.apply();
         ADD_CALLBACK(EVENT_TICK, fade_console);
     };

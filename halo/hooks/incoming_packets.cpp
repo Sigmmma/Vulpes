@@ -21,7 +21,7 @@ bool process_hud_chat_message(HudChat* packet){
 }
 
 static uintptr_t jmp_hud_chat_original_code;
-static uintptr_t func_process_hud_chat_message = (uintptr_t)&process_hud_chat_message;
+static auto func_process_hud_chat_message = &process_hud_chat_message;
 
 __attribute__((naked))
 void hook_hud_chat_intercept(){
@@ -67,11 +67,10 @@ void hook_hud_chat_intercept(){
 
 Signature(true, hud_chat_hook_signature,
     {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
-Patch(hud_chat_hook);
+PatchNew(hud_chat_hook, hud_chat_hook_signature, 0, 8, JMP_PATCH, &hook_hud_chat_intercept);
 
 void init_hud_chat_hook(){
-    hud_chat_hook.build_old(hud_chat_hook_signature.address(),
-        8, JMP_PATCH, reinterpret_cast<uintptr_t>(&hook_hud_chat_intercept));
+    hud_chat_hook.build();
     jmp_hud_chat_original_code = hud_chat_hook.get_return_address();
     hud_chat_hook.apply();
 }

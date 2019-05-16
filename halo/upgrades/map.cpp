@@ -176,7 +176,7 @@ bool read_map_file_header_from_file(const char* map_name,
     return approved;
 }
 
-static intptr_t func_read_map_file_header_from_file = (intptr_t)&read_map_file_header_from_file;
+static auto func_read_map_file_header_from_file = &read_map_file_header_from_file;
 
 __attribute__((naked))
 bool read_map_file_header_wrapper(){
@@ -218,9 +218,9 @@ bool get_map_crc(MapListEntry* entry){
     return true;
 }
 
-static uintptr_t func_get_map_crc = (intptr_t)&get_map_crc;
+static auto func_get_map_crc = &get_map_crc;
 static uintptr_t* multiplayer_maps_list_ptr;
-static uintptr_t* jmp_skip_chimera;
+static uintptr_t jmp_skip_chimera;
 
 __attribute__((naked))
 void get_map_crc_wrapper_server(){
@@ -264,50 +264,25 @@ void get_map_crc_wrapper(){
 }
 
 static bool map_upgrades_initialized = false;
-Patch(patch_read_map_file_header_replacement);
-Patch(patch_startup_crc_calc_nop);
-Patch(patch_get_map_crc);
-Patch(patch_get_map_crc_server);
-
+PatchNew(patch_read_map_file_header_replacement, sig_read_map_file_header, 0, 6, JMP_PATCH, &read_map_file_header_wrapper);
+PatchNew(patch_startup_crc_calc_nop, sig_game_startup_crc_call, 0, 5, NOP_PATCH, 0);
+PatchNew(patch_get_map_crc, sig_get_crc_from_table, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
+PatchNew(patch_get_map_crc_server, sig_server_map_crc, 5, 7, CALL_PATCH, &get_map_crc_wrapper_server);
 
 void init_map_crc_upgrades(bool server){
     is_server = server;
-    if (!map_upgrades_initialized){
-        map_folders.push_back(default_map_folder);
-        map_extensions.push_back(default_map_extension);
-    };
-    static intptr_t sig_addr = sig_read_map_file_header.address();
-    if (sig_addr && !map_upgrades_initialized){
-        patch_read_map_file_header_replacement.build_old(sig_addr, 6, JMP_PATCH, (intptr_t)&read_map_file_header_wrapper);
-
-    };
-    if (patch_read_map_file_header_replacement.is_built()){
-        patch_read_map_file_header_replacement.apply();
-    };
-    static intptr_t sig_addr2 = sig_game_startup_crc_call.address();
-    if (sig_addr2 && !map_upgrades_initialized){
-        patch_startup_crc_calc_nop.build_old(sig_addr2, 5, NOP_PATCH, 0);
-    };
-    static intptr_t sig_addr3 = sig_get_crc_from_table.address();
-    if (sig_addr3 && !map_upgrades_initialized){
-        patch_get_map_crc.build_old(sig_addr3, 6, CALL_PATCH, (intptr_t)&get_map_crc_wrapper);
-        multiplayer_maps_list_ptr = (uintptr_t*)*(uintptr_t*)(sig_addr3+2);
-        jmp_skip_chimera = (uintptr_t*)(sig_addr3+13);
-    };
-    if (patch_get_map_crc.is_built()){
+    if (patch_read_map_file_header_replacement.build()) patch_read_map_file_header_replacement.apply();
+    if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
+    if (patch_get_map_crc.build()){
+        if (!map_upgrades_initialized){
+            multiplayer_maps_list_ptr = *(uintptr_t**)(patch_get_map_crc.address()+2);
+            jmp_skip_chimera = patch_get_map_crc.address()+13;
+        };
         patch_get_map_crc.apply();
     };
-    static intptr_t sig_addr4 = sig_server_map_crc.address();
-    if (sig_addr4 && !map_upgrades_initialized){
-        patch_get_map_crc_server.build_old(sig_addr4+5, 7, CALL_PATCH, (intptr_t)&get_map_crc_wrapper_server);
-    };
-    if (patch_get_map_crc_server.is_built()){
+    if (patch_get_map_crc_server.build()){
         patch_get_map_crc_server.apply();
-        // This patch depends on the patch above for
-        // it to not break server joining.
-        if (patch_startup_crc_calc_nop.is_built()){
-            patch_startup_crc_calc_nop.apply();
-        };
+        if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
     };
     if (!map_upgrades_initialized){
         map_folders.push_back(default_map_folder);

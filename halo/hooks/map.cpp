@@ -75,16 +75,16 @@ void after_mp(){
     };
 }
 
-Cave(map_load_ui_sp_hook, (void*)&before_sp, (void*)&after_sp);
-Cave(map_load_mp_hook, (void*)&before_mp, (void*)&after_mp);
+Cave(map_load_ui_sp_hook, sig_map_load_ui_sp, 0, 5, &before_sp, &after_sp);
+Cave(map_load_mp_hook, sig_map_load_mp, 0, 6, &before_mp, &after_mp);
 
 void init_map_hooks(bool is_server){
     if (!is_server){
-        map_load_ui_sp_hook.build_old(sig_map_load_ui_sp.address(), 5);
+        map_load_ui_sp_hook.build();
         sp_map_name = *(char**)sig_sp_map_name.address();
         map_load_ui_sp_hook.apply();
     };
-    map_load_mp_hook.build_old(sig_map_load_mp.address(), 6);
+    map_load_mp_hook.build();
     mp_map_name = *(char**)sig_map_name.address();
     map_load_mp_hook.apply();
 }

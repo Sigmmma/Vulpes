@@ -17,11 +17,10 @@ Signature(true, sig_tick,
     {0x51, 0x53, 0x68, 0xFF, 0xFF, 0x0F, 0x00, 0x68, 0x1F, 0x00, 0x09,
      0x00, 0xC6, 0x05, -1, -1, -1, -1, 0x01});
 
-Cave(tick_hook, (void*)&before_tick, (void*)&after_tick);
+Cave(tick_hook, sig_tick, 0, 7, &before_tick, &after_tick);
 
 void init_tick_hook(){
-    static uintptr_t sig_addr = sig_tick.address();
-    tick_hook.build_old(sig_addr, 7);
+    tick_hook.build();
     tick_hook.apply();
 }
 
