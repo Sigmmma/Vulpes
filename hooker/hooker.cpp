@@ -217,6 +217,11 @@ bool CodePatch::build(intptr_t p_address){
     return patch_is_built;
 }
 
+intptr_t CodePatch::address(){
+    if (!patch_address) patch_address = sig.address();
+    return patch_address;
+}
+
 void CodePatch::build_old(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
     printf("Building CodePatch %s...", name);
     assert(p_address >= get_lowest_permitted_address());
