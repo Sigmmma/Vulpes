@@ -33,7 +33,7 @@ uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address)
             highest_allowed = get_highest_permitted_address();
         };
         assert(lowest_allowed >= get_lowest_permitted_address());
-        printf("Searching for CodeSignature %s between %X and %X...", name, lowest_allowed, highest_allowed);
+        printf("Searching for CodeSignature %s...", name);
         size_t size_of_block_to_find = sig.size();
         uintptr_t current_address = lowest_allowed;
         // Traverse from the lowest to highest address allowed searching for the set of bytes that we want.
