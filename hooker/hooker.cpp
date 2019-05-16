@@ -73,8 +73,7 @@ CodePatch::CodePatch(const char* d_name){
     name = d_name;
 }
 
-void CodePatch::setup_internal(size_t p_size, PatchTypes p_type, void* content, size_t c_size){
-    size = p_size; type = p_type;
+void CodePatch::setup_internal(void* content, size_t c_size){
     switch(type){
         case JA_PATCH :
             assert(size >= 6);
