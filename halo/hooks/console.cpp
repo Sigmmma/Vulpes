@@ -52,7 +52,8 @@ void rcon_in_hook(){
 
         "pop ebx;" // return ebx to its former glory
         "ret;"
-        : "+m" (rcon_dword_ptr)
+        :
+        : "m" (rcon_dword_ptr)
     );
 }
 
@@ -107,8 +108,9 @@ void auto_complete_hook(){
         "movsx edx, WORD PTR ds:[edx];"
         //"dec edx;"
         "ret;"
-        : "+m" (func_auto_complete)
-        : "m" (console_input_ptr),
+        :
+        : "m" (func_auto_complete),
+          "m" (console_input_ptr),
           "m" (results_ptr),
           "m" (count_ptr)
     );
