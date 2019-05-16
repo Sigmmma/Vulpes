@@ -29,13 +29,13 @@ Signature(false, sig_shader_trans_zfighting3,
 //Patch(patch_shader_trans_zfighting1_fix);
 // This patch makes it so that all shader transparent types are rendered with
 // these bias values. Essentually as if all of them have the 'decal' flag set.
-PatchNew(patch_shader_trans_zfighting2_fix, sig_shader_trans_zfighting2, 0, 9, SKIP_PATCH, 0);
+Patch(patch_shader_trans_zfighting2_fix, sig_shader_trans_zfighting2, 0, 9, SKIP_PATCH, 0);
 // These patches forces the decal bias pointers to be explicitly overwritten
 // so weird config.txt setups can't break this fix.
-PatchNew(patch_shader_trans_zfighting3a_fix, sig_shader_trans_zfighting3,         0xE, 4, INT_PATCH, &val_DecalZBiasValue);
-PatchNew(patch_shader_trans_zfighting3b_fix, sig_shader_trans_zfighting3,        0x34, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
-PatchNew(patch_shader_trans_zfighting3c_fix, sig_shader_trans_zfighting3,  0xE + 0x50, 4, INT_PATCH, &val_DecalZBiasValue);
-PatchNew(patch_shader_trans_zfighting3d_fix, sig_shader_trans_zfighting3, 0x34 + 0x50, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
+Patch(patch_shader_trans_zfighting3a_fix, sig_shader_trans_zfighting3,         0xE, 4, INT_PATCH, &val_DecalZBiasValue);
+Patch(patch_shader_trans_zfighting3b_fix, sig_shader_trans_zfighting3,        0x34, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
+Patch(patch_shader_trans_zfighting3c_fix, sig_shader_trans_zfighting3,  0xE + 0x50, 4, INT_PATCH, &val_DecalZBiasValue);
+Patch(patch_shader_trans_zfighting3d_fix, sig_shader_trans_zfighting3, 0x34 + 0x50, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
 
 void init_shdr_trans_zfighting_fixes(){
     if (patch_shader_trans_zfighting2_fix.build()){

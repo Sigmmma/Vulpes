@@ -8,9 +8,9 @@ Signature(false, sig_host_refusal2,
 Signature(false, sig_client_refusal,
     {-1, -1, 0x75, 0x11, 0x6A, 0x01, 0x6A, 0x7E, 0x68, 0xA0, 0x00, 0x00, 0x00});
 
-PatchNew(host_refusal_fix1, sig_host_refusal1, 0xA, 5, NOP_PATCH, 0);
-PatchNew(host_refusal_fix2, sig_host_refusal2, 5, {0xEB});
-PatchNew(client_refusal_fix, sig_client_refusal, 0, {0xEB, 0x13});
+Patch(host_refusal_fix1, sig_host_refusal1, 0xA, 5, NOP_PATCH, 0);
+Patch(host_refusal_fix2, sig_host_refusal2, 5, {0xEB});
+Patch(client_refusal_fix, sig_client_refusal, 0, {0xEB, 0x13});
 
 void init_host_refusal_fixes(){
     if (host_refusal_fix1.build() && host_refusal_fix2.build()){

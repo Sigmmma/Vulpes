@@ -264,10 +264,10 @@ void get_map_crc_wrapper(){
 }
 
 static bool map_upgrades_initialized = false;
-PatchNew(patch_read_map_file_header_replacement, sig_read_map_file_header, 0, 6, JMP_PATCH, &read_map_file_header_wrapper);
-PatchNew(patch_startup_crc_calc_nop, sig_game_startup_crc_call, 0, 5, NOP_PATCH, 0);
-PatchNew(patch_get_map_crc, sig_get_crc_from_table, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
-PatchNew(patch_get_map_crc_server, sig_server_map_crc, 5, 7, CALL_PATCH, &get_map_crc_wrapper_server);
+Patch(patch_read_map_file_header_replacement, sig_read_map_file_header, 0, 6, JMP_PATCH, &read_map_file_header_wrapper);
+Patch(patch_startup_crc_calc_nop, sig_game_startup_crc_call, 0, 5, NOP_PATCH, 0);
+Patch(patch_get_map_crc, sig_get_crc_from_table, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
+Patch(patch_get_map_crc_server, sig_server_map_crc, 5, 7, CALL_PATCH, &get_map_crc_wrapper_server);
 
 void init_map_crc_upgrades(bool server){
     is_server = server;

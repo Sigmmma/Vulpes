@@ -14,7 +14,7 @@ void hs_print_cleanser(char* string){
 
 Signature(false, sig_hs_print_overflow_fix,
     {0x83, 0xC4, 0x10, 0x85, 0xC0, 0x74, -1, 0x8B, 0x08, 0xA1, -1, -1, -1, -1, 0x51, 0xE8});
-PatchNew(hs_print_overflow_fix, sig_hs_print_overflow_fix, 15, 5, CALL_PATCH, &hs_print_cleanser);
+Patch(hs_print_overflow_fix, sig_hs_print_overflow_fix, 15, 5, CALL_PATCH, &hs_print_cleanser);
 
 void init_string_overflow_fixes(){
     if (hs_print_overflow_fix.build()) hs_print_overflow_fix.apply();

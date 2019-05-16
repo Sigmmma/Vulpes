@@ -55,8 +55,8 @@ void rcon_in_hook(){
     );
 }
 
-PatchNew(console_in_hook_patch, sig_console_input_hook, 0, 6, JMP_PATCH, &new_console_in_hook);
-PatchNew(rcon_in_hook_patch, sig_console_input_hook, -44, 25, JMP_PATCH, &rcon_in_hook);
+Patch(console_in_hook_patch, sig_console_input_hook, 0, 6, JMP_PATCH, &new_console_in_hook);
+Patch(rcon_in_hook_patch, sig_console_input_hook, -44, 25, JMP_PATCH, &rcon_in_hook);
 
 void init_console_input_hook(){
     if(console_in_hook_patch.build() && rcon_in_hook_patch.build()){
@@ -113,7 +113,7 @@ void auto_complete_hook(){
     );
 }
 
-PatchNew(auto_complete_patch, sig_auto_complete_hook, 0, 7, CALL_PATCH, &auto_complete_hook);
+Patch(auto_complete_patch, sig_auto_complete_hook, 0, 7, CALL_PATCH, &auto_complete_hook);
 
 void init_command_auto_complete_hook(){
     uintptr_t sig_addr2 = sig_console_input.address();

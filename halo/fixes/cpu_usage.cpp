@@ -24,11 +24,11 @@ Signature(false, sig_cpu_usage_fix_pattern1,
 Signature(false, sig_cpu_usage_fix_pattern2,
     {0xFF, 0x15, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x13, 0x84, 0xC0, 0x74});
 
-PatchNew(cpu_usage_fix_patch1, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &replacement_function);
-PatchNew(cpu_usage_fix_patch2, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &replacement_function);
-PatchNew(cpu_usage_fix_patch3, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
-PatchNew(cpu_usage_fix_patch4, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
-PatchNew(cpu_usage_fix_patch5, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
+Patch(cpu_usage_fix_patch1, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &replacement_function);
+Patch(cpu_usage_fix_patch2, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &replacement_function);
+Patch(cpu_usage_fix_patch3, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
+Patch(cpu_usage_fix_patch4, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
+Patch(cpu_usage_fix_patch5, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
 
 void init_cpu_usage_fixes(){
     if (cpu_usage_fix_patch1.build()) cpu_usage_fix_patch1.apply();

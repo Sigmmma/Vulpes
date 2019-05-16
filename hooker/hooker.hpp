@@ -44,8 +44,7 @@ enum PatchTypes {
 };
 
 // A macro so we don't have to fill in the name twice.
-#define Patch(name) CodePatch name(#name)
-#define PatchNew(name, ...) CodePatch name(#name, __VA_ARGS__)
+#define Patch(name, ...) CodePatch name(#name, __VA_ARGS__)
 // A class for patching code.
 class CodePatch {
 private:

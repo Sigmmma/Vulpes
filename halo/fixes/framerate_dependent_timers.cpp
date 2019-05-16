@@ -6,7 +6,7 @@ Signature(false, sig_death_timer_framerate_dep,
     {0x38, 0x1D, -1, -1, -1, -1, 0x74, 0x33, 0xA1, -1, -1, -1, -1, 0x38, 0x58,
      0x02, 0x75, 0x29, 0x66, 0xA1, -1, -1, -1, -1, 0x66, 0x8B, 0xC8, 0x66, 0x40});
 
-PatchNew(death_timer_framerate_dep_fix, 0, 2, NOP_PATCH, 0);
+Patch(death_timer_framerate_dep_fix, 0, 2, NOP_PATCH, 0);
 
 bool*    player_dead;
 int32_t* player_respawn_timer;
@@ -52,12 +52,12 @@ Signature(false, sig_scoreboard_ruleboard_intro_nop,
 
 const float fade = 1.0;
 
-PatchNew(patch_scoreboard_framerate_dep1a, sig_scoreboard_framerate_dep,   2, 4, INT_PATCH, &fade);
-PatchNew(patch_scoreboard_framerate_dep1b, sig_scoreboard_framerate_dep,  10, 4, INT_PATCH, &fade);
-PatchNew(patch_scoreboard_framerate_dep2a, sig_scoreboard_framerate_dep2,  2, 4, INT_PATCH, &fade);
-PatchNew(patch_scoreboard_framerate_dep3a, sig_scoreboard_framerate_dep3,  2, 4, INT_PATCH, &fade);
-PatchNew(patch_scoreboard_framerate_dep3b, sig_scoreboard_framerate_dep3, 14, 4, INT_PATCH, &fade);
-PatchNew(patch_ruleboard_intro_nop, sig_scoreboard_ruleboard_intro_nop,    6, 4, INT_PATCH, 0);
+Patch(patch_scoreboard_framerate_dep1a, sig_scoreboard_framerate_dep,   2, 4, INT_PATCH, &fade);
+Patch(patch_scoreboard_framerate_dep1b, sig_scoreboard_framerate_dep,  10, 4, INT_PATCH, &fade);
+Patch(patch_scoreboard_framerate_dep2a, sig_scoreboard_framerate_dep2,  2, 4, INT_PATCH, &fade);
+Patch(patch_scoreboard_framerate_dep3a, sig_scoreboard_framerate_dep3,  2, 4, INT_PATCH, &fade);
+Patch(patch_scoreboard_framerate_dep3b, sig_scoreboard_framerate_dep3, 14, 4, INT_PATCH, &fade);
+Patch(patch_ruleboard_intro_nop, sig_scoreboard_ruleboard_intro_nop,    6, 4, INT_PATCH, 0);
 
 void init_scoreboard_fix(){
     if (patch_scoreboard_framerate_dep1a.build()
@@ -94,7 +94,7 @@ static bool console_initialized = false;
 static bool* console_open;
 static void (*fade_console_halo)();
 
-PatchNew(patch_console_framerate_dep, sig_console_framerate_dep, 6, 5, NOP_PATCH, 0);
+Patch(patch_console_framerate_dep, sig_console_framerate_dep, 6, 5, NOP_PATCH, 0);
 
 void fade_console(){
     if (!*console_open){
