@@ -69,10 +69,6 @@ uintptr_t CodeSignature::address(bool recalculate){
 
 ////////////
 
-CodePatch::CodePatch(const char* d_name){
-    name = d_name;
-}
-
 void CodePatch::setup_internal(void* content, size_t c_size){
     switch(type){
         case JA_PATCH :

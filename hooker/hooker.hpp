@@ -81,7 +81,6 @@ public:
         size = patch_bytes.size(); type = MANUAL_PATCH;
         patched_code = patch_bytes;
     };
-    CodePatch(const char* d_name);
     intptr_t address();
     ////// Main functions.
     bool build(intptr_t p_address = 0);
