@@ -128,12 +128,11 @@ void init_vulpes(){
 }
 
 void destruct_vulpes(){
-    if (!server){
-        FreeConsole();
-    };
-
     revert_hooks();
     revert_halo_bug_fixes();
     revert_upgrades();
     revert_halo_bug_fixes();
+    if (!server){
+        FreeConsole();
+    };
 }
