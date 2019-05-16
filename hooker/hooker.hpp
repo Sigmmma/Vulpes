@@ -49,15 +49,38 @@ enum PatchTypes {
 #define PatchNew(name, ...) CodePatch name(#name, __VA_ARGS__)
 // A class for patching code.
 class CodePatch {
+private:
+    void setup_internal(size_t p_size, PatchTypes p_type, void* content, size_t c_size);
 public:
     // Initlializers.
-
+    template<typename T>
     CodePatch(const char* d_name,
               CodeSignature& p_sig, int p_sig_offset,
-              size_t p_size, PatchTypes p_type, intptr_t content);
+              size_t p_size, PatchTypes p_type, T content){
+        name = d_name; sig = p_sig; offset = p_sig_offset;
+        setup_internal(p_size, p_type, reinterpret_cast<void*>(&content), sizeof(T));
+    };
+    template<typename T>
     CodePatch(const char* d_name,
               intptr_t p_address,
-              size_t p_size, PatchTypes p_type, intptr_t content);
+              size_t p_size, PatchTypes p_type, T content){
+        name = d_name; patch_address = p_address;
+        setup_internal(p_size, p_type, reinterpret_cast<void*>(&content), sizeof(T));
+    };
+    CodePatch(const char* d_name,
+              CodeSignature& p_sig, int p_sig_offset,
+              std::vector<int16_t>& patch_bytes){
+        name = d_name; sig = p_sig; offset = p_sig_offset;
+        size = patch_bytes.size(); type = MANUAL_PATCH;
+        patched_code = patch_bytes;
+    };
+    CodePatch(const char* d_name,
+              intptr_t p_address,
+              std::vector<int16_t>& patch_bytes){
+        name = d_name; patch_address = p_address;
+        size = patch_bytes.size(); type = MANUAL_PATCH;
+        patched_code = patch_bytes;
+    };
     CodePatch(const char* d_name);
     ////// Main functions.
     bool build(intptr_t p_address = 0);
@@ -106,8 +129,6 @@ private:
     bool applied = false;
     PatchTypes type;
     const char* name;
-    template<typename T>
-    void setup_internal(size_t p_size, PatchTypes p_type, T content);
     void write_patch(std::vector<int16_t> patch_code);
 };
 

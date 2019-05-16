@@ -88,46 +88,35 @@ CodePatch::CodePatch(const char* d_name){
     name = d_name;
 }
 
-template<typename T>
-void CodePatch::setup_internal(size_t p_size, PatchTypes p_type, T content){
+void CodePatch::setup_internal(size_t p_size, PatchTypes p_type, void* content, size_t c_size){
     size = p_size; type = p_type;
-    assert(type != MANUAL_PATCH);
     switch(type){
         case JA_PATCH :
             assert(size >= 6);
         case JMP_PATCH :
         case CALL_PATCH :
             assert(size >= 5);
-            redirect_address = reinterpret_cast<intptr_t>(content);
+            redirect_address = *reinterpret_cast<intptr_t*>(content);
             break;
         case SKIP_PATCH :
             assert(size >= 2);
             break;
         case INT_PATCH :
-            assert(sizeof(T) == size && sizeof(T) <= 4);
-            for (int i=0; i<sizeof(T);i++){
+            assert(c_size == size && c_size <= 4);
+            for (int i=0; i<c_size;i++){
                 reinterpret_cast<uint8_t*>(&redirect_address)[i] =
-                    reinterpret_cast<uint8_t*>(&content)[i];
+                    reinterpret_cast<uint8_t*>(content)[i];
+            };
+            break;
+        case MANUAL_PATCH :
+            assert(c_size == size);
+            for (int i=0; i<c_size;i++){
+                patched_code.push_back(reinterpret_cast<uint8_t*>(content)[i]);
             };
             break;
         case NOP_PATCH :
             break;
     };
-}
-
-CodePatch::CodePatch(const char* d_name,
-                     CodeSignature& p_sig, int p_sig_offset,
-                     size_t p_size, PatchTypes p_type, intptr_t content){
-    name = d_name; sig = p_sig; offset = p_sig_offset;
-
-    setup_internal(p_size, p_type, content);
-}
-
-CodePatch::CodePatch(const char* d_name,
-                     intptr_t p_address,
-                     size_t p_size, PatchTypes p_type, intptr_t content){
-    name = d_name; patch_address = p_address;
-    setup_internal(p_size, p_type, content);
 }
 
 bool CodePatch::build(intptr_t p_address){
@@ -286,10 +275,8 @@ void CodePatch::build_old(uintptr_t p_address, size_t p_size, PatchTypes p_type,
             write_pointer = false;
             break;
         case MANUAL_PATCH :
-            throw std::invalid_argument(
-                "Used invalid patch type for CodePatch::build_old().\n"
-                "MANUAL_PATCH should only be through CodePatch::build_manual()."
-            );
+            used_area = patched_code.size();
+            write_pointer = false;
             break;
     };
 
