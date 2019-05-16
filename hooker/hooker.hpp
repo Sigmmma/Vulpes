@@ -40,19 +40,27 @@ enum PatchTypes {
     JMP_PATCH,  // Makes a jump to redirect_to.
     JA_PATCH,  // Makes a conditional jump to redirect_to.
     SKIP_PATCH,  // Puts a jmp at the start of the patch area which jumps to the end of the patch area. Pads the rest with NOPs.
+    INT_PATCH,
     MANUAL_PATCH // Requires you to pass your own bytes to write at the given area.
 };
 
 // A macro so we don't have to fill in the name twice.
 #define Patch(name) CodePatch name(#name)
-
+#define PatchNew(name, ...) CodePatch name(#name, __VA_ARGS__)
 // A class for patching code.
 class CodePatch {
 public:
     // Initlializers.
-    CodePatch(const char* d_name);
 
+    CodePatch(const char* d_name,
+              CodeSignature& p_sig, int p_sig_offset,
+              size_t p_size, PatchTypes p_type, intptr_t content);
+    CodePatch(const char* d_name,
+              intptr_t p_address,
+              size_t p_size, PatchTypes p_type, intptr_t content);
+    CodePatch(const char* d_name);
     ////// Main functions.
+    bool build(intptr_t p_address = 0);
     void build_old(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
     // Allows you to specify your own patch bytes,
     // with -1 in the place of bytes you don't want changed by the patch.
@@ -86,9 +94,11 @@ public:
     // Returns the bytes that the patch would put at the patch address.
     std::vector<int16_t> get_patched_bytes();
 private:
-    uintptr_t patch_address;
-    uintptr_t redirect_address;
-    uintptr_t return_address;
+    CodeSignature sig = CodeSignature(false,"",0,0,{});
+    int offset = 0;
+    uintptr_t patch_address = 0;
+    uintptr_t redirect_address = 0;
+    uintptr_t return_address = 0;
     std::vector<int16_t> original_code;
     std::vector<int16_t> patched_code;
     size_t size;
@@ -96,7 +106,8 @@ private:
     bool applied = false;
     PatchTypes type;
     const char* name;
-
+    template<typename T>
+    void setup_internal(size_t p_size, PatchTypes p_type, T content);
     void write_patch(std::vector<int16_t> patch_code);
 };
 

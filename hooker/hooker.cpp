@@ -1,5 +1,4 @@
 #include "hooker.hpp"
-
 #define WIN32_MEAN_AND_LEAN // Keeps the amount of windows.h includes to the bare minumum.
 #include <windows.h>
 #include <cassert>
@@ -7,7 +6,11 @@
 #include <cstdio>
 #include <iostream>
 
-CodeSignature::CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
+CodeSignature::CodeSignature(bool required,
+                             const char* d_name,
+                             uintptr_t lowest_search_address,
+                             uintptr_t highest_search_address,
+                             std::vector<int16_t> signature){
     imperative = required;
     lowest_allowed = lowest_search_address;
     highest_allowed = highest_search_address;
@@ -83,6 +86,151 @@ uintptr_t CodeSignature::get_address(uintptr_t start_address, uintptr_t end_addr
 
 CodePatch::CodePatch(const char* d_name){
     name = d_name;
+}
+
+template<typename T>
+void CodePatch::setup_internal(size_t p_size, PatchTypes p_type, T content){
+    size = p_size; type = p_type;
+    assert(type != MANUAL_PATCH);
+    switch(type){
+        case JA_PATCH :
+            assert(size >= 6);
+        case JMP_PATCH :
+        case CALL_PATCH :
+            assert(size >= 5);
+            redirect_address = reinterpret_cast<intptr_t>(content);
+            break;
+        case SKIP_PATCH :
+            assert(size >= 2);
+            break;
+        case INT_PATCH :
+            assert(sizeof(T) == size && sizeof(T) <= 4);
+            for (int i=0; i<sizeof(T);i++){
+                reinterpret_cast<uint8_t*>(&redirect_address)[i] =
+                    reinterpret_cast<uint8_t*>(&content)[i];
+            };
+            break;
+        case NOP_PATCH :
+            break;
+    };
+}
+
+CodePatch::CodePatch(const char* d_name,
+                     CodeSignature& p_sig, int p_sig_offset,
+                     size_t p_size, PatchTypes p_type, intptr_t content){
+    name = d_name; sig = p_sig; offset = p_sig_offset;
+
+    setup_internal(p_size, p_type, content);
+}
+
+CodePatch::CodePatch(const char* d_name,
+                     intptr_t p_address,
+                     size_t p_size, PatchTypes p_type, intptr_t content){
+    name = d_name; patch_address = p_address;
+    setup_internal(p_size, p_type, content);
+}
+
+bool CodePatch::build(intptr_t p_address){
+    if (patch_is_built){
+        return true;
+    };
+    printf("Building CodePatch %s...", name);
+    if (p_address && !patch_is_built){
+        patch_address = p_address;
+    };
+    if (!patch_address && !patch_is_built){
+        patch_address = sig.get_address() + offset;
+    };
+    if (!patch_address){
+        return false;
+    };
+    assert(patch_address >= get_lowest_permitted_address());
+
+    return_address = patch_address + size;
+
+    // Setup for the different types of patches.
+    uint32_t used_area;
+    bool write_pointer = false;
+    switch (type) {
+        default:
+        case NOP_PATCH :
+            used_area = 0;
+            write_pointer = false;
+            break;
+        case CALL_PATCH :
+            patched_code.push_back(CALL_BYTE);
+            used_area = 5;
+            write_pointer = true;
+            break;
+        case JMP_PATCH :
+            patched_code.push_back(JMP_BYTE);
+            used_area = 5;
+            write_pointer = true;
+            break;
+        case JA_PATCH :
+            patched_code.push_back(CONDJ_BYTE);
+            patched_code.push_back(JA_BYTE);
+            used_area = 6;
+            write_pointer = true;
+            break;
+        case SKIP_PATCH :
+            if(size < 128){
+                patched_code.push_back(JMP_SMALL_BYTE);
+                patched_code.push_back(uint8_t(size - 2));
+                used_area = 2;
+                write_pointer = false;
+            }else{
+                patched_code.push_back(JMP_BYTE);
+                used_area = 5;
+                write_pointer = true;
+                redirect_address = patch_address + size;
+            };
+            break;
+        case MANUAL_PATCH :
+            assert(size == patched_code.size());
+            break;
+        case INT_PATCH :
+            used_area = size;
+            for (int i=0; i<size; i++){
+                patched_code.push_back(reinterpret_cast<uint8_t*>(&redirect_address)[i]);
+            };
+            write_pointer = false;
+            break;
+    };
+
+    // Write pointer to our own code.
+    if (write_pointer){
+        // The version of the call and jmp instructions we use jump to the address
+        // relative to the start of the instruction + the size of the instruction.
+        uintptr_t relative_address_int = redirect_address - patch_address - used_area;
+        // Get the bytes that make up the address in the order that they are stored in memory.
+        uint8_t* relative_address_bytes = reinterpret_cast<uint8_t*>(&relative_address_int);
+        for (int i = 0; i < 4; i++){
+            patched_code.push_back(relative_address_bytes[i]);
+        };
+    };
+
+    // Pad remaining bytes.
+    for (int i = used_area; i < size; i++){
+        patched_code.push_back(NOP_BYTE);
+    };
+
+    // Copy the bytes found at the original address
+    // Also mimic the mask that could have been passed in through
+    // the manual patch constructor.
+    uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
+    // Make a copy of the old code
+    for (int i = 0; i < size; i++){
+        if (patched_code[i] != -1){
+            original_code.push_back(patch_address_bytes[i]);
+        }else{
+            original_code.push_back(-1);
+        };
+    };
+
+    patch_is_built = true;
+    printf("done\n");
+    return patch_is_built;
 }
 
 void CodePatch::build_old(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
