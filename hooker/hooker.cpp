@@ -18,8 +18,14 @@ CodeSignature::CodeSignature(bool required,
     name = d_name;
 }
 
-uintptr_t CodeSignature::address(){
+uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address){
     if (found_address == 0 && !already_tried){
+        if (start_address){
+            lowest_allowed = start_address;
+        };
+        if (end_address){
+            highest_allowed = end_address;
+        };
         if (!lowest_allowed){
             lowest_allowed = get_lowest_permitted_address();
         };
@@ -68,17 +74,6 @@ uintptr_t CodeSignature::address(bool recalculate){
         found_address = 0;
         already_tried = false;
     };
-    return address();
-}
-
-uintptr_t CodeSignature::address(uintptr_t start_address){
-    lowest_allowed = start_address;
-    return address();
-}
-
-uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address){
-    lowest_allowed = start_address;
-    highest_allowed = end_address;
     return address();
 }
 
