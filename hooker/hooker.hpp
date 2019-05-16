@@ -84,13 +84,6 @@ public:
     intptr_t address();
     ////// Main functions.
     bool build(intptr_t p_address = 0);
-    void build_old(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
-    // Allows you to specify your own patch bytes,
-    // with -1 in the place of bytes you don't want changed by the patch.
-    void build_manual(uintptr_t p_address, std::vector<int16_t> patch_bytes);
-    // A patch type that writes an int to a location
-    void build_int(uintptr_t p_address, uint32_t patch_int);
-    void build_int16(uintptr_t p_address, uint16_t patch_int);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.
