@@ -21,7 +21,7 @@ Cave(tick_hook, (void*)&before_tick, (void*)&after_tick);
 
 void init_tick_hook(){
     static uintptr_t sig_addr = sig_tick.get_address();
-    tick_hook.build(sig_addr, 7);
+    tick_hook.build_old(sig_addr, 7);
     tick_hook.apply();
 }
 

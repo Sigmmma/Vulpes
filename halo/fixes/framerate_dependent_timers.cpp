@@ -20,7 +20,7 @@ void increment_respawn_timer(){
 void init_checkpoint_revert_fix(){
     intptr_t sig_addr = sig_death_timer_framerate_dep.get_address();
     if (sig_addr && !death_timer_framerate_dep_fix.is_built()){
-        death_timer_framerate_dep_fix.build(sig_addr+27, 2, NOP_PATCH, 0);
+        death_timer_framerate_dep_fix.build_old(sig_addr+27, 2, NOP_PATCH, 0);
         player_dead = *(bool**)(sig_addr+2);
         player_respawn_timer = *(int32_t**)(sig_addr+20);
     };
@@ -117,7 +117,7 @@ void init_console_fix(){
     if (!console_initialized && sig_addr1 && sig_addr2){
         fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
         console_open = (bool*)*(uintptr_t*)sig_addr2;
-        patch_console_framerate_dep.build(sig_addr2+6, 5, NOP_PATCH, 0);
+        patch_console_framerate_dep.build_old(sig_addr2+6, 5, NOP_PATCH, 0);
         console_initialized = true;
     };
     if (console_initialized){

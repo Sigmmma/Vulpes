@@ -53,7 +53,7 @@ public:
     CodePatch(const char* d_name);
 
     ////// Main functions.
-    void build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
+    void build_old(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to);
     // Allows you to specify your own patch bytes,
     // with -1 in the place of bytes you don't want changed by the patch.
     void build_manual(uintptr_t p_address, std::vector<int16_t> patch_bytes);
@@ -105,7 +105,7 @@ private:
 class CodeCave {
 public:
     CodeCave(const char* h_name, void* before, void* after);
-    void build(uintptr_t p_address, size_t p_size);
+    void build_old(uintptr_t p_address, size_t p_size);
     void apply();
     void revert();
 

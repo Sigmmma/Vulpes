@@ -60,9 +60,9 @@ void init_console_input_hook(){
     if(!console_in_hook_patch.is_built()){
         uintptr_t sig_addr = sig_console_input_hook.get_address();
         return_to_halo_con_in = sig_addr+0x1E + 5 - 12;
-        console_in_hook_patch.build(sig_addr, 6, JMP_PATCH, (uintptr_t)&new_console_in_hook);
+        console_in_hook_patch.build_old(sig_addr, 6, JMP_PATCH, (uintptr_t)&new_console_in_hook);
         rcon_dword_ptr = *(intptr_t*)(sig_addr - 32 + 3);
-        rcon_in_hook_patch.build(sig_addr-32-12, 7+8+10, JMP_PATCH, (uintptr_t)&rcon_in_hook);
+        rcon_in_hook_patch.build_old(sig_addr-32-12, 7+8+10, JMP_PATCH, (uintptr_t)&rcon_in_hook);
     };
     console_in_hook_patch.apply();
     rcon_in_hook_patch.apply();
@@ -120,7 +120,7 @@ void init_command_auto_complete_hook(){
     uintptr_t sig_addr3 = sig_auto_complete_collected_list.get_address();
 
     if (sig_addr && sig_addr3){
-        auto_complete_patch.build(sig_addr, 7, CALL_PATCH, (uintptr_t)&auto_complete_hook);
+        auto_complete_patch.build_old(sig_addr, 7, CALL_PATCH, (uintptr_t)&auto_complete_hook);
         console_input_ptr = *(intptr_t*)sig_addr2;
         results_ptr       = *(intptr_t*)sig_addr3;
         count_ptr         = *(intptr_t*)(sig_addr3+14);

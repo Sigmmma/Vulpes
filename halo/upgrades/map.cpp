@@ -278,7 +278,7 @@ void init_map_crc_upgrades(bool server){
     };
     static intptr_t sig_addr = sig_read_map_file_header.get_address();
     if (sig_addr && !map_upgrades_initialized){
-        patch_read_map_file_header_replacement.build(sig_addr, 6, JMP_PATCH, (intptr_t)&read_map_file_header_wrapper);
+        patch_read_map_file_header_replacement.build_old(sig_addr, 6, JMP_PATCH, (intptr_t)&read_map_file_header_wrapper);
 
     };
     if (patch_read_map_file_header_replacement.is_built()){
@@ -286,11 +286,11 @@ void init_map_crc_upgrades(bool server){
     };
     static intptr_t sig_addr2 = sig_game_startup_crc_call.get_address();
     if (sig_addr2 && !map_upgrades_initialized){
-        patch_startup_crc_calc_nop.build(sig_addr2, 5, NOP_PATCH, 0);
+        patch_startup_crc_calc_nop.build_old(sig_addr2, 5, NOP_PATCH, 0);
     };
     static intptr_t sig_addr3 = sig_get_crc_from_table.get_address();
     if (sig_addr3 && !map_upgrades_initialized){
-        patch_get_map_crc.build(sig_addr3, 6, CALL_PATCH, (intptr_t)&get_map_crc_wrapper);
+        patch_get_map_crc.build_old(sig_addr3, 6, CALL_PATCH, (intptr_t)&get_map_crc_wrapper);
         multiplayer_maps_list_ptr = (uintptr_t*)*(uintptr_t*)(sig_addr3+2);
         jmp_skip_chimera = (uintptr_t*)(sig_addr3+13);
     };
@@ -299,7 +299,7 @@ void init_map_crc_upgrades(bool server){
     };
     static intptr_t sig_addr4 = sig_server_map_crc.get_address();
     if (sig_addr4 && !map_upgrades_initialized){
-        patch_get_map_crc_server.build(sig_addr4+5, 7, CALL_PATCH, (intptr_t)&get_map_crc_wrapper_server);
+        patch_get_map_crc_server.build_old(sig_addr4+5, 7, CALL_PATCH, (intptr_t)&get_map_crc_wrapper_server);
     };
     if (patch_get_map_crc_server.is_built()){
         patch_get_map_crc_server.apply();

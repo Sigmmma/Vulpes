@@ -46,7 +46,7 @@ void init_shdr_trans_zfighting_fixes(){
     static uintptr_t sig_addr3 = sig_shader_trans_zfighting3.get_address();
     static uintptr_t sig_addr4 = sig_shader_trans_zfighting3b.get_address(sig_addr3+1);
     if (!patch_shader_trans_zfighting2_fix.is_built() && sig_addr2){
-        patch_shader_trans_zfighting2_fix.build(sig_addr2, 9, NOP_PATCH, 0);
+        patch_shader_trans_zfighting2_fix.build_old(sig_addr2, 9, NOP_PATCH, 0);
     };
     if (patch_shader_trans_zfighting2_fix.is_built()){
         patch_shader_trans_zfighting2_fix.apply();

@@ -32,7 +32,7 @@ void init_animation_bug_fixes(){
     // Player Biped Mid-Air turn fix.
     static intptr_t sig_addr = sig_player_jump_turn_fix.get_address();
     if (sig_addr && !player_buped_mid_air_turn_fix.is_built()){
-        player_buped_mid_air_turn_fix.build(
+        player_buped_mid_air_turn_fix.build_old(
             sig_addr, 13, JMP_PATCH, (intptr_t)&player_biped_mid_air_turn_fix_code);
         jmp_no_turn_anim = get_call_address(sig_addr+7);
         jmp_original_code = player_buped_mid_air_turn_fix.get_return_address();

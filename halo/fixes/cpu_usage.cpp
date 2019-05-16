@@ -37,31 +37,31 @@ void init_cpu_usage_fixes(){
     if (!already_initialized){
         uintptr_t addr1 = sig_cpu_usage_fix_pattern1.get_address(true);
         if (addr1){
-            cpu_usage_fix_patch1.build(addr1,
+            cpu_usage_fix_patch1.build_old(addr1,
                 PATTERN1_PATCH_LEN, CALL_PATCH, reinterpret_cast<uintptr_t>(&replacement_function));
             cpu_usage_fix_patch1.apply();
         };
         uintptr_t addr2 = sig_cpu_usage_fix_pattern1.get_address(true);
         if (addr2){
-            cpu_usage_fix_patch2.build(addr2,
+            cpu_usage_fix_patch2.build_old(addr2,
                 PATTERN1_PATCH_LEN, CALL_PATCH, reinterpret_cast<uintptr_t>(&replacement_function));
             cpu_usage_fix_patch2.apply();
         };
         uintptr_t addr3 = sig_cpu_usage_fix_pattern2.get_address(true);
         if (addr3){
-            cpu_usage_fix_patch3.build(addr3,
+            cpu_usage_fix_patch3.build_old(addr3,
                 PATTERN2_PATCH_LEN, CALL_PATCH, reinterpret_cast<uintptr_t>(&replacement_function));
             cpu_usage_fix_patch3.apply();
         };
         uintptr_t addr4 = sig_cpu_usage_fix_pattern2.get_address(true);
         if (addr4){
-            cpu_usage_fix_patch4.build(addr4,
+            cpu_usage_fix_patch4.build_old(addr4,
                 PATTERN2_PATCH_LEN, CALL_PATCH, reinterpret_cast<uintptr_t>(&replacement_function));
             cpu_usage_fix_patch4.apply();
         };
         uintptr_t addr5 = sig_cpu_usage_fix_pattern2.get_address(true);
         if (addr5){
-            cpu_usage_fix_patch5.build(addr5,
+            cpu_usage_fix_patch5.build_old(addr5,
                 PATTERN2_PATCH_LEN, CALL_PATCH, reinterpret_cast<uintptr_t>(&replacement_function));
             cpu_usage_fix_patch5.apply();
         };

@@ -16,7 +16,7 @@ Patch(client_refusal_fix);
 
 void init_host_refusal_fixes(){
     if (sig_host_refusal1.get_address() && sig_host_refusal2.get_address()){
-        host_refusal_fix1.build(
+        host_refusal_fix1.build_old(
             sig_host_refusal1.get_address()+HOST_REFUSAL_CLIENT1_OFFSET,
             HOST_REFUSAL_CLIENT1_LEN, NOP_PATCH, 0);
         host_refusal_fix2.build_manual(

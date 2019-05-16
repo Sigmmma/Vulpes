@@ -7,16 +7,12 @@
 #include <cstdio>
 #include <iostream>
 
-std::vector<CodeSignature*> instantiated_signatures;
-std::vector<CodePatch*> instantiated_patches;
-
 CodeSignature::CodeSignature(bool required, const char* d_name, uintptr_t lowest_search_address, uintptr_t highest_search_address, std::vector<int16_t> signature){
     imperative = required;
     lowest_allowed = lowest_search_address;
     highest_allowed = highest_search_address;
     sig = signature;
     name = d_name;
-    instantiated_signatures.push_back(this);
 }
 
 uintptr_t CodeSignature::get_address(){
@@ -85,12 +81,11 @@ uintptr_t CodeSignature::get_address(uintptr_t start_address, uintptr_t end_addr
 
 ////////////
 
-CodePatch::CodePatch(const char * d_name){
+CodePatch::CodePatch(const char* d_name){
     name = d_name;
-    instantiated_patches.push_back(this);
 }
 
-void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
+void CodePatch::build_old(uintptr_t p_address, size_t p_size, PatchTypes p_type, uintptr_t redirect_to){
     printf("Building CodePatch %s...", name);
     assert(p_address >= get_lowest_permitted_address());
     patch_address = p_address; size = p_size; type = p_type; redirect_address = redirect_to;
@@ -144,7 +139,7 @@ void CodePatch::build(uintptr_t p_address, size_t p_size, PatchTypes p_type, uin
             break;
         case MANUAL_PATCH :
             throw std::invalid_argument(
-                "Used invalid patch type for CodePatch::build().\n"
+                "Used invalid patch type for CodePatch::build_old().\n"
                 "MANUAL_PATCH should only be through CodePatch::build_manual()."
             );
             break;

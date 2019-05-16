@@ -9,7 +9,7 @@ Patch(loading_screen_background_removal);
 void init_loading_screen_fixes(){
     static uintptr_t sig_addr = sig_loading_screen_background_render_call.get_address();
     if (!loading_screen_background_removal.is_built()){
-        loading_screen_background_removal.build(sig_addr, 5, NOP_PATCH, 0);
+        loading_screen_background_removal.build_old(sig_addr, 5, NOP_PATCH, 0);
     };
     if (loading_screen_background_removal.is_built()){
         loading_screen_background_removal.apply();

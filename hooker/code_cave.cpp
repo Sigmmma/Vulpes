@@ -174,16 +174,16 @@ CodeCave::CodeCave(const char* h_name, void* before, void* after){
     after_func = (intptr_t)after;
 }
 
-void CodeCave::build(uintptr_t p_address, size_t p_size){
+void CodeCave::build_old(uintptr_t p_address, size_t p_size){
     assert(p_size <= 16);
     printf("Building CodeCave %s...", name);
     cave_address = (intptr_t)prepare_code_cave();
     bool is_call_hook = false;
     if (*(uint8_t*)p_address == 0xE8){
         is_call_hook = true;
-        code_patch.build(p_address, p_size, CALL_PATCH, cave_address);
+        code_patch.build_old(p_address, p_size, CALL_PATCH, cave_address);
     }else{
-        code_patch.build(p_address, p_size, JMP_PATCH, cave_address);
+        code_patch.build_old(p_address, p_size, JMP_PATCH, cave_address);
     };
     set_call_address(cave_address+0x12, before_func);
     set_call_address(cave_address+0x45, after_func);
