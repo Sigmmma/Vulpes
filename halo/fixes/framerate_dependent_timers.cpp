@@ -21,8 +21,8 @@ void init_checkpoint_revert_fix(){
     intptr_t sig_addr = sig_death_timer_framerate_dep.get_address();
     if (sig_addr && !death_timer_framerate_dep_fix.is_built()){
         death_timer_framerate_dep_fix.build(sig_addr+27, 2, NOP_PATCH, 0);
-        player_dead = (bool*)*(uintptr_t*)(sig_addr+2);
-        player_respawn_timer = (int32_t*)*(uintptr_t*)(sig_addr+20);
+        player_dead = *(bool**)(sig_addr+2);
+        player_respawn_timer = *(int32_t**)(sig_addr+20);
     };
     if (death_timer_framerate_dep_fix.is_built()){
         death_timer_framerate_dep_fix.apply();
