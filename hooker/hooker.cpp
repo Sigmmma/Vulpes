@@ -432,10 +432,10 @@ uintptr_t CodePatch::get_return_address(){
 
 uintptr_t get_call_address(intptr_t call_pointer){
     uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
-    assert(call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9 || call_bytes[0] == 0x0F);
-    if (call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9){
+    assert(call_bytes[0] == CALL_BYTE || call_bytes[0] == JMP_BYTE || call_bytes[0] == CONDJ_BYTE);
+    if (call_bytes[0] == CALL_BYTE || call_bytes[0] == JMP_BYTE){
         return (*reinterpret_cast<uintptr_t*>(call_pointer + 1) + call_pointer + 5);
-    }else if((call_bytes[0] == 0x0F)){
+    }else if((call_bytes[0] == CONDJ_BYTE)){
         return (*reinterpret_cast<uintptr_t*>(call_pointer + 2) + call_pointer + 6);
     }
     return 0;
@@ -444,8 +444,8 @@ uintptr_t get_call_address(intptr_t call_pointer){
 void set_call_address(intptr_t call_pointer, intptr_t point_to){
     DWORD prota, protb;
     uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
-    assert(call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9);
-    if (call_bytes[0] == 0xE8 || call_bytes[0] == 0xE9){
+    assert(call_bytes[0] == CALL_BYTE || call_bytes[0] == JMP_BYTE);
+    if (call_bytes[0] == CALL_BYTE || call_bytes[0] == JMP_BYTE){
         VirtualProtect(reinterpret_cast<void*>(call_pointer), 5, PAGE_EXECUTE_READWRITE, &prota);
         *reinterpret_cast<intptr_t*>(call_pointer + 1) = point_to - 5 - call_pointer;
         VirtualProtect(reinterpret_cast<void*>(call_pointer), 5, prota, &protb);
