@@ -25,7 +25,7 @@ public:
     uintptr_t address(uintptr_t start_address);
     uintptr_t address(uintptr_t start_address, uintptr_t end_address);
 private:
-    uintptr_t address = 0;
+    uintptr_t found_address = 0;
     std::vector<int16_t> sig;
     uintptr_t lowest_allowed;
     uintptr_t highest_allowed;

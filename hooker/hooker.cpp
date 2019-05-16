@@ -19,7 +19,7 @@ CodeSignature::CodeSignature(bool required,
 }
 
 uintptr_t CodeSignature::address(){
-    if (address == 0 && !already_tried){
+    if (found_address == 0 && !already_tried){
         if (!lowest_allowed){
             lowest_allowed = get_lowest_permitted_address();
         };
@@ -31,7 +31,7 @@ uintptr_t CodeSignature::address(){
         size_t size_of_block_to_find = sig.size();
         uintptr_t current_address = lowest_allowed;
         // Traverse from the lowest to highest address allowed searching for the set of bytes that we want.
-        while (address == 0 && current_address - size_of_block_to_find <= highest_allowed){
+        while (found_address == 0 && current_address - size_of_block_to_find <= highest_allowed){
             bool mismatch = false;
             // For each address we go through our set of bytes until we get a mismatch or we reach the end of our signature.
             for (int j=0; j < size_of_block_to_find; j++){
@@ -46,26 +46,26 @@ uintptr_t CodeSignature::address(){
             };
             // If there was no mismatch then we have succesfully found the address and we can go home.
             if (!mismatch){
-                address = current_address;
+                found_address = current_address;
             };
             current_address++;
         };
     };
-    if (address == 0){
+    if (found_address == 0){
         printf("failed\n");
         if (imperative){
             // Crash
         };
     }else{
-        printf("success. Found at %X\n", address);
+        printf("success. Found at %X\n", found_address);
     }
     already_tried = true;
-    return address;
+    return found_address;
 }
 
 uintptr_t CodeSignature::address(bool recalculate){
     if (recalculate){
-        address = 0;
+        found_address = 0;
         already_tried = false;
     };
     return address();

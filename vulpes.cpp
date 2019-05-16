@@ -109,11 +109,11 @@ struct ImageSectionHeader {
 
 void init_vulpes(){
     // Get safe search bounds for CodeSignature.
-    ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.get_address());
+    ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.address());
     set_lowest_permitted_address(0x400000 + header->offset_to_segment);
     set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
     // Check if we're a server.
-    server = sig_server.get_address() != 0;
+    server = sig_server.address() != 0;
     if(!server){
         RedirectIOToConsole();
     };
