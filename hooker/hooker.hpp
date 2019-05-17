@@ -118,6 +118,7 @@ private:
 
 class CodeCave {
 public:
+    ////// Initlializers.
     template<typename T, typename T2>
     CodeCave(const char* h_name, CodeSignature& p_sig, int p_sig_offset,
              size_t p_size, T before, T2 after) CCTEMPLINIT1;
@@ -125,8 +126,15 @@ public:
     CodeCave(const char* h_name, uintptr_t p_address,
              size_t p_size, T before, T2 after) CCTEMPLINIT2;
     bool build(intptr_t p_address = 0);
+    // Applies the patch.
     void apply();
+    // Reverts the code to the original bytes.
     void revert();
+
+    // Returns the patch contained within this class.
+    // Can be used to interact with the existing interfaces
+    // to for instance check integrity.
+    CodePatch* patch();
 
 private:
     CodeSignature sig = CodeSignature(false,"",0,0,{});

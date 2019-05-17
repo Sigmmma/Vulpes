@@ -205,7 +205,7 @@ bool CodeCave::build(intptr_t p_address){
             set_call_address(cave_address+0x12, before_func);
             set_call_address(cave_address+0x45, after_func);
             // Make a copy of the original code we're overwriting.
-            uint8_t* original_code_cpy = (uint8_t*)cave_address+0x27;
+            uint8_t* original_code_cpy = (uint8_t*)(cave_address+0x27);
             std::vector<int16_t> original_code = code_patch.unpatched_bytes();
             // If we're not a call hook then we can in most cases (except for jumps) just copy the code.
             if (!is_call_hook){
@@ -228,10 +228,6 @@ bool CodeCave::build(intptr_t p_address){
     return true;
 }
 
-void CodeCave::apply(){
-    code_patch.apply();
-}
-
-void CodeCave::revert(){
-    code_patch.revert();
-}
+void CodeCave::apply(){code_patch.apply();}
+void CodeCave::revert(){code_patch.revert();}
+CodePatch* CodeCave::patch(){return &code_patch;}
