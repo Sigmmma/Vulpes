@@ -17,6 +17,20 @@ enum InstructionBytes : uint8_t {
     CONDJ_BYTE = 0x0F, // first byte
 
     JA_BYTE    = 0x87
-
-
 };
+
+// Here are macros for the code parts of the template based CodePatch initializers.
+// These are made because templates cannot have their code in
+// a source file while having the template definition in the header.
+
+#define CPTEMPLINIT1 {\
+    name = d_name; sig = p_sig; offset = p_sig_offset;\
+    size = p_size; type = p_type;\
+    setup_internal(reinterpret_cast<void*>(&content), sizeof(T));\
+}
+
+#define CPTEMPLINIT2 {\
+    name = d_name; patch_address = p_address;\
+    size = p_size; type = p_type;\
+    setup_internal(reinterpret_cast<void*>(&content), sizeof(T));\
+}

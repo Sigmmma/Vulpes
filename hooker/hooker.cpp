@@ -99,6 +99,29 @@ void CodePatch::setup_internal(void* content, size_t c_size){
     };
 }
 
+// Go to resource.hpp for the functional parts of the template based initializers.
+
+CodePatch::CodePatch(const char* d_name,
+          CodeSignature& p_sig, int p_sig_offset,
+          std::vector<int16_t> patch_bytes){
+    name = d_name;
+    sig = p_sig;
+    offset = p_sig_offset;
+    size = patch_bytes.size();
+    type = MANUAL_PATCH;
+    patched_code = patch_bytes;
+};
+CodePatch::CodePatch(const char* d_name,
+          intptr_t p_address,
+          std::vector<int16_t> patch_bytes){
+    name = d_name;
+    patch_address = p_address;
+    size = patch_bytes.size();
+    type = MANUAL_PATCH;
+    patched_code = patch_bytes;
+};
+
+
 bool CodePatch::build(intptr_t p_address){
     if (patch_is_built) return true;
     printf("Building CodePatch %s...", name);

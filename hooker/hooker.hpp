@@ -54,33 +54,17 @@ public:
     template<typename T>
     CodePatch(const char* d_name,
               CodeSignature& p_sig, int p_sig_offset,
-              size_t p_size, PatchTypes p_type, T content){
-        name = d_name; sig = p_sig; offset = p_sig_offset;
-        size = p_size; type = p_type;
-        setup_internal(reinterpret_cast<void*>(&content), sizeof(T));
-    };
+              size_t p_size, PatchTypes p_type, T content) CPTEMPLINIT1;
     template<typename T>
     CodePatch(const char* d_name,
               intptr_t p_address,
-              size_t p_size, PatchTypes p_type, T content){
-        name = d_name; patch_address = p_address;
-        size = p_size; type = p_type;
-        setup_internal(reinterpret_cast<void*>(&content), sizeof(T));
-    };
+              size_t p_size, PatchTypes p_type, T content) CPTEMPLINIT2;
     CodePatch(const char* d_name,
               CodeSignature& p_sig, int p_sig_offset,
-              std::vector<int16_t> patch_bytes){
-        name = d_name; sig = p_sig; offset = p_sig_offset;
-        size = patch_bytes.size(); type = MANUAL_PATCH;
-        patched_code = patch_bytes;
-    };
+              std::vector<int16_t> patch_bytes);
     CodePatch(const char* d_name,
               intptr_t p_address,
-              std::vector<int16_t> patch_bytes){
-        name = d_name; patch_address = p_address;
-        size = patch_bytes.size(); type = MANUAL_PATCH;
-        patched_code = patch_bytes;
-    };
+              std::vector<int16_t> patch_bytes);
     intptr_t address();
     ////// Main functions.
     bool build(intptr_t p_address = 0);
