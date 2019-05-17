@@ -34,7 +34,7 @@ void init_animation_bug_fixes(){
     if (sig_addr && !player_buped_mid_air_turn_fix.is_built()){
         player_buped_mid_air_turn_fix.build();
         jmp_no_turn_anim = get_call_address(sig_addr+7);
-        jmp_original_code = player_buped_mid_air_turn_fix.get_return_address();
+        jmp_original_code = player_buped_mid_air_turn_fix.return_address();
     };
     if (player_buped_mid_air_turn_fix.is_built()){
         player_buped_mid_air_turn_fix.apply();

@@ -71,7 +71,7 @@ Patch(hud_chat_hook, hud_chat_hook_signature, 0, 8, JMP_PATCH, &hook_hud_chat_in
 
 void init_hud_chat_hook(){
     hud_chat_hook.build();
-    jmp_hud_chat_original_code = hud_chat_hook.get_return_address();
+    jmp_hud_chat_original_code = hud_chat_hook.return_address();
     hud_chat_hook.apply();
 }
 

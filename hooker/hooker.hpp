@@ -50,60 +50,65 @@ class CodePatch {
 private:
     void setup_internal(void* content, size_t c_size);
 public:
-    // Initlializers.
+    ////// Initlializers.
+    // Dynamic initializers.
+    // Can be used with any of the PatchTypes from the enum above.
     template<typename T>
-    CodePatch(const char* d_name,
-              CodeSignature& p_sig, int p_sig_offset,
+    CodePatch(const char* d_name, CodeSignature& p_sig, int p_sig_offset,
               size_t p_size, PatchTypes p_type, T content) CPTEMPLINIT1;
     template<typename T>
-    CodePatch(const char* d_name,
-              intptr_t p_address,
+    CodePatch(const char* d_name, intptr_t p_address,
               size_t p_size, PatchTypes p_type, T content) CPTEMPLINIT2;
-    CodePatch(const char* d_name,
-              CodeSignature& p_sig, int p_sig_offset,
+    // MANUAL_PATCH initializers.
+    // These are used for self specifying patch bytes in vectors.
+    // Similarily to CodeSignature you can use -1 in the vector for wildcards
+    // that do not have their data changed.
+    CodePatch(const char* d_name, CodeSignature& p_sig, int p_sig_offset,
               std::vector<int16_t> patch_bytes);
-    CodePatch(const char* d_name,
-              intptr_t p_address,
+    CodePatch(const char* d_name, intptr_t p_address,
               std::vector<int16_t> patch_bytes);
     intptr_t address();
-    ////// Main functions.
+    ////// Runtime functions.
+    // Builds the patch at based on the data found at the current address.
+    // If not address is put in it will use the address passed earlier,
+    // or use a code signature to try and find an address.
+    // Returns true if success, false at fail, true if already built.
+    // This does not apply the patch.
     bool build(intptr_t p_address = 0);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.
     void revert();
-    // Returns the address that comes right after the code patch. For use in return jumps found in hooks.
-    uintptr_t get_return_address();
+    // Returns the address that comes right after the code patch.
+    // For use in return jumps found in hooks.
+    uintptr_t return_address();
 
     ////// Mostly debug functions after this point.
-
     // Checks if the code was changed since the last time we touched it.
-    // Used for patches that might be applied later, to see if another mod touched it.
-    // Also used to check if another mod overwrote our patch. (If we didn't crash and burn yet at that point.)
-    bool check_integrity();
-    // See if the patch is supposed to be applied.
-    bool is_applied();
+    // Returns true if our patched/the unpatched code is intact. False if not.
+    bool integrity();
+    // See if the patch is supposed to be patch_applied.
+    bool applied();
     // Returns the patch size.
-    size_t get_size();
+    size_t size();
     // Returns wether or not the patch has been built.
     bool is_built();
     // Returns the bytes that are currently at the patch address.
-    std::vector<int16_t> get_bytes_from_patch_address();
+    std::vector<int16_t> bytes_at_patch_address();
     // Returns the bytes that were at the address at the time the patch was built.
-    std::vector<int16_t> get_unpatched_bytes();
+    std::vector<int16_t> unpatched_bytes();
     // Returns the bytes that the patch would put at the patch address.
-    std::vector<int16_t> get_patched_bytes();
+    std::vector<int16_t> patched_bytes();
 private:
     CodeSignature sig = CodeSignature(false,"",0,0,{});
     int offset = 0;
     uintptr_t patch_address = 0;
     uintptr_t redirect_address = 0;
-    uintptr_t return_address = 0;
     std::vector<int16_t> original_code;
     std::vector<int16_t> patched_code;
-    size_t size;
-    bool patch_is_built = false;
-    bool applied = false;
+    size_t patch_size;
+    bool patch_built = false;
+    bool patch_applied = false;
     PatchTypes type;
     const char* name;
     void write_patch(std::vector<int16_t> patch_code);
@@ -114,22 +119,11 @@ private:
 class CodeCave {
 public:
     template<typename T, typename T2>
-    CodeCave(const char* h_name,
-             CodeSignature& p_sig, int p_sig_offset, size_t p_size,
-             T before, T2 after){
-        name = h_name; patch_size = p_size;
-        sig = p_sig; patch_offset = p_sig_offset;
-        before_func = reinterpret_cast<intptr_t>(before);
-        after_func = reinterpret_cast<intptr_t>(after);
-    };
+    CodeCave(const char* h_name, CodeSignature& p_sig, int p_sig_offset,
+             size_t p_size, T before, T2 after) CCTEMPLINIT1;
     template<typename T, typename T2>
-    CodeCave(const char* h_name,
-             uintptr_t p_address, size_t p_size,
-             T before, T2 after){
-        name = h_name; patch_size = p_size; patch_address = p_address;
-        before_func = reinterpret_cast<intptr_t>(before);
-        after_func = reinterpret_cast<intptr_t>(after);
-    };
+    CodeCave(const char* h_name, uintptr_t p_address,
+             size_t p_size, T before, T2 after) CCTEMPLINIT2;
     bool build(intptr_t p_address = 0);
     void apply();
     void revert();

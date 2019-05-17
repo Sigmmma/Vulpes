@@ -206,14 +206,14 @@ bool CodeCave::build(intptr_t p_address){
             set_call_address(cave_address+0x45, after_func);
             // Make a copy of the original code we're overwriting.
             uint8_t* original_code_cpy = (uint8_t*)cave_address+0x27;
-            std::vector<int16_t> original_code = code_patch.get_unpatched_bytes();
+            std::vector<int16_t> original_code = code_patch.unpatched_bytes();
             // If we're not a call hook then we can in most cases (except for jumps) just copy the code.
             if (!is_call_hook){
                 for (int i = 0; i<original_code.size(); i++){
                     original_code_cpy[i] = (uint8_t)original_code[i];
                 };
                 original_code_cpy[original_code.size()] = JMP_BYTE;
-                set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.get_return_address());
+                set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.return_address());
             }else{ // If it is a call we'll need to regenerate the offset to be correct for our cave.
                 original_code_cpy[0] = JMP_BYTE;
                 set_call_address((intptr_t)&original_code_cpy[0], get_call_address(patch_address));
