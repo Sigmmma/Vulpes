@@ -173,8 +173,9 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
 
             "pop eax;"
             "pop esi;"
-            : "+m" (func_send_message_to_player)// 0
-            : "m" (socket_ready),               // 1
+            :
+            : "m" (func_send_message_to_player),// 0
+              "m" (socket_ready),               // 1
               "m" (message),                    // 2
               "m" (message_size),               // 3
               "m" (bool_ingame_only),           // 4
