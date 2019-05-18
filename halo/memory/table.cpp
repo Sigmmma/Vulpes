@@ -9,62 +9,63 @@ Signature(true, sig_object_table,
 Signature(true, sig_weather_particle_table,
     {-1, -1, -1, -1, 0x89, 0x2D, -1, -1, -1, -1, 0x66, 0x89, 0x3D, -1, -1, -1, -1, 0x88, 0x5E, 0x24});
 
-uintptr_t* effect_ptrs_lst;
+Table** effect_ptrs_lst;
 
-uintptr_t* effect_ptrs(){
+Table** effect_ptrs(){
     static uintptr_t sig_addr1 = sig_weather_particle_table.address();
     if (!effect_ptrs_lst){
-        effect_ptrs_lst = (uintptr_t*)sig_addr1;
+        effect_ptrs_lst = reinterpret_cast<Table**>(sig_addr1);
     };
     return effect_ptrs_lst;
 }
 
 Table* weather_particles_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[0];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[0];
 }
 
 Table* particle_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[1];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[1];
 }
 
 Table* particle_system_particles_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[2];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[2];
 }
 
 Table* effect_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[3];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[3];
 }
 
 Table* effect_locations_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[4];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[4];
 }
 
 Table* decals_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[5];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[5];
 }
 
 Table* contrail_points_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[6];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[6];
 }
 
 Table* contrail_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[7];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[7];
 }
 
 Table* device_groups_table(){
-    static uintptr_t* effect_ptrs_loc = effect_ptrs();
-    return (Table*)effect_ptrs_loc[8];
+    static Table** effect_ptrs_loc = effect_ptrs();
+    return effect_ptrs_loc[8];
 }
 
 ObjectTable* object_table(){
-    static uintptr_t* object_table_ptr = (uintptr_t*)sig_object_table.address();
-    return (ObjectTable*)object_table_ptr[0];
+    static ObjectTable** object_table_ptr =
+        reinterpret_cast<ObjectTable**>(sig_object_table.address());
+    return object_table_ptr[0];
 }

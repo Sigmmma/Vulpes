@@ -275,7 +275,7 @@ void init_map_crc_upgrades(bool server){
     if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
     if (patch_get_map_crc.build()){
         if (!map_upgrades_initialized){
-            multiplayer_maps_list_ptr = *(uintptr_t**)(patch_get_map_crc.address()+2);
+            multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(patch_get_map_crc.address()+2);
             jmp_skip_chimera = patch_get_map_crc.address()+13;
         };
         patch_get_map_crc.apply();

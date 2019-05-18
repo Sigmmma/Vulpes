@@ -133,10 +133,10 @@ void init_code_caves(){
         t_pairs[i].ret_addr = 0;
         t_pairs[i].filled = false;
     };
-    code_cave_memory = (uint8_t*)VirtualAlloc(NULL, SIZE_OF_CODE_CAVE_MEMORY,
-                                              MEM_COMMIT | MEM_RESERVE,
-                                              PAGE_EXECUTE_READWRITE);
-    address_of_next_cave = (size_t)code_cave_memory;
+    code_cave_memory = reinterpret_cast<uint8_t*>(
+                            VirtualAlloc(NULL, SIZE_OF_CODE_CAVE_MEMORY,
+                            MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE));
+    address_of_next_cave = reinterpret_cast<size_t>(code_cave_memory);
     if (code_cave_memory == NULL){
         MessageBox(NULL, "Couldn't allocate memory for event hooks. Geez, I only asked for 16kilobytes", "Really!?", MB_OK);
         exit(0);
@@ -150,20 +150,20 @@ void revert_code_caves(){
 }
 
 intptr_t prepare_code_cave(){
-    size_t curr_cave = address_of_next_cave;
+    intptr_t curr_cave = address_of_next_cave;
     address_of_next_cave += sizeof(code_cave_template);
-    if (address_of_next_cave >= ((intptr_t)code_cave_memory + SIZE_OF_CODE_CAVE_MEMORY)){
+    if (address_of_next_cave >= (reinterpret_cast<intptr_t>(code_cave_memory) + SIZE_OF_CODE_CAVE_MEMORY)){
         MessageBox(NULL, "Ran out of space for hooks.", "Upgrade the hook space.", MB_OK);
         exit(0);
     };
 
-    memcpy((void*)curr_cave, code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
-    set_call_address(curr_cave+5,    (intptr_t)&register_return_address); // register original return address
-    set_call_address(curr_cave+0x4D, (intptr_t)&unregister_return_address); // retrieve original return address
-    *(intptr_t*)(curr_cave+0x23)  =  (intptr_t)curr_cave+0x3C; // Return address
-    set_call_address(curr_cave+0x12, (intptr_t)&null_func); // before function placeholder
-    set_call_address(curr_cave+0x45, (intptr_t)&null_func); // after function placeholder
-    set_call_address(curr_cave+0x37, (intptr_t)&null_func); // jump placeholder
+    memcpy(reinterpret_cast<void*>(curr_cave), code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
+    set_call_address(curr_cave+5,    reinterpret_cast<intptr_t>(&register_return_address)); // register original return address
+    set_call_address(curr_cave+0x4D, reinterpret_cast<intptr_t>(&unregister_return_address)); // retrieve original return address
+    *reinterpret_cast<intptr_t*>(curr_cave+0x23) = curr_cave+0x3C; // Return address
+    set_call_address(curr_cave+0x12, reinterpret_cast<intptr_t>(&null_func)); // before function placeholder
+    set_call_address(curr_cave+0x45, reinterpret_cast<intptr_t>(&null_func)); // after function placeholder
+    set_call_address(curr_cave+0x37, reinterpret_cast<intptr_t>(&null_func)); // jump placeholder
     return curr_cave;
 }
 /*
@@ -189,11 +189,11 @@ bool CodeCave::build(intptr_t p_address){
             return false;
         };
         // Allocate and pregenerate a cave.
-        cave_address = (intptr_t)prepare_code_cave();
+        cave_address = prepare_code_cave();
         // Determine if our hook is placed on a call instruction.
         // Build the patch accordingly.
         bool is_call_hook = false;
-        if (*(uint8_t*)patch_address == CALL_BYTE){
+        if (reinterpret_cast<uint8_t*>(patch_address)[0] == CALL_BYTE){
             is_call_hook = true;
             code_patch = CodePatch(name,patch_address,patch_size,CALL_PATCH,cave_address);
         }else{
@@ -205,18 +205,18 @@ bool CodeCave::build(intptr_t p_address){
             set_call_address(cave_address+0x12, before_func);
             set_call_address(cave_address+0x45, after_func);
             // Make a copy of the original code we're overwriting.
-            uint8_t* original_code_cpy = (uint8_t*)(cave_address+0x27);
+            uint8_t* original_code_cpy = reinterpret_cast<uint8_t*>(cave_address+0x27);
             std::vector<int16_t> original_code = code_patch.unpatched_bytes();
             // If we're not a call hook then we can in most cases (except for jumps) just copy the code.
             if (!is_call_hook){
                 for (int i = 0; i<original_code.size(); i++){
-                    original_code_cpy[i] = (uint8_t)original_code[i];
+                    original_code_cpy[i] = static_cast<uint8_t>(original_code[i]);
                 };
                 original_code_cpy[original_code.size()] = JMP_BYTE;
-                set_call_address((intptr_t)&original_code_cpy[original_code.size()], code_patch.return_address());
+                set_call_address(reinterpret_cast<intptr_t>(&original_code_cpy[original_code.size()]), code_patch.return_address());
             }else{ // If it is a call we'll need to regenerate the offset to be correct for our cave.
                 original_code_cpy[0] = JMP_BYTE;
-                set_call_address((intptr_t)&original_code_cpy[0], get_call_address(patch_address));
+                set_call_address(reinterpret_cast<intptr_t>(&original_code_cpy[0]), get_call_address(patch_address));
             };
             printf("done.\n");
         };

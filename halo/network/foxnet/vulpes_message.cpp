@@ -12,7 +12,7 @@ void send_vulpes_message(VulpesMessage* msg){
     message.msg_type = HudChatType::VULPES;
     message.player_id = -1;
     uint8_t buffer[1024];
-    uint32_t size = mdp_encode_stateless_iterated(buffer, HUD_CHAT, (void*)&message);
+    uint32_t size = mdp_encode_stateless_iterated(buffer, HUD_CHAT, &message);
     send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
 }
 

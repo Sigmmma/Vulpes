@@ -66,7 +66,7 @@ bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* messag
         "mov %3, al;"
         : "+m" (func_mdp_decode)
         : "m" (destination),
-          "m" ((void*)message_header),
+          "m" (message_header),
           "m" (success)
     );
     return success;
@@ -79,7 +79,7 @@ void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
         "call %0;"
         "popad;"
         :
-        : "m" (func_mdp_discard), "m" ((void*)message_header)
+        : "m" (func_mdp_discard), "m" (message_header)
     );
 }
 
@@ -175,7 +175,7 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
             "pop esi;"
             : "+m" (func_send_message_to_player)// 0
             : "m" (socket_ready),               // 1
-              "m" ((uint32_t)message),          // 2
+              "m" (message),                    // 2
               "m" (message_size),               // 3
               "m" (bool_ingame_only),           // 4
               "m" (bool_write_to_local_connection),//5
@@ -201,7 +201,7 @@ void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t
 }
 
 void init_message_delta_sender(){
-    socket_ready = (uintptr_t*)*(uintptr_t*)(sig_send_message_socket_ready.address());
+    socket_ready = *reinterpret_cast<uintptr_t**>(sig_send_message_socket_ready.address());
     func_send_message_to_all = sig_send_message_to_all.address() - 56;
     func_send_message_to_player = sig_send_message_to_player.address();
 }

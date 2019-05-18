@@ -1,8 +1,10 @@
-WARNS= -Wunused-value
+WARNS= -Wunused-value -Wold-style-cast
 ARCH= -masm=intel -msse2 -m32 -mfpmath=sse
 ARGS= $(WARNS) $(ARCH) -std=c++17
+ARGSC= $(ARCH)
 ARGSDEF= $(ARGS) -O2
 ARGSFAST= $(ARGS) -O3
+ARGSFASTC= $(ARGSC) -O3
 ARGSFASTER= $(ARGS) -Ofast
 LINKARGS= -m32 -W -s
 
@@ -22,8 +24,8 @@ build:
 	g++ -c hooker/hooker.cpp $(ARGSFAST) -o bin/hooks__hooker.o
 
 	g++ -c includes/guicon.cpp $(ARCH) -O3 -o bin/includes__guicon.o
-	g++ -c includes/string_raw_data_encoder.cpp $(ARGSFAST) -o bin/includes__string_raw_data_encoder.o
-	gcc -c includes/crc32.c $(ARCH) -O3 -o bin/includes__crc32.o
+	gcc -c includes/string_raw_data_encoder.c $(ARGSFASTC) -o bin/includes__string_raw_data_encoder.o
+	gcc -c includes/crc32.c $(ARGSFASTC) -O3 -o bin/includes__crc32.o
 
 	g++ -c halo/fixes/animation.cpp $(ARGSDEF) -o bin/fixes__animation.o
 	g++ -c halo/fixes/cpu_usage.cpp $(ARGSDEF) -o bin/fixes__cpu_usage.o

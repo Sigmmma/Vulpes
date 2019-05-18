@@ -81,11 +81,11 @@ Cave(map_load_mp_hook, sig_map_load_mp, 0, 6, &before_mp, &after_mp);
 void init_map_hooks(bool is_server){
     if (!is_server){
         map_load_ui_sp_hook.build();
-        sp_map_name = *(char**)sig_sp_map_name.address();
+        sp_map_name = *reinterpret_cast<char**>(sig_sp_map_name.address());
         map_load_ui_sp_hook.apply();
     };
     map_load_mp_hook.build();
-    mp_map_name = *(char**)sig_map_name.address();
+    mp_map_name = *reinterpret_cast<char**>(sig_map_name.address());
     map_load_mp_hook.apply();
 }
 

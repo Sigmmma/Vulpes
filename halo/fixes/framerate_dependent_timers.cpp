@@ -23,8 +23,8 @@ void init_checkpoint_revert_fix(){
     static intptr_t sig_addr = sig_death_timer_framerate_dep.address();
     if (!initialized && sig_addr){
         death_timer_framerate_dep_fix.build(sig_addr+27);
-        player_dead = *(bool**)(sig_addr+2);
-        player_respawn_timer = *(int32_t**)(sig_addr+20);
+        player_dead = *reinterpret_cast<bool**>(sig_addr+2);
+        player_respawn_timer = *reinterpret_cast<int32_t**>(sig_addr+20);
         initialized = true;
     };
     if (initialized){
@@ -106,7 +106,7 @@ void init_console_fix(){
     static intptr_t sig_addr1 = sig_console_fade_call.address();
     if (sig_addr1 && patch_console_framerate_dep.build()){
         fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
-        console_open = *(bool**)(patch_console_framerate_dep.address()-6);
+        console_open = *reinterpret_cast<bool**>(patch_console_framerate_dep.address()-6);
         patch_console_framerate_dep.apply();
         ADD_CALLBACK(EVENT_TICK, fade_console);
     };

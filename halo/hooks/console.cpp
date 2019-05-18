@@ -61,7 +61,7 @@ Patch(rcon_in_hook_patch, sig_console_input_hook, -44, 25, JMP_PATCH, &rcon_in_h
 void init_console_input_hook(){
     if(console_in_hook_patch.build() && rcon_in_hook_patch.build()){
         return_to_halo_con_in = console_in_hook_patch.address() + 23;
-        rcon_dword_ptr = *(intptr_t*)(rcon_in_hook_patch.address() + 15);
+        rcon_dword_ptr = *reinterpret_cast<intptr_t*>(rcon_in_hook_patch.address() + 15);
         console_in_hook_patch.apply();
         rcon_in_hook_patch.apply();
     };
@@ -116,13 +116,13 @@ void auto_complete_hook(){
 Patch(auto_complete_patch, sig_auto_complete_hook, 0, 7, CALL_PATCH, &auto_complete_hook);
 
 void init_command_auto_complete_hook(){
-    uintptr_t sig_addr2 = sig_console_input.address();
-    uintptr_t sig_addr3 = sig_auto_complete_collected_list.address();
+    static uintptr_t sig_addr2 = sig_console_input.address();
+    static uintptr_t sig_addr3 = sig_auto_complete_collected_list.address();
 
     if (auto_complete_patch.build() && sig_addr2 && sig_addr3){
-        console_input_ptr = *(intptr_t*)sig_addr2;
-        results_ptr       = *(intptr_t*)sig_addr3;
-        count_ptr         = *(intptr_t*)(sig_addr3+14);
+        console_input_ptr = *reinterpret_cast<intptr_t*>(sig_addr2);
+        results_ptr       = *reinterpret_cast<intptr_t*>(sig_addr3);
+        count_ptr         = *reinterpret_cast<intptr_t*>(sig_addr3+14);
         auto_complete_patch.apply();
     }else{
         console_out_error("Error: Couldn't perform auto complete patch. Vulpes commands will not auto complete.");

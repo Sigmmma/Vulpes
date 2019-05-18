@@ -593,7 +593,7 @@ string VulpesCommand::get_name(){
     return name;
 }
 char* VulpesCommand::get_name_chars(){
-    return (char*)&name_chars;
+    return &name_chars[0];
 }
 
 
