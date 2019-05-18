@@ -149,31 +149,23 @@ void revert_code_caves(){
     };
 }
 
-intptr_t prepare_code_cave(){
-    intptr_t curr_cave = address_of_next_cave;
+uint8_t* prepare_code_cave(){
+    uint8_t* curr_cave = reinterpret_cast<uint8_t*>(address_of_next_cave);
     address_of_next_cave += sizeof(code_cave_template);
     if (address_of_next_cave >= (reinterpret_cast<intptr_t>(code_cave_memory) + SIZE_OF_CODE_CAVE_MEMORY)){
         MessageBox(NULL, "Ran out of space for hooks.", "Upgrade the hook space.", MB_OK);
         exit(0);
     };
-
-    memcpy(reinterpret_cast<void*>(curr_cave), code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
-    set_call_address(curr_cave+5,    reinterpret_cast<intptr_t>(&register_return_address)); // register original return address
-    set_call_address(curr_cave+0x4D, reinterpret_cast<intptr_t>(&unregister_return_address)); // retrieve original return address
-    *reinterpret_cast<intptr_t*>(curr_cave+0x23) = curr_cave+0x3C; // Return address
-    set_call_address(curr_cave+0x12, reinterpret_cast<intptr_t>(&null_func)); // before function placeholder
-    set_call_address(curr_cave+0x45, reinterpret_cast<intptr_t>(&null_func)); // after function placeholder
-    set_call_address(curr_cave+0x37, reinterpret_cast<intptr_t>(&null_func)); // jump placeholder
+    memcpy(curr_cave, code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
+    set_call_address(&curr_cave[0x5],  &register_return_address); // register original return address
+    set_call_address(&curr_cave[0x4D], &unregister_return_address); // retrieve original return address
+    *reinterpret_cast<intptr_t*>(&curr_cave[0x23]) = reinterpret_cast<intptr_t>(&curr_cave[0x3C]); // Return address
+    set_call_address(&curr_cave[0x12], &null_func); // before function placeholder
+    set_call_address(&curr_cave[0x45], &null_func); // after function placeholder
+    set_call_address(&curr_cave[0x37], &null_func); // jump placeholder
     return curr_cave;
 }
-/*
-CodeCave::CodeCave(const char* h_name, uintptr_t p_address, size_t p_size, void* before, void* after){
-    code_patch = CodePatch(h_name);
-    name = h_name;
-    before_func = (intptr_t)before;
-    after_func = (intptr_t)after;
-}
-*/
+
 bool CodeCave::build(intptr_t p_address){
     if (!code_patch.is_built()){
         printf("Building CodeCave %s...", name);
@@ -189,7 +181,7 @@ bool CodeCave::build(intptr_t p_address){
             return false;
         };
         // Allocate and pregenerate a cave.
-        cave_address = prepare_code_cave();
+        cave_address = reinterpret_cast<intptr_t>(prepare_code_cave());
         // Determine if our hook is placed on a call instruction.
         // Build the patch accordingly.
         bool is_call_hook = false;
@@ -213,10 +205,10 @@ bool CodeCave::build(intptr_t p_address){
                     original_code_cpy[i] = static_cast<uint8_t>(original_code[i]);
                 };
                 original_code_cpy[original_code.size()] = JMP_BYTE;
-                set_call_address(reinterpret_cast<intptr_t>(&original_code_cpy[original_code.size()]), code_patch.return_address());
+                set_call_address(&original_code_cpy[original_code.size()], code_patch.return_address());
             }else{ // If it is a call we'll need to regenerate the offset to be correct for our cave.
                 original_code_cpy[0] = JMP_BYTE;
-                set_call_address(reinterpret_cast<intptr_t>(&original_code_cpy[0]), get_call_address(patch_address));
+                set_call_address(&original_code_cpy[0], get_call_address(patch_address));
             };
             printf("done.\n");
         };

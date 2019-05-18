@@ -153,6 +153,16 @@ private:
 uintptr_t get_call_address(intptr_t call_pointer);
 void      set_call_address(intptr_t call_pointer, intptr_t point_to);
 
+template<typename T>
+uintptr_t get_call_address(T call_pointer){
+    return get_call_address(*reinterpret_cast<intptr_t*>(&call_pointer));
+}
+
+template<typename T, typename T2>
+void set_call_address(T call_pointer, T2 point_to){
+    set_call_address(*reinterpret_cast<intptr_t*>(&call_pointer),
+                     *reinterpret_cast<intptr_t*>(&point_to));
+}
 
 // These are initialization functions, these should rarely actually be called.
 uintptr_t get_lowest_permitted_address();
