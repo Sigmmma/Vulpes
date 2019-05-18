@@ -77,9 +77,7 @@ void wstr_raw_data_decode(uint16_t* dest, const wchar_t* src, size_t len){
         int e = 1+i/15; // encoding index
         // If we find a NULL terminator there is no more encoded data to
         // go through.
-        if (src[len+e] == 0){
-            break;
-        };
+        if (src[len+e] == 0) break;
         // Decrement the integer at the id if the encoding info indicates
         // one was added.
         if (src[len+e] & MASKS16[m]){
