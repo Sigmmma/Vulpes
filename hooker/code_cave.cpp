@@ -64,6 +64,28 @@ const uint8_t code_cave_template[] = {
     0xc3
 };
 
+const uint8_t code_cave_template2[] = {
+    // before function.
+    0x60,
+    0x54,
+    0x3e, 0x83, 0x04, 0x24, 0x24,
+    0xe8, 0x00, 0x00, 0x00, 0x00,
+    0x83, 0xc4, 0x04,
+    0x84, 0xc0,
+    0x74, 0x15,
+    0x61,
+    // original function
+    0xe8, 0x00, 0x00, 0x00, 0x00,
+    // after function
+    0x60,
+    0x54,
+    0x3e, 0x83, 0x04, 0x24, 0x24,
+    0xe8, 0x00, 0x00, 0x00, 0x00,
+    0x83, 0xc4, 0x04,
+    0x61,
+    0xe9, 0x00, 0x00, 0x00, 0x00
+};
+
 // This is so we can track return addresses for each thread.
 // I absolutely do not want to end up in the position of having
 // a condition where a function we hooked into gets called twice
@@ -75,7 +97,7 @@ typedef struct {
     bool filled;
 }ThreadReturnAddressPair;
 
-ThreadReturnAddressPair t_pairs[200];
+ThreadReturnAddressPair t_pairs[0xFF];
 
 __attribute__((regparm(1)))
 void register_return_address(uint32_t return_addr){
@@ -124,7 +146,7 @@ uint32_t unregister_return_address(){
 }
 
 static size_t address_of_next_cave = 0;
-const size_t SIZE_OF_CODE_CAVE_MEMORY = 16384;
+const size_t SIZE_OF_CODE_CAVE_MEMORY = 0x4000;
 static uint8_t* code_cave_memory;
 
 void init_code_caves(){
@@ -144,25 +166,35 @@ void init_code_caves(){
 }
 
 void revert_code_caves(){
-    if (code_cave_memory != NULL){
-        free(code_cave_memory);
-    };
+    if (code_cave_memory != NULL) free(code_cave_memory);
 }
 
-uint8_t* prepare_code_cave(){
+uint8_t* prepare_code_cave(bool call_hook){
     uint8_t* curr_cave = reinterpret_cast<uint8_t*>(address_of_next_cave);
-    address_of_next_cave += sizeof(code_cave_template);
-    if (address_of_next_cave >= (reinterpret_cast<intptr_t>(code_cave_memory) + SIZE_OF_CODE_CAVE_MEMORY)){
-        MessageBox(NULL, "Ran out of space for hooks.", "Upgrade the hook space.", MB_OK);
-        exit(0);
+    if (!call_hook){
+        address_of_next_cave += sizeof(code_cave_template);
+        if (address_of_next_cave >= (reinterpret_cast<intptr_t>(code_cave_memory) + SIZE_OF_CODE_CAVE_MEMORY)){
+            MessageBox(NULL, "Ran out of space for hooks.", "Upgrade the hook space.", MB_OK);
+            exit(0);
+        };
+        memcpy(curr_cave, code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
+        set_call_address(&curr_cave[0x5],  &register_return_address); // register original return address
+        set_call_address(&curr_cave[0x4D], &unregister_return_address); // retrieve original return address
+        *reinterpret_cast<intptr_t*>(&curr_cave[0x23]) = reinterpret_cast<intptr_t>(&curr_cave[0x3C]); // Return address
+        set_call_address(&curr_cave[0x12], &null_func); // before function placeholder
+        set_call_address(&curr_cave[0x45], &null_func); // after function placeholder
+        set_call_address(&curr_cave[0x37], &null_func); // jump placeholder
+    }else{
+        address_of_next_cave += sizeof(code_cave_template2);
+        if (address_of_next_cave >= (reinterpret_cast<intptr_t>(code_cave_memory) + SIZE_OF_CODE_CAVE_MEMORY)){
+            MessageBox(NULL, "Ran out of space for hooks.", "Upgrade the hook space.", MB_OK);
+            exit(0);
+        };
+        memcpy(curr_cave, code_cave_template2, sizeof(code_cave_template2)); // Get default pattern into the space.
+        set_call_address(&curr_cave[0x7],  &null_func); // before function placeholder
+        set_call_address(&curr_cave[0x20], &null_func); // after function placeholder
+        set_call_address(&curr_cave[0x14], &null_func); // call placeholder
     };
-    memcpy(curr_cave, code_cave_template, sizeof(code_cave_template)); // Get default pattern into the space.
-    set_call_address(&curr_cave[0x5],  &register_return_address); // register original return address
-    set_call_address(&curr_cave[0x4D], &unregister_return_address); // retrieve original return address
-    *reinterpret_cast<intptr_t*>(&curr_cave[0x23]) = reinterpret_cast<intptr_t>(&curr_cave[0x3C]); // Return address
-    set_call_address(&curr_cave[0x12], &null_func); // before function placeholder
-    set_call_address(&curr_cave[0x45], &null_func); // after function placeholder
-    set_call_address(&curr_cave[0x37], &null_func); // jump placeholder
     return curr_cave;
 }
 
@@ -177,45 +209,41 @@ bool CodeCave::build(intptr_t p_address){
         if (!patch_address) patch_address = sig.address() + patch_offset;
         // Fail condition.
         if (patch_address - patch_offset <= 0){
-            printf("failed.");
+            printf("failed.\n");
             return false;
         };
+
+        bool is_call_hook = (reinterpret_cast<uint8_t*>(patch_address)[0] == CALL_BYTE);
         // Allocate and pregenerate a cave.
-        cave_address = reinterpret_cast<intptr_t>(prepare_code_cave());
-        // Determine if our hook is placed on a call instruction.
-        // Build the patch accordingly.
-        bool is_call_hook = false;
-        if (reinterpret_cast<uint8_t*>(patch_address)[0] == CALL_BYTE){
-            is_call_hook = true;
-            code_patch = CodePatch(name,patch_address,patch_size,CALL_PATCH,cave_address);
-        }else{
-            code_patch = CodePatch(name,patch_address,patch_size,JMP_PATCH,cave_address);
-        };
+        cave_address = reinterpret_cast<intptr_t>(prepare_code_cave(is_call_hook));
+
+        code_patch = CodePatch(name,patch_address,patch_size,JMP_PATCH,cave_address);
 
         if (code_patch.build()){
-            // Write the before and after calls to the appropriate spots in the cave.
-            set_call_address(cave_address+0x12, before_func);
-            set_call_address(cave_address+0x45, after_func);
-            // Make a copy of the original code we're overwriting.
-            uint8_t* original_code_cpy = reinterpret_cast<uint8_t*>(cave_address+0x27);
-            std::vector<int16_t> original_code = code_patch.unpatched_bytes();
-            // If we're not a call hook then we can in most cases (except for jumps) just copy the code.
             if (!is_call_hook){
+                // Write the before and after calls to the appropriate spots in the cave.
+                set_call_address(cave_address+0x12, before_func);
+                set_call_address(cave_address+0x45, after_func);
+                // Make a copy of the original code we're overwriting.
+                uint8_t* original_code_cpy = reinterpret_cast<uint8_t*>(cave_address+0x27);
+                std::vector<int16_t> original_code = code_patch.unpatched_bytes();
+                // If we're not a call hook then we can in most cases (except for jumps) just copy the code.
                 for (int i = 0; i<original_code.size(); i++){
                     original_code_cpy[i] = static_cast<uint8_t>(original_code[i]);
                 };
                 original_code_cpy[original_code.size()] = JMP_BYTE;
                 set_call_address(&original_code_cpy[original_code.size()], code_patch.return_address());
-            }else{ // If it is a call we'll need to regenerate the offset to be correct for our cave.
-                original_code_cpy[0] = JMP_BYTE;
-                set_call_address(&original_code_cpy[0], get_call_address(patch_address));
+            }else{
+                set_call_address(cave_address+0x7,  before_func);
+                set_call_address(cave_address+0x14, get_call_address(patch_address));
+                set_call_address(cave_address+0x20, after_func);
+                set_call_address(cave_address+0x29, code_patch.return_address());
             };
             printf("done.\n");
+        }else{
+            printf("failed.\n");
+            return false;
         };
-    };
-    if (!code_patch.is_built()){
-        printf("failed.");
-        return false;
     };
     return true;
 }
