@@ -1,8 +1,7 @@
 #pragma once
-#include "types.hpp"
 #include "object.hpp"
-#include "actor.hpp"
-#include "damage_effect.hpp"
+#include "../../actor.hpp"
+#include "../../damage_effect.hpp"
 
 enum class UnitAnimationState : int8_t {
     INVALID = -1,
@@ -175,11 +174,11 @@ struct UnitSpeech {
 class ObjectUnit : public Object {
 public:
     // functions:
-
+/*
     void speak(AiCommunicationType type,
                int16_t arg2,
                UnitSpeech new_speech);
-
+*/
     // members:
     MemRef      actor;                          // 1F4
     struct {

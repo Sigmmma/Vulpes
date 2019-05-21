@@ -1,5 +1,6 @@
 #pragma once
-#include "types.hpp"
+#include "../../types.hpp"
+#include "../table.hpp"
 
 struct ScenarioLocation {
     int32_t leaf_id;
@@ -296,6 +297,13 @@ public:
     int16_t data_size;
 
     void* object_data;
-}; static_assert(sizeof(ObjectHeader) == 12);
+}; static_assert(sizeof(ObjectHeader) == 0xC);
+
+class ObjectTable : public Table {
+public:
+    ObjectHeader* objects;
+};
+
+ObjectTable* object_table();
 
 #pragma pack(pop)

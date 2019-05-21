@@ -1,5 +1,4 @@
 #pragma once
-#include "types.hpp"
 #include "object.hpp"
 
 #pragma pack(push, 1)
@@ -62,3 +61,5 @@ public:
 }; static_assert(sizeof(ObjectDeviceLightFixture) == SIZE_LIGHT_FIXTURE);
 
 #pragma pack(pop)
+
+Table* device_groups_table();

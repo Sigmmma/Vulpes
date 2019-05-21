@@ -1,7 +1,6 @@
 #include "object_unit.hpp"
-#include "actor.hpp"
-#include "../functions/object_unit.hpp"
-
+#include "../../../functions/object_unit.hpp"
+/*
 void ObjectUnit::speak(
     AiCommunicationType type,
     int16_t arg2,
@@ -9,3 +8,4 @@ void ObjectUnit::speak(
 
     unit_speak(self_ref, arg2, &new_speech);
 }
+*/

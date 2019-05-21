@@ -45,11 +45,15 @@ build:
 	g++ -c halo/hooks/map.cpp $(ARGSDEF) -o bin/hooks__map.o
 	g++ -c halo/hooks/tick.cpp $(ARGSDEF) -o bin/hooks__tick.o
 
-	g++ -c halo/memory/object.cpp $(ARGSDEF) -o bin/memory__object.o
-	g++ -c halo/memory/object_device.cpp $(ARGSDEF) -o bin/memory__object_device.o
-	g++ -c halo/memory/object_item.cpp $(ARGSDEF) -o bin/memory__object_item.o
-	g++ -c halo/memory/object_unit.cpp $(ARGSDEF) -o bin/memory__object_unit.o
-	g++ -c halo/memory/table.cpp $(ARGSDEF) -o bin/memory__table.o
+	g++ -c halo/memory/gamestate/object/object.cpp $(ARGSDEF) -o bin/memory__gamestate__object.o
+	g++ -c halo/memory/gamestate/object/object_device.cpp $(ARGSDEF) -o bin/memory__gamestate__object_device.o
+	g++ -c halo/memory/gamestate/object/object_item.cpp $(ARGSDEF) -o bin/memory__gamestate__object_item.o
+	g++ -c halo/memory/gamestate/object/object_unit.cpp $(ARGSDEF) -o bin/memory__gamestate__object_unit.o
+	g++ -c halo/memory/gamestate/effect.cpp $(ARGSDEF) -o bin/memory__gamestate__effect.o
+	g++ -c halo/memory/gamestate/player.cpp $(ARGSDEF) -o bin/memory__gamestate__player.o
+	g++ -c halo/memory/gamestate/table.cpp $(ARGSDEF) -o bin/memory__gamestate__table.o
+	g++ -c halo/memory/gamestate/terminal.cpp $(ARGSDEF) -o bin/memory__gamestate__terminal.o
+
 	g++ -c halo/memory/types.cpp $(ARGSFASTER) -o bin/memory__types.o
 
 	g++ -c halo/network/network_globals.cpp $(ARGSDEF) -o bin/network__network_globals.o

@@ -1,5 +1,6 @@
 #pragma once
-#include "object.hpp"
+#include "table.hpp"
+#include "object/object.hpp"
 
 enum class InteractionType : uint16_t {
     NONE                    = 0,
