@@ -1,6 +1,6 @@
 #include "vulpes.hpp"
 #define WIN32_MEAN_AND_LEAN
-#include <Windows.h>
+#include <windows.h>
 
 static bool loaded = false;
 

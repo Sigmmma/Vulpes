@@ -5,5 +5,6 @@
  */
 
 #pragma once
+#include <cstdint>
 
-void init_debug_commands();
+uint8_t developer_mode_level();
