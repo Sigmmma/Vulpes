@@ -1,3 +1,9 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #include "object_unit.hpp"
 #include "../../hooker/hooker.hpp"
 #include "../memory/gamestate/object/object_unit.hpp"

@@ -1,3 +1,9 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #include "../../hooker/hooker.hpp"
 
 Signature(true, sig_message_delta_object_index, {0x8B, 0x44, 0x24, 0x14, 0x50, 0x8B, 0xCF, 0xB8, -1, -1, -1, -1, 0xE8});

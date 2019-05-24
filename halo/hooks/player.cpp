@@ -1,3 +1,9 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 Signature(true, sig_player_teleport,
     {0x8D, 0x54, 0x24, 0x20, 0x52, 0x50, 0x8B, 0xFE}); //+8 size 5
 

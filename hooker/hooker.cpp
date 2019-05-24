@@ -1,3 +1,9 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #include "hooker.hpp"
 #define WIN32_MEAN_AND_LEAN // Keeps the amount of windows.h includes to the bare minumum.
 #include <windows.h>
@@ -54,7 +60,7 @@ uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address)
         };
     }else{
         printf("success. Found at %X\n", found_address);
-    }
+    };
     already_tried = true;
     return found_address;
 }
