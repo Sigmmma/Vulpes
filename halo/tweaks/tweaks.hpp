@@ -6,4 +6,5 @@
 
 #pragma once
 
-void init_debug_commands();
+void init_tweaks();
+void revert_tweaks();
