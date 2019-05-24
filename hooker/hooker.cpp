@@ -320,13 +320,16 @@ uintptr_t get_call_address(intptr_t call_pointer){
 void set_call_address(intptr_t call_pointer, intptr_t point_to){
     DWORD prota, protb;
     uint8_t* call_bytes = reinterpret_cast<uint8_t*>(call_pointer);
-    assert(call_bytes[0] == CALL_BYTE || call_bytes[0] == JMP_BYTE);
+    assert(call_bytes[0] == CALL_BYTE || call_bytes[0] == JMP_BYTE || call_bytes[0] == CONDJ_BYTE);
     if (call_bytes[0] == CALL_BYTE || call_bytes[0] == JMP_BYTE){
         VirtualProtect(reinterpret_cast<void*>(call_pointer), 5, PAGE_EXECUTE_READWRITE, &prota);
         *reinterpret_cast<intptr_t*>(call_pointer + 1) = point_to - 5 - call_pointer;
         VirtualProtect(reinterpret_cast<void*>(call_pointer), 5, prota, &protb);
+    }else if(call_bytes[0] == CONDJ_BYTE){
+        VirtualProtect(reinterpret_cast<void*>(call_pointer), 6, PAGE_EXECUTE_READWRITE, &prota);
+        *reinterpret_cast<intptr_t*>(call_pointer + 2) = point_to - 6 - call_pointer;
+        VirtualProtect(reinterpret_cast<void*>(call_pointer), 6, prota, &protb);
     };
-
 }
 
 static uintptr_t lowest_permitted_address = 0x400000;
