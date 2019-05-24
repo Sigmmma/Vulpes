@@ -7,5 +7,5 @@ Signature(true, sig_object_table,
 ObjectTable* object_table(){
     static ObjectTable** object_table_ptr =
         reinterpret_cast<ObjectTable**>(sig_object_table.address());
-    return object_table_ptr[0];
+    return *object_table_ptr;
 }
