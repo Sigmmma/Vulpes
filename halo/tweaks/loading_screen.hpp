@@ -6,4 +6,5 @@
 
 #pragma once
 
-void init_debug_commands();
+void init_loading_screen_fixes();
+void revert_loading_screen_fixes();

@@ -1,0 +1,1 @@
+This folder houses old stuff that may have taken a while to figure out, but likely won't be used anymore and should be excluded from the main code.

@@ -1,11 +1,17 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #include "handler.hpp"
-#include "../halo_functions/console.hpp"
+#include "../halo/functions/console.hpp"
 #include <regex>
 #include <cassert>
 #include <algorithm>
 #include <exception>
 #include <ctype.h>
-#include "../halo_functions/devmode.hpp"
+#include "../halo/functions/devmode.hpp"
 
 using namespace std;
 
@@ -593,7 +599,7 @@ string VulpesCommand::get_name(){
     return name;
 }
 char* VulpesCommand::get_name_chars(){
-    return (char*)&name_chars;
+    return &name_chars[0];
 }
 
 

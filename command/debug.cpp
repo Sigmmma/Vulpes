@@ -1,7 +1,13 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #include "debug.hpp"
 #include "handler.hpp"
-#include "../halo_functions/console.hpp"
-#include "../halo_bug_fixes/shdr_trans_zfighting.hpp"
+#include "../halo/functions/console.hpp"
+#include "../halo/fixes/shdr_trans_zfighting.hpp"
 
 bool toggle_shader_trans_fix(std::vector<VulpesArg> input){
     bool on = input[0].bool_out();

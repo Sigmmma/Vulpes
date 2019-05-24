@@ -6,4 +6,5 @@
 
 #pragma once
 
-void init_debug_commands();
+void init_object_hooks();
+void revert_object_hooks();
