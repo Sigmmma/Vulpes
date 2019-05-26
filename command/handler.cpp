@@ -5,7 +5,7 @@
  */
 
 #include "handler.hpp"
-#include "../halo/functions/console.hpp"
+#include "../halo/functions/messaging.hpp"
 #include <regex>
 #include <cassert>
 #include <algorithm>
@@ -119,8 +119,7 @@ bool process_command(char* input, int32_t network_machine_id){
         try {
             parsed_args = matching_cmd->parse_args(matches, &success);
         }catch (exception& e){
-            console_out_error("Couldn't parse command.");
-            console_out_error(e.what());
+            cprintf_error("Couldn't parse command. %s", e.what());
             return false;
         };
         if (success){
@@ -220,26 +219,15 @@ int64_t parse_to_integer(string input, char** leftover){
 int32_t VulpesArgDef::parse_int(string input, char** leftover){
     int32_t output;
     int64_t parsed = parse_to_integer(input, leftover);
-    char error_str[80];
     if(parsed > imax){
-        snprintf(error_str, 80,
-                "Input for arg %s too high. Highest allowed: %d, got %d.",
-                name.data(), imax, parsed);
-        console_out_error(error_str);
-        snprintf(error_str, 80,
-                "Setting it to %d.",
-                imax);
-        console_out_error(error_str);
+        cprintf_error("Input for arg %s too high. Highest allowed: %d, got %d.",
+                      name.data(), imax, parsed);
+        cprintf_error("Setting it to %d.", imax);
         output = imax;
     }else if(parsed < imin){
-        snprintf(error_str, 80,
-                "Input for arg %s too low. Lowest allowed: %d, got %d.",
-                name.data(), imin, parsed);
-        console_out_error(error_str);
-        snprintf(error_str, 80,
-                "Setting it to %d.",
-                imax);
-        console_out_error(error_str);
+        cprintf_error("Input for arg %s too low. Lowest allowed: %d, got %d.",
+                      name.data(), imin, parsed);
+        cprintf_error("Setting it to %d.", imax);
         output = imin;
     }else{
         output = static_cast<int32_t>(parsed);
@@ -249,26 +237,15 @@ int32_t VulpesArgDef::parse_int(string input, char** leftover){
 
 float VulpesArgDef::parse_flt(string input, char** leftover){
     float output = strtof(input.data(), leftover);
-    char error_str[80];
     if(output > fmax){
-        snprintf(error_str, 80,
-                "Input for arg %s too high. Highest allowed: %f, got %f.",
-                name.data(), fmax, output);
-        console_out_error(error_str);
-        snprintf(error_str, 80,
-                "Setting it to %f.",
-                fmax);
-        console_out_error(error_str);
+        cprintf_error("Input for arg %s too high. Highest allowed: %f, got %f.",
+                      name.data(), fmax, output);
+        cprintf_error("Setting it to %f.", fmax);
         output = fmax;
     }else if(output < fmin){
-        snprintf(error_str, 80,
-                "Input for arg %s too low. Lowest allowed: %f, got %f.",
-                name.data(), fmin, output);
-        console_out_error(error_str);
-        snprintf(error_str, 80,
-                "Setting it to %f.",
-                fmax);
-        console_out_error(error_str);
+        cprintf_error("Input for arg %s too low. Lowest allowed: %f, got %f.",
+                      name.data(), fmin, output);
+        cprintf_error("Setting it to %f.", fmax);
         output = fmin;
     };
     return output;
@@ -282,11 +259,8 @@ bool VulpesArgDef::parse_bool(string input){
     }else if (input == "no" || input == "off" || input == "false" || input == "0"){
         return false;
     }else {
-        char error_str[80];
-        snprintf(error_str, 80,
-                "Couldn't parse input \"%s\" for %s. Assuming false.",
-                input.data(), name.data());
-        console_out(error_str);
+        cprintf_error("Couldn't parse input \"%s\" for %s. Assuming false.",
+                      input.data(), name.data());
         return false;
     };
 }
@@ -321,21 +295,14 @@ int VulpesArgDef::parse_time(string input, bool* success){
     };
 
     // Throw a fit if our input can't be valid.
-    char error_str[80];
     if (!has_digit_chars && !has_alpha_chars){
-        printf("Nothing.");
-        snprintf(error_str, 80,
-                "Couldn't parse input \"%s\" for %s. What!?",
-                input.data(), name.data());
-        console_out_error(error_str);
+        cprintf_error("Couldn't parse input \"%s\" for %s. What!?",
+                      input.data(), name.data());
         *success = false;
         return 0;
     }else if (!has_digit_chars){
-        printf("All letters.");
-        snprintf(error_str, 80,
-                "Couldn't parse input \"%s\" for %s. Numbers please?",
-                input.data(), name.data());
-        console_out_error(error_str);
+        cprintf_error("Couldn't parse input \"%s\" for %s. Numbers please?",
+                      input.data(), name.data());
         *success = false;
         return 0;
     };
@@ -344,7 +311,6 @@ int VulpesArgDef::parse_time(string input, bool* success){
     vector<string> n;
     vector<string> a;
     if (has_alpha_chars && has_digit_chars){
-        printf("Digits and Alphabetics.");
         smatch time_match;
         string::const_iterator search_start(input.cbegin());
         while(regex_search(search_start, input.cend(), time_match, time_split)){
@@ -360,10 +326,8 @@ int VulpesArgDef::parse_time(string input, bool* success){
     };
     // Throw more fits if the splitting failed.
     if (!n.size()){
-        snprintf(error_str, 80,
-                "Couldn't parse input \"%s\" for %s. I got nothing.",
-                input.data(), name.data());
-        console_out(error_str);
+        cprintf_error("Couldn't parse input \"%s\" for %s. I got nothing.",
+                      input.data(), name.data());
         *success = false;
         return 0;
     };
@@ -395,10 +359,9 @@ int VulpesArgDef::parse_time(string input, bool* success){
             } else if(n_int[i].size() == 4){
                 unit = Time::DAYS;
             } else {
-                snprintf(error_str, 80,
-                        "Couldn't parse input \"%s\" for %s. Too few or too many units.",
-                        input.data(), name.data());
-                console_out_error(error_str);
+                cprintf_error("Couldn't parse input \"%s\" for %s. "
+                              "Too few or too many units.",
+                              input.data(), name.data());
                 *success = false;
                 return 0;
             };
@@ -415,10 +378,9 @@ int VulpesArgDef::parse_time(string input, bool* success){
         } else if (a[i] == "d" || a[i] == "day" || a[i] == "days"){
             unit = Time::DAYS;
         } else {
-            snprintf(error_str, 80,
-                    "Couldn't parse input \"%s\" for %s. %s is not an accepted time unit.",
-                    input.data(), name.data(), a[i].data());
-            console_out_error(error_str);
+            cprintf_error("Couldn't parse input \"%s\" for %s. "
+                          "%s is not an accepted time unit.",
+                          input.data(), name.data(), a[i].data());
             *success = false;
             return 0;
         };
@@ -609,7 +571,6 @@ vector<VulpesArgDef> VulpesCommand::get_arg_defs(){
 }
 
 vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings, bool* success){
-    char error_str[80];
     int required_args;
     for (required_args = 0; required_args<args.size(); required_args++){
         if (args[required_args].optional){
@@ -617,26 +578,20 @@ vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings, bool* su
         };
     };
     if (arg_strings.size() < required_args){
-        snprintf(error_str, 80,
-                "Too few args for command: %s. Got %d, expected %d to %d.",
-                name.data(), arg_strings.size(), required_args, args.size());
-        console_out(error_str);
+        cprintf_error("Too few args for command: %s. Got %d, expected %d to %d.",
+                      name.data(), arg_strings.size(), required_args, args.size());
         throw wrong_arg_count_exception;
     }else if (arg_strings.size() > args.size()){
-        snprintf(error_str, 80,
-                "Too many args for command: %s. Got %d, expected %d to %d.",
-                name.data(), arg_strings.size(), required_args, args.size());
-        console_out(error_str);
+        cprintf_error("Too many args for command: %s. Got %d, expected %d to %d.",
+                      name.data(), arg_strings.size(), required_args, args.size());
         throw wrong_arg_count_exception;
     };
     vector<VulpesArg> parsed_args;
     for (int i=0; i<arg_strings.size(); i++){
         parsed_args.push_back(VulpesArg(args[i], arg_strings[i], success));
         if (!*success){
-            snprintf(error_str, 80,
-                    "Couldn't parse arg #%d %s",
-                    i+1, args[i].display_name.data());
-            console_out_error(error_str);
+            cprintf_error("Couldn't parse arg #%d %s",
+                          i+1, args[i].display_name.data());
             *success = false;
             break;
         };
@@ -653,10 +608,8 @@ bool VulpesCommand::execute(vector<VulpesArg> parsed_args){
     try {
         success = cmd_func(parsed_args);
     }catch(exception& e){
-        char error_str[80];
-        snprintf(error_str, 80,
-                "Execution of command %s failed. Exception: %s",
-                name.data(), e.what());
+        cprintf_error("Execution of command %s failed. Exception: %s",
+                      name.data(), e.what());
         success = false;
     };
     return success;

@@ -35,7 +35,6 @@ build:
 	g++ -c halo/fixes/shdr_trans_zfighting.cpp $(ARGSDEF) -o bin/fixes__shdr_trans_zfighting.o
 	g++ -c halo/fixes/string_overflows.cpp $(ARGSDEF) -o bin/fixes__string_overflows.o
 
-	g++ -c halo/functions/console.cpp $(ARGS) -o bin/functions__console.o
 	g++ -c halo/functions/devmode.cpp $(ARGSDEF) -o bin/functions__devmode.o
 	g++ -c halo/functions/message_delta.cpp $(ARGS) -o bin/functions__message_delta.o
 	g++ -c halo/functions/messaging.cpp $(ARGSFAST) -o bin/functions__messaging.o

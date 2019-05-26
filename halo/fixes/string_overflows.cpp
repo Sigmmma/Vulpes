@@ -6,7 +6,7 @@
 
 #include "string_overflows.hpp"
 #include "../../hooker/hooker.hpp"
-#include "../functions/console.hpp"
+#include "../functions/messaging.hpp"
 #include "../functions/devmode.hpp"
 
 // HSC has a print function which does not accept extra arguments like a format print would.
@@ -15,7 +15,7 @@
 
 __attribute__((fastcall))
 void hs_print_cleanser(char* string){
-    if (developer_mode_level() >= 4) console_out(string, ARGBFloat(1.0, 0.0, 1.0, 0.0));
+    if (developer_mode_level() >= 4) cprintf_info("%s", string);
 }
 
 Signature(false, sig_hs_print_overflow_fix,
