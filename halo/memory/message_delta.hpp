@@ -490,7 +490,7 @@ struct RemotePlayerPositionUpdateHeader {
     int32_t player_id;
     int8_t update_id;
     int8_t sequence_number;
-    PAD(3);
+    PAD(2);
 };
 
 struct RemotePlayerPositionUpdate {
