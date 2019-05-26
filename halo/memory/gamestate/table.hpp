@@ -9,20 +9,29 @@
 
 class Table {
 public:
+
+    // Checks if there is an empty entry and sets one up if there is,
+    // returns a MemRef to the allocated id.
+    MemRef allocate();
+    // Deletes the entry at the given MemRef.
+    // Returns true if succesful, false if it couldn't find it.
+    bool remove(MemRef id);
+
     char name[0x20];
     int16_t max_count;
     int16_t index_size;
-    int32_t one;
-    int32_t data_v;
-    int16_t zero;
-    int16_t size;
-    int16_t count;
+    bool valid;
+    bool id_zero_valid;
+    PAD(2);
+    int32_t sig; // d@t@
     int16_t next_id;
-};
+    int16_t last_id;
+    MemRef next;
+}; static_assert(sizeof(Table) == 0x34);
 
 class GenericTable : public Table {
 public:
     void* first;
 };
 
-Table** effect_ptrs();
+GenericTable** effect_ptrs();

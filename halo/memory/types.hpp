@@ -19,15 +19,13 @@ class MemRef {
 public:
 union {
     struct {
-    uint16_t local;
+    int16_t local;
     uint16_t salt;  //Like a global id, the game assigns one of these to everything that has an id.
                     //It just counts up for each assignment until it loops over
     }id;
 
     uint32_t raw;
 };
-    bool valid();
-    // TODO: Implement functions to retrieve corresponding memory objects.
 };
 
 class Vec2d{

@@ -12,6 +12,7 @@
 #include <exception>
 #include <ctype.h>
 #include "../halo/functions/devmode.hpp"
+#include "../halo/memory/gamestate/console.hpp"
 
 using namespace std;
 

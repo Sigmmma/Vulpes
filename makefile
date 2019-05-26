@@ -39,6 +39,7 @@ build:
 	g++ -c halo/functions/devmode.cpp $(ARGSDEF) -o bin/functions__devmode.o
 	g++ -c halo/functions/message_delta.cpp $(ARGS) -o bin/functions__message_delta.o
 	g++ -c halo/functions/object_unit.cpp $(ARGS) -o bin/functions__object_unit.o
+	g++ -c halo/functions/table.cpp $(ARGS) -o bin/functions__table.o
 
 	g++ -c halo/hooks/console.cpp $(ARGSDEF) -o bin/hooks__console.o
 	g++ -c halo/hooks/incoming_packets.cpp $(ARGSDEF) -o bin/hooks__incoming_packets.o

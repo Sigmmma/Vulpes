@@ -68,4 +68,4 @@ public:
 
 #pragma pack(pop)
 
-Table* device_groups_table();
+GenericTable* device_groups_table();
