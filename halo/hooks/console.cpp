@@ -5,7 +5,7 @@
  */
 
 #include "../../hooker/hooker.hpp"
-#include "../functions/console.hpp"
+#include "../functions/messaging.hpp"
 #include "../../command/handler.hpp"
 
 Signature(true, sig_console_input_hook,
@@ -131,7 +131,8 @@ void init_command_auto_complete_hook(){
         count_ptr         = *reinterpret_cast<intptr_t*>(sig_addr3+14);
         auto_complete_patch.apply();
     }else{
-        console_out_error("Error: Couldn't perform auto complete patch. Vulpes commands will not auto complete.");
+        cprintf_error("Error: Couldn't perform auto complete patch. "
+                      "Vulpes commands will not auto complete.");
     };
 }
 
