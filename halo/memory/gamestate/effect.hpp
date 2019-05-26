@@ -7,11 +7,11 @@
 #pragma once
 #include "table.hpp"
 
-Table* weather_particles_table();
-Table* particle_table();
-Table* particle_system_particles_table();
-Table* effect_table();
-Table* effect_locations_table();
-Table* decals_table();
-Table* contrail_points_table();
-Table* contrail_table();
+GenericTable* weather_particles_table();
+GenericTable* particle_table();
+GenericTable* particle_system_particles_table();
+GenericTable* effect_table();
+GenericTable* effect_locations_table();
+GenericTable* decals_table();
+GenericTable* contrail_points_table();
+GenericTable* contrail_table();
