@@ -105,10 +105,10 @@ struct ObjectUpdateHeader {
     int8_t baseline_id;
     int8_t message_index;
     bool update_baseline;
+    PAD(1);
 };
 
 struct ObjectUpdateHeaderTimestamped : public ObjectUpdateHeader {
-    uint8_t _pad;
     uint16_t timestamp; // I'm not sure what type this is yet.
 };
 
@@ -154,7 +154,7 @@ struct BipedUpdate {
 // Encode ObjectUpdateHeaderTimestamped before this
 struct VehicleUpdate {
     bool at_rest;
-    uint8_t _pad[3];
+    PAD(3);
     Vec3d position;
     Vec3d translational_velocity;
     Vec3d angular_velocity;
@@ -170,7 +170,7 @@ struct HudAdditem {
 
 struct PlayerCreate {
     uint8_t player_id;
-    uint8_t _pad[3];
+    PAD(3);
     int32_t raw_player_index;//?
     int32_t translated_player_index;
     int32_t team_index;
@@ -182,7 +182,7 @@ struct PlayerSpawn {
     int32_t team_index;
     int32_t parent_vehicle_network_id;
     int16_t vehicle_seat_index;
-    int16_t _pad;
+    PAD(2);
     int32_t weapon_object_network_ids[4];
     int16_t desired_weapon_index;
     int16_t powerup_durations[2];
@@ -221,9 +221,9 @@ struct UnitKill {
     bool ignore_hard_pings;
     bool force_hard_pings;
     bool should_allignment_vector_be_null;
-    uint8_t _pad;
+    PAD(1);
     int16_t damage_part;
-    int16_t _pad2;
+    PAD(2);
     float angle;
     Vec2d allignment_vector;
     int32_t respawn_timer;
@@ -409,21 +409,7 @@ struct ProjectileNew {
     int8_t current_baseline_id;
 };
 
-struct EquipmentNew {
-    MemRef tag_id;
-    int32_t server_object_id;
-    int16_t owner_team_id;
-    PAD(2);
-    int16_t owner_player_id;
-    PAD(2);
-    int32_t owner_object_id;
-    uint32_t object_flags;
-    Vec3d position;
-    Vec3d forward; // might want to normalize these
-    Vec3d up; // might want to normalize these
-    Vec3d translational_velocity;
-    Vec3d angular_velocity;
-    int8_t current_baseline_id;
+struct EquipmentNew : public ProjectileNew {
 };
 
 struct WeaponNew {
@@ -463,13 +449,146 @@ struct GameSettingsUpdate {
 // struct ParametersControl
 
 struct LocalPlayerUpdate {
-    int8_t sequence_numbers;
+    int8_t sequence_number;
     int8_t last_completed_update_id;
     PAD(2);
     Vec3d position;
 };
 
+struct LocalPlayerVehicleUpdate {
+    int8_t sequence_number;
+    int8_t last_completed_update_id;
+    PAD(2);
+    int32_t vehicle_id;
+    Vec3d position;
+    Vec3d translational_velocity;
+    Vec3d angular_velocity;
+    Vec3d forward;
+    Vec3d up;
+};
 
+struct RemotePlayerActionUpdateHeader {
+    int32_t player_id;
+    int8_t update_id;
+    int8_t baseline_id;
+};
+
+struct RemotePlayerActionUpdate {
+    uint32_t ticks_to_apply_update_to;
+    uint32_t control_flags;
+    PAD(8);
+    float forward_throttle;
+    float sideways_throttle;
+    float primary_trigger;
+    int16_t desired_weapon_id;
+    int16_t desired_grenade_id;
+    PAD(4);
+    Vec3d facing;
+};
+
+struct RemotePlayerPositionUpdateHeader {
+    int32_t player_id;
+    int8_t update_id;
+    int8_t sequence_number;
+    PAD(3);
+};
+
+struct RemotePlayerPositionUpdate {
+    Vec3d locality_reference_position;
+};
+
+struct RemotePlayerVehicleUpdate {
+    int32_t vehicle_id;
+    Vec3d position;
+    Vec3d translational_velocity;
+    Vec3d angular_velocity;
+    Vec3d forward;
+    Vec3d up;
+};
+
+struct RemotePlayerTotalUpdateBipedHeader : public RemotePlayerPositionUpdateHeader {
+    int8_t sequence_number;
+};
+
+struct RemotePlayerTotalUpdateBiped : public RemotePlayerActionUpdate {
+    Vec3d position;
+};
+
+struct RemotePlayerTotalUpdateVehicle {
+    RemotePlayerActionUpdate player;
+    RemotePlayerVehicleUpdate vehicle;
+};
+
+struct WeaponStartReload {
+    int32_t weapon_id;
+    int16_t magazine_id;
+    int16_t total_rounds;
+    int16_t loaded_rounds;
+};
+
+struct WeaponAmmoPickupMidReload {
+    int32_t weapon_id;
+    int16_t magazine_id;
+    int16_t rounds_picked_up;
+};
+
+struct WeaponFinishReload : public WeaponStartReload {
+};
+
+struct WeaponCancelReload : public WeaponStartReload {
+};
+
+struct NetgameEquipmentNew {
+    int32_t object_id;
+    MemRef tag_id;
+    MemRef netgam_equipment_tag_id;
+};
+
+struct ProjectileDetonate {
+    int32_t object_id;
+    Vec3d position;
+};
+
+struct ItemAccelerate {
+    int32_t object_id;
+    float magnitude;
+    Vec3d direction;
+};
+
+struct DamageDealt {
+    int32_t damaged_object_id;
+    float shield_damage;
+    bool shields_depleted;
+};
+
+struct ProjectileAttach {
+    int32_t projectile_object_id;
+    int32_t parent_object_id;
+    int16_t parent_node_id;
+};
+
+struct ClientToServerPong {
+    int8_t player_id;
+};
+
+struct SuperPingUpdate {
+    int8_t player_id;
+    PAD(3);
+    int32_t player_ping;
+};
+
+struct SvMotd {
+    char text[256]; // Confirm
+};
+
+struct RconRequest {
+    char password[9];
+    char command[64];
+};
+
+struct RconResponse {
+    char text[80];
+};
 
 struct VulpesMessage {
     uint16_t payload_size;
