@@ -13,6 +13,8 @@
 
 Signature(true, sig_console_line_new,
     {0x8B, 0x15, -1, -1, -1, -1, 0x66, 0x83, 0x7A, 0x2E, 0x20, 0x75, 0x11});
+Signature(false, sig_console_to_terminal_and_network,
+    {0x55, 0x8B, 0xEC, 0x83, 0xE4, 0xF8, 0x81, 0xEC, 0x10, 0x01, 0x00, 0x00, 0x56});
 
 ConsoleOutput* console_new_line(){
     ConsoleGlobals* globals = console_globals();
@@ -30,6 +32,9 @@ ConsoleOutput* console_new_line(){
 }
 
 void vcprintf(const ARGBFloat& color, const char* format, va_list args){
+    static __attribute__((regparm(1)))void (*console_to_terminal_and_network)(void*) =
+        reinterpret_cast<__attribute__((regparm(1)))void (*)(void*)>(
+        sig_console_to_terminal_and_network.address());
     ConsoleGlobals* globals = console_globals();
     if (globals->initialized){
         ConsoleOutput* output = console_new_line();
@@ -40,6 +45,7 @@ void vcprintf(const ARGBFloat& color, const char* format, va_list args){
             output->color.green = color.green;
             output->color.blue  = color.blue;
             output->tab_stops   = strstr(output->text, "|t") != NULL;
+            console_to_terminal_and_network(&output->text);
         };
     };
 }
