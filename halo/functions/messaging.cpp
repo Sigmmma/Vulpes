@@ -7,6 +7,7 @@
 #include "messaging.hpp"
 #include "../../hooker/hooker.hpp"
 #include "../memory/gamestate/console.hpp"
+#include "message_delta.hpp"
 #include <cstdio>
 #include <cstring>
 
@@ -75,5 +76,27 @@ void cprintf_error(const char* format, ...){
     va_list args;
     va_start(args, format);
     vcprintf(ARGBFloat(1.0, 1.0, 0.0, 0.0), format, args);
+    va_end(args);
+}
+
+void rprintf(int player_id, const char* format, ...){
+    va_list args;
+    va_start(args, format);
+    char buffer[100];
+    RconResponse message;
+    vsnprintf(&message.text[0], 80, format, args);
+    uint32_t size = mdp_encode_stateless_iterated(buffer, RCON_RESPONSE, &message);
+    send_delta_message_to_player(player_id, &buffer, size, true, true, false, true, 3);
+    va_end(args);
+}
+
+void rprintf_all(const char* format, ...){
+    va_list args;
+    va_start(args, format);
+    char buffer[100];
+    RconResponse message;
+    vsnprintf(&message.text[0], 80, format, args);
+    uint32_t size = mdp_encode_stateless_iterated(buffer, RCON_RESPONSE, &message);
+    send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
     va_end(args);
 }
