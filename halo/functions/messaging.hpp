@@ -19,6 +19,7 @@ void cprintf_error(const char* format, ...); // Red
 
 // Prints a formatted string to a client's console.
 void rprintf(int player_id, const char* format, ...);
+void rprintf_all(const char* format, ...);
 
 // Print a formatted string to the terminal.
 // If a seperate terminal window was opened we print to that.
