@@ -19,6 +19,7 @@ build:
 
 	g++ -c command/debug.cpp $(ARGSFAST) -o bin/command__debug.o
 	g++ -c command/handler.cpp $(ARGSFAST) -o bin/command__handler.o
+	g++ -c command/server.cpp $(ARGSFAST) -o bin/command__server.o
 
 	g++ -c hooker/code_cave.cpp $(ARGSFAST) -o bin/hooks__hooker_code_cave.o
 	g++ -c hooker/hooker.cpp $(ARGSFAST) -o bin/hooks__hooker.o
