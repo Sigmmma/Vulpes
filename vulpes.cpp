@@ -28,8 +28,10 @@ void revert_hooks(){
 }
 
 #include "command/debug.hpp"
+#include "command/server.hpp"
 void init_commands(){
     init_debug_commands();
+    init_server_commands();
 }
 
 #include "halo/fixes/cpu_usage.hpp"
