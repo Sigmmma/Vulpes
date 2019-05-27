@@ -587,7 +587,7 @@ struct RconRequest {
 };
 
 struct RconResponse {
-    char text[80];
+    char text[81];
 };
 
 struct VulpesMessage {
