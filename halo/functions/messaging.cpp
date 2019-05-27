@@ -7,8 +7,8 @@
 #include "messaging.hpp"
 #include "../../hooker/hooker.hpp"
 #include "../memory/gamestate/console.hpp"
-#include "message_delta.hpp"
 #include <cstdio>
+#include <string>
 #include <cstring>
 
 Signature(true, sig_console_line_new,
@@ -93,21 +93,36 @@ void cprintf_error(const char* format, ...){
 void rprintf(int player_id, const char* format, ...){
     va_list args;
     va_start(args, format);
-    char buffer[100];
+    char buffer[80+16];
     RconResponse message;
+    memset(&message.text[0], 0, 80);
     vsnprintf(&message.text[0], 80, format, args);
     uint32_t size = mdp_encode_stateless_iterated(buffer, RCON_RESPONSE, &message);
-    send_delta_message_to_player(player_id, &buffer, size, true, true, false, true, 3);
+    if (player_id < 0){
+        send_delta_message_to_all(&buffer, size, true, true, false, true, 2);
+    }else if (player_id < 16){
+        send_delta_message_to_player(player_id, &buffer, size, true, true, false, true, 2);
+    };
     va_end(args);
 }
 
-void rprintf_all(const char* format, ...){
+void chatf(HudChatType type, int src_player, int dest_player,
+           const char* format, ...){
     va_list args;
     va_start(args, format);
-    char buffer[100];
-    RconResponse message;
-    vsnprintf(&message.text[0], 80, format, args);
-    uint32_t size = mdp_encode_stateless_iterated(buffer, RCON_RESPONSE, &message);
-    send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
+    char buffer[512+16];
+    vsnprintf(&buffer[0], 256, format, args);
+    wchar_t output[256];
+    std::mbstowcs(output, buffer, 256);
+    HudChat message;
+    message.message = &output[0];
+    message.msg_type = type;
+    message.player_id = src_player;
+    uint32_t size = mdp_encode_stateless_iterated(buffer, HUD_CHAT, &message);
+    if (dest_player < 0){
+        send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
+    }else if (dest_player < 16){
+        send_delta_message_to_player(dest_player, &buffer, size, true, true, false, true, 3);
+    };
     va_end(args);
 }
