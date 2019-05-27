@@ -6,6 +6,7 @@
 
 #pragma once
 #include "../memory/types.hpp"
+#include "message_delta.hpp"
 #include <cstdarg>
 
 // Print a formatted string to the Halo console.
@@ -18,11 +19,16 @@ void cprintf_warn (const char* format, ...); // Yellow
 void cprintf_error(const char* format, ...); // Red
 
 // Prints a formatted string to a client's console.
+// -1 means all.
 void rprintf(int player_id, const char* format, ...);
-void rprintf_all(const char* format, ...);
 
 // Print a formatted string to the terminal.
 // If a seperate terminal window was opened we print to that.
 // If we're a server we use the internal printing system
 // so we don't screw with user input.
 void tprintf(const char* format, ...);
+
+// Send a formatted chat message to any or all clients.
+// -1 means all.
+void chatf(HudChatType type, int src_player, int dest_player,
+           const char* format, ...);
