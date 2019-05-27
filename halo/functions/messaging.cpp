@@ -16,9 +16,12 @@ Signature(true, sig_console_line_new,
 Signature(false, sig_console_to_terminal_and_network,
     {0x55, 0x8B, 0xEC, 0x83, 0xE4, 0xF8, 0x81, 0xEC, 0x10, 0x01, 0x00, 0x00, 0x56});
 
+typedef uint32_t (*FpReturnsInt)();
+
 ConsoleOutput* console_new_line(){
     ConsoleGlobals* globals = console_globals();
-    static uint32_t (*console_line_new)() = reinterpret_cast<uint32_t (*)()>(sig_console_line_new.address());
+    static auto console_line_new =
+        reinterpret_cast<FpReturnsInt>(sig_console_line_new.address());
     MemRef line;
     line.raw = console_line_new();
 
@@ -31,9 +34,11 @@ ConsoleOutput* console_new_line(){
     };
 }
 
+typedef __attribute__((regparm(1)))void (*ConsoleToTerminalAndNetworkCall)(void*);
+
 void vcprintf(const ARGBFloat& color, const char* format, va_list args){
-    static __attribute__((regparm(1)))void (*console_to_terminal_and_network)(void*) =
-        reinterpret_cast<__attribute__((regparm(1)))void (*)(void*)>(
+    static auto console_to_terminal_and_network =
+        reinterpret_cast<ConsoleToTerminalAndNetworkCall>(
         sig_console_to_terminal_and_network.address());
     ConsoleGlobals* globals = console_globals();
     if (globals->initialized){
