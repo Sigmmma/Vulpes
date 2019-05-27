@@ -51,7 +51,7 @@ void init_halo_bug_fixes(){
         init_framerate_dependent_timer_fixes();
         ADD_CALLBACK(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
         init_loading_screen_fixes();
-        init_tweaks();
+        ADD_CALLBACK(EVENT_TICK, init_tweaks);
     };
 }
 
