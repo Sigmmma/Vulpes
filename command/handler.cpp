@@ -114,6 +114,12 @@ bool process_command(char* input, int32_t network_machine_id){
         };
     };
     if (found_match){
+        ConsoleInputGlobals* input_globals = console_input_globals();
+        if (input_globals->history.inputs_saved < 8) input_globals->history.inputs_saved++;
+        int16_t i = (input_globals->history.current_id + 1) % 8;
+        input_globals->history.current_id = i;
+        strncpy(input_globals->history.entries[i],
+                input, 255);
         vector<VulpesArg> parsed_args;
         bool success = true;
         try {
