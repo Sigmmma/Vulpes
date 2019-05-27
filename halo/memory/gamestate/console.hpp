@@ -77,5 +77,5 @@ struct ConsoleGlobals {
 #pragma pack(pop)
 
 ConsoleGlobals* console_globals();
-ConsoleOutputTable*  console_output_table();
+ConsoleOutputTable* console_output_table();
 ConsoleInputGlobals* console_input_globals();

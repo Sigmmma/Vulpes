@@ -76,7 +76,7 @@ struct SharedVariantData {
     int32_t suicide_penalty;     // 18
     int32_t lives;               // 1C
 
-    float health; //             // 20 I thought this was damage_multiplier...
+    float health; //             // 20
     int32_t score_to_win;        // 24
     WeaponSet weapon_set;        // 28
 
