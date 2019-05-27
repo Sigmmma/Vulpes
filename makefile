@@ -51,6 +51,7 @@ build:
 	g++ -c halo/memory/gamestate/object/object_device.cpp $(ARGSDEF) -o bin/memory__gamestate__object_device.o
 	g++ -c halo/memory/gamestate/object/object_item.cpp $(ARGSDEF) -o bin/memory__gamestate__object_item.o
 	g++ -c halo/memory/gamestate/object/object_unit.cpp $(ARGSDEF) -o bin/memory__gamestate__object_unit.o
+	g++ -c halo/memory/gamestate/server/game_variant.cpp $(ARGSDEF) -o bin/memory__gamestate__game_variant.o
 	g++ -c halo/memory/gamestate/console.cpp $(ARGSDEF) -o bin/memory__gamestate__terminal.o
 	g++ -c halo/memory/gamestate/effect.cpp $(ARGSDEF) -o bin/memory__gamestate__effect.o
 	g++ -c halo/memory/gamestate/player.cpp $(ARGSDEF) -o bin/memory__gamestate__player.o
