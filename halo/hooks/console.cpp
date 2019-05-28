@@ -11,71 +11,39 @@
 Signature(true, sig_console_input_hook,
     {0x3C, 0x23, 0x74, 0x0A, 0x3C, 0x2F, 0x75, 0x0F});
 
-uintptr_t rcon_dword_ptr;
 const auto prcs_cmd = &process_command;
 uintptr_t return_to_halo_con_in;
 __attribute__((naked))
 void new_console_in_hook(){
     asm (
-        "add esp, 0x500;"
-        "mov eax, 0xFFFFFFFF;" // No network owner
     "console_in:"
-        "push eax;"
         "push edi;"
         "call %0;"
         "pop edi;"
-        "add esp, 4;"
 
         "cmp al, 0;"
         "jne continue_to_halo_con_in;"
         "xor al, al;"
+        "add esp, 0x500;"
         "ret;"
     "continue_to_halo_con_in:"
-        "sub esp, 0x500;"
         "jmp %1;"
         :
         : "m" (prcs_cmd), "m" (return_to_halo_con_in)
     );
 }
 
-__attribute__((naked))
-void rcon_in_hook(){
-    asm (
-        // Emulate default behavior of moving eax (player_network_id) into this dword.
-        "push ebx;" // protect ebx
-        "mov ebx, %0;"
-        "mov DWORD PTR ds:[ebx], eax;"
-
-        "push 0;"
-        "call console_in;"
-        "add esp, 4;"
-
-        // Emulate default behavior of making this dword -1.
-        "mov ebx, %0;"
-        "mov DWORD PTR ds:[ebx], 0xFFFFFFFF;"
-
-        "pop ebx;" // return ebx to its former glory
-        "ret;"
-        :
-        : "m" (rcon_dword_ptr)
-    );
-}
-
 Patch(console_in_hook_patch, sig_console_input_hook, 0, 6, JMP_PATCH, &new_console_in_hook);
-Patch(rcon_in_hook_patch, sig_console_input_hook, -44, 25, JMP_PATCH, &rcon_in_hook);
 
 void init_console_input_hook(){
-    if(console_in_hook_patch.build() && rcon_in_hook_patch.build()){
+    if(console_in_hook_patch.build()){
         return_to_halo_con_in = console_in_hook_patch.address() + 23;
-        rcon_dword_ptr = *reinterpret_cast<intptr_t*>(rcon_in_hook_patch.address() + 15);
         console_in_hook_patch.apply();
-        rcon_in_hook_patch.apply();
     };
 }
 
 void revert_console_input_hook(){
     console_in_hook_patch.revert();
-    rcon_in_hook_patch.revert();
 }
 
 Signature(false, sig_auto_complete_hook,
