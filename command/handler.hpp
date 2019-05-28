@@ -12,7 +12,7 @@
 
 // These functions are and should only be called by the game.
 __attribute__((cdecl))
-void auto_complete(char* buffer[], uint16_t* current_index, const char* input);
+void auto_complete(char* buffer[], uint16_t* current_index);
 __attribute__((cdecl))
 bool process_command(char* input);
 
