@@ -33,26 +33,29 @@ regex command_split("([^\\s\"]+)|\"([^\"]*)\"|\"([^\"]*)");
 
 // Adds Vulpes results to an already constructed autocomplete list.
 __attribute__((cdecl))
-void auto_complete(char* buffer[], uint16_t* current_index, const char* input){
-    string input_str(input);
+void auto_complete(char* buffer[], uint16_t* current_index){
+    char* input = console_input_globals()->state.edit_text.text;
+    if (input && input[0]){
+        string input_str(input);
 
-    uint8_t developer_mode = developer_mode_level();
+        uint8_t developer_mode = developer_mode_level();
 
-    int i = 0;
-    int j = *current_index;
-    while (i < commands.size() && *current_index < 256){
-        string cmp_str = commands[i]->get_name();
-        if (input_str.size() <= cmp_str.size()){
-            cmp_str.resize(input_str.size());
-            if (input_str == cmp_str
-            && developer_mode >= commands[i]->get_dev_level()){
-                buffer[j] = commands[i]->get_name_chars();
-                j++;
+        int i = 0;
+        int j = *current_index;
+        while (i < commands.size() && *current_index < 256){
+            string cmp_str = commands[i]->get_name();
+            if (input_str.size() <= cmp_str.size()){
+                cmp_str.resize(input_str.size());
+                if (input_str == cmp_str
+                && developer_mode >= commands[i]->get_dev_level()){
+                    buffer[j] = commands[i]->get_name_chars();
+                    j++;
+                };
             };
+            i++;
         };
-        i++;
+        *current_index = j;
     };
-    *current_index = j;
 }
 
 // Returns false if the original Halo function should not fire after this.
