@@ -57,7 +57,7 @@ void auto_complete(char* buffer[], uint16_t* current_index, const char* input){
 
 // Returns false if the original Halo function should not fire after this.
 __attribute__((cdecl))
-bool process_command(char* input, int32_t network_machine_id){
+bool process_command(char* input){
     string input_str(input);
     // A line starting with this should be ignored.
     if(input_str.find(";") == 0){
