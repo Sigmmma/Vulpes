@@ -14,7 +14,7 @@
 __attribute__((cdecl))
 void auto_complete(char* buffer[], uint16_t* current_index, const char* input);
 __attribute__((cdecl))
-bool process_command(char* input, int32_t network_machine_id);
+bool process_command(char* input);
 
 // Interface for registering commands.
 
