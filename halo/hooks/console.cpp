@@ -51,11 +51,8 @@ Signature(false, sig_auto_complete_hook,
 Signature(false, sig_auto_complete_collected_list,
     {-1, -1, -1, -1, 0x0F, 0xBF, 0xC8, 0x66, 0x40, 0x89, 0x34, 0x8A, 0x66, 0xA3,
      -1, -1, -1, -1, 0x83, 0xC3, 0x04, 0x4D, 0x75, 0x98, 0x5F});
-Signature(false, sig_console_input,
-    {-1, -1, -1, -1, 0x8B, 0xC2, 0x8D, 0x78, 0x01, 0xEB, 0x03, 0x8D, 0x49, 0x00});
 
 static auto func_auto_complete = &auto_complete;
-static intptr_t console_input_ptr;
 static intptr_t results_ptr;
 static intptr_t count_ptr;
 
@@ -63,38 +60,28 @@ __attribute__((naked))
 void auto_complete_hook(){
     asm (
         // Get the address of the list of matching char*s
-        "mov edx, %2;"
+        "mov edx, %1;"
         "mov edx, [edx];"
-        // Get the pointer to the console input text.
-        "mov ebx, %1;"
-        "mov ebx, [ebx];"
         // Shove all of this data into our autocomplete function
-        "push ebx;"
-        "push %3;"
+        "push %2;"
         "push edx;"
         "call %0;"
-        "add esp, 12;"
+        "add esp, 8;"
         // move the output count to where the code expects it to be
-        "mov edx, %3;"
+        "mov edx, %2;"
         "movsx edx, WORD PTR ds:[edx];"
-        //"dec edx;"
         "ret;"
         :
-        : "m" (func_auto_complete),
-          "m" (console_input_ptr),
-          "m" (results_ptr),
-          "m" (count_ptr)
+        : "m" (func_auto_complete), "m" (results_ptr), "m" (count_ptr)
     );
 }
 
 Patch(auto_complete_patch, sig_auto_complete_hook, 0, 7, CALL_PATCH, &auto_complete_hook);
 
 void init_command_auto_complete_hook(){
-    static uintptr_t sig_addr2 = sig_console_input.address();
     static uintptr_t sig_addr3 = sig_auto_complete_collected_list.address();
 
-    if (auto_complete_patch.build() && sig_addr2 && sig_addr3){
-        console_input_ptr = *reinterpret_cast<intptr_t*>(sig_addr2);
+    if (auto_complete_patch.build() && sig_addr3){
         results_ptr       = *reinterpret_cast<intptr_t*>(sig_addr3);
         count_ptr         = *reinterpret_cast<intptr_t*>(sig_addr3+14);
         auto_complete_patch.apply();
