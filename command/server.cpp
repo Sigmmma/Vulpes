@@ -8,13 +8,18 @@
 #include "handler.hpp"
 #include "../halo/functions/messaging.hpp"
 #include "../halo/functions/message_delta.hpp"
+#include "../halo/memory/gamestate/network.hpp"
 
 bool cmd_rprint_func(std::vector<VulpesArg> input){
-    int player_id = input[0].int_out();
-    if (player_id < 16){
-        rprintf(player_id, input[1].str_out().data());
+    if (game_is_server_executable()){
+        int player_id = input[0].int_out();
+        if (player_id < 16){
+            rprintf(player_id, input[1].str_out().data());
+        }else{
+            cprintf_error("Player id: %d is too high.", player_id);
+        };
     }else{
-        cprintf_error("Player id: %d is too high.", player_id);
+        cprintf_error("v_sv_print is a Vulpes dedicated-server-only command.");
     };
     return true;
 }
