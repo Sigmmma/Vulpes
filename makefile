@@ -54,12 +54,12 @@ build:
 	g++ -c halo/memory/gamestate/server/game_variant.cpp $(ARGSDEF) -o bin/memory__gamestate__game_variant.o
 	g++ -c halo/memory/gamestate/console.cpp $(ARGSDEF) -o bin/memory__gamestate__terminal.o
 	g++ -c halo/memory/gamestate/effect.cpp $(ARGSDEF) -o bin/memory__gamestate__effect.o
+	g++ -c halo/memory/gamestate/network.cpp $(ARGSDEF) -o bin/memory__gamestate__network.o
 	g++ -c halo/memory/gamestate/player.cpp $(ARGSDEF) -o bin/memory__gamestate__player.o
 	g++ -c halo/memory/gamestate/table.cpp $(ARGSDEF) -o bin/memory__gamestate__table.o
 
 	g++ -c halo/memory/types.cpp $(ARGSFASTER) -o bin/memory__types.o
 
-	g++ -c halo/network/network_globals.cpp $(ARGSDEF) -o bin/network__network_globals.o
 	g++ -c halo/network/foxnet/vulpes_message.cpp $(ARGSDEF) -o bin/network__foxnet__vulpes_message.o
 
 	g++ -c halo/tweaks/loading_screen.cpp $(ARGSDEF) -o bin/tweaks__loading_screen.o

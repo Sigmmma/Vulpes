@@ -13,4 +13,5 @@ enum class ConnectionType : uint32_t {
     HOST = 2
 };
 
-ConnectionType get_connection_type();
+ConnectionType* connection_type();
+bool* allow_client_side_projectiles();
