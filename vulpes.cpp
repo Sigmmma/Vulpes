@@ -93,15 +93,10 @@ void init_network(){
 
 #include "includes/fox.hpp"
 #include "includes/guicon.hpp"
+#include "halo/memory/gamestate/network.hpp"
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
-Signature(false, sig_server,
-    { 0x75, 0x2D, 0x68, -1, -1, -1, -1, 0xE8, -1, -1, -1, -1,
-      0x68, -1, -1, -1, -1, 0x68, -1, -1, -1, -1, 0xE8, -1, -1, -1, -1,
-      0x68, -1, -1, -1, -1, 0x68, -1, -1, -1, -1, 0x33, 0xC0,
-      0xE8, -1, -1, -1, -1, 0x83, 0xC4, 0x14, 0x8B, 0x44, 0x24, 0x04,
-      0x68, -1, -1, -1, -1, 0x68, -1, -1, -1, -1, 0x50 });
 struct ImageSectionHeader {
     uint32_t bullshit1[4];
     uint32_t size_of_segment;
@@ -115,8 +110,7 @@ void init_vulpes(){
     set_lowest_permitted_address(0x400000 + header->offset_to_segment);
     set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
     // Check if we're a server.
-    server = sig_server.address() != 0;
-    if(!server){
+    if(!game_is_server_executable()){
         RedirectIOToConsole();
     };
     printf(_FOX);
