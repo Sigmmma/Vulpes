@@ -95,7 +95,7 @@ public:
     bool execute(std::vector<VulpesArg> parsed_args);
 
 private:
-    char name_chars[32];
+    char name_chars[64];
     std::string name;
     std::vector<VulpesArgDef> args;
     bool (*cmd_func)(std::vector<VulpesArg>);
