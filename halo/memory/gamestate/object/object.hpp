@@ -176,8 +176,8 @@ public:
     Vec3d up;
     Vec3d angular_velocity;
     ScenarioLocation scenario_location;
-    Vec3d center; // Used for bounding sphere
-    float radius; // Bounding sphere radius
+    Vec3d bounding_center; // Used for bounding sphere
+    float bounding_radius; // Bounding sphere radius
     float scale;
     ObjectType type;
     PAD(3);
