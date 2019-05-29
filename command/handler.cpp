@@ -122,7 +122,7 @@ bool process_command(char* input){
         if (input_globals->history.inputs_saved < 8) input_globals->history.inputs_saved++;
         int16_t i = (input_globals->history.current_id + 1) % 8;
         input_globals->history.current_id = i;
-        strncpy(input_globals->history.entries[i], input, 255);
+        strncpy(input_globals->history.entries[i], input, 254);
 
         vector<VulpesArg> parsed_args;
         bool success = true;
