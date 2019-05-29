@@ -542,7 +542,7 @@ VulpesCommand::VulpesCommand(string cmd_name,
                              bool (*function_to_exec)(vector<VulpesArg>),
                              uint8_t min_dev_level, int num_args, ...){
     name = cmd_name;
-    strncpy(name_chars, name.data(), 32);
+    strncpy(name_chars, name.data(), 63);
     cmd_func = function_to_exec;
     developer_level = min_dev_level;
     va_list va_args;
