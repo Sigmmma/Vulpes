@@ -15,3 +15,4 @@ enum class ConnectionType : uint32_t {
 
 ConnectionType* connection_type();
 bool* allow_client_side_projectiles();
+bool game_is_server_executable();
