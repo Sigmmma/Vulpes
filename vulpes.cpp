@@ -7,6 +7,7 @@ static bool server = false;
 
 #include "hooker/hooker.hpp"
 #include "halo/hooks/incoming_packets.hpp"
+#include "halo/hooks/king.hpp"
 #include "halo/hooks/console.hpp"
 #include "halo/hooks/tick.hpp"
 #include "halo/hooks/map.hpp"
@@ -14,6 +15,7 @@ void init_hooks(){
     init_code_caves();
 
     init_incoming_packet_hooks();
+    init_king_hooks();
     init_console_hooks();
     init_tick_hook();
     init_map_hooks(server);
@@ -22,6 +24,7 @@ void revert_hooks(){
     revert_code_caves();
 
     revert_incoming_packet_hooks();
+    revert_king_hooks();
     revert_console_hooks();
     revert_tick_hook();
     revert_map_hooks();
