@@ -44,6 +44,7 @@ build:
 
 	g++ -c halo/hooks/console.cpp $(ARGSDEF) -o bin/hooks__console.o
 	g++ -c halo/hooks/incoming_packets.cpp $(ARGSDEF) -o bin/hooks__incoming_packets.o
+	g++ -c halo/hooks/king.cpp $(ARGSDEF) -o bin/hooks__king.o
 	g++ -c halo/hooks/map.cpp $(ARGSDEF) -o bin/hooks__map.o
 	g++ -c halo/hooks/tick.cpp $(ARGSDEF) -o bin/hooks__tick.o
 
@@ -52,6 +53,7 @@ build:
 	g++ -c halo/memory/gamestate/object/object_item.cpp $(ARGSDEF) -o bin/memory__gamestate__object_item.o
 	g++ -c halo/memory/gamestate/object/object_unit.cpp $(ARGSDEF) -o bin/memory__gamestate__object_unit.o
 	g++ -c halo/memory/gamestate/server/game_variant.cpp $(ARGSDEF) -o bin/memory__gamestate__game_variant.o
+	g++ -c halo/memory/gamestate/server/king.cpp $(ARGSDEF) -o bin/memory__gamestate__king.o
 	g++ -c halo/memory/gamestate/console.cpp $(ARGSDEF) -o bin/memory__gamestate__terminal.o
 	g++ -c halo/memory/gamestate/effect.cpp $(ARGSDEF) -o bin/memory__gamestate__effect.o
 	g++ -c halo/memory/gamestate/network.cpp $(ARGSDEF) -o bin/memory__gamestate__network.o
