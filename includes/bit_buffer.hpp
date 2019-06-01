@@ -22,12 +22,8 @@
 
 #pragma once
 
-//#include <cstdlib>
-//#include <unistd.h>
 #include <cmath>
-
 #include <vector>
-
 #include <cstdint>
 
 class bit_iterator;

@@ -258,6 +258,7 @@ struct HudChat {
     int8_t player_id;
     PAD(3);
     wchar_t* message;
+    HudChat(){}
     HudChat(HudChatType type, int8_t player, wchar_t* text)
         {msg_type=type; player_id=player; message=text;}
 };
