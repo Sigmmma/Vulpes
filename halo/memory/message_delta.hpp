@@ -254,10 +254,12 @@ struct PlayerHandlePowerup {
 
 struct HudChat {
     HudChatType msg_type;
-    int8_t _pad[3];
+    PAD(3);
     int8_t player_id;
-    int8_t _pad2[3];
+    PAD(3);
     wchar_t* message;
+    HudChat(HudChatType type, int8_t player, wchar_t* text)
+        {msg_type=type; player_id=player; message=text;}
 };
 
 struct SlayerScoreArray {

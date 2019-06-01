@@ -114,10 +114,7 @@ void chatf(HudChatType type, int src_player, int dest_player,
     vsnprintf(&buffer[0], 256, format, args);
     wchar_t output[256];
     std::mbstowcs(output, buffer, 256);
-    HudChat message;
-    message.message = &output[0];
-    message.msg_type = type;
-    message.player_id = src_player;
+    HudChat message(type, src_player, &output[0]);
     uint32_t size = mdp_encode_stateless_iterated(buffer, HUD_CHAT, &message);
     if (dest_player < 0){
         send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
