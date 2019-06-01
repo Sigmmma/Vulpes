@@ -1,3 +1,7 @@
+/*
+ * (c) 2019 gbMichelle
+ */
+
 #include <string.h>
 #include <stdint.h>
 
