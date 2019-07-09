@@ -130,7 +130,7 @@ void init_vulpes(){
     init_halo_functions();
     init_network();
     init_commands();
-    
+
     ADD_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
 }
 
