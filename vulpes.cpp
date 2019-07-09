@@ -94,6 +94,12 @@ void init_halo_functions(){
 void init_network(){
 }
 
+#include "halo/functions/messaging.hpp"
+void tell_user_that_we_loaded(){
+    cprintf_info("Vulpes has loaded.");
+    DEL_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
+}
+
 #include "includes/fox.hpp"
 #include "includes/guicon.hpp"
 #include "halo/memory/gamestate/network.hpp"
@@ -124,6 +130,8 @@ void init_vulpes(){
     init_halo_functions();
     init_network();
     init_commands();
+
+    ADD_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
 }
 
 void destruct_vulpes(){
