@@ -31,54 +31,29 @@ Signature(false, sig_sp_map_name,
 
 Signature(true, sig_event_map_reset_hook, {0x5B, 0x68, -1, -1, -1, -1, 0x33, 0xC0});
 
-char dummy_string[256] = "";
 char* mp_map_name = 0;
 char* sp_map_name = 0;
 
 bool before_sp(){
-    if (sp_map_name){
-        call_in_order(pre_map, sp_map_name);
-        call_in_order(pre_sp, sp_map_name);
-    }else{
-        call_in_order(pre_map, &dummy_string[0]);
-        call_in_order(pre_sp, &dummy_string[0]);
-        dummy_string[0] = 0;
-    };
+    call_in_order(pre_map);
+    call_in_order(pre_sp);
     return true;
 }
 
 void after_sp(){
-    if (sp_map_name){
-        call_in_order(post_map, sp_map_name);
-        call_in_order(post_sp, sp_map_name);
-    }else{
-        call_in_order(post_map, &dummy_string[0]);
-        call_in_order(post_sp, &dummy_string[0]);
-        dummy_string[0] = 0;
-    };
+    call_in_order(post_map);
+    call_in_order(post_sp);
 }
 
 bool before_mp(){
-    if (mp_map_name){
-        call_in_order(pre_map, mp_map_name);
-        call_in_order(pre_mp, mp_map_name);
-    }else{
-        call_in_order(pre_map, &dummy_string[0]);
-        call_in_order(pre_mp, &dummy_string[0]);
-        dummy_string[0] = 0;
-    };
+    call_in_order(pre_map);
+    call_in_order(pre_mp);
     return true;
 }
 
 void after_mp(){
-    if (mp_map_name){
-        call_in_order(post_map, mp_map_name);
-        call_in_order(post_mp, mp_map_name);
-    }else{
-        call_in_order(post_map, &dummy_string[0]);
-        call_in_order(post_mp, &dummy_string[0]);
-        dummy_string[0] = 0;
-    };
+    call_in_order(post_map);
+    call_in_order(post_mp);
 }
 
 Cave(map_load_ui_sp_hook, sig_map_load_ui_sp, 0, 5, &before_sp, &after_sp);
