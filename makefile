@@ -48,6 +48,8 @@ build:
 	g++ -c halo/hooks/map.cpp $(ARGSDEF) -o bin/hooks__map.o
 	g++ -c halo/hooks/tick.cpp $(ARGSDEF) -o bin/hooks__tick.o
 
+	g++ -c halo/lua/lua.cpp $(ARGSFASTER) -o bin/lua__lua.o
+
 	g++ -c halo/memory/gamestate/object/object.cpp $(ARGSDEF) -o bin/memory__gamestate__object.o
 	g++ -c halo/memory/gamestate/object/object_device.cpp $(ARGSDEF) -o bin/memory__gamestate__object_device.o
 	g++ -c halo/memory/gamestate/object/object_item.cpp $(ARGSDEF) -o bin/memory__gamestate__object_item.o
