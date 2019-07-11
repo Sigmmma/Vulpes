@@ -12,19 +12,21 @@
 #include <windows.h>
 #include <cstdio>
 
+#include "../paths.hpp"
+
 static bool initialized = false;
 
 void init_lua(){
     initialized = true;
     { // Create folders.
         char path_string[4096];
-        sprintf(path_string,"%s\\vulpes", profile_path());
+        sprintf(path_string, VULPES_PATH,     profile_path());
         CreateDirectory(path_string, NULL);
-        sprintf(path_string,"%s\\vulpes\\lua", profile_path());
+        sprintf(path_string, LUA_BASE_PATH,   profile_path());
         CreateDirectory(path_string, NULL);
-        sprintf(path_string,"%s\\vulpes\\lua\\map", profile_path());
+        sprintf(path_string, LUA_MAP_PATH,    profile_path());
         CreateDirectory(path_string, NULL);
-        sprintf(path_string,"%s\\vulpes\\lua\\global", profile_path());
+        sprintf(path_string, LUA_GLOBAL_PATH, profile_path());
         CreateDirectory(path_string, NULL);
     }
     // init_callbacks();
