@@ -192,27 +192,29 @@ public:
         MemRef  next_unit;                      // 1FC
         MemRef  prev_unit;                      // 200
     } swarm;
-    bool        _unknown_bit487         : 1; // checked by biped_speech_update
-    BITPAD(bool, 3); //unknown                  // 204
-    bool        powerup_on              : 1;
-    bool        powerup_additional      : 1;
-    bool        controllable            : 1;
-    bool        berserking              : 1;
-    BITPAD(bool, 8); //unknown
-    BITPAD(bool, 3); //unknown
-    bool        unknown_bit19           : 1; // integrated_light_related
-    bool        will_not_drop_items     : 1;
-    bool        unknown_bit21           : 1;
-    bool        can_blink               : 1;
-    bool        impervious              : 1; // prevents unit from being knocked around or playing ping animations
-    bool        suspended               : 1;
-    bool        blind                   : 1;
-    bool        unknown_bit26           : 1; // when this is on, the integrated NV power increases. rate is 2x the speed it leaks when on
-    // Wtf is an NV??
-    bool        possessed               : 1;
-    bool        desires_flashlight_on   : 1;
-    bool        desires_flashlight_off  : 1;
-    BITPAD(bool, 2);
+    struct {
+        bool        _unknown_bit487         : 1; // checked by biped_speech_update
+        BITPAD(bool, 3); //unknown                  // 204
+        bool        powerup_on              : 1;
+        bool        powerup_additional      : 1;
+        bool        controllable            : 1;
+        bool        berserking              : 1;
+        BITPAD(bool, 8); //unknown
+        BITPAD(bool, 3); //unknown
+        bool        unknown_bit19           : 1; // integrated_light_related
+        bool        will_not_drop_items     : 1;
+        bool        unknown_bit21           : 1;
+        bool        can_blink               : 1;
+        bool        impervious              : 1; // prevents unit from being knocked around or playing ping animations
+        bool        suspended               : 1;
+        bool        blind                   : 1;
+        bool        unknown_bit26           : 1; // when this is on, the integrated NV power increases. rate is 2x the speed it leaks when on
+        // Wtf is an NV??
+        bool        possessed               : 1;
+        bool        desires_flashlight_on   : 1;
+        bool        desires_flashlight_off  : 1;
+        BITPAD(bool, 2);
+    } unit_flags;
     UnitControlBits control_bits;               // 208
     PAD(2);
     PAD(2);                                     // 20C
@@ -248,12 +250,14 @@ public:
     PAD(2);                                     // 292
     MemRef     grenade_projectile;              // 294
     struct UnitAnimationData {
-        bool    animation_bit0_unknown : 1;     // 298
-        bool    animation_bit1_unknown : 1;
-        bool    animation_bit2_unknown : 1;
-        bool    animation_bit3_unknown : 1;
-        BITPAD(bool, 4);
-        PAD(1);
+        struct {
+            bool    animation_bit0_unknown : 1;     // 298
+            bool    animation_bit1_unknown : 1;
+            bool    animation_bit2_unknown : 1;
+            bool    animation_bit3_unknown : 1;
+            BITPAD(bool, 4);
+            PAD(1);
+        } flags;
         int16_t _unknown_some_animation_index_maybe; // 29A
         int16_t _unknown_some_animation_index;       // 29C
         PAD(2); // Only set on initialization, never read afterwards.//29C
@@ -375,14 +379,16 @@ enum class BipedMovementState : int8_t {
 
 class UnitBiped : public ObjectUnit {
 public:
-    bool        airborne : 1; // 4CC
-    bool        slipping : 1;
-    bool        absolute_movement : 1;
-    bool        no_collision : 1;
-    bool        passes_through_other_bipeds : 1;
-    bool        limping2 : 1;
-    BITPAD(bool, 2); //unknown
-    PAD(3); // unknown flags?
+    struct {
+        bool        airborne : 1; // 4CC
+        bool        slipping : 1;
+        bool        absolute_movement : 1;
+        bool        no_collision : 1;
+        bool        passes_through_other_bipeds : 1;
+        bool        limping2 : 1;
+        BITPAD(bool, 2); //unknown
+        PAD(3); // unknown flags?
+    } biped_flags;
     // I expect these to be stun related
     int8_t      landing_timer; // counts up whe biped lands, gets higher depending on height.
     int8_t      landing_force; // instantly changes when landing. Depends on how hard the fall was.
@@ -432,13 +438,15 @@ public:
 
 class UnitVehicle : public ObjectUnit {
 public:
-    bool    _vehicle_unknown0 : 1;          // 4CC
-    bool    hovering : 1;
-    bool    crouched : 1;
-    bool    jumping : 1;
-    bool    _vehicle_unknown1 : 1;
-    bool    _vehicle_unknown2 : 3;
-    PAD(1);
+    struct {
+        bool    _vehicle_unknown0 : 1;          // 4CC
+        bool    hovering : 1;
+        bool    crouched : 1;
+        bool    jumping : 1;
+        bool    _vehicle_unknown1 : 1;
+        bool    _vehicle_unknown2 : 3;
+        PAD(1);
+    } vehicle_flags;
     PAD(2); // unknown int16                // 4CD
     PAD(4); //unknown set of bytes          // 4D0
     float   speed;                          // 4D4
