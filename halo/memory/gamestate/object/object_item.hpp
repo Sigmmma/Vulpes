@@ -163,11 +163,13 @@ public:
 }; static_assert(sizeof(ObjectEquipment) == SIZE_EQUIPMENT);
 
 class ObjectProjectile : public ObjectItem {
-    bool tracer : 1;
-    bool _projectile_unknown_bit : 1;
-    bool attached : 1;
-    bool _projectile_unknown_bit2 : 5;
-    PAD(3); //possibly more bits
+    struct {
+        bool tracer : 1;
+        bool _projectile_unknown_bit : 1;
+        bool attached : 1;
+        BITPAD(bool, 5); //unknown
+        PAD(3); //possibly more bits
+    } projectile_flags;
     int16_t action_enum;
     int16_t material_id; // unconfirmed.
     MemRef source_unit;
