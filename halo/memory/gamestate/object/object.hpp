@@ -107,7 +107,7 @@ struct ObjectPlacementData {
 
 class Object {
 public:
-    MemRef tag;
+    MemRef tag_definition;
     // Multiplayer related stuff
     struct ObjectNetwork {
         ObjectNetworkRole role; // 4
@@ -116,39 +116,40 @@ public:
         PAD(2);
         int32_t existence_ticks; // C
     } base_network;
-    bool hidden : 1;// 10
-    bool on_ground : 1;
-    bool ignore_gravity : 1;
-    bool in_water : 1;
-    bool _unknown_bit4 : 1;
-    bool at_rest : 1;
-    bool _unknown_bit6 : 1;
-    bool no_collision2 : 1; // Confirm this
-    bool _unknown_bit8 : 1;
-    bool _unknown_bit9 : 1;
-    bool has_sound_looping_attachment : 1; // Confirm this
-    bool connected_to_map : 1;
-    bool not_placed_automatically : 1;
-    bool is_device_machine : 1;
-    bool is_elevator : 1;
-    bool is_elevator2 : 1;
-    bool not_garbage : 1; // Prevents it from being cleaned up in garbage collection.
-    bool _unknown_bit17 : 1;
-    bool does_not_cast_shadow : 1;
-    bool delete_at_deactivation : 1;
-    bool do_not_reactivate : 1;
-    bool out_of_bounds : 1;
-    bool beautify : 1;
-    bool limping : 1;
-    bool collidable : 1;
-    bool has_collision_model : 1;
-    bool _unknown_bit26 : 1; // message delta related. see object_type_should_force_baseline_update
-    bool _unknown_bit27 : 1; // message delta related. see *_process_update_delta
-    // These should be documented specifically so we can avoid using them.
-    bool opensauce_is_transforming_in : 1;
-    bool opensauce_is_transforming_out : 1;
-    bool _pad_bits : 2;
-
+    struct {
+        bool hidden : 1;// 10
+        bool on_ground : 1;
+        bool ignore_gravity : 1;
+        bool in_water : 1;
+        bool _unknown_bit4 : 1;
+        bool at_rest : 1;
+        bool _unknown_bit6 : 1;
+        bool no_collision2 : 1; // Confirm this
+        bool _unknown_bit8 : 1;
+        bool _unknown_bit9 : 1;
+        bool has_sound_looping_attachment : 1; // Confirm this
+        bool connected_to_map : 1;
+        bool not_placed_automatically : 1;
+        bool is_device_machine : 1;
+        bool is_elevator : 1;
+        bool is_elevator2 : 1;
+        bool not_garbage : 1; // Prevents it from being cleaned up in garbage collection.
+        bool _unknown_bit17 : 1;
+        bool does_not_cast_shadow : 1;
+        bool delete_at_deactivation : 1;
+        bool do_not_reactivate : 1;
+        bool out_of_bounds : 1;
+        bool beautify : 1;
+        bool limping : 1;
+        bool collidable : 1;
+        bool has_collision_model : 1;
+        bool _unknown_bit26 : 1; // message delta related. see object_type_should_force_baseline_update
+        bool _unknown_bit27 : 1; // message delta related. see *_process_update_delta
+        // These should be documented specifically so we can avoid using them.
+        bool opensauce_is_transforming_in : 1;
+        bool opensauce_is_transforming_out : 1;
+        bool _pad_bits : 2;
+    } flags;
     int32_t object_marker_id; // 14
 
     struct ObjectNetworkDelta {
@@ -212,19 +213,21 @@ public:
         int32_t shield_damage_update_tick;
         int32_t health_damage_update_tick;
         int16_t shield_stun_ticks;
-        bool health_damage_effect_applied : 1;
-        bool shield_damage_effect_applied : 1;
-        bool health_depleted : 1;
-        bool shield_depleted : 1;
-        bool shield_related : 1;
-        bool killed : 1;
-        bool killed_silent : 1;
-        bool _cannot_melee_attack : 1; //confirm if true
-        bool _unknown : 3;
-        bool cannot_take_damage : 1;
-        bool shield_recharging : 1;
-        bool killed_no_stats : 1;
-        bool _pad : 2;
+        struct {
+            bool health_damage_effect_applied : 1;
+            bool shield_damage_effect_applied : 1;
+            bool health_depleted : 1;
+            bool shield_depleted : 1;
+            bool shield_related : 1;
+            bool killed : 1;
+            bool killed_silent : 1;
+            bool cannot_melee_attack : 1; //confirm if true
+            bool _unknown : 3;
+            bool cannot_take_damage : 1;
+            bool shield_recharging : 1;
+            bool killed_no_stats : 1;
+            bool _pad : 2;
+        } flags;
     } vitals; static_assert(sizeof(ObjectVitalityData) == 0x30);
     PAD(4);
     MemRef cluster_partition;
@@ -251,18 +254,20 @@ public:
         MemRef first_widget;
     }attachment_data; static_assert(sizeof(ObjectAttachmentsData) == 0x2C);
     MemRef cached_render_state;
-    bool region_0_destroyed : 1;
-    bool region_1_destroyed : 1;
-    bool region_2_destroyed : 1;
-    bool region_3_destroyed : 1;
-    bool region_4_destroyed : 1;
-    bool region_5_destroyed : 1;
-    bool region_6_destroyed : 1;
-    bool region_7_destroyed : 1;
+    struct {
+        bool region_0 : 1;
+        bool region_1 : 1;
+        bool region_2 : 1;
+        bool region_3 : 1;
+        bool region_4 : 1;
+        bool region_5 : 1;
+        bool region_6 : 1;
+        bool region_7 : 1;
+    }region_destroyeds;
     PAD(1);
     int16_t shader_permutation;
-    uint8_t region_health[8];
-    int8_t region_permutation_id[8];
+    uint8_t region_healths[8];
+    int8_t region_permutation_ids[8];
     RGBFloat change_colors_lower[4];
     RGBFloat change_colors_upper[4];
     struct ObjectHeaderBlockReference {
@@ -289,14 +294,16 @@ class ObjectSoundScenery : public Object {
 class ObjectHeader {
 public:
     int16_t salt_id;
-    bool active:1;
-    bool visible:1;
-    bool newly_created:1;
-    bool flagged_for_deletion:1;
-    bool is_child:1;
-    bool is_connected_to_map:1;
-    bool automatic_deactivation_enabled:1;
-    bool _unknown7:1;
+    struct {
+        bool active:1;
+        bool visible:1;
+        bool newly_created:1;
+        bool flagged_for_deletion:1;
+        bool is_child:1;
+        bool is_connected_to_map:1;
+        bool automatic_deactivation_enabled:1;
+        bool _unknown7:1;
+    } flags;
     ObjectType type;
 
     PAD(2);
