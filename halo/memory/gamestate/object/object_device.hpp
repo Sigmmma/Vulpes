@@ -34,12 +34,14 @@ public:
 
 class ObjectDeviceMachine : public ObjectDevice {
 public:
-    bool does_not_operate_automatically : 1;
-    bool machine_one_sided : 1;
-    bool never_appears_locked : 1;
-    bool opened_by_melee_attack : 1;
-    bool _device_machine_pad_bits1 : 4;
-    PAD(3);
+    struct {
+        bool does_not_operate_automatically : 1;
+        bool machine_one_sided : 1;
+        bool never_appears_locked : 1;
+        bool opened_by_melee_attack : 1;
+        BITPAD(bool, 4);
+        PAD(3);
+    } device_flags;
     uint32_t ticks_since_started_opening;
     Vec3d elevator_position;
 }; static_assert(sizeof(ObjectDeviceMachine) == SIZE_MACHINE);
@@ -48,10 +50,12 @@ public:
 
 class ObjectDeviceControl : public ObjectDevice {
 public:
-    bool usable_from_both_sides : 1;
-    bool device_control_unused_bits1 : 4;
-    bool device_control_pad_bits1 : 3;
-    PAD(3);
+    struct {
+        bool usable_from_both_sides : 1;
+        bool device_control_unused_bits1 : 4;
+        BITPAD(bool, 3);
+        PAD(3);
+    } device_control_flags;
     int16_t custom_name_id;
     PAD(2);
 }; static_assert(sizeof(ObjectDeviceControl) == SIZE_CONTROL);
