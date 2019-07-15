@@ -11,14 +11,14 @@
 Signature(true, sig_console_input_hook,
     {0x3C, 0x23, 0x74, 0x0A, 0x3C, 0x2F, 0x75, 0x0F});
 
-const auto prcs_cmd = &process_command;
-uintptr_t return_to_halo_con_in;
+static uintptr_t return_to_halo_con_in;
+
 __attribute__((naked))
 void new_console_in_hook(){
     asm (
     "console_in:"
         "push edi;"
-        "call %0;"
+        "call _handler___process_command;"
         "pop edi;"
 
         "cmp al, 0;"
@@ -27,9 +27,9 @@ void new_console_in_hook(){
         "add esp, 0x500;"
         "ret;"
     "continue_to_halo_con_in:"
-        "jmp %1;"
+        "jmp %[return_to_halo_con_in];"
         :
-        : "m" (prcs_cmd), "m" (return_to_halo_con_in)
+        : [return_to_halo_con_in] "m" (return_to_halo_con_in)
     );
 }
 
@@ -52,7 +52,6 @@ Signature(false, sig_auto_complete_collected_list,
     {-1, -1, -1, -1, 0x0F, 0xBF, 0xC8, 0x66, 0x40, 0x89, 0x34, 0x8A, 0x66, 0xA3,
      -1, -1, -1, -1, 0x83, 0xC3, 0x04, 0x4D, 0x75, 0x98, 0x5F});
 
-static auto func_auto_complete = &auto_complete;
 static intptr_t results_ptr;
 static intptr_t count_ptr;
 
@@ -60,19 +59,19 @@ __attribute__((naked))
 void auto_complete_hook(){
     asm (
         // Get the address of the list of matching char*s
-        "mov edx, %1;"
+        "mov edx, %[results_ptr];"
         "mov edx, [edx];"
         // Shove all of this data into our autocomplete function
-        "push %2;"
+        "push %[count_ptr];"
         "push edx;"
-        "call %0;"
+        "call _handler__auto_complete;"
         "add esp, 8;"
         // move the output count to where the code expects it to be
-        "mov edx, %2;"
+        "mov edx, %[count_ptr];"
         "movsx edx, WORD PTR ds:[edx];"
         "ret;"
         :
-        : "m" (func_auto_complete), "m" (results_ptr), "m" (count_ptr)
+        : [results_ptr] "m" (results_ptr), [count_ptr] "m" (count_ptr)
     );
 }
 
