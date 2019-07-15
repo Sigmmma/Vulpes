@@ -12,9 +12,9 @@
 
 // These functions are and should only be called by the game.
 __attribute__((cdecl))
-void auto_complete(char* buffer[], uint16_t* current_index);
+void auto_complete(char* buffer[], uint16_t* current_index) asm("_handler__auto_complete");
 __attribute__((cdecl))
-bool process_command(char* input);
+bool process_command(char* input) asm("_handler___process_command");
 
 // Interface for registering commands.
 
