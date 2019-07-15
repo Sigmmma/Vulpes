@@ -11,6 +11,8 @@
 DEFINE_EVENT_HOOK_LIST(EVENT_RECEIVE_CHAT_MESSAGE, hud_chat_events);
 
 // HUD_CHAT = 0xF
+bool process_hud_chat_message(HudChat* packet) asm ("_process_hud_chat_message");
+
 bool process_hud_chat_message(HudChat* packet){
     if (packet->msg_type == HudChatType::VULPES){
         handle_hud_chat_vulpes_message(packet->message);
@@ -27,7 +29,6 @@ bool process_hud_chat_message(HudChat* packet){
 }
 
 static uintptr_t jmp_hud_chat_original_code;
-static auto func_process_hud_chat_message = &process_hud_chat_message;
 
 __attribute__((naked))
 void hook_hud_chat_intercept(){
@@ -43,7 +44,7 @@ void hook_hud_chat_intercept(){
         // Call process_packet()
         "lea ebx, [esp+0x10+0xC];"
         "push ebx;"
-        "call %[process_hud_chat_message];"
+        "call _process_hud_chat_message;"
         "add esp, 4;"
         // If it returns false, cancel the original function by returning.
         // If it returns true, go back to the original function.
@@ -66,8 +67,7 @@ void hook_hud_chat_intercept(){
     "revert_to_original_code:"
         "jmp %[hud_chat_original_code];"
         :
-        : [process_hud_chat_message] "m" (func_process_hud_chat_message),
-          [hud_chat_original_code] "m" (jmp_hud_chat_original_code)
+        : [hud_chat_original_code] "m" (jmp_hud_chat_original_code)
     );
 }
 

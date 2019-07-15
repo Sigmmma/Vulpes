@@ -45,10 +45,7 @@ void vcprintf(const ARGBFloat& color, const char* format, va_list args){
         ConsoleOutput* output = console_new_line();
         if (output){
             vsnprintf(&output->text[0], 255, format, args);
-            output->color.alpha = color.alpha;
-            output->color.red   = color.red;
-            output->color.green = color.green;
-            output->color.blue  = color.blue;
+            output->color = color;
             output->tab_stops   = strstr(output->text, "|t") != NULL;
             console_to_terminal_and_network(&output->text);
         };
