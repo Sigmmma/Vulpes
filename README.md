@@ -45,8 +45,8 @@ Vulpes will sync AI, and in the long term it will strengten the netcode to aid w
 ### Multiplayer Server Commands
 For multiplayer a lot of commands are added to both mirror SAPP's featureset and give server admins strong abilities without needing to resort to lua scripts.
     WIP
- - v_sv_hill_move: Allows you to move the hill on demand.
- - v_sv_hill_timer: Allows you to set the time it will take for the hill to move.
+ - **v_sv_hill_move:** Allows you to move the hill on demand.
+ - **v_sv_hill_timer:** Allows you to set the time it will take for the hill to move.
 ### User Commands:
     WIP
 ### Quality of life
