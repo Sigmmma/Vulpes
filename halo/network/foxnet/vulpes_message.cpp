@@ -10,7 +10,7 @@
 #include <cstring>
 
 void send_vulpes_message(VulpesMessage* msg){
-    wchar_t output[512];
+    wchar_t output[1024/2];
     output[0] = msg->payload_size;
     size_t wchar_array_size = msg->payload_size/2 + msg->payload_size%2;
     wstr_raw_data_encode(&output[1], &msg->payload16[0], wchar_array_size);

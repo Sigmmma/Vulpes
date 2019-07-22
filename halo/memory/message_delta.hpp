@@ -597,8 +597,8 @@ struct VulpesMessage {
     uint16_t payload_size;
     union {
         uint8_t  payload8[1000];
-        uint16_t payload16[500];
-        uint32_t payload32[250];
+        uint16_t payload16[1000/2];
+        uint32_t payload32[1000/4];
     };
 }; static_assert(sizeof(VulpesMessage) == 1002);
 
