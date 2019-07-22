@@ -247,7 +247,7 @@ struct ClientGameUpdate {
 
 struct PlayerHandlePowerup {
     int8_t player_id;
-    int8_t _pad[3];
+    PAD(3);
     int16_t powerup_time;
     int16_t duration_in_ticks;
 };
