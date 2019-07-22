@@ -15,6 +15,7 @@ Signature(true, sig_hill_timer_reset,
     {0xC7, 0x05, -1, -1, -1, 0x00, 0x08, 0x07, 0x00, 0x00,
      0xE8, -1, -1, 0xFF, 0xFF});
 
+void king_timer_reset() asm ("_king_timer_reset");
 void king_timer_reset(){
     king_globals()->current_hill_time_left = king_globals_upgrade()->hill_length;
 }
@@ -25,11 +26,9 @@ __attribute__((naked))
 void king_timer_reset_hook(){
     asm(
         "pushad;"
-        "call %0;"
+        "call _king_timer_reset;"
         "popad;"
         "ret"
-        :
-        : "m" (king_timer_reset_func)
     );
 }
 /*
