@@ -1,0 +1,31 @@
+#!/bin/sh
+
+if [ -z "$1" ] # Check if there actually was an arg
+then
+    echo "Add the command line option --rebuild if you need to rebuild the cmake crap."
+else
+    REBUILD="--rebuild"
+    CLEAR="--clean"
+    if [ $1 = $REBUILD ]
+    then
+        rm -R CMakeFiles
+        rm cmake_install.cmake
+        rm CMakeCache.txt
+        rm Makefile
+    else
+        if [ $1 = $CLEAR ]
+        then
+            rm -R CMakeFiles
+            rm cmake_install.cmake
+            rm CMakeCache.txt
+            rm Makefile
+            rm *.dll
+            exit 0
+        fi
+        echo "I don't understand what that argument is."
+        exit 0
+    fi
+fi
+
+cmake -DCMAKE_TOOLCHAIN_FILE=./Toolchain-cross-mingw32-linux.cmake
+make all
