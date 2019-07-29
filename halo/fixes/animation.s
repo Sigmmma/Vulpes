@@ -15,8 +15,8 @@ _player_biped_mid_air_turn_fix_code:
         test byte ptr [edi+0x4CC], 1 # obj: is_airborne
         je back_to_original_code
     no_turn_anim:
-        jmp [_jmp_no_turn_anim]
+        jmp [_animation__jmp_no_turn_anim]
     back_to_original_code:
-        jmp [_jmp_original_code]
+        jmp [_animation__jmp_original_code]
 
 .att_syntax
