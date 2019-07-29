@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstdint>
 
-static bool server = false;
+#include "halo/memory/gamestate/network.hpp"
 
 #include "hooker/hooker.hpp"
 #include "halo/hooks/incoming_packets.hpp"
@@ -18,7 +18,7 @@ void init_hooks(){
     init_king_hooks();
     init_console_hooks();
     init_tick_hook();
-    init_map_hooks(server);
+    init_map_hooks(game_is_server_executable());
 }
 void revert_hooks(){
     revert_code_caves();
@@ -52,7 +52,7 @@ void init_halo_bug_fixes(){
     init_host_refusal_fixes();
     init_string_overflow_fixes();
     ADD_CALLBACK(EVENT_MAP_LOAD_MP, revert_animation_bug_fixes_e);
-    if (!server){
+    if (!game_is_server_executable()){
         init_framerate_dependent_timer_fixes();
         ADD_CALLBACK(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
         init_loading_screen_fixes();
@@ -74,7 +74,7 @@ void revert_halo_bug_fixes(){
 
 #include "halo/upgrades/map.hpp"
 void init_upgrades(){
-    init_map_crc_upgrades(server);
+    init_map_crc_upgrades(game_is_server_executable());
 }
 
 void revert_upgrades(){
@@ -102,7 +102,6 @@ void tell_user_that_we_loaded(){
 
 #include "includes/fox.hpp"
 #include "includes/guicon.hpp"
-#include "halo/memory/gamestate/network.hpp"
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
@@ -139,7 +138,7 @@ void destruct_vulpes(){
     revert_halo_bug_fixes();
     revert_upgrades();
     revert_halo_bug_fixes();
-    if (!server){
+    if (!game_is_server_executable()){
         FreeConsole();
     };
 }
