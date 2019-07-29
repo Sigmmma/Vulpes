@@ -12,6 +12,7 @@ else
         rm cmake_install.cmake
         rm CMakeCache.txt
         rm Makefile
+        rm *.dll*
     else
         if [ $1 = $CLEAR ]
         then
@@ -19,7 +20,7 @@ else
             rm cmake_install.cmake
             rm CMakeCache.txt
             rm Makefile
-            rm *.dll
+            rm *.dll*
             exit 0
         fi
         echo "I don't understand what that argument is."
