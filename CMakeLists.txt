@@ -54,8 +54,11 @@ add_library(Vulpes SHARED
     halo/functions/table.cpp
 
     halo/hooks/console.cpp
+    halo/hooks/console.s
     halo/hooks/incoming_packets.cpp
+    halo/hooks/incoming_packets.s
     halo/hooks/king.cpp
+    halo/hooks/king.s
     halo/hooks/map.cpp
     halo/hooks/tick.cpp
 

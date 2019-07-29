@@ -15,22 +15,14 @@ Signature(true, sig_hill_timer_reset,
     {0xC7, 0x05, -1, -1, -1, 0x00, 0x08, 0x07, 0x00, 0x00,
      0xE8, -1, -1, 0xFF, 0xFF});
 
-void king_timer_reset() asm ("_king_timer_reset");
-void king_timer_reset(){
+extern "C" void king_timer_reset(){
     king_globals()->current_hill_time_left = king_globals_upgrade()->hill_length;
 }
 
-static auto king_timer_reset_func = &king_timer_reset;
-
-__attribute__((naked))
-void king_timer_reset_hook(){
-    asm(
-        "pushad;"
-        "call _king_timer_reset;"
-        "popad;"
-        "ret"
-    );
+extern "C" {
+    extern king_timer_reset_hook();
 }
+
 /*
 Patch(king_timer_start_hook, sig_king_timer_start, 0, 10,
     CALL_PATCH, &king_timer_reset_hook);*/
