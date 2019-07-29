@@ -11,33 +11,16 @@
 Signature(true, sig_console_input_hook,
     {0x3C, 0x23, 0x74, 0x0A, 0x3C, 0x2F, 0x75, 0x0F});
 
-static uintptr_t return_to_halo_con_in;
-
-__attribute__((naked))
-void new_console_in_hook(){
-    asm (
-    "console_in:"
-        "push edi;"
-        "call _handler___process_command;"
-        "pop edi;"
-
-        "cmp al, 0;"
-        "jne continue_to_halo_con_in;"
-        "xor al, al;"
-        "add esp, 0x500;"
-        "ret;"
-    "continue_to_halo_con_in:"
-        "jmp %[return_to_halo_con_in];"
-        :
-        : [return_to_halo_con_in] "m" (return_to_halo_con_in)
-    );
+extern "C" {
+    uintptr_t console_hook__return_to_halo_con_in;
+    extern console_hook__console_in();
 }
 
-Patch(console_in_hook_patch, sig_console_input_hook, 0, 6, JMP_PATCH, &new_console_in_hook);
+Patch(console_in_hook_patch, sig_console_input_hook, 0, 6, JMP_PATCH, &console_hook__console_in);
 
 void init_console_input_hook(){
     if(console_in_hook_patch.build()){
-        return_to_halo_con_in = console_in_hook_patch.address() + 23;
+        console_hook__return_to_halo_con_in = console_in_hook_patch.address() + 23;
         console_in_hook_patch.apply();
     };
 }
@@ -52,37 +35,20 @@ Signature(false, sig_auto_complete_collected_list,
     {-1, -1, -1, -1, 0x0F, 0xBF, 0xC8, 0x66, 0x40, 0x89, 0x34, 0x8A, 0x66, 0xA3,
      -1, -1, -1, -1, 0x83, 0xC3, 0x04, 0x4D, 0x75, 0x98, 0x5F});
 
-static intptr_t results_ptr;
-static intptr_t count_ptr;
-
-__attribute__((naked))
-void auto_complete_hook(){
-    asm (
-        // Get the address of the list of matching char*s
-        "mov edx, %[results_ptr];"
-        "mov edx, [edx];"
-        // Shove all of this data into our autocomplete function
-        "push %[count_ptr];"
-        "push edx;"
-        "call _handler__auto_complete;"
-        "add esp, 8;"
-        // move the output count to where the code expects it to be
-        "mov edx, %[count_ptr];"
-        "movsx edx, WORD PTR ds:[edx];"
-        "ret;"
-        :
-        : [results_ptr] "m" (results_ptr), [count_ptr] "m" (count_ptr)
-    );
+extern "C" {
+    intptr_t console_hook__results_ptr;
+    intptr_t console_hook__count_ptr;
+    extern console_hook__auto_complete();
 }
 
-Patch(auto_complete_patch, sig_auto_complete_hook, 0, 7, CALL_PATCH, &auto_complete_hook);
+Patch(auto_complete_patch, sig_auto_complete_hook, 0, 7, CALL_PATCH, &console_hook__auto_complete);
 
 void init_command_auto_complete_hook(){
     static uintptr_t sig_addr3 = sig_auto_complete_collected_list.address();
 
     if (auto_complete_patch.build() && sig_addr3){
-        results_ptr       = *reinterpret_cast<intptr_t*>(sig_addr3);
-        count_ptr         = *reinterpret_cast<intptr_t*>(sig_addr3+14);
+        console_hook__results_ptr = *reinterpret_cast<intptr_t*>(sig_addr3);
+        console_hook__count_ptr   = *reinterpret_cast<intptr_t*>(sig_addr3+14);
         auto_complete_patch.apply();
     }else{
         cprintf_error("Error: Couldn't perform auto complete patch. "

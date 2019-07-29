@@ -25,9 +25,8 @@
 // the jump. That area will execute the after part of the wrapper and return
 // to the place that originally called the function we are hooking into.
 
-__attribute__((naked))
 void null_func(){
-    asm ("ret");
+    return;
 }
 
 const uint8_t code_cave_template[] = {

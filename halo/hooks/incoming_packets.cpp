@@ -11,9 +11,7 @@
 DEFINE_EVENT_HOOK_LIST(EVENT_RECEIVE_CHAT_MESSAGE, hud_chat_events);
 
 // HUD_CHAT = 0xF
-bool process_hud_chat_message(HudChat* packet) asm ("_process_hud_chat_message");
-
-bool process_hud_chat_message(HudChat* packet){
+extern "C" bool process_hud_chat_message(HudChat* packet){
     if (packet->msg_type == HudChatType::VULPES){
         handle_hud_chat_vulpes_message(packet->message);
         return false;
@@ -28,56 +26,18 @@ bool process_hud_chat_message(HudChat* packet){
     return allow;
 }
 
-static uintptr_t jmp_hud_chat_original_code;
-
-__attribute__((naked))
-void hook_hud_chat_intercept(){
-    asm (
-        // Copy original code behavior we are overwriting.
-        "cmp al, 0;"
-        "je abort;"
-        // Our own code starts here.
-        "push eax;"
-        "push ebx;"
-        "push ecx;"
-        "push edx;"
-        // Call process_packet()
-        "lea ebx, [esp+0x10+0xC];"
-        "push ebx;"
-        "call _process_hud_chat_message;"
-        "add esp, 4;"
-        // If it returns false, cancel the original function by returning.
-        // If it returns true, go back to the original function.
-        "cmp al, 0;"
-        "pop edx;"
-        "pop ecx;"
-        "pop ebx;"
-        "pop eax;"
-        "jne revert_to_original_code;"
-        // Copy of the original way the function aborts.
-        // This is so we can abort the game's processing of this packet.
-    "abort:"
-        "pop edi;"
-        "pop esi;"
-        "pop ebx;"
-        "mov esp, ebp;"
-        "pop ebp;"
-        "ret;"
-        // Restore the original registers.
-    "revert_to_original_code:"
-        "jmp %[hud_chat_original_code];"
-        :
-        : [hud_chat_original_code] "m" (jmp_hud_chat_original_code)
-    );
+extern "C" {
+    uintptr_t incoming_packets__jmp_hud_chat_original_code;
+    extern incoming_packets__hook_hud_chat_intercept();
 }
 
 Signature(true, hud_chat_hook_signature,
     {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
-Patch(hud_chat_hook, hud_chat_hook_signature, 0, 8, JMP_PATCH, &hook_hud_chat_intercept);
+Patch(hud_chat_hook, hud_chat_hook_signature, 0, 8, JMP_PATCH, &incoming_packets__hook_hud_chat_intercept);
 
 void init_hud_chat_hook(){
     hud_chat_hook.build();
-    jmp_hud_chat_original_code = hud_chat_hook.return_address();
+    incoming_packets__jmp_hud_chat_original_code = hud_chat_hook.return_address();
     hud_chat_hook.apply();
 }
 
