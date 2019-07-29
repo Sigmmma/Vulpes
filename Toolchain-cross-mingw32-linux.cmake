@@ -6,6 +6,7 @@ set(COMPILER_PREFIX "i686-w64-mingw32")
 # which compilers to use for C and C++
 find_program(CMAKE_RC_COMPILER NAMES ${COMPILER_PREFIX}-windres)
 find_program(CMAKE_C_COMPILER NAMES ${COMPILER_PREFIX}-gcc)
+find_program(CMAKE_ASM_COMPILER NAMES ${COMPILER_PREFIX}-gcc)
 find_program(CMAKE_CXX_COMPILER NAMES ${COMPILER_PREFIX}-g++)
 
 # here is the target environment located

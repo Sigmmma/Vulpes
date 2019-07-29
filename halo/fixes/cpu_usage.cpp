@@ -6,21 +6,9 @@
 
 #include "cpu_usage.hpp"
 #include "../../hooker/hooker.hpp"
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
 
-const auto sleep = &Sleep;
-
-__attribute__((naked))
-void replacement_function(){
-    asm (
-        "push 1;"
-        "call %0;"
-        "mov al, BYTE PTR ss:[esp+0x1b];"
-        "ret 4;"
-        :
-        : "m" (sleep)
-    );
+extern "C" {
+    extern cpu_usage_sleep_replacement();
 }
 
 // Used for fix 1 and 2
@@ -30,11 +18,11 @@ Signature(false, sig_cpu_usage_fix_pattern1,
 Signature(false, sig_cpu_usage_fix_pattern2,
     {0xFF, 0x15, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x13, 0x84, 0xC0, 0x74});
 
-Patch(cpu_usage_fix_patch1, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &replacement_function);
-Patch(cpu_usage_fix_patch2, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &replacement_function);
-Patch(cpu_usage_fix_patch3, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
-Patch(cpu_usage_fix_patch4, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
-Patch(cpu_usage_fix_patch5, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &replacement_function);
+Patch(cpu_usage_fix_patch1, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch2, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch3, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch4, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch5, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
 
 void init_cpu_usage_fixes(){
     if (cpu_usage_fix_patch1.build()) cpu_usage_fix_patch1.apply();
