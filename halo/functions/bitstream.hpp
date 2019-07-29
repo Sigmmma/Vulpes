@@ -7,6 +7,8 @@
 #pragma once
 #include <cstdint>
 
+// This is all depricated for now.
+
 __attribute__((naked)) // ecx, eax, esp+4
 void bitstream_write(void* const iteration_header,
                  uint32_t* const write_this,
