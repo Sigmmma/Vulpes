@@ -82,6 +82,7 @@ add_library(Vulpes SHARED
     halo/tweaks/tweaks.cpp
 
     halo/upgrades/map.cpp
+    halo/upgrades/map.s
 )
 
 add_library(VulpesLoader SHARED
