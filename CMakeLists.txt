@@ -38,7 +38,9 @@ add_library(Vulpes SHARED
     includes/crc32.c
 
     halo/fixes/animation.cpp
+    halo/fixes/animation.s
     halo/fixes/cpu_usage.cpp
+    halo/fixes/cpu_usage.s
     halo/fixes/file_handle_leak.cpp
     halo/fixes/framerate_dependent_timers.cpp
     halo/fixes/host_refusal.cpp
