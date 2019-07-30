@@ -33,7 +33,6 @@ add_library(Vulpes SHARED
     hooker/code_cave.cpp
     hooker/hooker.cpp
 
-    includes/guicon.cpp
     includes/string_raw_data_encoder.c
     includes/crc32.c
 

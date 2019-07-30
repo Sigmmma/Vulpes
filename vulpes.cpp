@@ -101,7 +101,6 @@ void tell_user_that_we_loaded(){
 }
 
 #include "includes/fox.hpp"
-#include "includes/guicon.hpp"
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
@@ -117,10 +116,7 @@ void init_vulpes(){
     ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.address());
     set_lowest_permitted_address(0x400000 + header->offset_to_segment);
     set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
-    // Check if we're a server.
-    if(!game_is_server_executable()){
-        RedirectIOToConsole();
-    };
+
     printf(_FOX);
 
     init_hooks();
@@ -138,7 +134,4 @@ void destruct_vulpes(){
     revert_halo_bug_fixes();
     revert_upgrades();
     revert_halo_bug_fixes();
-    if (!game_is_server_executable()){
-        FreeConsole();
-    };
 }
