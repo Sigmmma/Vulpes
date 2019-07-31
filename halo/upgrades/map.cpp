@@ -13,7 +13,9 @@
 #include <cstdio>
 #include <fstream>
 
-static bool is_server = false;
+extern "C" {
+    bool is_server = false;
+}
 
 // NOP this call if other sigs are found
 Signature(false, sig_game_startup_crc_call,
@@ -153,7 +155,7 @@ FILE* open_map_file(const char* name){
 
 // The upgrades here are that we don't check the size of the map file.
 // And we allow for multiple folders and extensions.
-__attribute__((regparm(2)))
+extern "C" __attribute__((regparm(2)))
 bool read_map_file_header_from_file(const char* map_name,
                           HaloMapHeader* header){
     bool approved = false;
@@ -182,25 +184,6 @@ bool read_map_file_header_from_file(const char* map_name,
     return approved;
 }
 
-static auto func_read_map_file_header_from_file = &read_map_file_header_from_file;
-
-__attribute__((naked))
-bool read_map_file_header_wrapper(){
-    asm(
-        "cmp %1, 0;"
-        "push edx;"
-        "mov edx, esi;"
-        "je not_a_server;"
-        "mov eax, ecx;"
-    "not_a_server:"
-        "call %0;"
-        "pop edx;"
-        "ret;"
-        :
-        : "m" (func_read_map_file_header_from_file), "m" (is_server)
-    );
-}
-
 struct MapListEntry {
     const char* name;
     int32_t index;
@@ -209,7 +192,7 @@ struct MapListEntry {
     uint32_t crc;
 };
 
-__attribute__((regparm(1)))
+extern "C" __attribute__((regparm(1)))
 bool get_map_crc(MapListEntry* entry){
     if (entry->crc == 0xFFFFFFFF){
         FILE* map_file = open_map_file(entry->name);
@@ -224,49 +207,13 @@ bool get_map_crc(MapListEntry* entry){
     return true;
 }
 
-static auto func_get_map_crc = &get_map_crc;
-static uintptr_t* multiplayer_maps_list_ptr;
-static uintptr_t jmp_skip_chimera;
+extern "C" {
+    uintptr_t* multiplayer_maps_list_ptr;
+    uintptr_t jmp_skip_chimera;
 
-__attribute__((naked))
-void get_map_crc_wrapper_server(){
-    asm(
-        "shl ecx, 4;"
-        "pushad;"
-        "add eax, ecx;"
-        "call %0;"
-        "popad;"
-        "mov eax, [eax+ecx+0xC];"
-        "ret;"
-        :
-        :"m" (func_get_map_crc)
-    );
-}
-
-__attribute__((naked))
-void get_map_crc_wrapper(){
-    asm(
-        "mov edx, %1;"
-        "mov edx, [edx];"
-        "shl eax, 4;"
-        "pushad;"
-        "add eax, edx;"
-        "call %0;"
-        "test al,al;"
-        "jz leave_it_to_chimera;"
-        "popad;"
-        "mov ecx, [eax+edx+0xC];"
-        "add esp, 4;"
-        "jmp %2;"
-    "leave_it_to_chimera:"
-        "popad;"
-        "mov ecx, edx;"
-        "ret"
-        :
-        :"m" (func_get_map_crc),
-         "m" (multiplayer_maps_list_ptr),
-         "m" (jmp_skip_chimera)
-    );
+    extern read_map_file_header_wrapper();
+    extern get_map_crc_wrapper_server();
+    extern get_map_crc_wrapper();
 }
 
 static bool map_upgrades_initialized = false;
