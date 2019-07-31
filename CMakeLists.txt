@@ -72,6 +72,7 @@ add_library(Vulpes SHARED
     halo/memory/gamestate/network.cpp
     halo/memory/gamestate/player.cpp
     halo/memory/gamestate/table.cpp
+    halo/memory/global.cpp
 
     halo/memory/types.cpp
 
@@ -82,6 +83,8 @@ add_library(Vulpes SHARED
 
     halo/upgrades/map.cpp
     halo/upgrades/map.s
+
+    halo/lua/lua.cpp
 )
 
 add_library(VulpesLoader SHARED
