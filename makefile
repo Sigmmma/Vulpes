@@ -24,6 +24,7 @@ build:
 	g++ -c hooker/code_cave.cpp $(ARGSFAST) -o bin/hooks__hooker_code_cave.o
 	g++ -c hooker/hooker.cpp $(ARGSFAST) -o bin/hooks__hooker.o
 
+	g++ -c includes/bit_buffer.cpp $(ARGSFAST) -o bin/includes__bit_buffer.o
 	g++ -c includes/guicon.cpp $(ARCH) -O3 -o bin/includes__guicon.o
 	gcc -c includes/string_raw_data_encoder.c $(ARGSFASTC) -o bin/includes__string_raw_data_encoder.o
 	gcc -c includes/crc32.c $(ARGSFASTC) -O3 -o bin/includes__crc32.o

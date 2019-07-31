@@ -247,17 +247,20 @@ struct ClientGameUpdate {
 
 struct PlayerHandlePowerup {
     int8_t player_id;
-    int8_t _pad[3];
+    PAD(3);
     int16_t powerup_time;
     int16_t duration_in_ticks;
 };
 
 struct HudChat {
     HudChatType msg_type;
-    int8_t _pad[3];
+    PAD(3);
     int8_t player_id;
-    int8_t _pad2[3];
+    PAD(3);
     wchar_t* message;
+    HudChat(){}
+    HudChat(HudChatType type, int8_t player, wchar_t* text)
+        {msg_type=type; player_id=player; message=text;}
 };
 
 struct SlayerScoreArray {
@@ -594,8 +597,8 @@ struct VulpesMessage {
     uint16_t payload_size;
     union {
         uint8_t  payload8[1000];
-        uint16_t payload16[500];
-        uint32_t payload32[250];
+        uint16_t payload16[1000/2];
+        uint32_t payload32[1000/4];
     };
 }; static_assert(sizeof(VulpesMessage) == 1002);
 
