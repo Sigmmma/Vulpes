@@ -51,10 +51,10 @@ void init_halo_bug_fixes(){
     init_file_handle_leak_fixes();
     init_host_refusal_fixes();
     init_string_overflow_fixes();
-    ADD_CALLBACK(EVENT_MAP_LOAD_MP, revert_animation_bug_fixes_e);
+    ADD_CALLBACK(EVENT_MAP_LOAD_MP, revert_animation_bug_fixes);
     if (!server){
         init_framerate_dependent_timer_fixes();
-        ADD_CALLBACK(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes_e);
+        ADD_CALLBACK(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes);
         init_loading_screen_fixes();
         ADD_CALLBACK(EVENT_TICK, init_tweaks);
     };
@@ -103,6 +103,7 @@ void tell_user_that_we_loaded(){
 #include "includes/fox.hpp"
 #include "includes/guicon.hpp"
 #include "halo/memory/gamestate/network.hpp"
+#include "halo/lua/lua.hpp"
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
@@ -131,6 +132,8 @@ void init_vulpes(){
     init_network();
     init_commands();
 
+    init_lua();
+
     ADD_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
 }
 
@@ -139,6 +142,9 @@ void destruct_vulpes(){
     revert_halo_bug_fixes();
     revert_upgrades();
     revert_halo_bug_fixes();
+
+    destruct_lua();
+
     if (!server){
         FreeConsole();
     };

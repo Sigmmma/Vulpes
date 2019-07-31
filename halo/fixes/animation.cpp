@@ -50,6 +50,3 @@ void init_animation_bug_fixes(){
 void revert_animation_bug_fixes(){
     player_buped_mid_air_turn_fix.revert();
 }
-
-void init_animation_bug_fixes_e(char* dummy){init_animation_bug_fixes();}
-void revert_animation_bug_fixes_e(char* dummy){revert_animation_bug_fixes();}
