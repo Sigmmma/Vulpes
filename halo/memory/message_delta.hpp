@@ -9,6 +9,7 @@
 #include "gamestate/player.hpp"
 
 enum MessageDeltaType : int8_t {
+    NONE                               = -1,
     OBJECT_DELETION                    = 0,
     PROJECTILE_UPDATE                  = 1,
     EQUIPMENT_UPDATE                   = 2,
