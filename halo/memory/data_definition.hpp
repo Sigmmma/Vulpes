@@ -10,7 +10,7 @@
 // These are used to determine how to handle certain events for
 // objects and other gamestate things.
 
-struct DataDefinition {
+struct ObjectDataDefinition {
     char* type_name;
     TagTypes type_id;
     int32_t unknown;
