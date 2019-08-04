@@ -24,9 +24,9 @@ struct ObjectDataDefinition {
     void (*dispose_from_old_map)();
     // Actual per object update functions.
     void (*adjust_placement)(MemRef,uint32_t);
-    void (*new)(MemRef);
+    void (*create)(MemRef);
     void (*place)(MemRef,uint32_t);
-    void (*delete)(MemRef);
+    void (*destroy)(MemRef);
     void (*update)(MemRef); // Return true
     void (*export_function_values)(MemRef);
     void (*handle_deleted_object)(MemRef,uint32_t);
