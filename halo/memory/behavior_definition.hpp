@@ -18,7 +18,7 @@ typedef void (*ObjAdjustPlacement)(uint32_t,uint32_t);
 typedef void (*ObjCreate)(uint32_t);
 typedef void (*ObjPlace)(uint32_t,uint32_t);
 typedef void (*ObjDestroy)(uint32_t);
-typedef void (*ObjUpdate)(uint32_t);
+typedef bool (*ObjUpdate)(uint32_t);
 typedef void (*ObjExportFunctionValues)(uint32_t);
 typedef void (*ObjHandleDeletedObject)(uint32_t,uint32_t);
 typedef void (*ObjHandleRegionDestroyed)(uint32_t,uint32_t,uint32_t);
