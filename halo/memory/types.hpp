@@ -110,9 +110,3 @@ public:
     float z;
     float d;
 };
-
-#  ifdef __GNUC__
-#    define CDECL __attribute__ ((__cdecl__))
-#  else
-#    define CDECL __cdecl
-#  endif
