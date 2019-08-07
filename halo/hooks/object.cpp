@@ -53,7 +53,7 @@ Signature(true, sig_biped_jump,
     ObjGenerateUpdateHeader       type ## _generate_update_header        = NULL; \
     ObjHandleReceivedUpdate       type ## _handle_received_update        = NULL; \
     ObjShouldDoUpdateIncremental  type ## _should_do_update_incremental  = NULL; \
-    ObjShouldDoUpdateBaseline     type ## _should_do_update_baseline     = NULL; \
+    ObjSetLastUpdateTime          type ## _set_last_update_time          = NULL; \
     // End of Macro
 
 ObjectBehaviorDefinition new_obje_beh;
@@ -128,7 +128,7 @@ extern "C" {
     type ## _generate_update_header = def.generate_update_header; \
     type ## _handle_received_update = def.handle_received_update; \
     type ## _should_do_update_incremental = def.should_do_update_incremental; \
-    type ## _should_do_update_baseline = def.should_do_update_baseline; \
+    type ## _set_last_update_time = def.set_last_update_time; \
     // End of Macro
 
 static ObjectBehaviorDefinition* backup[12];

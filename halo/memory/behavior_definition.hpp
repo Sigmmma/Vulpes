@@ -13,28 +13,30 @@
 // objects and other gamestate things.
 
 // Typedeffing these so that we have central definitions.
+// The first arg is always the raw object MemRef
 
 typedef void (*ObjAdjustPlacement)(uint32_t,uint32_t);
-typedef void (*ObjCreate)(uint32_t);
+typedef  bool(*ObjCreate)(uint32_t);
 typedef void (*ObjPlace)(uint32_t,uint32_t);
 typedef void (*ObjDestroy)(uint32_t);
-typedef bool (*ObjUpdate)(uint32_t);
+typedef  bool(*ObjUpdate)(uint32_t);
 typedef void (*ObjExportFunctionValues)(uint32_t);
 typedef void (*ObjHandleDeletedObject)(uint32_t,uint32_t);
 typedef void (*ObjHandleRegionDestroyed)(uint32_t,uint32_t,uint32_t);
-typedef void (*ObjHandleParentDestroyed)(uint32_t);
+typedef  bool(*ObjHandleParentDestroyed)(uint32_t);
 typedef void (*ObjPreprocessNodeOrientations)(uint32_t,uint32_t);
 typedef void (*ObjPostprocessNodeMatricies)(uint32_t,uint32_t);
 typedef void (*ObjReset)(uint32_t);
 typedef void (*ObjDisconnectFromStructureBsp)(uint32_t);
 typedef void (*ObjNotifyImpulseSound)(uint32_t,uint32_t,uint32_t);
 typedef void (*ObjRenderDebug)(uint32_t);
+// Gbx
 typedef void (*ObjNewToNetwork)(uint32_t,uint32_t,uint32_t,uint32_t);
-typedef bool (*ObjUpdateBaseline)(uint32_t);
+typedef  bool(*ObjUpdateBaseline)(uint32_t);
 typedef void (*ObjGenerateUpdateHeader)(uint32_t,void* /*output_buffer*/,uint32_t /* edx for mdp_encode*/,uint32_t);
-typedef void (*ObjHandleReceivedUpdate)(uint32_t,uint32_t,int16_t,uint32_t*);
-typedef void (*ObjShouldDoUpdateIncremental)(uint32_t);
-typedef void (*ObjShouldDoUpdateBaseline)(uint32_t);
+typedef  bool(*ObjHandleReceivedUpdate)(uint32_t,uint32_t,int16_t,uint32_t*);
+typedef  bool(*ObjShouldDoUpdateIncremental)(uint32_t);
+typedef void (*ObjSetLastUpdateTime)(uint32_t);
 
 //
 
@@ -82,7 +84,7 @@ struct ObjectBehaviorDefinition {
     // Just returns true
     bool (*nullsub_ret_true)(uint32_t);
     // Returns true if it is time for a baseline update.
-    ObjShouldDoUpdateBaseline     should_do_update_baseline;
+    ObjSetLastUpdateTime          set_last_update_time;
     // Back to Bungie
     ObjectBehaviorDefinition* parent_definitions[18];
 };
