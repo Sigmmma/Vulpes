@@ -59,6 +59,7 @@ add_library(Vulpes SHARED
     halo/hooks/king.cpp
     halo/hooks/king.s
     halo/hooks/map.cpp
+    halo/hooks/object.cpp
     halo/hooks/tick.cpp
 
     halo/memory/gamestate/object/object.cpp
@@ -72,6 +73,7 @@ add_library(Vulpes SHARED
     halo/memory/gamestate/network.cpp
     halo/memory/gamestate/player.cpp
     halo/memory/gamestate/table.cpp
+    halo/memory/behavior_definition.cpp
     halo/memory/global.cpp
 
     halo/memory/types.cpp

@@ -10,6 +10,7 @@
 #include "halo/hooks/king.hpp"
 #include "halo/hooks/console.hpp"
 #include "halo/hooks/tick.hpp"
+#include "halo/hooks/object.hpp"
 #include "halo/hooks/map.hpp"
 void init_hooks(){
     init_code_caves();
@@ -18,6 +19,7 @@ void init_hooks(){
     init_king_hooks();
     init_console_hooks();
     init_tick_hook();
+    init_object_hooks();
     init_map_hooks(game_is_server_executable());
 }
 void revert_hooks(){
@@ -27,6 +29,7 @@ void revert_hooks(){
     revert_king_hooks();
     revert_console_hooks();
     revert_tick_hook();
+    revert_object_hooks();
     revert_map_hooks();
 }
 
