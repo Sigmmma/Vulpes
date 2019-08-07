@@ -16,5 +16,7 @@ static inline bool exec_if_valid_bool(T function, Args&& ... args) {
 
 template<typename T, typename ... Args>
 static inline void exec_if_valid(T function, Args&& ... args) {
-    if(function != NULL)  function(std::forward<Args>(args) ...);
+    if(function != NULL) {
+        function(std::forward<Args>(args) ...);
+    };
 }
