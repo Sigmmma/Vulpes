@@ -60,6 +60,7 @@ add_library(Vulpes SHARED
     halo/hooks/king.s
     halo/hooks/map.cpp
     halo/hooks/object.cpp
+    halo/hooks/object.s
     halo/hooks/tick.cpp
 
     halo/memory/gamestate/object/object.cpp

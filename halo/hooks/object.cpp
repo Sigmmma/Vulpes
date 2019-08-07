@@ -32,6 +32,43 @@ Signature(true, sig_biped_jump,
     {0x8B, 0x0D, -1, -1, -1, 0x00,
      0x8B, 0x51, 0x34, 0x83, 0xEC, 0x10, 0x53, 0x55}); // size 6 do manual
 
+Signature(true, sig_weapon_pull_trigger,
+    {0x81, 0xEC, 0x94, 0x00, 0x00, 0x00, 0x8B, 0x84,
+     0x24, 0x98, 0x00, 0x00, 0x00, 0x8B, 0x0D}); // size 6 do manual
+
+extern "C" {
+    uintptr_t after_weapon_hook__pull_trigger;
+    extern weapon_pull_trigger_wrapper();
+}
+
+#include "../functions/messaging.hpp"
+#include <cstdlib>
+
+struct WeaponPullTrigArgs {
+    uint32_t obj;
+    int trigger_id;
+};
+
+extern "C" bool before_weapon_pull_trigger(WeaponPullTrigArgs* args){
+    return true;
+}
+
+extern "C" void after_weapon_pull_trigger(WeaponPullTrigArgs* args){
+}
+
+Patch(weapon_pull_trigger_hook_patch, sig_weapon_pull_trigger, 0, 6, JMP_PATCH, &weapon_pull_trigger_wrapper);
+
+void init_weapon_hooks(){
+    if (weapon_pull_trigger_hook_patch.build()) {
+        weapon_pull_trigger_hook_patch.apply();
+        after_weapon_hook__pull_trigger = weapon_pull_trigger_hook_patch.return_address();
+    };
+}
+
+void revert_weapon_hooks(){
+    weapon_pull_trigger_hook_patch.revert();
+}
+
 #define OBJECT_BEHAVIOR_FUNCTION_PTRS(type) \
     ObjAdjustPlacement            type ## _adjust_placement              = NULL; \
     ObjCreate                     type ## _create                        = NULL; \
@@ -255,6 +292,10 @@ void init_object_hooks(){
 
     // Put hooks in place.
 
+    // Other hooks:
+
+    init_weapon_hooks();
+
 }
 
 void revert_object_hooks(){
@@ -267,5 +308,7 @@ void revert_object_hooks(){
     VirtualProtect(game_defs, 4*12, PAGE_EXECUTE_READWRITE, &prota);
     memcpy(game_defs, &backup, sizeof(ObjectBehaviorDefinition));
     VirtualProtect(game_defs, 4*12, prota, &protb);
+
+    revert_weapon_hooks();
 
 }
