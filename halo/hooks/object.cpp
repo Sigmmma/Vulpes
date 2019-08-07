@@ -5,6 +5,7 @@
  */
 
 #include "../../hooker/hooker.hpp"
+#include "../../hooker/function_pointer_safe.hpp"
 #include "../memory/gamestate/object/object.hpp"
 #include "../memory/behavior_definition.hpp"
 #include <windows.h>
@@ -133,7 +134,7 @@ extern "C" {
 static ObjectBehaviorDefinition* backup[12];
 
 void init_object_hooks(){
-    ObjectBehaviorDefinition** game_defs = object_behavior_defs();
+    auto game_defs = object_behavior_defs();
 
     // Copy data to our new defs.
 
@@ -258,7 +259,7 @@ void init_object_hooks(){
 
 void revert_object_hooks(){
 
-    ObjectBehaviorDefinition** game_defs = object_behavior_defs();
+    auto game_defs = object_behavior_defs();
 
     // Revert to the old defs.
 
