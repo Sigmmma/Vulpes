@@ -41,9 +41,6 @@ extern "C" {
     extern weapon_pull_trigger_wrapper();
 }
 
-#include "../functions/messaging.hpp"
-#include <cstdlib>
-
 struct WeaponPullTrigArgs {
     uint32_t obj;
     int trigger_id;
