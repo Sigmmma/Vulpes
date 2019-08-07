@@ -208,7 +208,7 @@ void init_object_hooks(){
     new_ssce_beh.parent_definitions[0] = &new_obje_beh;
     new_ssce_beh.parent_definitions[1] = &new_ssce_beh;
 
-    // Backup old defs.
+    // Backup old def pointers.
 
     memcpy(&backup, game_defs, sizeof(ObjectBehaviorDefinition));
 
