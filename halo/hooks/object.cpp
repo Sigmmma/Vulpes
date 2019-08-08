@@ -11,12 +11,7 @@
 #include <windows.h>
 #include <cstring>
 
-<<<<<<< HEAD
 // Shared signatures
-=======
-// Signatures for finding stuff.
-// Currently unused. Will be used soon.
->>>>>>> origin/hooks-inbound
 
 Signature(true, sig_object_update,
     {0x51, 0x8B, 0x0D, -1, -1, -1, 0x00, 0x8B, 0x51, 0x34, 0x53, 0x8B,
