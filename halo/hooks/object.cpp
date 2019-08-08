@@ -11,7 +11,12 @@
 #include <windows.h>
 #include <cstring>
 
+<<<<<<< HEAD
 // Shared signatures
+=======
+// Signatures for finding stuff.
+// Currently unused. Will be used soon.
+>>>>>>> origin/hooks-inbound
 
 Signature(true, sig_object_update,
     {0x51, 0x8B, 0x0D, -1, -1, -1, 0x00, 0x8B, 0x51, 0x34, 0x53, 0x8B,
@@ -75,7 +80,34 @@ void revert_weapon_hooks(){
     weapon_pull_trigger_hook_patch.revert();
 }
 
-#define OBJECT_BEHAVIOR_FUNCTION_PTRS(type) \
+// New behavior definitions, when initialized hooking into
+// one of these functions is as simple as re-assigning
+// the pointer to a replacement function.
+
+ObjectBehaviorDefinition new_obje_beh;
+ObjectBehaviorDefinition new_devi_beh;
+ObjectBehaviorDefinition new_item_beh;
+ObjectBehaviorDefinition new_unit_beh;
+
+ObjectBehaviorDefinition new_bipd_beh;
+ObjectBehaviorDefinition new_vehi_beh;
+ObjectBehaviorDefinition new_weap_beh;
+
+ObjectBehaviorDefinition new_eqip_beh;
+ObjectBehaviorDefinition new_garb_beh;
+ObjectBehaviorDefinition new_proj_beh;
+
+ObjectBehaviorDefinition new_scen_beh;
+ObjectBehaviorDefinition new_mach_beh;
+ObjectBehaviorDefinition new_ctrl_beh;
+ObjectBehaviorDefinition new_lifi_beh;
+
+ObjectBehaviorDefinition new_plac_beh;
+ObjectBehaviorDefinition new_ssce_beh;
+
+// Defining this as a macro since it is repeated 16 times.
+
+#define DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(type) \
     ObjAdjustPlacement            type ## _adjust_placement              = NULL; \
     ObjCreate                     type ## _create                        = NULL; \
     ObjPlace                      type ## _place                         = NULL; \
@@ -99,56 +131,41 @@ void revert_weapon_hooks(){
     ObjSetLastUpdateTime          type ## _set_last_update_time          = NULL; \
     // End of Macro
 
-ObjectBehaviorDefinition new_obje_beh;
-ObjectBehaviorDefinition new_devi_beh;
-ObjectBehaviorDefinition new_item_beh;
-ObjectBehaviorDefinition new_unit_beh;
+extern "C" { // Demangle naming for ASM.
 
-ObjectBehaviorDefinition new_bipd_beh;
-ObjectBehaviorDefinition new_vehi_beh;
-ObjectBehaviorDefinition new_weap_beh;
-
-ObjectBehaviorDefinition new_eqip_beh;
-ObjectBehaviorDefinition new_garb_beh;
-ObjectBehaviorDefinition new_proj_beh;
-
-ObjectBehaviorDefinition new_scen_beh;
-ObjectBehaviorDefinition new_mach_beh;
-ObjectBehaviorDefinition new_ctrl_beh;
-ObjectBehaviorDefinition new_lifi_beh;
-
-ObjectBehaviorDefinition new_plac_beh;
-ObjectBehaviorDefinition new_ssce_beh;
-
-extern "C" {
+    //////////
+    // Declaring all function pointers for each object type here
+    // so that the assembly can access it easily if needed.
 
     // Negative type indices
 
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(object);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(device);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(item);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(unit);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(object);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(device);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(item);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(unit);
 
     // Positive type indices
 
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(biped);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(vehicle);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(weapon);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(biped);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(vehicle);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(weapon);
 
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(equipment);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(garbage);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(projectile);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(equipment);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(garbage);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(projectile);
 
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(scenery);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(scenery);
 
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(machine);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(control);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(light_fixture);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(machine);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(control);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(light_fixture);
 
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(placeholder);
-    OBJECT_BEHAVIOR_FUNCTION_PTRS(sound_scenery);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(placeholder);
+    DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(sound_scenery);
 
 }
+
+// We're going to have to manually copy all of these, so we use another macro.
 
 #define COPY_EVENT_DEF(type, def) \
     type ## _adjust_placement = def.adjust_placement; \
@@ -181,85 +198,94 @@ void init_object_hooks(){
 
     // Copy data to our new defs.
 
-    memcpy(&new_obje_beh, game_defs[static_cast<int>(ObjectType::BIPED)]->parent_definitions[0],  sizeof(ObjectBehaviorDefinition));
+    const size_t s = sizeof(ObjectBehaviorDefinition);
+
+    // These top 4 are negative indices and are not in the base array,
+    // but we still need them. They are parent types of other object types
+    // found here though, so we get that data by looking through the parent
+    // type definitions.
+
+    memcpy(&new_obje_beh, game_defs[static_cast<int>(ObjectType::BIPED)]->parent_definitions[0], s);
     new_obje_beh.parent_definitions[0] = &new_obje_beh;
 
-    memcpy(&new_devi_beh, game_defs[static_cast<int>(ObjectType::MACHINE)]->parent_definitions[1],sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_devi_beh, game_defs[static_cast<int>(ObjectType::MACHINE)]->parent_definitions[1], s);
     new_devi_beh.parent_definitions[0] = &new_obje_beh;
     new_devi_beh.parent_definitions[1] = &new_devi_beh;
 
-    memcpy(&new_item_beh, game_defs[static_cast<int>(ObjectType::WEAPON)]->parent_definitions[1], sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_item_beh, game_defs[static_cast<int>(ObjectType::WEAPON)]->parent_definitions[1], s);
     new_item_beh.parent_definitions[0] = &new_obje_beh;
     new_item_beh.parent_definitions[1] = &new_item_beh;
 
-    memcpy(&new_unit_beh, game_defs[static_cast<int>(ObjectType::BIPED)]->parent_definitions[1],  sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_unit_beh, game_defs[static_cast<int>(ObjectType::BIPED)]->parent_definitions[1], s);
     new_unit_beh.parent_definitions[0] = &new_obje_beh;
     new_unit_beh.parent_definitions[1] = &new_unit_beh;
 
-    memcpy(&new_bipd_beh, game_defs[static_cast<int>(ObjectType::BIPED)],       sizeof(ObjectBehaviorDefinition));
+    // 0 and up
+
+    memcpy(&new_bipd_beh, game_defs[static_cast<int>(ObjectType::BIPED)], s);
     new_bipd_beh.parent_definitions[0] = &new_obje_beh;
     new_bipd_beh.parent_definitions[1] = &new_unit_beh;
     new_bipd_beh.parent_definitions[2] = &new_bipd_beh;
 
-    memcpy(&new_vehi_beh, game_defs[static_cast<int>(ObjectType::VEHICLE)],     sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_vehi_beh, game_defs[static_cast<int>(ObjectType::VEHICLE)], s);
     new_vehi_beh.parent_definitions[0] = &new_obje_beh;
     new_vehi_beh.parent_definitions[1] = &new_unit_beh;
     new_vehi_beh.parent_definitions[2] = &new_vehi_beh;
 
-    memcpy(&new_weap_beh, game_defs[static_cast<int>(ObjectType::WEAPON)],      sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_weap_beh, game_defs[static_cast<int>(ObjectType::WEAPON)], s);
     new_weap_beh.parent_definitions[0] = &new_obje_beh;
     new_weap_beh.parent_definitions[1] = &new_item_beh;
     new_weap_beh.parent_definitions[2] = &new_weap_beh;
 
-    memcpy(&new_eqip_beh, game_defs[static_cast<int>(ObjectType::EQUIPMENT)],   sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_eqip_beh, game_defs[static_cast<int>(ObjectType::EQUIPMENT)], s);
     new_eqip_beh.parent_definitions[0] = &new_obje_beh;
     new_eqip_beh.parent_definitions[1] = &new_item_beh;
     new_eqip_beh.parent_definitions[2] = &new_eqip_beh;
 
-    memcpy(&new_garb_beh, game_defs[static_cast<int>(ObjectType::GARBAGE)],     sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_garb_beh, game_defs[static_cast<int>(ObjectType::GARBAGE)], s);
     new_garb_beh.parent_definitions[0] = &new_obje_beh;
     new_garb_beh.parent_definitions[1] = &new_item_beh;
     new_garb_beh.parent_definitions[2] = &new_garb_beh;
 
-    memcpy(&new_proj_beh, game_defs[static_cast<int>(ObjectType::PROJECTILE)],  sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_proj_beh, game_defs[static_cast<int>(ObjectType::PROJECTILE)], s);
     new_proj_beh.parent_definitions[0] = &new_obje_beh;
     new_proj_beh.parent_definitions[1] = &new_proj_beh;
 
-    memcpy(&new_scen_beh, game_defs[static_cast<int>(ObjectType::SCENERY)],     sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_scen_beh, game_defs[static_cast<int>(ObjectType::SCENERY)], s);
     new_scen_beh.parent_definitions[0] = &new_obje_beh;
     new_scen_beh.parent_definitions[1] = &new_scen_beh;
 
-    memcpy(&new_mach_beh, game_defs[static_cast<int>(ObjectType::MACHINE)],     sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_mach_beh, game_defs[static_cast<int>(ObjectType::MACHINE)], s);
     new_mach_beh.parent_definitions[0] = &new_obje_beh;
     new_mach_beh.parent_definitions[1] = &new_devi_beh;
     new_mach_beh.parent_definitions[2] = &new_mach_beh;
 
-    memcpy(&new_ctrl_beh, game_defs[static_cast<int>(ObjectType::CONTROL)],     sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_ctrl_beh, game_defs[static_cast<int>(ObjectType::CONTROL)], s);
     new_ctrl_beh.parent_definitions[0] = &new_obje_beh;
     new_ctrl_beh.parent_definitions[1] = &new_devi_beh;
     new_ctrl_beh.parent_definitions[2] = &new_ctrl_beh;
 
-    memcpy(&new_lifi_beh, game_defs[static_cast<int>(ObjectType::LIGHT_FIXTURE)],sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_lifi_beh, game_defs[static_cast<int>(ObjectType::LIGHT_FIXTURE)], s);
     new_lifi_beh.parent_definitions[0] = &new_obje_beh;
     new_lifi_beh.parent_definitions[1] = &new_devi_beh;
     new_lifi_beh.parent_definitions[2] = &new_lifi_beh;
 
-    memcpy(&new_plac_beh, game_defs[static_cast<int>(ObjectType::PLACEHOLDER)], sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_plac_beh, game_defs[static_cast<int>(ObjectType::PLACEHOLDER)], s);
     new_plac_beh.parent_definitions[0] = &new_obje_beh;
     new_plac_beh.parent_definitions[1] = &new_plac_beh;
 
-    memcpy(&new_ssce_beh, game_defs[static_cast<int>(ObjectType::SOUND_SCENERY)],sizeof(ObjectBehaviorDefinition));
+    memcpy(&new_ssce_beh, game_defs[static_cast<int>(ObjectType::SOUND_SCENERY)], s);
     new_ssce_beh.parent_definitions[0] = &new_obje_beh;
     new_ssce_beh.parent_definitions[1] = &new_ssce_beh;
 
-    // Backup old def pointers.
+    // Backup old def pointers for when the DLL needs to unload.
 
     memcpy(&backup, game_defs, sizeof(ObjectBehaviorDefinition));
 
-    // Replace old defs with our new defs.
+    // Replace old def pointers with pointers to our new defs.
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, 4*12, PAGE_EXECUTE_READWRITE, &prota);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), PAGE_EXECUTE_READWRITE, &prota);
 
     game_defs[static_cast<int>(ObjectType::BIPED)]          = &new_bipd_beh;
     game_defs[static_cast<int>(ObjectType::VEHICLE)]        = &new_vehi_beh;
@@ -274,9 +300,10 @@ void init_object_hooks(){
     game_defs[static_cast<int>(ObjectType::PLACEHOLDER)]    = &new_plac_beh;
     game_defs[static_cast<int>(ObjectType::SOUND_SCENERY)]  = &new_ssce_beh;
 
-    VirtualProtect(game_defs, 4*12, prota, &protb);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), prota, &protb);
 
-    // Copy the function pointers to our assembly callable vars.
+    // Copy the function pointers to our assembly callable vars
+    // before we hook into them.
 
     COPY_EVENT_DEF(object,          new_obje_beh);
     COPY_EVENT_DEF(device,          new_devi_beh);
@@ -297,6 +324,11 @@ void init_object_hooks(){
     COPY_EVENT_DEF(sound_scenery,   new_ssce_beh);
 
     // Put hooks in place.
+    // Hooking into one of the above copied functions is as easy as replacing
+    // its pointer with the pointer to the replacing function.
+    // In most cases we will still need to execute the old one though. So,
+    // when doing that make sure to call the old function. It can simply be
+    // called by name because of how we've copied them.
 
     // Other hooks:
 
@@ -311,9 +343,9 @@ void revert_object_hooks(){
     // Revert to the old defs.
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, 4*12, PAGE_EXECUTE_READWRITE, &prota);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), PAGE_EXECUTE_READWRITE, &prota);
     memcpy(game_defs, &backup, sizeof(ObjectBehaviorDefinition));
-    VirtualProtect(game_defs, 4*12, prota, &protb);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), prota, &protb);
 
     revert_weapon_hooks();
 
