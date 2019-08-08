@@ -240,7 +240,7 @@ void init_object_hooks(){
     // Replace old def pointers with pointers to our new defs.
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, 12*sizeof(ObjectBehaviorDefinition*), PAGE_EXECUTE_READWRITE, &prota);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), PAGE_EXECUTE_READWRITE, &prota);
 
     game_defs[static_cast<int>(ObjectType::BIPED)]          = &new_bipd_beh;
     game_defs[static_cast<int>(ObjectType::VEHICLE)]        = &new_vehi_beh;
@@ -255,7 +255,7 @@ void init_object_hooks(){
     game_defs[static_cast<int>(ObjectType::PLACEHOLDER)]    = &new_plac_beh;
     game_defs[static_cast<int>(ObjectType::SOUND_SCENERY)]  = &new_ssce_beh;
 
-    VirtualProtect(game_defs, 12*sizeof(ObjectBehaviorDefinition*), prota, &protb);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), prota, &protb);
 
     // Copy the function pointers to our assembly callable vars
     // before we hook into them.
@@ -294,8 +294,8 @@ void revert_object_hooks(){
     // Revert to the old defs.
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, 12*sizeof(ObjectBehaviorDefinition*), PAGE_EXECUTE_READWRITE, &prota);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), PAGE_EXECUTE_READWRITE, &prota);
     memcpy(game_defs, &backup, sizeof(ObjectBehaviorDefinition));
-    VirtualProtect(game_defs, 12*sizeof(ObjectBehaviorDefinition*), prota, &protb);
+    VirtualProtect(game_defs, sizeof(ObjectBehaviorDefinition*[12]), prota, &protb);
 
 }
