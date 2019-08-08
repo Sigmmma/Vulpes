@@ -6,6 +6,7 @@
 
 #include "map.hpp"
 #include "../../hooker/hooker.hpp"
+#include "../memory/types.hpp"
 
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_MAP_LOAD, pre_map);
 DEFINE_EVENT_HOOK_LIST(EVENT_MAP_LOAD, post_map);
@@ -31,8 +32,8 @@ Signature(false, sig_sp_map_name,
 
 Signature(true, sig_event_map_reset_hook, {0x5B, 0x68, -1, -1, -1, -1, 0x33, 0xC0});
 
-char* mp_map_name = 0;
-char* sp_map_name = 0;
+char* mp_map_name = NULL;
+char* sp_map_name = NULL;
 
 bool before_sp(){
     call_in_order(pre_map);
