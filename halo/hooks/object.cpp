@@ -7,6 +7,7 @@
 #include "../../hooker/hooker.hpp"
 #include "../../hooker/function_pointer_safe.hpp"
 #include "../memory/gamestate/object/object.hpp"
+#include "../memory/types.hpp"
 #include "../memory/behavior_definition.hpp"
 #include <windows.h>
 #include <cstring>
@@ -161,76 +162,76 @@ void init_object_hooks(){
     // found here though, so we get that data by looking through the parent
     // type definitions.
 
-    memcpy(&new_obje_beh, game_defs[static_cast<int>(ObjectType::BIPED)]->parent_definitions[0], S);
+    memcpy(&new_obje_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[0], S);
     new_obje_beh.parent_definitions[0] = &new_obje_beh;
 
-    memcpy(&new_devi_beh, game_defs[static_cast<int>(ObjectType::MACHINE)]->parent_definitions[1], S);
+    memcpy(&new_devi_beh, game_defs[etoi(ObjectType::MACHINE)]->parent_definitions[1], S);
     new_devi_beh.parent_definitions[0] = &new_obje_beh;
     new_devi_beh.parent_definitions[1] = &new_devi_beh;
 
-    memcpy(&new_item_beh, game_defs[static_cast<int>(ObjectType::WEAPON)]->parent_definitions[1], S);
+    memcpy(&new_item_beh, game_defs[etoi(ObjectType::WEAPON)]->parent_definitions[1], S);
     new_item_beh.parent_definitions[0] = &new_obje_beh;
     new_item_beh.parent_definitions[1] = &new_item_beh;
 
-    memcpy(&new_unit_beh, game_defs[static_cast<int>(ObjectType::BIPED)]->parent_definitions[1], S);
+    memcpy(&new_unit_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[1], S);
     new_unit_beh.parent_definitions[0] = &new_obje_beh;
     new_unit_beh.parent_definitions[1] = &new_unit_beh;
 
     // 0 and up
 
-    memcpy(&new_bipd_beh, game_defs[static_cast<int>(ObjectType::BIPED)], S);
+    memcpy(&new_bipd_beh, game_defs[etoi(ObjectType::BIPED)], S);
     new_bipd_beh.parent_definitions[0] = &new_obje_beh;
     new_bipd_beh.parent_definitions[1] = &new_unit_beh;
     new_bipd_beh.parent_definitions[2] = &new_bipd_beh;
 
-    memcpy(&new_vehi_beh, game_defs[static_cast<int>(ObjectType::VEHICLE)], S);
+    memcpy(&new_vehi_beh, game_defs[etoi(ObjectType::VEHICLE)], S);
     new_vehi_beh.parent_definitions[0] = &new_obje_beh;
     new_vehi_beh.parent_definitions[1] = &new_unit_beh;
     new_vehi_beh.parent_definitions[2] = &new_vehi_beh;
 
-    memcpy(&new_weap_beh, game_defs[static_cast<int>(ObjectType::WEAPON)], S);
+    memcpy(&new_weap_beh, game_defs[etoi(ObjectType::WEAPON)], S);
     new_weap_beh.parent_definitions[0] = &new_obje_beh;
     new_weap_beh.parent_definitions[1] = &new_item_beh;
     new_weap_beh.parent_definitions[2] = &new_weap_beh;
 
-    memcpy(&new_eqip_beh, game_defs[static_cast<int>(ObjectType::EQUIPMENT)], S);
+    memcpy(&new_eqip_beh, game_defs[etoi(ObjectType::EQUIPMENT)], S);
     new_eqip_beh.parent_definitions[0] = &new_obje_beh;
     new_eqip_beh.parent_definitions[1] = &new_item_beh;
     new_eqip_beh.parent_definitions[2] = &new_eqip_beh;
 
-    memcpy(&new_garb_beh, game_defs[static_cast<int>(ObjectType::GARBAGE)], S);
+    memcpy(&new_garb_beh, game_defs[etoi(ObjectType::GARBAGE)], S);
     new_garb_beh.parent_definitions[0] = &new_obje_beh;
     new_garb_beh.parent_definitions[1] = &new_item_beh;
     new_garb_beh.parent_definitions[2] = &new_garb_beh;
 
-    memcpy(&new_proj_beh, game_defs[static_cast<int>(ObjectType::PROJECTILE)], S);
+    memcpy(&new_proj_beh, game_defs[etoi(ObjectType::PROJECTILE)], S);
     new_proj_beh.parent_definitions[0] = &new_obje_beh;
     new_proj_beh.parent_definitions[1] = &new_proj_beh;
 
-    memcpy(&new_scen_beh, game_defs[static_cast<int>(ObjectType::SCENERY)], S);
+    memcpy(&new_scen_beh, game_defs[etoi(ObjectType::SCENERY)], S);
     new_scen_beh.parent_definitions[0] = &new_obje_beh;
     new_scen_beh.parent_definitions[1] = &new_scen_beh;
 
-    memcpy(&new_mach_beh, game_defs[static_cast<int>(ObjectType::MACHINE)], S);
+    memcpy(&new_mach_beh, game_defs[etoi(ObjectType::MACHINE)], S);
     new_mach_beh.parent_definitions[0] = &new_obje_beh;
     new_mach_beh.parent_definitions[1] = &new_devi_beh;
     new_mach_beh.parent_definitions[2] = &new_mach_beh;
 
-    memcpy(&new_ctrl_beh, game_defs[static_cast<int>(ObjectType::CONTROL)], S);
+    memcpy(&new_ctrl_beh, game_defs[etoi(ObjectType::CONTROL)], S);
     new_ctrl_beh.parent_definitions[0] = &new_obje_beh;
     new_ctrl_beh.parent_definitions[1] = &new_devi_beh;
     new_ctrl_beh.parent_definitions[2] = &new_ctrl_beh;
 
-    memcpy(&new_lifi_beh, game_defs[static_cast<int>(ObjectType::LIGHT_FIXTURE)], S);
+    memcpy(&new_lifi_beh, game_defs[etoi(ObjectType::LIGHT_FIXTURE)], S);
     new_lifi_beh.parent_definitions[0] = &new_obje_beh;
     new_lifi_beh.parent_definitions[1] = &new_devi_beh;
     new_lifi_beh.parent_definitions[2] = &new_lifi_beh;
 
-    memcpy(&new_plac_beh, game_defs[static_cast<int>(ObjectType::PLACEHOLDER)], S);
+    memcpy(&new_plac_beh, game_defs[etoi(ObjectType::PLACEHOLDER)], S);
     new_plac_beh.parent_definitions[0] = &new_obje_beh;
     new_plac_beh.parent_definitions[1] = &new_plac_beh;
 
-    memcpy(&new_ssce_beh, game_defs[static_cast<int>(ObjectType::SOUND_SCENERY)], S);
+    memcpy(&new_ssce_beh, game_defs[etoi(ObjectType::SOUND_SCENERY)], S);
     new_ssce_beh.parent_definitions[0] = &new_obje_beh;
     new_ssce_beh.parent_definitions[1] = &new_ssce_beh;
 
@@ -245,18 +246,18 @@ void init_object_hooks(){
     DWORD prota, protb;
     VirtualProtect(game_defs, COPY_SIZE, PAGE_EXECUTE_READWRITE, &prota);
 
-    game_defs[static_cast<int>(ObjectType::BIPED)]          = &new_bipd_beh;
-    game_defs[static_cast<int>(ObjectType::VEHICLE)]        = &new_vehi_beh;
-    game_defs[static_cast<int>(ObjectType::WEAPON)]         = &new_weap_beh;
-    game_defs[static_cast<int>(ObjectType::EQUIPMENT)]      = &new_eqip_beh;
-    game_defs[static_cast<int>(ObjectType::GARBAGE)]        = &new_garb_beh;
-    game_defs[static_cast<int>(ObjectType::PROJECTILE)]     = &new_proj_beh;
-    game_defs[static_cast<int>(ObjectType::SCENERY)]        = &new_scen_beh;
-    game_defs[static_cast<int>(ObjectType::MACHINE)]        = &new_mach_beh;
-    game_defs[static_cast<int>(ObjectType::CONTROL)]        = &new_ctrl_beh;
-    game_defs[static_cast<int>(ObjectType::LIGHT_FIXTURE)]  = &new_lifi_beh;
-    game_defs[static_cast<int>(ObjectType::PLACEHOLDER)]    = &new_plac_beh;
-    game_defs[static_cast<int>(ObjectType::SOUND_SCENERY)]  = &new_ssce_beh;
+    game_defs[etoi(ObjectType::BIPED)]          = &new_bipd_beh;
+    game_defs[etoi(ObjectType::VEHICLE)]        = &new_vehi_beh;
+    game_defs[etoi(ObjectType::WEAPON)]         = &new_weap_beh;
+    game_defs[etoi(ObjectType::EQUIPMENT)]      = &new_eqip_beh;
+    game_defs[etoi(ObjectType::GARBAGE)]        = &new_garb_beh;
+    game_defs[etoi(ObjectType::PROJECTILE)]     = &new_proj_beh;
+    game_defs[etoi(ObjectType::SCENERY)]        = &new_scen_beh;
+    game_defs[etoi(ObjectType::MACHINE)]        = &new_mach_beh;
+    game_defs[etoi(ObjectType::CONTROL)]        = &new_ctrl_beh;
+    game_defs[etoi(ObjectType::LIGHT_FIXTURE)]  = &new_lifi_beh;
+    game_defs[etoi(ObjectType::PLACEHOLDER)]    = &new_plac_beh;
+    game_defs[etoi(ObjectType::SOUND_SCENERY)]  = &new_ssce_beh;
 
     VirtualProtect(game_defs, COPY_SIZE, prota, &protb);
 
