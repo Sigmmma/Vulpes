@@ -28,6 +28,9 @@ enum class Team : int8_t {
     UNUSED_7    = 7
 };
 
+const size_t VALID_OBJECT_TYPES = 12;
+const size_t POSITIVE_OBJECT_TYPES = VALID_OBJECT_TYPES;
+
 enum class ObjectType : int8_t{
     OBJECT = -4,
     DEVICE = -3,
