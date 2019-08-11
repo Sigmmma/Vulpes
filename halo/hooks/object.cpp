@@ -188,7 +188,6 @@ extern "C" { // Demangle naming for ASM.
     // End of Macro
 
 static ObjectBehaviorDefinition* vanilla_def_pointers_backup[POSITIVE_OBJECT_TYPES];
-const size_t OBJECT_DEF_PTR_ARRAY_ABS_SIZE = sizeof(uintptr_t)*POSITIVE_OBJECT_TYPES;
 
 void init_object_hooks(){
     auto game_defs = object_behavior_defs();
@@ -277,14 +276,14 @@ void init_object_hooks(){
 
     // Backup old array of def pointers for when the DLL needs to unload.
 
-    const size_t COPY_SIZE = OBJECT_DEF_PTR_ARRAY_ABS_SIZE;
+    const size_t copy_size = sizeof(uintptr_t)*POSITIVE_OBJECT_TYPES;
 
-    memcpy(&vanilla_def_pointers_backup, game_defs, COPY_SIZE);
+    memcpy(&vanilla_def_pointers_backup, game_defs, copy_size);
 
     // Replace old array of def pointers with pointers to our new defs.
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, COPY_SIZE, PAGE_EXECUTE_READWRITE, &prota);
+    VirtualProtect(game_defs, copy_size, PAGE_EXECUTE_READWRITE, &prota);
 
     game_defs[etoi(ObjectType::BIPED)]          = &new_bipd_beh;
     game_defs[etoi(ObjectType::VEHICLE)]        = &new_vehi_beh;
@@ -299,7 +298,7 @@ void init_object_hooks(){
     game_defs[etoi(ObjectType::PLACEHOLDER)]    = &new_plac_beh;
     game_defs[etoi(ObjectType::SOUND_SCENERY)]  = &new_ssce_beh;
 
-    VirtualProtect(game_defs, COPY_SIZE, prota, &protb);
+    VirtualProtect(game_defs, copy_size, prota, &protb);
 
     // Copy the function pointers to our assembly callable vars
     // before we hook into them.
@@ -341,12 +340,12 @@ void revert_object_hooks(){
 
     // Revert to the old defs.
 
-    const size_t COPY_SIZE = OBJECT_DEF_PTR_ARRAY_ABS_SIZE;
+    const size_t copy_size = sizeof(uintptr_t)*POSITIVE_OBJECT_TYPES;
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, COPY_SIZE, PAGE_EXECUTE_READWRITE, &prota);
-    memcpy(game_defs, &vanilla_def_pointers_backup, COPY_SIZE);
-    VirtualProtect(game_defs, COPY_SIZE, prota, &protb);
+    VirtualProtect(game_defs, copy_size, PAGE_EXECUTE_READWRITE, &prota);
+    memcpy(game_defs, &vanilla_def_pointers_backup, copy_size);
+    VirtualProtect(game_defs, copy_size, prota, &protb);
 
     revert_weapon_hooks();
 
