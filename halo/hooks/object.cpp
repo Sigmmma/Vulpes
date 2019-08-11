@@ -194,96 +194,96 @@ void init_object_hooks(){
 
     // Copy data to our new defs.
 
-    size_t d_size = sizeof(ObjectBehaviorDefinition);
+    size_t def_size = sizeof(ObjectBehaviorDefinition);
 
     // These top 4 are negative indices and are not in the base array,
     // but we still need them. They are parent types of other object types
     // found here though, so we get that data by looking through the parent
     // type definitions.
 
-    memcpy(&new_obje_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[0], d_size);
+    memcpy(&new_obje_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[0], def_size);
     new_obje_beh.parent_definitions[0] = &new_obje_beh;
 
-    memcpy(&new_devi_beh, game_defs[etoi(ObjectType::MACHINE)]->parent_definitions[1], d_size);
+    memcpy(&new_devi_beh, game_defs[etoi(ObjectType::MACHINE)]->parent_definitions[1], def_size);
     new_devi_beh.parent_definitions[0] = &new_obje_beh;
     new_devi_beh.parent_definitions[1] = &new_devi_beh;
 
-    memcpy(&new_item_beh, game_defs[etoi(ObjectType::WEAPON)]->parent_definitions[1], d_size);
+    memcpy(&new_item_beh, game_defs[etoi(ObjectType::WEAPON)]->parent_definitions[1], def_size);
     new_item_beh.parent_definitions[0] = &new_obje_beh;
     new_item_beh.parent_definitions[1] = &new_item_beh;
 
-    memcpy(&new_unit_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[1], d_size);
+    memcpy(&new_unit_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[1], def_size);
     new_unit_beh.parent_definitions[0] = &new_obje_beh;
     new_unit_beh.parent_definitions[1] = &new_unit_beh;
 
     // 0 and up
 
-    memcpy(&new_bipd_beh, game_defs[etoi(ObjectType::BIPED)], d_size);
+    memcpy(&new_bipd_beh, game_defs[etoi(ObjectType::BIPED)], def_size);
     new_bipd_beh.parent_definitions[0] = &new_obje_beh;
     new_bipd_beh.parent_definitions[1] = &new_unit_beh;
     new_bipd_beh.parent_definitions[2] = &new_bipd_beh;
 
-    memcpy(&new_vehi_beh, game_defs[etoi(ObjectType::VEHICLE)], d_size);
+    memcpy(&new_vehi_beh, game_defs[etoi(ObjectType::VEHICLE)], def_size);
     new_vehi_beh.parent_definitions[0] = &new_obje_beh;
     new_vehi_beh.parent_definitions[1] = &new_unit_beh;
     new_vehi_beh.parent_definitions[2] = &new_vehi_beh;
 
-    memcpy(&new_weap_beh, game_defs[etoi(ObjectType::WEAPON)], d_size);
+    memcpy(&new_weap_beh, game_defs[etoi(ObjectType::WEAPON)], def_size);
     new_weap_beh.parent_definitions[0] = &new_obje_beh;
     new_weap_beh.parent_definitions[1] = &new_item_beh;
     new_weap_beh.parent_definitions[2] = &new_weap_beh;
 
-    memcpy(&new_eqip_beh, game_defs[etoi(ObjectType::EQUIPMENT)], d_size);
+    memcpy(&new_eqip_beh, game_defs[etoi(ObjectType::EQUIPMENT)], def_size);
     new_eqip_beh.parent_definitions[0] = &new_obje_beh;
     new_eqip_beh.parent_definitions[1] = &new_item_beh;
     new_eqip_beh.parent_definitions[2] = &new_eqip_beh;
 
-    memcpy(&new_garb_beh, game_defs[etoi(ObjectType::GARBAGE)], d_size);
+    memcpy(&new_garb_beh, game_defs[etoi(ObjectType::GARBAGE)], def_size);
     new_garb_beh.parent_definitions[0] = &new_obje_beh;
     new_garb_beh.parent_definitions[1] = &new_item_beh;
     new_garb_beh.parent_definitions[2] = &new_garb_beh;
 
-    memcpy(&new_proj_beh, game_defs[etoi(ObjectType::PROJECTILE)], d_size);
+    memcpy(&new_proj_beh, game_defs[etoi(ObjectType::PROJECTILE)], def_size);
     new_proj_beh.parent_definitions[0] = &new_obje_beh;
     new_proj_beh.parent_definitions[1] = &new_proj_beh;
 
-    memcpy(&new_scen_beh, game_defs[etoi(ObjectType::SCENERY)], d_size);
+    memcpy(&new_scen_beh, game_defs[etoi(ObjectType::SCENERY)], def_size);
     new_scen_beh.parent_definitions[0] = &new_obje_beh;
     new_scen_beh.parent_definitions[1] = &new_scen_beh;
 
-    memcpy(&new_mach_beh, game_defs[etoi(ObjectType::MACHINE)], d_size);
+    memcpy(&new_mach_beh, game_defs[etoi(ObjectType::MACHINE)], def_size);
     new_mach_beh.parent_definitions[0] = &new_obje_beh;
     new_mach_beh.parent_definitions[1] = &new_devi_beh;
     new_mach_beh.parent_definitions[2] = &new_mach_beh;
 
-    memcpy(&new_ctrl_beh, game_defs[etoi(ObjectType::CONTROL)], d_size);
+    memcpy(&new_ctrl_beh, game_defs[etoi(ObjectType::CONTROL)], def_size);
     new_ctrl_beh.parent_definitions[0] = &new_obje_beh;
     new_ctrl_beh.parent_definitions[1] = &new_devi_beh;
     new_ctrl_beh.parent_definitions[2] = &new_ctrl_beh;
 
-    memcpy(&new_lifi_beh, game_defs[etoi(ObjectType::LIGHT_FIXTURE)], d_size);
+    memcpy(&new_lifi_beh, game_defs[etoi(ObjectType::LIGHT_FIXTURE)], def_size);
     new_lifi_beh.parent_definitions[0] = &new_obje_beh;
     new_lifi_beh.parent_definitions[1] = &new_devi_beh;
     new_lifi_beh.parent_definitions[2] = &new_lifi_beh;
 
-    memcpy(&new_plac_beh, game_defs[etoi(ObjectType::PLACEHOLDER)], d_size);
+    memcpy(&new_plac_beh, game_defs[etoi(ObjectType::PLACEHOLDER)], def_size);
     new_plac_beh.parent_definitions[0] = &new_obje_beh;
     new_plac_beh.parent_definitions[1] = &new_plac_beh;
 
-    memcpy(&new_ssce_beh, game_defs[etoi(ObjectType::SOUND_SCENERY)], d_size);
+    memcpy(&new_ssce_beh, game_defs[etoi(ObjectType::SOUND_SCENERY)], def_size);
     new_ssce_beh.parent_definitions[0] = &new_obje_beh;
     new_ssce_beh.parent_definitions[1] = &new_ssce_beh;
 
     // Backup old array of def pointers for when the DLL needs to unload.
 
-    size_t a_size = sizeof(uintptr_t)*POSITIVE_OBJECT_TYPES;
+    size_t array_size = sizeof(uintptr_t)*POSITIVE_OBJECT_TYPES;
 
-    memcpy(&vanilla_def_pointers_backup, game_defs, a_size);
+    memcpy(&vanilla_def_pointers_backup, game_defs, array_size);
 
     // Replace old array of def pointers with pointers to our new defs.
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, a_size, PAGE_EXECUTE_READWRITE, &prota);
+    VirtualProtect(game_defs, array_size, PAGE_EXECUTE_READWRITE, &prota);
 
     game_defs[etoi(ObjectType::BIPED)]          = &new_bipd_beh;
     game_defs[etoi(ObjectType::VEHICLE)]        = &new_vehi_beh;
@@ -298,7 +298,7 @@ void init_object_hooks(){
     game_defs[etoi(ObjectType::PLACEHOLDER)]    = &new_plac_beh;
     game_defs[etoi(ObjectType::SOUND_SCENERY)]  = &new_ssce_beh;
 
-    VirtualProtect(game_defs, a_size, prota, &protb);
+    VirtualProtect(game_defs, array_size, prota, &protb);
 
     // Copy the function pointers to our assembly callable vars
     // before we hook into them.
@@ -340,12 +340,12 @@ void revert_object_hooks(){
 
     // Revert to the old defs.
 
-    size_t a_size = sizeof(uintptr_t)*POSITIVE_OBJECT_TYPES;
+    size_t array_size = sizeof(uintptr_t)*POSITIVE_OBJECT_TYPES;
 
     DWORD prota, protb;
-    VirtualProtect(game_defs, a_size, PAGE_EXECUTE_READWRITE, &prota);
-    memcpy(game_defs, &vanilla_def_pointers_backup, a_size);
-    VirtualProtect(game_defs, a_size, prota, &protb);
+    VirtualProtect(game_defs, array_size, PAGE_EXECUTE_READWRITE, &prota);
+    memcpy(game_defs, &vanilla_def_pointers_backup, array_size);
+    VirtualProtect(game_defs, array_size, prota, &protb);
 
     revert_weapon_hooks();
 
