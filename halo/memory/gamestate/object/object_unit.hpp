@@ -425,7 +425,7 @@ public:
             int8_t  grenade_counts[2];
             PAD(2);
             float   body_vitality;
-            float   shield_vitality;
+            float   shield_vitality; // Actual shield divided by 3
             bool    shield_stun_ticks_greater_than_zero;
             PAD(3);
         }; static_assert(sizeof(BipedNetworkDelta) == 0x10);

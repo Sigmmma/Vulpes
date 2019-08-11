@@ -12,6 +12,12 @@
 #define PAD(s) uint8_t CONCAT2(padding, __LINE__)[s]
 #define BITPAD(type,s) type CONCAT2(padding, __LINE__) : s
 
+// Convert enums to integers and unsigned integers
+
+#define etoi(enum_value) static_cast<int>(enum_value)
+#define etou(enum_value) static_cast<unsigned int>(enum_value)
+
+
 #define NULL __null
 
 // Class for references in Halo memory. Not the same as TagRef.

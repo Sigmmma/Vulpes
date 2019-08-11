@@ -62,7 +62,7 @@ uint32_t mdp_encode_stateless_iterated(
 
     return mdp_encode_stateless_iterated(output_buffer, 0, type, 0, unencoded_message, 0, 1, 0);
 }
-// Test this
+// Test this // Wrong, eax is also an input for the type.
 bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header){
     bool success;
     asm (
