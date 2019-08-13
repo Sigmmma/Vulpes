@@ -10,7 +10,7 @@
 
 .globl _weapon_pull_trigger_wrapper
 _weapon_pull_trigger_wrapper:
-        cc_before _before_weapon_pull_trigger
+        cc_before_pass_input _before_weapon_pull_trigger
 
         // Re-Push arguments.
         push [esp+8]
@@ -18,7 +18,7 @@ _weapon_pull_trigger_wrapper:
         call weapon_pull_trigger_actual
         add esp, 8
 
-        cc_after _after_weapon_pull_trigger
+        cc_after_pass_output _after_weapon_pull_trigger
 
         ret
     weapon_pull_trigger_actual:
