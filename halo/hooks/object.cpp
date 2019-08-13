@@ -63,7 +63,11 @@ extern "C" bool before_weapon_pull_trigger(WeaponPullTrigArgs* args){
 extern "C" void after_weapon_pull_trigger(WeaponPullTrigArgs* args){
 }
 
-Patch(weapon_pull_trigger_hook_patch, sig_weapon_pull_trigger, 0, 6, JMP_PATCH, &weapon_pull_trigger_wrapper);
+Patch(
+    weapon_pull_trigger_hook_patch,
+    sig_weapon_pull_trigger, 0, 6,
+    JMP_PATCH, &weapon_pull_trigger_wrapper
+);
 
 void init_weapon_hooks(){
     if (weapon_pull_trigger_hook_patch.build()) {

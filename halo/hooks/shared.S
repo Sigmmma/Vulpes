@@ -48,4 +48,25 @@ cancel_hook:
         popad
 .endm
 
+// Protects the stack and executes the before function.
+//
+// Cancels the actual function and the after function if that returns false.
+
+.macro cc_before_no_pass func
+        pushad
+        call \func
+        // If this function returns false, block the execution of the next.
+        test al,al
+        je cancel_hook
+        popad
+.endm
+
+// Protects the stack and executes the after function.
+
+.macro cc_after_no_pass func
+        pushad
+        call \func
+        popad
+.endm
+
 .att_syntax
