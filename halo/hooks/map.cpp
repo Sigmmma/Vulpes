@@ -35,30 +35,38 @@ Signature(true, sig_event_map_reset_hook, {0x5B, 0x68, -1, -1, -1, -1, 0x33, 0xC
 char* mp_map_name = NULL;
 char* sp_map_name = NULL;
 
-bool before_sp(){
+bool before_map_load_sp(){
     call_in_order(pre_map);
     call_in_order(pre_sp);
     return true;
 }
 
-void after_sp(){
+void after_map_load_sp(){
     call_in_order(post_map);
     call_in_order(post_sp);
 }
 
-bool before_mp(){
+bool before_map_load_mp(){
     call_in_order(pre_map);
     call_in_order(pre_mp);
     return true;
 }
 
-void after_mp(){
+void after_map_load_mp(){
     call_in_order(post_map);
     call_in_order(post_mp);
 }
 
-Cave(map_load_ui_sp_hook, sig_map_load_ui_sp, 0, 5, &before_sp, &after_sp);
-Cave(map_load_mp_hook, sig_map_load_mp, 0, 6, &before_mp, &after_mp);
+Cave(
+    map_load_ui_sp_hook,
+    sig_map_load_ui_sp, 0, 5,
+    &before_map_load_sp, &after_map_load_sp
+);
+Cave(
+    map_load_mp_hook,
+    sig_map_load_mp, 0, 6,
+    &before_map_load_mp, &after_map_load_mp
+);
 
 void init_map_hooks(bool is_server){
     if (!is_server){
