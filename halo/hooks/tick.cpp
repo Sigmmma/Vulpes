@@ -10,12 +10,12 @@
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_TICK, pre_events);
 DEFINE_EVENT_HOOK_LIST(EVENT_TICK, events);
 
-extern "C" bool before_tick(intptr_t original_args_ptr){
+extern "C" bool before_tick(uint32_t* last_tick_index){
     call_in_order(pre_events);
     return true;
 }
 
-extern "C" void after_tick(intptr_t original_args_ptr){
+extern "C" void after_tick(){
     call_in_order(events);
 }
 
