@@ -120,41 +120,6 @@ private:
     void write_patch(std::vector<int16_t> patch_code);
 };
 
-#define Cave(name, ...) CodeCave name(#name, __VA_ARGS__)
-
-class CodeCave {
-public:
-    ////// Initlializers.
-    template<typename T, typename T2>
-    CodeCave(const char* h_name, CodeSignature& p_sig, int p_sig_offset,
-             size_t p_size, T before, T2 after) CCTEMPLINIT1;
-    template<typename T, typename T2>
-    CodeCave(const char* h_name, uintptr_t p_address,
-             size_t p_size, T before, T2 after) CCTEMPLINIT2;
-    bool build(intptr_t p_address = 0);
-    // Applies the patch.
-    void apply();
-    // Reverts the code to the original bytes.
-    void revert();
-
-    // Returns the patch contained within this class.
-    // Can be used to interact with the existing interfaces
-    // to for instance check integrity.
-    CodePatch* patch();
-
-private:
-    CodeSignature sig = CodeSignature(false,"",0,0,{});
-    intptr_t before_func;
-    intptr_t func_continue;
-    intptr_t after_func;
-    intptr_t cave_address;
-    intptr_t patch_address = 0;
-    size_t patch_size = 0;
-    int patch_offset = 0;
-    const char* name;
-    CodePatch code_patch = CodePatch("",0,0,NOP_PATCH,0);
-};
-
 // Gets the direct pointer to whatever the instruction at this address CALLs or JUMPs to.
 uintptr_t get_call_address(intptr_t call_pointer);
 void      set_call_address(intptr_t call_pointer, intptr_t point_to);
@@ -175,5 +140,3 @@ uintptr_t get_lowest_permitted_address();
 uintptr_t get_highest_permitted_address();
 void set_lowest_permitted_address(uintptr_t new_address);
 void set_highest_permitted_address(uintptr_t new_address);
-void init_code_caves();
-void revert_code_caves();

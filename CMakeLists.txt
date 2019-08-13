@@ -30,7 +30,6 @@ add_library(Vulpes SHARED
     command/handler.cpp
     command/server.cpp
 
-    hooker/code_cave.cpp
     hooker/hooker.cpp
 
     includes/string_raw_data_encoder.c
