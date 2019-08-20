@@ -17,6 +17,25 @@
 #define etoi(enum_value) static_cast<int>(enum_value)
 #define etou(enum_value) static_cast<unsigned int>(enum_value)
 
+// Array sum and average functions.
+
+template<typename T, typename A>
+static inline T sum(A array, size_t size) {
+    T sum = 0;
+    for (int i=0; i<size; i++){
+        sum += array[i];
+    };
+    return sum;
+}
+
+template<typename T, typename A>
+static inline T avg(A array, size_t size) {
+    T sum = 0;
+    for (int i=0; i<size; i++){
+        sum += array[i];
+    };
+    return sum / size;
+}
 
 #define NULL __null
 
