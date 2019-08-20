@@ -10,6 +10,8 @@
 #include "../memory/types.hpp"
 #include <chrono>
 
+bool print_tick_duration = false;
+
 const size_t TICKS_PER_SECOND = 30; //TODO: Move this somewhere else.
 
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_TICK, pre_events);
@@ -29,16 +31,17 @@ extern "C" bool before_tick(uint32_t* last_tick_index){
 extern "C" void after_tick(){
     call_in_order(events);
 
+    // Benchmarking stuff.
+    // Move this somewhere else eventually.
+
     auto after = std::chrono::high_resolution_clock::now();
-    size_t mod = tick_count % TICKS_PER_SECOND;
-    tick_duration[mod] = static_cast<float>(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(after-before).count()
-    );
-    if (tick_count > 0 && mod == 0){
+    int mod = tick_count % TICKS_PER_SECOND;
+    tick_duration[mod] = static_cast<float>(std::chrono::duration_cast<std::chrono::nanoseconds>(after-before).count());
+    if (print_tick_duration && tick_count > 0 && mod == 0){
         float average = avg<float>(tick_duration, TICKS_PER_SECOND);
         cprintf(
             "Average Tick Time for last second: %.6f ms",
-            average / 1000000.0
+            average / 1000000.0 // Nanoseconds to miliseconds.
         );
     };
     tick_count++;
