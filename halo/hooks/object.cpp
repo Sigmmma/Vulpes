@@ -9,29 +9,24 @@
 #include "../memory/gamestate/object/object.hpp"
 #include "../memory/types.hpp"
 #include "../memory/behavior_definition.hpp"
+#include "../functions/messaging.hpp"
 #include <windows.h>
 #include <cstring>
 
 // Shared signatures
 
+/* Unused
 Signature(true, sig_object_update,
     {0x51, 0x8B, 0x0D, -1, -1, -1, 0x00, 0x8B, 0x51, 0x34, 0x53, 0x8B,
      0x5C, 0x24, 0x0C, 0x8B, 0xC3, 0x25, 0xFF, 0xFF, 0x00, 0x00}); // + 0 size 7
 
 Signature(true, sig_objects_update,
     {0x00, 0x8A, -1, 0x0C, 0x83, 0xEC, 0x0C}); // -5 on client, -4 on server. size 6 on client, size 5 on server.
-
-Signature(true, sig_object_new,
-    {0x81, 0xEC, 0x1C, 0x02, 0x00, 0x00, 0x8B, 0x0D}); // size 6, do manual
-
-// Biped signatures
-
-Signature(true, sig_biped_jump,
-    {0x8B, 0x0D, -1, -1, -1, 0x00,
-     0x8B, 0x51, 0x34, 0x83, 0xEC, 0x10, 0x53, 0x55}); // size 6 do manual
+*/
 
 // Weapon signatures
 
+/* Unused for now.
 Signature(true, sig_weapon_fire_call,
     {0x8B, 0x8C, 0x24, 0xAC, 0x00, 0x00, 0x00, 0x50, 0x51, 0x56,
      0xE8, -1, -1, 0x00, 0x00, 0x83, 0xC4, 0x0C}); // + 0xA size 5
@@ -39,46 +34,9 @@ Signature(true, sig_weapon_fire_call,
 Signature(true, sig_weapon_fire_object_new_call,
     {0x8D, 0x84, 0x24, 0xA4, 0x00, 0x00, 0x00, 0x50,
      0xE8, -1, -1, -1, 0x00, 0x8B, 0xF0}); // + 8 size 5
+*/
 
-Signature(true, sig_weapon_pull_trigger,
-    {0x81, 0xEC, 0x94, 0x00, 0x00, 0x00, 0x8B, 0x84,
-     0x24, 0x98, 0x00, 0x00, 0x00, 0x8B, 0x0D}); // size 6 do manual
 
-extern "C" {
-
-    uintptr_t after_weapon_hook__pull_trigger;
-    extern weapon_pull_trigger_wrapper();
-
-}
-
-struct WeaponPullTriggerArgs {
-    uint32_t obj;
-    int trigger_id;
-};
-
-extern "C" bool before_weapon_pull_trigger(WeaponPullTriggerArgs* args){
-    return true;
-}
-
-extern "C" void after_weapon_pull_trigger(WeaponPullTriggerArgs* args){
-}
-
-Patch(
-    weapon_pull_trigger_hook_patch,
-    sig_weapon_pull_trigger, 0, 6,
-    JMP_PATCH, &weapon_pull_trigger_wrapper
-);
-
-void init_weapon_hooks(){
-    if (weapon_pull_trigger_hook_patch.build()) {
-        weapon_pull_trigger_hook_patch.apply();
-        after_weapon_hook__pull_trigger = weapon_pull_trigger_hook_patch.return_address();
-    };
-}
-
-void revert_weapon_hooks(){
-    weapon_pull_trigger_hook_patch.revert();
-}
 
 // New behavior definitions, when initialized hooking into
 // one of these functions is as simple as re-assigning
@@ -105,30 +63,7 @@ ObjectBehaviorDefinition new_lifi_beh;
 ObjectBehaviorDefinition new_plac_beh;
 ObjectBehaviorDefinition new_ssce_beh;
 
-// Defining this as a macro since it is repeated 16 times.
 
-#define DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(type) \
-    ObjAdjustPlacement            type ## _adjust_placement              = NULL; \
-    ObjCreate                     type ## _create                        = NULL; \
-    ObjPlace                      type ## _place                         = NULL; \
-    ObjDestroy                    type ## _destroy                       = NULL; \
-    ObjUpdate                     type ## _update                        = NULL; \
-    ObjExportFunctionValues       type ## _export_function_values        = NULL; \
-    ObjHandleDeletedObject        type ## _handle_deleted_object         = NULL; \
-    ObjHandleRegionDestroyed      type ## _handle_region_destroyed       = NULL; \
-    ObjHandleParentDestroyed      type ## _handle_parent_destroyed       = NULL; \
-    ObjPreprocessNodeOrientations type ## _preprocess_node_orientations  = NULL; \
-    ObjPostprocessNodeMatricies   type ## _postprocess_node_matricies    = NULL; \
-    ObjReset                      type ## _reset                         = NULL; \
-    ObjDisconnectFromStructureBsp type ## _disconnect_from_structure_bsp = NULL; \
-    ObjNotifyImpulseSound         type ## _notify_impulse_sound          = NULL; \
-    ObjRenderDebug                type ## _render_debug                  = NULL; \
-    ObjNewToNetwork               type ## _new_to_network                = NULL; \
-    ObjUpdateBaseline             type ## _update_baseline               = NULL; \
-    ObjGenerateUpdateHeader       type ## _generate_update_header        = NULL; \
-    ObjHandleReceivedUpdate       type ## _handle_received_update        = NULL; \
-    ObjShouldDoUpdateIncremental  type ## _should_do_update_incremental  = NULL; \
-    ObjSetLastUpdateTime          type ## _set_last_update_time          = NULL; \
     // End of Macro
 
 extern "C" { // Demangle naming for ASM.
@@ -137,6 +72,31 @@ extern "C" { // Demangle naming for ASM.
     // Declaring all function pointers for each object type here
     // so that the assembly can access it easily if needed.
 
+    // Defining this as a macro since it is repeated 16 times.
+
+    #define DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(type) \
+        ObjAdjustPlacement            type ## _adjust_placement              = NULL; \
+        ObjCreate                     type ## _create                        = NULL; \
+        ObjPlace                      type ## _place                         = NULL; \
+        ObjDestroy                    type ## _destroy                       = NULL; \
+        ObjUpdate                     type ## _update                        = NULL; \
+        ObjExportFunctionValues       type ## _export_function_values        = NULL; \
+        ObjHandleDeletedObject        type ## _handle_deleted_object         = NULL; \
+        ObjHandleRegionDestroyed      type ## _handle_region_destroyed       = NULL; \
+        ObjHandleParentDestroyed      type ## _handle_parent_destroyed       = NULL; \
+        ObjPreprocessNodeOrientations type ## _preprocess_node_orientations  = NULL; \
+        ObjPostprocessNodeMatricies   type ## _postprocess_node_matricies    = NULL; \
+        ObjReset                      type ## _reset                         = NULL; \
+        ObjDisconnectFromStructureBsp type ## _disconnect_from_structure_bsp = NULL; \
+        ObjNotifyImpulseSound         type ## _notify_impulse_sound          = NULL; \
+        ObjRenderDebug                type ## _render_debug                  = NULL; \
+        ObjNewToNetwork               type ## _new_to_network                = NULL; \
+        ObjUpdateBaseline             type ## _update_baseline               = NULL; \
+        ObjGenerateUpdateHeader       type ## _generate_update_header        = NULL; \
+        ObjHandleReceivedUpdate       type ## _handle_received_update        = NULL; \
+        ObjShouldDoUpdateIncremental  type ## _should_do_update_incremental  = NULL; \
+        ObjSetLastUpdateTime          type ## _set_last_update_time          = NULL; \
+
     // Negative type indices
 
     DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(object);
@@ -144,7 +104,7 @@ extern "C" { // Demangle naming for ASM.
     DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(item);
     DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(unit);
 
-    // Positive type indices
+    // Positive (Valid) type indices
 
     DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(biped);
     DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(vehicle);
@@ -163,35 +123,85 @@ extern "C" { // Demangle naming for ASM.
     DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(placeholder);
     DELC_OBJ_BEHAVIOR_FUNCTION_PTRS(sound_scenery);
 
+    #undef DELC_OBJ_BEHAVIOR_FUNCTION_PTRS
+
 }
 
-// We're going to have to manually copy all of these, so we use another macro.
-
-#define COPY_EVENT_DEF(type, def) \
-    type ## _adjust_placement = def.adjust_placement; \
-    type ## _create = def.create; \
-    type ## _place = def.place; \
-    type ## _destroy = def.destroy; \
-    type ## _update = def.update; \
-    type ## _export_function_values = def.export_function_values; \
-    type ## _handle_deleted_object = def.handle_deleted_object; \
-    type ## _handle_region_destroyed = def.handle_region_destroyed; \
-    type ## _handle_parent_destroyed = def.handle_parent_destroyed; \
-    type ## _preprocess_node_orientations = def.preprocess_node_orientations; \
-    type ## _postprocess_node_matricies = def.postprocess_node_matricies; \
-    type ## _reset = def.reset; \
-    type ## _disconnect_from_structure_bsp = def.disconnect_from_structure_bsp; \
-    type ## _notify_impulse_sound = def.notify_impulse_sound; \
-    type ## _render_debug = def.render_debug; \
-    type ## _new_to_network = def.new_to_network; \
-    type ## _update_baseline = def.update_baseline; \
-    type ## _generate_update_header = def.generate_update_header; \
-    type ## _handle_received_update = def.handle_received_update; \
-    type ## _should_do_update_incremental = def.should_do_update_incremental; \
-    type ## _set_last_update_time = def.set_last_update_time; \
-    // End of Macro
-
 static ObjectBehaviorDefinition* vanilla_def_pointers_backup[POSITIVE_OBJECT_TYPES];
+
+extern "C" {
+
+    uintptr_t after_object_hook__create;
+    extern object_create_wrapper();
+
+    uintptr_t after_weapon_hook__pull_trigger;
+    extern weapon_pull_trigger_wrapper();
+
+    uintptr_t after_biped_hook__jump;
+    extern biped_jump_wrapper();
+
+}
+
+struct ObjectCreateArgs {
+    int unknown;
+    int unknown2;
+};
+
+extern "C" bool before_object_create(ObjectCreateArgs* args){
+    return true;
+}
+
+extern "C" void after_object_create(uint32_t* ret_value){
+    cprintf_info("Object created with index %X", *ret_value);
+}
+
+Signature(true, sig_object_create,
+    {0x81, 0xEC, 0x1C, 0x02, 0x00, 0x00, 0x8B, 0x0D});
+Patch(
+    object_create_hook_patch,
+    sig_object_create, 0, 6,
+    JMP_PATCH, &object_create_wrapper
+);
+
+// Only called when a biped actually jumps
+
+extern "C" bool before_biped_jump(uint32_t* obj){
+    return true;
+}
+
+extern "C" void after_biped_jump(uint32_t* obj){
+}
+
+Signature(true, sig_biped_jump,
+    {0x8B, 0x0D, -1, -1, -1, 0x00,
+     0x8B, 0x51, 0x34, 0x83, 0xEC, 0x10, 0x53, 0x55});
+Patch(
+    biped_jump_hook_patch,
+    sig_biped_jump, 6, 6,
+    JMP_PATCH, &biped_jump_wrapper
+);
+
+struct WeaponPullTriggerArgs {
+    uint32_t obj;
+    int trigger_id;
+};
+
+extern "C" bool before_weapon_pull_trigger(WeaponPullTriggerArgs* args){
+    return true;
+}
+
+extern "C" void after_weapon_pull_trigger(WeaponPullTriggerArgs* args){
+}
+
+Signature(true, sig_weapon_pull_trigger,
+    {0x81, 0xEC, 0x94, 0x00, 0x00, 0x00, 0x8B, 0x84,
+     0x24, 0x98, 0x00, 0x00, 0x00, 0x8B, 0x0D});
+Patch(
+    weapon_pull_trigger_hook_patch,
+    sig_weapon_pull_trigger, 0, 6,
+    JMP_PATCH, &weapon_pull_trigger_wrapper
+);
+
 
 void init_object_hooks(){
     auto game_defs = object_behavior_defs();
@@ -306,6 +316,31 @@ void init_object_hooks(){
 
     // Copy the function pointers to our assembly callable vars
     // before we hook into them.
+    // We're going to have to manually copy all of these, so we use another macro.
+
+    #define COPY_EVENT_DEF(type, def) \
+        type ## _adjust_placement = def.adjust_placement; \
+        type ## _create = def.create; \
+        type ## _place = def.place; \
+        type ## _destroy = def.destroy; \
+        type ## _update = def.update; \
+        type ## _export_function_values = def.export_function_values; \
+        type ## _handle_deleted_object = def.handle_deleted_object; \
+        type ## _handle_region_destroyed = def.handle_region_destroyed; \
+        type ## _handle_parent_destroyed = def.handle_parent_destroyed; \
+        type ## _preprocess_node_orientations = def.preprocess_node_orientations; \
+        type ## _postprocess_node_matricies = def.postprocess_node_matricies; \
+        type ## _reset = def.reset; \
+        type ## _disconnect_from_structure_bsp = def.disconnect_from_structure_bsp; \
+        type ## _notify_impulse_sound = def.notify_impulse_sound; \
+        type ## _render_debug = def.render_debug; \
+        type ## _new_to_network = def.new_to_network; \
+        type ## _update_baseline = def.update_baseline; \
+        type ## _generate_update_header = def.generate_update_header; \
+        type ## _handle_received_update = def.handle_received_update; \
+        type ## _should_do_update_incremental = def.should_do_update_incremental; \
+        type ## _set_last_update_time = def.set_last_update_time; \
+        // End of Macro
 
     COPY_EVENT_DEF(object,          new_obje_beh);
     COPY_EVENT_DEF(device,          new_devi_beh);
@@ -325,6 +360,8 @@ void init_object_hooks(){
     COPY_EVENT_DEF(placeholder,     new_plac_beh);
     COPY_EVENT_DEF(sound_scenery,   new_ssce_beh);
 
+    #undef COPY_EVENT_DEF
+
     // Put hooks in place.
     // Hooking into one of the above copied functions is as easy as replacing
     // its pointer with the pointer to the replacing function.
@@ -332,9 +369,28 @@ void init_object_hooks(){
     // when doing that make sure to call the old function. It can simply be
     // called by name because of how we've copied them.
 
-    // Other hooks:
+    //////// Other hooks:
 
-    init_weapon_hooks();
+    // Objects:
+
+    if (object_create_hook_patch.build()) {
+        object_create_hook_patch.apply();
+        after_object_hook__create = object_create_hook_patch.return_address();
+    };
+
+    // Bipeds:
+
+    if (biped_jump_hook_patch.build()) {
+        biped_jump_hook_patch.apply();
+        after_biped_hook__jump = biped_jump_hook_patch.return_address();
+    };
+
+    // Weapons:
+
+    if (weapon_pull_trigger_hook_patch.build()) {
+        weapon_pull_trigger_hook_patch.apply();
+        after_weapon_hook__pull_trigger = weapon_pull_trigger_hook_patch.return_address();
+    };
 
 }
 
@@ -351,6 +407,10 @@ void revert_object_hooks(){
     memcpy(game_defs, &vanilla_def_pointers_backup, array_size);
     VirtualProtect(game_defs, array_size, prota, &protb);
 
-    revert_weapon_hooks();
+    //////// Other hooks:
+
+    // Weapons:
+
+    weapon_pull_trigger_hook_patch.revert();
 
 }
