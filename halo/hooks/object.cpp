@@ -190,7 +190,7 @@ extern "C" bool before_weapon_pull_trigger(WeaponPullTriggerArgs* args){
     return true;
 }
 
-extern "C" void after_weapon_pull_trigger(WeaponPullTriggerArgs* args){
+extern "C" void after_weapon_pull_trigger(){
 }
 
 Signature(true, sig_weapon_pull_trigger,

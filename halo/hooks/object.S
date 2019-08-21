@@ -54,7 +54,7 @@ _weapon_pull_trigger_wrapper:
         call weapon_pull_trigger_actual
         add esp, 8
 
-        cc_after_pass_output _after_weapon_pull_trigger
+        cc_after_no_pass _after_weapon_pull_trigger
 
         ret
     weapon_pull_trigger_actual:
