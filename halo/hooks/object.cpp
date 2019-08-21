@@ -51,16 +51,16 @@ extern "C" {
 
 }
 
-struct WeaponPullTrigArgs {
+struct WeaponPullTriggerArgs {
     uint32_t obj;
     int trigger_id;
 };
 
-extern "C" bool before_weapon_pull_trigger(WeaponPullTrigArgs* args){
+extern "C" bool before_weapon_pull_trigger(WeaponPullTriggerArgs* args){
     return true;
 }
 
-extern "C" void after_weapon_pull_trigger(WeaponPullTrigArgs* args){
+extern "C" void after_weapon_pull_trigger(WeaponPullTriggerArgs* args){
 }
 
 Patch(
