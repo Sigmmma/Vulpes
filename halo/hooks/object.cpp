@@ -61,8 +61,6 @@ ObjectBehaviorDefinition new_plac_beh;
 ObjectBehaviorDefinition new_ssce_beh;
 
 
-    // End of Macro
-
 extern "C" { // Demangle naming for ASM.
 
     //////////
