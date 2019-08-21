@@ -9,11 +9,11 @@
 #include "../memory/gamestate/object/object.hpp"
 #include "../memory/types.hpp"
 #include "../memory/behavior_definition.hpp"
-#include "../functions/messaging.hpp"
 #include <windows.h>
 #include <cstring>
 
-// Shared signatures
+// Signatures for finding stuff.
+// Currently unused. Will be used soon.
 
 /* Unused
 Signature(true, sig_object_update,
@@ -30,13 +30,10 @@ Signature(true, sig_objects_update,
 Signature(true, sig_weapon_fire_call,
     {0x8B, 0x8C, 0x24, 0xAC, 0x00, 0x00, 0x00, 0x50, 0x51, 0x56,
      0xE8, -1, -1, 0x00, 0x00, 0x83, 0xC4, 0x0C}); // + 0xA size 5
-
 Signature(true, sig_weapon_fire_object_new_call,
     {0x8D, 0x84, 0x24, 0xA4, 0x00, 0x00, 0x00, 0x50,
      0xE8, -1, -1, -1, 0x00, 0x8B, 0xF0}); // + 8 size 5
 */
-
-
 
 // New behavior definitions, when initialized hooking into
 // one of these functions is as simple as re-assigning
@@ -151,8 +148,7 @@ extern "C" bool before_object_create(ObjectCreateArgs* args){
     return true;
 }
 
-extern "C" void after_object_create(uint32_t* ret_value){
-    cprintf_info("Object created with index %X", *ret_value);
+extern "C" void after_object_create(uint32_t* obj){
 }
 
 Signature(true, sig_object_create,
