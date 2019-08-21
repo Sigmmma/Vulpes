@@ -6,10 +6,6 @@
 
 #include "tick.hpp"
 #include "../../hooker/hooker.hpp"
-#include "../functions/messaging.hpp"
-#include "../memory/types.hpp"
-
-bool print_tick_duration = false;
 
 const size_t TICKS_PER_SECOND = 30; //TODO: Move this somewhere else.
 
