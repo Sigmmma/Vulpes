@@ -40,9 +40,9 @@ cancel_hook:
         pushad
         // Push pointer to result.
         // pushad pushes all registers starting with eax.
-        // eax contains the return value. 8*4 = 0x20 so look there for eax.
+        // eax contains the return value. 7*4 = 0x1C so look there for eax.
         push esp
-        add DWORD PTR ds:[esp],0x20
+        add DWORD PTR ds:[esp],0x1C
         call \func
         add esp, 4
         popad
