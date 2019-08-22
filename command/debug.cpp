@@ -68,12 +68,12 @@ void init_debug_commands(){
 
     static VulpesCommand cmd_get_network_id_from_obj_id(
         "v_dev_get_network_id_from_obj_id",
-        &get_network_id_from_obj_id, 0, 1,
+        &get_network_id_from_obj_id, 4, 1,
         VulpesArgDef("", true, A_LONG)
     );
     static VulpesCommand cmd_get_object_id_from_network_id(
         "v_dev_get_object_id_from_network_id",
-        &get_object_id_from_network_id, 0, 1,
+        &get_object_id_from_network_id, 4, 1,
         VulpesArgDef("", true, A_LONG)
     );
 }
