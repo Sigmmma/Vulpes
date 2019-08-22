@@ -5,6 +5,7 @@
  */
 
 #include "../../hooker/hooker.hpp"
+#include "../memory/types.hpp"
 
 Signature(true, sig_message_delta_object_index, {0x8B, 0x44, 0x24, 0x14, 0x50, 0x8B, 0xCF, 0xB8, -1, -1, -1, -1, 0xE8});
 
@@ -20,7 +21,7 @@ uintptr_t message_delta_object_index = *reinterpret_cast<uintptr_t*>(sig_message
 uintptr_t func_server_register_network_index = sig_func_server_register_network_index.address();
 uintptr_t func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.address();
 uintptr_t func_unregister_network_index = sig_func_unregister_network_index.address();
-typedef struct{
+struct SyncedObjectHeader{
     uint32_t max_count;
     uint32_t int1;                  //0x4
     uint32_t int2;                  //0x8
@@ -34,7 +35,7 @@ typedef struct{
     uint32_t pointer8;              //0x20
     uint32_t last_used_slot;        //0x24
     MemRef* translation_index;      //0x28 // same as network_translation_table
-}SyncedObjectHeader;
+};
 
 int32_t server_register_network_index(MemRef object){
     SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHeader*>(message_delta_object_index + 0x58);
@@ -77,22 +78,22 @@ void unregister_network_index(MemRef object){
         "mov esi, %[local_object_id];"
         "call %[unregister_network_index];"
         :
-        : [message_delta_object_index] "+m" (message_delta_object_index),
+        : [message_delta_object_index] "m" (message_delta_object_index),
           [local_object_id] "m" (object.raw),
           [unregister_network_index] "m" (func_unregister_network_index)
     );
 }
 
 MemRef get_object_from_network_index(int32_t network_id){
-    MemRef* network_translation_table = reinterpret_cast<MemRef*>(*translation_table_ptr + 0x28);
+    static MemRef* network_translation_table = reinterpret_cast<MemRef*>(*reinterpret_cast<uintptr_t*>(sig_translation_table_ptr.address()) + 0x28);
     return network_translation_table[network_id];
 }
 
 int32_t get_network_id_from_object(MemRef object){
-    SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHandler*>(message_delta_object_index + 0x58);
-    MemRef* network_translation_table = reinterpret_cast<MemRef*>(*translation_table_ptr + 0x28);
+    SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHeader*>(message_delta_object_index + 0x58);
+    static MemRef* network_translation_table = reinterpret_cast<MemRef*>(*reinterpret_cast<uintptr_t*>(sig_translation_table_ptr.address()) + 0x28);
     for (int i=1; i < synced_objects->max_count; i++){
-        if (network_translation_table[network_id].raw == object.raw){
+        if (network_translation_table[i].raw == object.raw){
             return i;
         };
     };

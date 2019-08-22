@@ -79,6 +79,7 @@ add_library(Vulpes SHARED
     halo/memory/types.cpp
 
     halo/network/foxnet/vulpes_message.cpp
+    halo/network/network_id.cpp
 
     halo/tweaks/loading_screen.cpp
     halo/tweaks/tweaks.cpp
