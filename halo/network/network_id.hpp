@@ -12,8 +12,6 @@
 ////// There is only 511 network id slots, and when figuring this all out
 ////// I have seen a few servers that saturate these slots pretty badly.
 
-////// Everything in here is currently untested. This may very well not work.
-
 
 // Used to register a new id on creation of an object that we want to sync.
 int32_t server_register_network_index(MemRef object); // Returns -1 if there is no space to add one.
@@ -29,3 +27,6 @@ MemRef  get_object_from_network_index(int32_t network_id);
 
 // Used to find the network id for an object, when creating packets to send over.
 int32_t get_network_id_from_object(MemRef object); // returns -1 if not found.
+
+// Initialize all the pointers.
+void init_network_id();

@@ -5,8 +5,7 @@
  */
 
 #include "../../hooker/hooker.hpp"
-
-Signature(true, sig_message_delta_object_index, {0x8B, 0x44, 0x24, 0x14, 0x50, 0x8B, 0xCF, 0xB8, -1, -1, -1, -1, 0xE8});
+#include "../memory/types.hpp"
 
 Signature(true, sig_func_server_register_network_index, {0x55, 0x56, 0x8B, 0x70, 0x58, 0x8A, 0x46, 0x0C, 0x8D, 0x6E, 0x0C, 0x57, 0x83, 0xCF, 0xFF, 0x3C, 0x01, 0x75});
 
@@ -16,11 +15,12 @@ Signature(true, sig_func_unregister_network_index, {0x53, 0x57, 0x8B, 0x78, 0x58
 
 Signature(true, sig_translation_table_ptr, {-1, -1, -1, -1, 0x8B, 0x52, 0x28, 0x8B, 0x34, 0x8A});
 
-uintptr_t message_delta_object_index = *reinterpret_cast<uintptr_t*>(sig_message_delta_object_index.address() + 8);
-uintptr_t func_server_register_network_index = sig_func_server_register_network_index.address();
-uintptr_t func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.address();
-uintptr_t func_unregister_network_index = sig_func_unregister_network_index.address();
-typedef struct{
+uintptr_t message_delta_object_index;
+uintptr_t func_server_register_network_index;
+uintptr_t func_client_register_network_index_from_remote;
+uintptr_t func_unregister_network_index;
+
+struct SyncedObjectHeader{
     uint32_t max_count;
     uint32_t int1;                  //0x4
     uint32_t int2;                  //0x8
@@ -34,22 +34,27 @@ typedef struct{
     uint32_t pointer8;              //0x20
     uint32_t last_used_slot;        //0x24
     MemRef* translation_index;      //0x28 // same as network_translation_table
-}SyncedObjectHeader;
+};
+
+// Pointer to a pointer because the game might change the actual pointer
+// So we want to read what is in the game's pointer to make sure we're safe.
+SyncedObjectHeader** synced_objects_header = NULL;
 
 int32_t server_register_network_index(MemRef object){
-    SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHeader*>(message_delta_object_index + 0x58);
+    SyncedObjectHeader* synced_objects = *synced_objects_header;
     if (synced_objects->count >= synced_objects->max_count){
         // Just don't even try if we're at max capacity.
         return -1;
     };
     int32_t network_id;
     asm (
-        "mov eax, %[message_delta_object_index];"
+        "mov eax, %[synced_objects];"
         "push %[local_object_id];"
         "call %[server_register_network_index];"
         "mov %[network_id], eax;"
+        "add esp, 4;"
         :
-        : [message_delta_object_index] "m" (message_delta_object_index),
+        : [synced_objects] "m" (synced_objects),
           [network_id] "m" (network_id),
           [local_object_id] "m" (object.raw),
           [server_register_network_index] "m" (func_server_register_network_index)
@@ -58,13 +63,15 @@ int32_t server_register_network_index(MemRef object){
 }
 
 void register_network_index_from_remote(int32_t network_id, MemRef object){
+    SyncedObjectHeader* synced_objects = *synced_objects_header;
     asm (
-        "mov eax, %[message_delta_object_index];"
+        "mov eax, %[synced_objects];"
         "mov ecx, %[local_object_id];"
         "push %[network_id];"
         "call %[client_register_network_index_from_remote];"
+        "add esp, 4;"
         :
-        : [message_delta_object_index] "m" (message_delta_object_index),
+        : [synced_objects] "m" (synced_objects),
           [local_object_id] "m" (object.raw),
           [network_id] "m" (network_id),
           [client_register_network_index_from_remote] "m" (func_client_register_network_index_from_remote)
@@ -72,29 +79,52 @@ void register_network_index_from_remote(int32_t network_id, MemRef object){
 }
 
 void unregister_network_index(MemRef object){
+    SyncedObjectHeader* synced_objects = *synced_objects_header;
     asm (
-        "mov eax, %[message_delta_object_index];"
+        "mov edi, %[synced_objects];"
         "mov esi, %[local_object_id];"
-        "call %[unregister_network_index];"
+        "call unregister_network_index_prologue;"
+        // When the call above is done the code will end up here.
+        "jmp after;" // Do this jump to avoid an
+                     // ugly repeat ending in a fucked EIP
+
+        // Creating a prologue here because we're starting the function
+        // differently than intended.
+        // This is essentially a partial function inside of our function.
+    "unregister_network_index_prologue:"
+        "push ebx;"
+        "push edi;"
+        "jmp %[unregister_network_index];"
+        
+    "after:"
         :
-        : [message_delta_object_index] "+m" (message_delta_object_index),
+        : [synced_objects] "m" (synced_objects),
           [local_object_id] "m" (object.raw),
           [unregister_network_index] "m" (func_unregister_network_index)
     );
 }
 
 MemRef get_object_from_network_index(int32_t network_id){
-    MemRef* network_translation_table = reinterpret_cast<MemRef*>(*translation_table_ptr + 0x28);
-    return network_translation_table[network_id];
+    SyncedObjectHeader* synced_objects = *synced_objects_header;
+    return synced_objects->translation_index[network_id];
 }
 
 int32_t get_network_id_from_object(MemRef object){
-    SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHandler*>(message_delta_object_index + 0x58);
-    MemRef* network_translation_table = reinterpret_cast<MemRef*>(*translation_table_ptr + 0x28);
+    SyncedObjectHeader* synced_objects = *synced_objects_header;
     for (int i=1; i < synced_objects->max_count; i++){
-        if (network_translation_table[network_id].raw == object.raw){
+        if (synced_objects->translation_index[i].raw == object.raw){
             return i;
         };
     };
     return -1;
+}
+
+void init_network_id(){
+    synced_objects_header = reinterpret_cast<SyncedObjectHeader**>(*reinterpret_cast<uintptr_t**>(sig_translation_table_ptr.address()));
+    // +3 because if we enter the function on the second instruction
+    // we only need to supply the pointer to the synced_object_header.
+    func_server_register_network_index = sig_func_server_register_network_index.address() + 3;
+    func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.address() + 3;
+    // +5 Here for the same reason.
+    func_unregister_network_index = sig_func_unregister_network_index.address() + 5;
 }
