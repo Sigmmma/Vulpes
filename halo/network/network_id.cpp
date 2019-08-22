@@ -41,7 +41,7 @@ struct SyncedObjectHeader{
 SyncedObjectHeader** synced_objects_header = NULL;
 
 int32_t server_register_network_index(MemRef object){
-    SyncedObjectHeader* synced_objects = reinterpret_cast<SyncedObjectHeader*>(**reinterpret_cast<uintptr_t**>(sig_translation_table_ptr.address()));
+    SyncedObjectHeader* synced_objects = *synced_objects_header;
     if (synced_objects->count >= synced_objects->max_count){
         // Just don't even try if we're at max capacity.
         return -1;
@@ -52,6 +52,7 @@ int32_t server_register_network_index(MemRef object){
         "push %[local_object_id];"
         "call %[server_register_network_index];"
         "mov %[network_id], eax;"
+        "add esp, 4;"
         :
         : [message_delta_object_index] "m" (message_delta_object_index),
           [network_id] "m" (network_id),
@@ -67,6 +68,7 @@ void register_network_index_from_remote(int32_t network_id, MemRef object){
         "mov ecx, %[local_object_id];"
         "push %[network_id];"
         "call %[client_register_network_index_from_remote];"
+        "add esp, 4;"
         :
         : [message_delta_object_index] "m" (message_delta_object_index),
           [local_object_id] "m" (object.raw),
