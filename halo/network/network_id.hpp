@@ -12,8 +12,6 @@
 ////// There is only 511 network id slots, and when figuring this all out
 ////// I have seen a few servers that saturate these slots pretty badly.
 
-////// Everything in here is currently untested. This may very well not work.
-
 
 // Used to register a new id on creation of an object that we want to sync.
 int32_t server_register_network_index(MemRef object); // Returns -1 if there is no space to add one.
@@ -23,9 +21,6 @@ void    register_network_index_from_remote(int32_t network_id, MemRef object);
 
 // Used when an object should not be synced anymore.
 void    unregister_network_index(MemRef object);
-
-//            ||||
-// These work VVVV
 
 // Used for translating remote ids in messages.
 MemRef  get_object_from_network_index(int32_t network_id);

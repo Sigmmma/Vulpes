@@ -79,26 +79,26 @@ void register_network_index_from_remote(int32_t network_id, MemRef object){
 }
 
 void unregister_network_index(MemRef object){
-    /*
-     * We're creating this struct here because the original code looks for
-     * synced_objects at the offset 0x58 from the pointer in eax.
-     *
-     * What it does:
-     * mov edi, [eax+58h]
-     *
-     * This is just easier and more reliable than writing an ASM workaround.
-     */
-    struct {
-        PAD(0x58);
-        SyncedObjectHeader* synced_objects = *synced_objects_header;
-    }synced_objects;
-    auto synced_objects_ptr = &synced_objects;
+    SyncedObjectHeader* synced_objects = *synced_objects_header;
     asm (
-        "mov eax, %[synced_objects_ptr];"
+        "mov edi, %[synced_objects];"
         "mov esi, %[local_object_id];"
-        "call %[unregister_network_index];"
+        "call unregister_network_index_prologue;"
+        // When the call above is done the code will end up here.
+        "jmp after;" // Do this jump to avoid an
+                     // ugly repeat ending in a fucked EIP
+
+        // Creating a prologue here because we're starting the function
+        // differently than intended.
+        // This is essentially a partial function inside of our function.
+    "unregister_network_index_prologue:"
+        "push ebx;"
+        "push edi;"
+        "jmp %[unregister_network_index];"
+        
+    "after:"
         :
-        : [synced_objects_ptr] "m" (synced_objects_ptr),
+        : [synced_objects] "m" (synced_objects),
           [local_object_id] "m" (object.raw),
           [unregister_network_index] "m" (func_unregister_network_index)
     );
@@ -125,6 +125,6 @@ void init_network_id(){
     // we only need to supply the pointer to the synced_object_header.
     func_server_register_network_index = sig_func_server_register_network_index.address() + 3;
     func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.address() + 3;
-    // Not here because the function is a little more complicated.
-    func_unregister_network_index = sig_func_unregister_network_index.address();
+    // +5 Here for the same reason.
+    func_unregister_network_index = sig_func_unregister_network_index.address() + 5;
 }
