@@ -24,8 +24,14 @@ void    register_network_index_from_remote(int32_t network_id, MemRef object);
 // Used when an object should not be synced anymore.
 void    unregister_network_index(MemRef object);
 
+//            ||||
+// These work VVVV
+
 // Used for translating remote ids in messages.
 MemRef  get_object_from_network_index(int32_t network_id);
 
 // Used to find the network id for an object, when creating packets to send over.
 int32_t get_network_id_from_object(MemRef object); // returns -1 if not found.
+
+// Initialize all the pointers.
+void init_network_id();

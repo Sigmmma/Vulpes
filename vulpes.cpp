@@ -93,8 +93,9 @@ void init_halo_functions(){
     init_message_delta_sender();
 }
 
-
+#include "halo/network/network_id.hpp"
 void init_network(){
+    init_network_id();
 }
 
 #include "halo/functions/messaging.hpp"
