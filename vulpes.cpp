@@ -13,8 +13,6 @@
 #include "halo/hooks/object.hpp"
 #include "halo/hooks/map.hpp"
 void init_hooks(){
-    init_code_caves();
-
     init_incoming_packet_hooks();
     init_king_hooks();
     init_console_hooks();
@@ -23,8 +21,6 @@ void init_hooks(){
     init_map_hooks(game_is_server_executable());
 }
 void revert_hooks(){
-    revert_code_caves();
-
     revert_incoming_packet_hooks();
     revert_king_hooks();
     revert_console_hooks();

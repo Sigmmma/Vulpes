@@ -40,16 +40,3 @@ enum InstructionBytes : uint8_t {
     patch_size = p_size; type = p_type;\
     setup_internal(reinterpret_cast<void*>(&content), sizeof(T));\
 }
-
-#define CCTEMPLINIT1 {\
-    name = h_name; patch_size = p_size;\
-    sig = p_sig; patch_offset = p_sig_offset;\
-    before_func = reinterpret_cast<intptr_t>(before);\
-    after_func = reinterpret_cast<intptr_t>(after);\
-}
-
-#define CCTEMPLINIT2 {\
-    name = h_name; patch_size = p_size; patch_address = p_address;\
-    before_func = reinterpret_cast<intptr_t>(before);\
-    after_func = reinterpret_cast<intptr_t>(after);\
-}
