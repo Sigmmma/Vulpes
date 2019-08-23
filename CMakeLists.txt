@@ -30,16 +30,15 @@ add_library(Vulpes SHARED
     command/handler.cpp
     command/server.cpp
 
-    hooker/code_cave.cpp
     hooker/hooker.cpp
 
     includes/string_raw_data_encoder.c
     includes/crc32.c
 
     halo/fixes/animation.cpp
-    halo/fixes/animation.s
+    halo/fixes/animation.S
     halo/fixes/cpu_usage.cpp
-    halo/fixes/cpu_usage.s
+    halo/fixes/cpu_usage.S
     halo/fixes/file_handle_leak.cpp
     halo/fixes/framerate_dependent_timers.cpp
     halo/fixes/host_refusal.cpp
@@ -53,14 +52,17 @@ add_library(Vulpes SHARED
     halo/functions/table.cpp
 
     halo/hooks/console.cpp
-    halo/hooks/console.s
+    halo/hooks/console.S
     halo/hooks/incoming_packets.cpp
-    halo/hooks/incoming_packets.s
+    halo/hooks/incoming_packets.S
     halo/hooks/king.cpp
-    halo/hooks/king.s
+    halo/hooks/king.S
     halo/hooks/map.cpp
+    halo/hooks/map.S
     halo/hooks/object.cpp
+    halo/hooks/object.S
     halo/hooks/tick.cpp
+    halo/hooks/tick.S
 
     halo/memory/gamestate/object/object.cpp
     halo/memory/gamestate/object/object_device.cpp
@@ -84,7 +86,7 @@ add_library(Vulpes SHARED
     halo/tweaks/tweaks.cpp
 
     halo/upgrades/map.cpp
-    halo/upgrades/map.s
+    halo/upgrades/map.S
 
     halo/lua/lua.cpp
 )

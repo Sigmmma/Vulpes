@@ -6,6 +6,7 @@
 
 #include "map.hpp"
 #include "../../hooker/hooker.hpp"
+#include "../memory/types.hpp"
 
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_MAP_LOAD, pre_map);
 DEFINE_EVENT_HOOK_LIST(EVENT_MAP_LOAD, post_map);
@@ -31,46 +32,68 @@ Signature(false, sig_sp_map_name,
 
 Signature(true, sig_event_map_reset_hook, {0x5B, 0x68, -1, -1, -1, -1, 0x33, 0xC0});
 
-char* mp_map_name = 0;
-char* sp_map_name = 0;
+char* mp_map_name = NULL;
+char* sp_map_name = NULL;
 
-bool before_sp(){
+extern "C" bool before_map_load_sp(){
     call_in_order(pre_map);
     call_in_order(pre_sp);
     return true;
 }
 
-void after_sp(){
+extern "C" void after_map_load_sp(){
     call_in_order(post_map);
     call_in_order(post_sp);
 }
 
-bool before_mp(){
+extern "C" bool before_map_load_mp(){
     call_in_order(pre_map);
     call_in_order(pre_mp);
     return true;
 }
 
-void after_mp(){
+extern "C" void after_map_load_mp(){
     call_in_order(post_map);
     call_in_order(post_mp);
 }
 
-Cave(map_load_ui_sp_hook, sig_map_load_ui_sp, 0, 5, &before_sp, &after_sp);
-Cave(map_load_mp_hook, sig_map_load_mp, 0, 6, &before_mp, &after_mp);
+extern "C" {
+
+    uintptr_t map_load_sp_actual_jmp;
+    extern map_load_sp_wrapper();
+
+    uintptr_t map_load_mp_actual_jmp;
+    extern map_load_mp_wrapper();
+
+}
+
+Patch(
+    map_load_ui_sp_hook_patch,
+    sig_map_load_ui_sp, 0, 5,
+    JMP_PATCH, &map_load_sp_wrapper
+);
+Patch(
+    map_load_mp_hook_patch,
+    sig_map_load_mp, 0, 6,
+    JMP_PATCH, &map_load_mp_wrapper
+);
 
 void init_map_hooks(bool is_server){
     if (!is_server){
-        map_load_ui_sp_hook.build();
         sp_map_name = *reinterpret_cast<char**>(sig_sp_map_name.address());
-        map_load_ui_sp_hook.apply();
+
+        map_load_ui_sp_hook_patch.build();
+        map_load_ui_sp_hook_patch.apply();
+        map_load_sp_actual_jmp = map_load_ui_sp_hook_patch.return_address();
     };
-    map_load_mp_hook.build();
     mp_map_name = *reinterpret_cast<char**>(sig_map_name.address());
-    map_load_mp_hook.apply();
+
+    map_load_mp_hook_patch.build();
+    map_load_mp_hook_patch.apply();
+    map_load_mp_actual_jmp = map_load_mp_hook_patch.return_address();
 }
 
 void revert_map_hooks(){
-    map_load_ui_sp_hook.revert();
-    map_load_mp_hook.revert();
+    map_load_ui_sp_hook_patch.revert();
+    map_load_mp_hook_patch.revert();
 }
