@@ -48,11 +48,12 @@ int32_t server_register_network_index(MemRef object){
     };
     int32_t network_id;
     asm (
+        // Put arguments where Halo's custom calling convention expects them.
         "mov eax, %[synced_objects];"
-        "push %[local_object_id];"
+        "push %[local_object_id];" // esp - 4
         "call %[server_register_network_index];"
-        "mov %[network_id], eax;"
-        "add esp, 4;"
+        "mov %[network_id], eax;" // Get return value.
+        "add esp, 4;" // Sync stack to before the push
         :
         : [synced_objects] "m" (synced_objects),
           [network_id] "m" (network_id),
@@ -65,11 +66,12 @@ int32_t server_register_network_index(MemRef object){
 void register_network_index_from_remote(int32_t network_id, MemRef object){
     SyncedObjectHeader* synced_objects = *synced_objects_header;
     asm (
+        // Put arguments where Halo's custom calling convention expects them.
         "mov eax, %[synced_objects];"
         "mov ecx, %[local_object_id];"
-        "push %[network_id];"
+        "push %[network_id];" // esp - 4
         "call %[client_register_network_index_from_remote];"
-        "add esp, 4;"
+        "add esp, 4;" // Sync stack to before the push
         :
         : [synced_objects] "m" (synced_objects),
           [local_object_id] "m" (object.raw),
@@ -81,6 +83,7 @@ void register_network_index_from_remote(int32_t network_id, MemRef object){
 void unregister_network_index(MemRef object){
     SyncedObjectHeader* synced_objects = *synced_objects_header;
     asm (
+        // Put arguments where Halo's custom calling convention expects them.
         "mov edi, %[synced_objects];"
         "mov esi, %[local_object_id];"
         "call unregister_network_index_prologue;"
@@ -95,7 +98,7 @@ void unregister_network_index(MemRef object){
         "push ebx;"
         "push edi;"
         "jmp %[unregister_network_index];"
-        
+
     "after:"
         :
         : [synced_objects] "m" (synced_objects),
@@ -120,7 +123,14 @@ int32_t get_network_id_from_object(MemRef object){
 }
 
 void init_network_id(){
-    synced_objects_header = reinterpret_cast<SyncedObjectHeader**>(*reinterpret_cast<uintptr_t**>(sig_translation_table_ptr.address()));
+    // *** - * = **
+    /* If we dereference what the signature address comes up with we end up at
+     * some code that has a reference to the pointer to the thing that we want.
+     * If we store that it means we have a pointer/reference to the
+     * pointer the game uses which allows us to always be able to validly check
+     * where the game is looking for this struct by reading what is in its ptr.
+     */
+    synced_objects_header = *reinterpret_cast<SyncedObjectHeader***>(sig_translation_table_ptr.address());
     // +3 because if we enter the function on the second instruction
     // we only need to supply the pointer to the synced_object_header.
     func_server_register_network_index = sig_func_server_register_network_index.address() + 3;
