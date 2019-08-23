@@ -143,10 +143,16 @@ struct ObjectCreateArgs {
 };
 
 extern "C" bool before_object_create(ObjectCreateArgs* args){
+
+    // Stub: Hook current unused.
+
     return true;
 }
 
 extern "C" void after_object_create(uint32_t* obj){
+
+    // Stub: Hook current unused.
+
 }
 
 Signature(true, sig_object_create,
@@ -160,10 +166,16 @@ Patch(
 // Only called when a biped actually jumps
 
 extern "C" bool before_biped_jump(uint32_t* obj){
+
+    // Stub: Hook current unused.
+
     return true;
 }
 
 extern "C" void after_biped_jump(uint32_t* obj){
+
+    // Stub: Hook current unused.
+
 }
 
 Signature(true, sig_biped_jump,
@@ -181,10 +193,16 @@ struct WeaponPullTriggerArgs {
 };
 
 extern "C" bool before_weapon_pull_trigger(WeaponPullTriggerArgs* args){
+
+    // Stub: Hook current unused.
+
     return true;
 }
 
 extern "C" void after_weapon_pull_trigger(){
+
+    // Stub: Hook current unused.
+
 }
 
 Signature(true, sig_weapon_pull_trigger,
