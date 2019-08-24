@@ -9,6 +9,7 @@
 #include "../halo/functions/messaging.hpp"
 #include "../halo/fixes/shdr_trans_zfighting.hpp"
 #include "../halo/memory/gamestate/network.hpp"
+#include "../halo/network/network_id.hpp"
 
 bool toggle_shader_trans_fix(std::vector<VulpesArg> input){
     bool on = input[0].bool_out();
@@ -41,6 +42,18 @@ bool toggle_allow_client_side_projectiles(std::vector<VulpesArg> input){
     return true;
 }
 
+bool get_network_id_from_obj_id(std::vector<VulpesArg> input){
+    uint32_t id = input[0].int_out();
+    cprintf("%d", get_network_id_from_object(*reinterpret_cast<MemRef*>(&id)));
+    return true;
+}
+
+bool get_object_id_from_network_id(std::vector<VulpesArg> input){
+    uint32_t id = input[0].int_out();
+    cprintf("0x%X", get_object_from_network_index(id));
+    return true;
+}
+
 void init_debug_commands(){
     static VulpesCommand cmd_dev_shader_transparent_fix(
         "v_dev_shader_transparent_fix",
@@ -51,5 +64,16 @@ void init_debug_commands(){
         "v_dev_allow_client_side_projectiles",
         &toggle_allow_client_side_projectiles, 4, 1,
         VulpesArgDef("", false, A_BOOL)
+    );
+
+    static VulpesCommand cmd_get_network_id_from_obj_id(
+        "v_dev_get_network_id_from_obj_id",
+        &get_network_id_from_obj_id, 4, 1,
+        VulpesArgDef("", true, A_LONG)
+    );
+    static VulpesCommand cmd_get_object_id_from_network_id(
+        "v_dev_get_object_id_from_network_id",
+        &get_object_id_from_network_id, 4, 1,
+        VulpesArgDef("", true, A_LONG)
     );
 }
