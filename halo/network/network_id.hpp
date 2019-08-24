@@ -5,6 +5,7 @@
  */
 
 #pragma once
+#include "../memory/types.hpp"
 
 ////// These are functions for using the existing object syncing infrastructure.
 ////// I really have to stress that we shouldn't use these too much if we start
@@ -30,3 +31,22 @@ int32_t get_network_id_from_object(MemRef object); // returns -1 if not found.
 
 // Initialize all the pointers.
 void init_network_id();
+
+struct SyncedObjectHeader{
+    uint32_t max_count;
+    uint32_t int1;                  //0x4
+    uint32_t int2;                  //0x8
+    uint32_t initialized; //bool    //0xC
+
+    uint32_t int4;                  //0x10
+    uint32_t pointer5;              //0x14 // Can't make sense out of this
+    uint32_t count;                 //0x1B
+    uint32_t pointer7;              //0x1C
+
+    uint32_t pointer8;              //0x20
+    uint32_t last_used_slot;        //0x24
+    MemRef* translation_index;      //0x28 // same as network_translation_table
+};
+
+// Get synced objects table.
+SyncedObjectHeader* synced_objects();

@@ -192,7 +192,7 @@ public:
 class PlayerTable : public Table  {
 public:
     Player* players;
-}
+};
 
 #pragma pack(pop)
 

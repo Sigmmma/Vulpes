@@ -5,6 +5,7 @@
  */
 
 #include "player.hpp"
+#include "../../../hooker/hooker.hpp"
 
 Signature(true, sig_player_table,
     {-1, -1, -1, 0x00, 0x89, 0x44, 0x24, 0x48, 0x35, 0x72, 0x65, 0x74, 0x69});
