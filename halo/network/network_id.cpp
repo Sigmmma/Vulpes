@@ -4,8 +4,8 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include "network_id.hpp"
 #include "../../hooker/hooker.hpp"
-#include "../memory/types.hpp"
 
 Signature(true, sig_func_server_register_network_index, {0x55, 0x56, 0x8B, 0x70, 0x58, 0x8A, 0x46, 0x0C, 0x8D, 0x6E, 0x0C, 0x57, 0x83, 0xCF, 0xFF, 0x3C, 0x01, 0x75});
 
@@ -19,22 +19,6 @@ uintptr_t message_delta_object_index;
 uintptr_t func_server_register_network_index;
 uintptr_t func_client_register_network_index_from_remote;
 uintptr_t func_unregister_network_index;
-
-struct SyncedObjectHeader{
-    uint32_t max_count;
-    uint32_t int1;                  //0x4
-    uint32_t int2;                  //0x8
-    uint32_t initialized; //bool    //0xC
-
-    uint32_t int4;                  //0x10
-    uint32_t pointer5;              //0x14 // Can't make sense out of this
-    uint32_t count;                 //0x1B
-    uint32_t pointer7;              //0x1C
-
-    uint32_t pointer8;              //0x20
-    uint32_t last_used_slot;        //0x24
-    MemRef* translation_index;      //0x28 // same as network_translation_table
-};
 
 // Pointer to a pointer because the game might change the actual pointer
 // So we want to read what is in the game's pointer to make sure we're safe.
@@ -137,4 +121,8 @@ void init_network_id(){
     func_client_register_network_index_from_remote = sig_func_client_register_network_index_from_remote.address() + 3;
     // +5 Here for the same reason.
     func_unregister_network_index = sig_func_unregister_network_index.address() + 5;
+}
+
+SyncedObjectHeader* synced_objects(){
+    return *synced_objects_header;
 }

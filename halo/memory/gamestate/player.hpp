@@ -189,4 +189,11 @@ public:
 
 }; static_assert(sizeof(Player) == 0x200);
 
+class PlayerTable : public Table  {
+public:
+    Player* players;
+};
+
 #pragma pack(pop)
+
+PlayerTable* player_table(); // Array of all 16 players.
