@@ -33,6 +33,7 @@ int32_t get_network_id_from_object(MemRef object); // returns -1 if not found.
 void init_network_id();
 
 struct SyncedObjectHeader{
+    // The members that are called things like int# and pointer# are unknown.
     uint32_t max_count;
     uint32_t int1;                  //0x4
     uint32_t int2;                  //0x8
