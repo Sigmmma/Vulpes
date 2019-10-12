@@ -15,7 +15,7 @@ project(Vulpes
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-value -Wold-style-cast -masm=intel -msse2 -m32 -mfpmath=sse")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-value -Wold-style-cast -masm=intel -msse -msse2 -m32 -mfpmath=sse")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O3")
 set(CMAKE_SHARED_LINKER_FLAGS "-m32 -W -s -static-libgcc -static-libstdc++ -lkernel32")
