@@ -19,14 +19,14 @@ static bool initialized = false;
 void init_lua(){
     initialized = true;
     { // Create folders.
-        char path_string[4096];
-        sprintf(path_string, VULPES_PATH,     profile_path());
+        char path_string[4096+1];
+        sprintf_s(path_string, 4096, VULPES_PATH,     profile_path());
         CreateDirectory(path_string, NULL);
-        sprintf(path_string, LUA_BASE_PATH,   profile_path());
+        sprintf_s(path_string, 4096, LUA_BASE_PATH,   profile_path());
         CreateDirectory(path_string, NULL);
-        sprintf(path_string, LUA_MAP_PATH,    profile_path());
+        sprintf_s(path_string, 4096, LUA_MAP_PATH,    profile_path());
         CreateDirectory(path_string, NULL);
-        sprintf(path_string, LUA_GLOBAL_PATH, profile_path());
+        sprintf_s(path_string, 4096, LUA_GLOBAL_PATH, profile_path());
         CreateDirectory(path_string, NULL);
     }
     // init_callbacks();
