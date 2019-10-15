@@ -5,8 +5,6 @@
  */
 
 #include <string>
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
 
 #include <lua.hpp>
 
@@ -33,13 +31,8 @@ static void luaV_load_scripts_for_map(){
 
     // Check if it is actually a directory / even exists.
     if (is_dir(path_str)){
-        // Create a query for paths that match the lua filetype.
-        auto query_str = path_str + "\\*.lua";
-        WIN32_FIND_DATA find_file_data;
-        FindFirstFile(query_str.data(), &find_file_data);
-
-        // If it's actually a file.
-        auto file_str = path_str + find_file_data.cFileName;
+        // Check if there is an index.lua
+        auto file_str = path_str + "\\index.lua";
         if (is_file(file_str)){
             // Create a new lua state.
             auto *state = luaL_newstate();
