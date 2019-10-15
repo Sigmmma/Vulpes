@@ -45,15 +45,14 @@ void load_map_lua_scripts(){
             // Create a new lua state.
             auto *state = luaL_newstate();
 
-            // Register funcions.
-            register_messaging_functions(state);
+            // Register functions.
+            luaV_reg_messaging_funcs(state);
 
             // Load contents of file into the lua compiler
             if(luaL_loadfile(state, file_str.data())
             || lua_pcall(state, 0, 0, 0)){
                 print_lua_error(state);
                 lua_close(state);
-                return;
             };
         };
         return;
