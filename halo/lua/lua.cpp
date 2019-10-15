@@ -8,6 +8,8 @@
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 
+#include <lua.hpp>
+
 #include "../../includes/file_helpers.hpp"
 #include "../functions/messaging.hpp"
 #include "../hooks/map.hpp"
@@ -15,20 +17,17 @@
 #include "../memory/types.hpp"
 #include "../paths.hpp"
 
+#include "lua_helpers.hpp"
 #include "lua_messaging.hpp"
 #include "lua.hpp"
 
 static bool initialized = false;
 
-void print_lua_error(lua_State *state){
-    // Print whatever is at the top of the lua stack.
-    // This should be an error when this function is called.
-    cprintf_error(lua_tostring(state, -1));
-    // TODO: Make errors log to a file.
-    lua_pop(state, 1);
+static void luaV_register_functions(lua_State *state, bool sanboxed){
+    luaV_reg_messaging_funcs(state);
 }
 
-void load_map_lua_scripts(){
+static void luaV_load_scripts_for_map(){
     // Get path to where the lua scripts should be stored.
     auto path_str = std::string(profile_path()) + LUA_MAP_PATH + "\\" + map_name() + "\\";
 
@@ -46,12 +45,12 @@ void load_map_lua_scripts(){
             auto *state = luaL_newstate();
 
             // Register functions.
-            luaV_reg_messaging_funcs(state);
+            luaV_register_functions(state, true);
 
             // Load contents of file into the lua compiler
             if(luaL_loadfile(state, file_str.data())
             || lua_pcall(state, 0, 0, 0)){
-                print_lua_error(state);
+                luaV_print_error(state);
                 lua_close(state);
             };
         };
@@ -70,10 +69,10 @@ void init_lua(){
         make_dir(std::string(profile_path()) + LUA_GLOBAL_PATH);
     }
     // init_callbacks();
-    ADD_CALLBACK(EVENT_MAP_LOAD, load_map_lua_scripts);
+    ADD_CALLBACK(EVENT_MAP_LOAD, luaV_load_scripts_for_map);
 }
 
 void destruct_lua(){
-
     initialized = false;
+    DEL_CALLBACK(EVENT_MAP_LOAD, luaV_load_scripts_for_map);
 }

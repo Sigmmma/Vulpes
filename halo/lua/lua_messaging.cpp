@@ -3,7 +3,7 @@
 #include <lua.hpp>
 
 #include "../functions/messaging.hpp"
-#include "lua_extension.hpp"
+#include "lua_helpers.hpp"
 
 static int luaV_cprint(lua_State *state) noexcept {
     // Check if the number of arguments is correct for a print call.
