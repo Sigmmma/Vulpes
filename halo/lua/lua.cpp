@@ -56,8 +56,6 @@ static void luaV_load_scripts_for_map(){
         };
         return;
     };
-
-    cprintf_info("There was no folder with the corresponding map name.");
 }
 
 void init_lua(){
