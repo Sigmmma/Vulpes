@@ -7,3 +7,4 @@
 #pragma once
 
 char* profile_path();
+char* map_name();

@@ -24,16 +24,7 @@ Signature(true, sig_map_load_mp,
     {0x81, 0xEC, 0x10, 0x01, 0x00, 0x00, 0x53, 0x55, 0x8B, 0xAC,
      0x24, 0x1C, 0x01, 0x00, 0x00});
 
-Signature(true, sig_map_name,
-    {-1,-1,-1,-1, 0xE8,-1,-1,-1,-1, 0x32, 0xC9, 0x83, 0xF8, 0x13, 0x7D});
-Signature(false, sig_sp_map_name,
-    {-1,-1,-1,-1, 0xC6, 0x05,-1,-1,-1,-1, 0x00, 0xE8,-1,-1,-1,-1,
-     0x8A, 0x44, 0x24, 0x1F});
-
 Signature(true, sig_event_map_reset_hook, {0x5B, 0x68, -1, -1, -1, -1, 0x33, 0xC0});
-
-char* mp_map_name = NULL;
-char* sp_map_name = NULL;
 
 extern "C" bool before_map_load_sp(){
     call_in_order(pre_map);
@@ -80,14 +71,10 @@ Patch(
 
 void init_map_hooks(bool is_server){
     if (!is_server){
-        sp_map_name = *reinterpret_cast<char**>(sig_sp_map_name.address());
-
         map_load_ui_sp_hook_patch.build();
         map_load_ui_sp_hook_patch.apply();
         map_load_sp_actual_jmp = map_load_ui_sp_hook_patch.return_address();
     };
-    mp_map_name = *reinterpret_cast<char**>(sig_map_name.address());
-
     map_load_mp_hook_patch.build();
     map_load_mp_hook_patch.apply();
     map_load_mp_actual_jmp = map_load_mp_hook_patch.return_address();
