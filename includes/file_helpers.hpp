@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <windows.h>
 
 static inline size_t file_get_size(FILE* f){
@@ -29,16 +30,20 @@ static inline void file_read_into_buffer(T buff, FILE* f){
     fseek(f, pos, SEEK_SET);
 }
 
-static inline bool is_dir(char* path){
-    DWORD ftyp = GetFileAttributesA(path);
+static inline bool is_dir(std::string path){
+    DWORD ftyp = GetFileAttributes(path.data());
     if (ftyp == INVALID_FILE_ATTRIBUTES) return false;
     if (ftyp & FILE_ATTRIBUTE_DIRECTORY) return true;
     return false;
 }
 
-static inline bool is_file(char* path){
-    DWORD ftyp = GetFileAttributesA(path);
+static inline bool is_file(std::string path){
+    DWORD ftyp = GetFileAttributes(path.data());
     if (ftyp == INVALID_FILE_ATTRIBUTES) return false;
     if (ftyp & FILE_ATTRIBUTE_DIRECTORY) return false;
     return true;
+}
+
+static inline void make_dir(std::string path){
+    CreateDirectory(path.data() , 0);
 }

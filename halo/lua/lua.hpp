@@ -6,5 +6,10 @@
 
 #pragma once
 
+#include <lua.hpp>
+
+// Call this when a lua frame encounters an error.
+void print_lua_error(lua_State *state);
+
 void init_lua();
 void destruct_lua();
