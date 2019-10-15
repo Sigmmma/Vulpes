@@ -95,13 +95,15 @@ void init_network(){
 }
 
 #include "halo/functions/messaging.hpp"
+#include "halo/lua/lua.hpp"
 void tell_user_that_we_loaded(){
+    init_lua();
     cprintf_info("Vulpes has loaded.");
     DEL_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
 }
 
 #include "includes/fox.hpp"
-#include "halo/lua/lua.hpp"
+
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
@@ -127,7 +129,7 @@ void init_vulpes(){
     init_network();
     init_commands();
 
-    init_lua();
+
 
     ADD_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
 }

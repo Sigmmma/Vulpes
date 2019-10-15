@@ -90,6 +90,7 @@ add_library(Vulpes SHARED
     halo/upgrades/map.S
 
     halo/lua/lua.cpp
+    halo/lua/lua_messaging.cpp
 )
 
 add_library(VulpesLoader SHARED
