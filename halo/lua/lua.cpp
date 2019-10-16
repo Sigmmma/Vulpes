@@ -25,6 +25,7 @@ static void luaV_register_functions(lua_State *state, bool sanboxed){
     luaV_reg_messaging_funcs(state);
 }
 
+//TODO: Make this load scripts from maps.
 static void luaV_load_scripts_for_map(){
     // Get path to where the lua scripts should be stored.
     auto path_str = std::string(profile_path()) + LUA_MAP_PATH + "\\" + map_name() + "\\";
