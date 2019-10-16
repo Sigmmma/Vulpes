@@ -54,12 +54,13 @@ static void luaV_load_scripts_for_map(){
 
 void init_lua(){
     initialized = true;
-    { // Create folders.
-        make_dir(std::string(profile_path()) + VULPES_PATH);
-        make_dir(std::string(profile_path()) + LUA_BASE_PATH);
-        make_dir(std::string(profile_path()) + LUA_MAP_PATH);
-        make_dir(std::string(profile_path()) + LUA_GLOBAL_PATH);
-    }
+
+    // Create folders if they don't exist.
+    make_dir(std::string(profile_path()) + VULPES_PATH);
+    make_dir(std::string(profile_path()) + LUA_BASE_PATH);
+    make_dir(std::string(profile_path()) + LUA_MAP_PATH);
+    make_dir(std::string(profile_path()) + LUA_GLOBAL_PATH);
+
     // init_callbacks();
     ADD_CALLBACK(EVENT_MAP_LOAD, luaV_load_scripts_for_map);
 }
