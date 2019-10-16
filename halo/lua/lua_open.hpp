@@ -6,6 +6,9 @@
 
 #pragma once
 
+// This is a wrapper for lua_open that replaces certain functions,
+// and excludes others for the safety of the user.
+
 #include <lua.hpp>
 
-void luaV_reg_messaging_funcs(lua_State *state);
+LUALIB_API void luaV_openlibs(lua_State *state, bool unlocked);

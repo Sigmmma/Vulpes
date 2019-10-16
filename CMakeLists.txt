@@ -91,6 +91,7 @@ add_library(Vulpes SHARED
 
     halo/lua/lua.cpp
     halo/lua/lua_messaging.cpp
+    halo/lua/lua_open.cpp
 )
 
 add_library(VulpesLoader SHARED
