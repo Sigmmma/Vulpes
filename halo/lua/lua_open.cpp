@@ -65,6 +65,7 @@ static int LuaV_sandboxed_require(lua_State *L){
     }
     // Load the script with its name set to map_name:script_name
     if(luaV_loadfile_as(L, full_path, std::string(map_name()) + ":" + name)){
+        luaV_print_error(L);
         return luaL_error(L, "Something went wrong loading the file.");
     }
 
