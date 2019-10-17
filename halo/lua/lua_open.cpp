@@ -70,18 +70,18 @@ static int LuaV_sandboxed_require(lua_State *L){
     }
 
     // More LuaJIT source (Original comments):
-    if (lua_isfunction(L, -1)){    /* did it find module? */
+    if (lua_isfunction(L, -1)){ // did it find module?
         lua_pushlightuserdata(L, sentinel);
-        lua_setfield(L, 2, name);    /* _LOADED[name] = sentinel */
-        lua_pushstring(L, name);    /* pass name as argument to module */
-        lua_call(L, 1, 1);    /* run loaded module */
-        if (!lua_isnil(L, -1))    /* non-nil return? */
-            lua_setfield(L, 2, name);    /* _LOADED[name] = returned value */
+        lua_setfield(L, 2, name); // _LOADED[name] = sentinel
+        lua_pushstring(L, name); // pass name as argument to module
+        lua_call(L, 1, 1); // run loaded module
+        if (!lua_isnil(L, -1)) // non-nil return?
+            lua_setfield(L, 2, name); // _LOADED[name] = returned value
         lua_getfield(L, 2, name);
-        if (lua_touserdata(L, -1) == sentinel) {     /* module did not set a value? */
-            lua_pushboolean(L, 1);    /* use true as result */
-            lua_pushvalue(L, -1);    /* extra copy to be returned */
-            lua_setfield(L, 2, name);    /* _LOADED[name] = true */
+        if (lua_touserdata(L, -1) == sentinel){ // module did not set a value?
+            lua_pushboolean(L, 1); // use true as result
+            lua_pushvalue(L, -1); // extra copy to be returned
+            lua_setfield(L, 2, name); // _LOADED[name] = true
         }
     }else{
         // Pop the return value off the stack as it sucks!
