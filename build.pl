@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use File::Path qw( rmtree );
+use File::Copy qw( copy );
 use Getopt::Std;
 use Cwd qw( getcwd );
 
@@ -40,6 +41,7 @@ sub delete_luajit_build_files {
 }
 sub build_luajit {
     print "Building LuaJIT!\n";
+    copy("./lib/LuaJIT_Makefile", "./lib/LuaJIT/src/Makefile");
     my $wd = getcwd();
     chdir "./lib/LuaJIT/src";
     system "make HOST_CC=\"gcc -m32\" CROSS=i686-w64-mingw32- TARGET_SYS=Windows";
@@ -61,3 +63,6 @@ if ($options{c}) {
 
 if ($options{j}){build_luajit;}
 build;
+
+#copy("./Vulpes.dll", "/home/michelle/Halo/Games/Halo Custom Edition/Vulpes.dll");
+#copy("./VulpesLoader.dll", "/home/michelle/Halo/Games/Halo Custom Edition/strings.dll");
