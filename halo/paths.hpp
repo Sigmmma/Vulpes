@@ -12,4 +12,4 @@
 
 #define LUA_MAP_PATH    VULPES_PATH "\\lua\\map"
 
-#define LUA_GLOBAL_PATH VULPES_PATH "\\lua\\globals"
+#define LUA_GLOBAL_PATH VULPES_PATH "\\lua\\global"

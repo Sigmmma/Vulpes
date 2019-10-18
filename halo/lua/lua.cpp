@@ -85,6 +85,7 @@ void init_lua(){
 
 void destruct_lua(){
     initialized = false;
+    luaV_unload_scripts_for_map();
     DEL_CALLBACK(EVENT_MAP_LOAD,     luaV_load_scripts_for_map);
     DEL_CALLBACK(EVENT_PRE_MAP_LOAD, luaV_unload_scripts_for_map);
 }

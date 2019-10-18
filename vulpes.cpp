@@ -96,11 +96,7 @@ void init_network(){
 
 #include "halo/functions/messaging.hpp"
 #include "halo/lua/lua.hpp"
-void tell_user_that_we_loaded(){
-    init_lua();
-    cprintf_info("Vulpes has loaded.");
-    DEL_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
-}
+void pre_first_map_load_init();
 
 #include "includes/fox.hpp"
 
@@ -130,8 +126,21 @@ void init_vulpes(){
     init_commands();
 
 
+    // Final initialization step for things that act on data that isn't valid
+    // until way later when the game has loaded more.
+    ADD_CALLBACK(EVENT_PRE_MAP_LOAD, pre_first_map_load_init);
+}
 
-    ADD_CALLBACK(EVENT_TICK, tell_user_that_we_loaded);
+void pre_first_map_load_init(){
+    DEL_CALLBACK(EVENT_PRE_MAP_LOAD, pre_first_map_load_init);
+
+    // Initialize lua.
+    // TODO: Potentially find better place for this that will also load on the
+    // server if the server has no decided to load a map yet.
+    init_lua();
+
+    // Tell the user that we loaded, so it is less ambiguous.
+    cprintf_info("Vulpes loaded.");
 }
 
 void destruct_vulpes(){
@@ -139,4 +148,5 @@ void destruct_vulpes(){
     revert_halo_bug_fixes();
     revert_upgrades();
     revert_halo_bug_fixes();
+    destruct_lua();
 }
