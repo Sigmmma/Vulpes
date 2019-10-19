@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use File::Path qw( rmtree );
-use File::pushd; qw( pushd popd );
+use File::pushd qw( pushd );
 use File::Copy qw( copy );
 use Getopt::Std;
 
