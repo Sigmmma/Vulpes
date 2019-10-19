@@ -31,12 +31,8 @@ static inline std::string luaV_check_as_string(lua_State *state, int stackpos){
 }
 
 static inline int luaV_loadfile_as(lua_State *state, std::string path, std::string name){
-    // Check if file exists.
-    // TODO: Make this a proper error.
-    if (!is_file(path)) return 0;
-
     FILE* lua_file = fopen(path.data(), "r");
-    if (!lua_file) return 0;
+    if (!lua_file) return 1;
     size_t size = file_get_size(lua_file);
     auto content = std::make_unique<char[]>(size);
     file_read_into_buffer(content.get(), lua_file);
