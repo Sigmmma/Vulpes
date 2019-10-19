@@ -49,7 +49,7 @@ static int LuaV_sandboxed_require(lua_State *L){
     // In sandboxed mode we're not allowing anything but alphanumerics
     // underscores, dashes and dots for file extensions.
     for (char & c : std::string(name)) {
-        if ((!isalnum(c)) && (c != *".") && (c != *"_") && (c != *"-")){
+        if ((!isalnum(c)) && (c != '.') && (c != '_') && (c != '-')){
             char character[2] = {c, 0x00};
             auto error = std::string("Illegal character in sandboxed require statement: \"") + character + "\"";
             return luaL_error(L, error.data());
