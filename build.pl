@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 use File::Path qw( rmtree );
+use File::pushd; qw( pushd popd );
 use File::Copy qw( copy );
 use Getopt::Std;
-use Cwd qw( getcwd );
 
 sub usage {
     print
@@ -42,10 +42,10 @@ sub delete_luajit_build_files {
 sub build_luajit {
     print "Building LuaJIT!\n";
     copy("./lib/LuaJIT_Makefile", "./lib/LuaJIT/src/Makefile");
-    my $wd = getcwd();
-    chdir "./lib/LuaJIT/src";
-    system "make HOST_CC=\"gcc -m32\" CROSS=i686-w64-mingw32- TARGET_SYS=Windows";
-    chdir $wd;
+    {
+        my $wd = pushd "./lib/LuaJIT/src";
+        system "make HOST_CC=\"gcc -m32\" CROSS=i686-w64-mingw32- TARGET_SYS=Windows";
+    }
 }
 
 if (@ARGV && $ARGV[0] eq "--help"){usage()}
@@ -63,6 +63,9 @@ if ($options{c}) {
 
 if ($options{j}){build_luajit;}
 build;
+
+# Uncomment and edit these to your needs if you want the build script to
+# autoinstall the built files.
 
 #copy("./Vulpes.dll", "/home/michelle/Halo/Games/Halo Custom Edition/Vulpes.dll");
 #copy("./VulpesLoader.dll", "/home/michelle/Halo/Games/Halo Custom Edition/strings.dll");
