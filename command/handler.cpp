@@ -5,14 +5,14 @@
  */
 
 #include "handler.hpp"
-#include "../halo/functions/messaging.hpp"
+#include "../vulpes/functions/messaging.hpp"
 #include <regex>
 #include <cassert>
 #include <algorithm>
 #include <exception>
 #include <ctype.h>
-#include "../halo/functions/devmode.hpp"
-#include "../halo/memory/gamestate/console.hpp"
+#include "../vulpes/functions/devmode.hpp"
+#include "../vulpes/memory/gamestate/console.hpp"
 
 using namespace std;
 

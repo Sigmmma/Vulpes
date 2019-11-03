@@ -22,8 +22,8 @@ set(CMAKE_SHARED_LINKER_FLAGS "-m32 -W -s -static-libgcc -static-libstdc++ -lker
 
 
 add_library(Vulpes SHARED
-    halo/version.rc
-    halo/vulpes.cpp
+    vulpes/version.rc
+    vulpes/vulpes.cpp
 
     command/debug.cpp
     command/handler.cpp
@@ -34,63 +34,63 @@ add_library(Vulpes SHARED
     includes/string_raw_data_encoder.c
     includes/crc32.c
 
-    halo/fixes/animation.cpp
-    halo/fixes/animation.S
-    halo/fixes/cpu_usage.cpp
-    halo/fixes/cpu_usage.S
-    halo/fixes/file_handle_leak.cpp
-    halo/fixes/framerate_dependent_timers.cpp
-    halo/fixes/host_refusal.cpp
-    halo/fixes/shdr_trans_zfighting.cpp
-    halo/fixes/string_overflows.cpp
+    vulpes/fixes/animation.cpp
+    vulpes/fixes/animation.S
+    vulpes/fixes/cpu_usage.cpp
+    vulpes/fixes/cpu_usage.S
+    vulpes/fixes/file_handle_leak.cpp
+    vulpes/fixes/framerate_dependent_timers.cpp
+    vulpes/fixes/host_refusal.cpp
+    vulpes/fixes/shdr_trans_zfighting.cpp
+    vulpes/fixes/string_overflows.cpp
 
-    halo/functions/devmode.cpp
-    halo/functions/message_delta.cpp
-    halo/functions/messaging.cpp
-    halo/functions/object_unit.cpp
-    halo/functions/table.cpp
+    vulpes/functions/devmode.cpp
+    vulpes/functions/message_delta.cpp
+    vulpes/functions/messaging.cpp
+    vulpes/functions/object_unit.cpp
+    vulpes/functions/table.cpp
 
-    halo/hooks/console.cpp
-    halo/hooks/console.S
-    halo/hooks/incoming_packets.cpp
-    halo/hooks/incoming_packets.S
-    halo/hooks/king.cpp
-    halo/hooks/king.S
-    halo/hooks/map.cpp
-    halo/hooks/map.S
-    halo/hooks/object.cpp
-    halo/hooks/object.S
-    halo/hooks/tick.cpp
-    halo/hooks/tick.S
+    vulpes/hooks/console.cpp
+    vulpes/hooks/console.S
+    vulpes/hooks/incoming_packets.cpp
+    vulpes/hooks/incoming_packets.S
+    vulpes/hooks/king.cpp
+    vulpes/hooks/king.S
+    vulpes/hooks/map.cpp
+    vulpes/hooks/map.S
+    vulpes/hooks/object.cpp
+    vulpes/hooks/object.S
+    vulpes/hooks/tick.cpp
+    vulpes/hooks/tick.S
 
-    halo/memory/gamestate/object/object.cpp
-    halo/memory/gamestate/object/object_device.cpp
-    halo/memory/gamestate/object/object_item.cpp
-    halo/memory/gamestate/object/object_unit.cpp
-    halo/memory/gamestate/server/game_variant.cpp
-    halo/memory/gamestate/server/king.cpp
-    halo/memory/gamestate/console.cpp
-    halo/memory/gamestate/effect.cpp
-    halo/memory/gamestate/network.cpp
-    halo/memory/gamestate/player.cpp
-    halo/memory/gamestate/table.cpp
-    halo/memory/behavior_definition.cpp
-    halo/memory/global.cpp
+    vulpes/memory/gamestate/object/object.cpp
+    vulpes/memory/gamestate/object/object_device.cpp
+    vulpes/memory/gamestate/object/object_item.cpp
+    vulpes/memory/gamestate/object/object_unit.cpp
+    vulpes/memory/gamestate/server/game_variant.cpp
+    vulpes/memory/gamestate/server/king.cpp
+    vulpes/memory/gamestate/console.cpp
+    vulpes/memory/gamestate/effect.cpp
+    vulpes/memory/gamestate/network.cpp
+    vulpes/memory/gamestate/player.cpp
+    vulpes/memory/gamestate/table.cpp
+    vulpes/memory/behavior_definition.cpp
+    vulpes/memory/global.cpp
 
-    halo/memory/types.cpp
+    vulpes/memory/types.cpp
 
-    halo/network/foxnet/vulpes_message.cpp
-    halo/network/network_id.cpp
+    vulpes/network/foxnet/vulpes_message.cpp
+    vulpes/network/network_id.cpp
 
-    halo/tweaks/loading_screen.cpp
-    halo/tweaks/tweaks.cpp
+    vulpes/tweaks/loading_screen.cpp
+    vulpes/tweaks/tweaks.cpp
 
-    halo/upgrades/map.cpp
-    halo/upgrades/map.S
+    vulpes/upgrades/map.cpp
+    vulpes/upgrades/map.S
 
-    halo/lua/lua.cpp
-    halo/lua/lua_messaging.cpp
-    halo/lua/lua_open.cpp
+    vulpes/lua/lua.cpp
+    vulpes/lua/lua_messaging.cpp
+    vulpes/lua/lua_open.cpp
 )
 
 add_library(VulpesLoader SHARED

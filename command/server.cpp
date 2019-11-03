@@ -6,10 +6,10 @@
 
 #include "server.hpp"
 #include "handler.hpp"
-#include "../halo/functions/messaging.hpp"
-#include "../halo/functions/message_delta.hpp"
-#include "../halo/memory/gamestate/network.hpp"
-#include "../halo/memory/gamestate/server/king.hpp"
+#include "../vulpes/functions/messaging.hpp"
+#include "../vulpes/functions/message_delta.hpp"
+#include "../vulpes/memory/gamestate/network.hpp"
+#include "../vulpes/memory/gamestate/server/king.hpp"
 
 bool cmd_rprint_func(std::vector<VulpesArg> input){
     if (game_is_server_executable()){
