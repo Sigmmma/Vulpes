@@ -31,7 +31,7 @@ ConsoleOutput* console_new_line(){
         return output;
     }else{
         return NULL;
-    };
+    }
 }
 
 typedef __attribute__((regparm(1)))void (*ConsoleToTerminalAndNetworkCall)(void*);
@@ -48,8 +48,8 @@ void vcprintf(const ARGBFloat& color, const char* format, va_list args){
             output->color = color;
             output->tab_stops   = strstr(output->text, "|t") != NULL;
             console_to_terminal_and_network(&output->text);
-        };
-    };
+        }
+    }
 }
 
 void cprintf(const ARGBFloat& color, const char* format, ...){
@@ -99,7 +99,7 @@ void rprintf(int player_id, const char* format, ...){
         send_delta_message_to_all(&buffer, size, true, true, false, true, 2);
     }else if (player_id < 16){
         send_delta_message_to_player(player_id, &buffer, size, true, true, false, true, 2);
-    };
+    }
     va_end(args);
 }
 
@@ -117,6 +117,6 @@ void chatf(HudChatType type, int src_player, int dest_player,
         send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
     }else if (dest_player < 16){
         send_delta_message_to_player(dest_player, &buffer, size, true, true, false, true, 3);
-    };
+    }
     va_end(args);
 }

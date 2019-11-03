@@ -388,21 +388,21 @@ void init_object_hooks(){
     if (object_create_hook_patch.build()) {
         object_create_hook_patch.apply();
         after_object_hook__create = object_create_hook_patch.return_address();
-    };
+    }
 
     // Bipeds:
 
     if (biped_jump_hook_patch.build()) {
         biped_jump_hook_patch.apply();
         after_biped_hook__jump = biped_jump_hook_patch.return_address();
-    };
+    }
 
     // Weapons:
 
     if (weapon_pull_trigger_hook_patch.build()) {
         weapon_pull_trigger_hook_patch.apply();
         after_weapon_hook__pull_trigger = weapon_pull_trigger_hook_patch.return_address();
-    };
+    }
 
 }
 

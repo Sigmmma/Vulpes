@@ -29,7 +29,7 @@ int32_t server_register_network_index(MemRef object){
     if (synced_objects->count >= synced_objects->max_count){
         // Just don't even try if we're at max capacity.
         return -1;
-    };
+    }
     int32_t network_id;
     asm (
         // Put arguments where Halo's custom calling convention expects them.
@@ -101,8 +101,8 @@ int32_t get_network_id_from_object(MemRef object){
     for (int i=1; i < synced_objects->max_count; i++){
         if (synced_objects->translation_index[i].raw == object.raw){
             return i;
-        };
-    };
+        }
+    }
     return -1;
 }
 

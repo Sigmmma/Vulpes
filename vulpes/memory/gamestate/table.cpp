@@ -35,6 +35,6 @@ GenericTable** effect_ptrs(){
     static uintptr_t sig_addr1 = sig_weather_particle_table.address();
     if (!effect_ptrs_lst){
         effect_ptrs_lst = reinterpret_cast<GenericTable**>(sig_addr1);
-    };
+    }
     return effect_ptrs_lst;
 }

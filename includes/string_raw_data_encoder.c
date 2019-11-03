@@ -31,8 +31,8 @@ size_t wstr_raw_data_encode(wchar_t* dest, const uint16_t* src, size_t len){
     if ((void*)dest != (void*)src){
         for (int i=0;i<len;i++){
             dest[i] = src[i];
-        };
-    };
+        }
+    }
     // Make sure there isn't any 0s. Add encoding info at the back.
     size_t enc_len = 0;
     int16_t cur_meta;
@@ -47,14 +47,14 @@ size_t wstr_raw_data_encode(wchar_t* dest, const uint16_t* src, size_t len){
             // This is to avoid more logic
             // and having any 0s cutting off our encoding data.
             cur_meta = MASKS16[15];
-        };
+        }
         // If the data == 0 then add 1 and indicate that we did this
         // in the encoding mask.
         if (dest[i] == 0){
             cur_meta |= MASKS16[bit];
             dest[i]++;
-        };
-    };
+        }
+    }
     // NULL terminate.
     enc_len++;
     dest[len+enc_len-1] = 0;
@@ -64,7 +64,7 @@ size_t wstr_raw_data_encode(wchar_t* dest, const uint16_t* src, size_t len){
     while (dest[len+enc_len-1] == MASKS16[15] && enc_len > 0){
         dest[len+enc_len-1] = 0;
         enc_len--;
-    };
+    }
     return len+enc_len;
 }
 
@@ -74,8 +74,8 @@ void wstr_raw_data_decode(uint16_t* dest, const wchar_t* src, size_t len){
     if ((void*)dest != (void*)src){
         for (int i=0;i<len;i++){
             dest[i] = src[i];
-        };
-    };
+        }
+    }
     for (int i=0;i<len;i++){
         int m = i%15; // mask index
         int e = 1+i/15; // encoding index
@@ -86,6 +86,6 @@ void wstr_raw_data_decode(uint16_t* dest, const wchar_t* src, size_t len){
         // one was added.
         if (src[len+e] & MASKS16[m]){
             dest[i]--;
-        };
-    };
+        }
+    }
 }

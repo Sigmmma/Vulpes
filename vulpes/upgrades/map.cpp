@@ -148,8 +148,8 @@ FILE* open_map_file(const char* name){
                      map_folders[i].data(), name, map_extensions[j].data());
             map_file = fopen(&map_path[0], "rb");
             if (map_file != NULL) break;
-        };
-    };
+        }
+    }
     return map_file;
 }
 
@@ -175,12 +175,12 @@ bool read_map_file_header_from_file(const char* map_name,
                 approved = true;
             }else{
                 approved = false;
-            };
+            }
         }else{
             approved = false;
-        };
+        }
         fclose(map_file);
-    };
+    }
     return approved;
 }
 
@@ -202,7 +202,7 @@ bool get_map_crc(MapListEntry* entry){
         }else{
             return false;
         }
-    };
+    }
     printf("Map name: %s, crc: %X\n", entry->name, entry->crc);
     return true;
 }
@@ -230,18 +230,18 @@ void init_map_crc_upgrades(bool server){
         if (!map_upgrades_initialized){
             multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(patch_get_map_crc.address()+2);
             jmp_skip_chimera = patch_get_map_crc.address()+13;
-        };
+        }
         patch_get_map_crc.apply();
-    };
+    }
     if (patch_get_map_crc_server.build()){
         patch_get_map_crc_server.apply();
         if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
-    };
+    }
     if (!map_upgrades_initialized){
         map_folders.push_back(default_map_folder);
         map_extensions.push_back(default_map_extension);
         map_upgrades_initialized = true;
-    };
+    }
 }
 
 void revert_map_crc_upgrades(){

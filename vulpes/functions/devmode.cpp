@@ -16,5 +16,5 @@ uint8_t developer_mode_level(){
         return *developer_mode;
     }else{
         return 0;
-    };
+    }
 }

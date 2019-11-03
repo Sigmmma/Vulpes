@@ -20,7 +20,7 @@ int32_t* player_respawn_timer;
 void increment_respawn_timer(){
     if (*player_dead){
         *player_respawn_timer = *player_respawn_timer + 1;
-    };
+    }
 }
 
 static bool initialized = false;
@@ -32,11 +32,11 @@ void init_checkpoint_revert_fix(){
         player_dead = *reinterpret_cast<bool**>(sig_addr+2);
         player_respawn_timer = *reinterpret_cast<int32_t**>(sig_addr+20);
         initialized = true;
-    };
+    }
     if (initialized){
         death_timer_framerate_dep_fix.apply();
         ADD_CALLBACK(EVENT_TICK, increment_respawn_timer);
-    };
+    }
 }
 
 void revert_checkpoint_revert_fix(){
@@ -76,7 +76,7 @@ void init_scoreboard_fix(){
         patch_scoreboard_framerate_dep2a.apply();
         patch_scoreboard_framerate_dep3a.apply();
         patch_scoreboard_framerate_dep3b.apply();
-    };
+    }
     if (patch_ruleboard_intro_nop.build()) patch_ruleboard_intro_nop.apply();
 }
 
@@ -105,7 +105,7 @@ Patch(patch_console_framerate_dep, sig_console_framerate_dep, 6, 5, NOP_PATCH, 0
 void fade_console(){
     if (!*console_open){
         fade_console_halo();
-    };
+    }
 }
 
 void init_console_fix(){
@@ -115,7 +115,7 @@ void init_console_fix(){
         console_open = *reinterpret_cast<bool**>(patch_console_framerate_dep.address()-6);
         patch_console_framerate_dep.apply();
         ADD_CALLBACK(EVENT_TICK, fade_console);
-    };
+    }
 }
 
 void revert_console_fix(){

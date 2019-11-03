@@ -27,7 +27,7 @@ void init_file_handle_leak_fixes(){
         file_handle_leak_patch1.apply();
         file_handle_leak_patch2.apply();
         file_handle_leak_patch3.apply();
-    };
+    }
 }
 
 void revert_file_handle_leak_fixes(){

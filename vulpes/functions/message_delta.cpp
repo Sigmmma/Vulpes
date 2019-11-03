@@ -147,7 +147,7 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
               "m" (bool_unbuffered),            // 7
               "m" (buffer_priority)             // 8
         );
-    };
+    }
 }
 
 void send_delta_message_to_player(int32_t player_id, void* message, uint32_t message_size,
@@ -191,7 +191,7 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
               "m" (buffer_priority),            // 8
               "m" (player_id)                   // 9
         );
-    };
+    }
 }
 
 void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t message_size,
@@ -203,8 +203,8 @@ void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t
             send_delta_message_to_player(i, message, message_size,
                 ingame_only, write_to_local_connection,
                 flush_queue, unbuffered, buffer_priority);
-        };
-    };
+        }
+    }
 }
 
 void init_message_delta_sender(){

@@ -56,7 +56,7 @@ void init_halo_bug_fixes(){
         ADD_CALLBACK(EVENT_MAP_LOAD_SP_UI, init_animation_bug_fixes);
         init_loading_screen_fixes();
         ADD_CALLBACK(EVENT_TICK, init_tweaks);
-    };
+    }
 }
 
 void revert_halo_bug_fixes(){
@@ -161,6 +161,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     }else if(fdwReason == DLL_PROCESS_DETACH && loaded) {
         destruct_vulpes();
         loaded = false;
-    };
+    }
     return true;
 }

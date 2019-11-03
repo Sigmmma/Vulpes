@@ -30,7 +30,7 @@ static inline std::string luaV_check_as_string(lua_State *state, int stackpos){
         return std::string("nil");
     }else{
         return std::string(luaL_checkstring(state, stackpos));
-    };
+    }
 }
 
 // Like LuaL_loadfile but it lets you specify a name for the error messages.

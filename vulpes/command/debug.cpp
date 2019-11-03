@@ -19,7 +19,7 @@ bool toggle_shader_trans_fix(std::vector<VulpesArg> input){
     }else{
         revert_shdr_trans_zfighting_fixes();
         cprintf("Turned OFF transparent fix.");
-    };
+    }
     return true;
 }
 
@@ -31,14 +31,14 @@ bool toggle_allow_client_side_projectiles(std::vector<VulpesArg> input){
             cprintf("Turned ON client side projectiles.");
         }else{
             cprintf("Turned OFF client side projectiles.");
-        };
+        }
     }else{
         if (*allow_client_side_projectiles()){
             cprintf("Client side projectiles are ON.");
         }else{
             cprintf("Client side projectiles are OFF.");
-        };
-    };
+        }
+    }
     return true;
 }
 

@@ -43,24 +43,24 @@ uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address)
                 // If our current byte matches our current sig element, start the next iteration.
                 if (sig[j] == -1 || reinterpret_cast<uint8_t*>(current_address)[j] == sig[j]){
                     continue;
-                };
+                }
                 // If neither of the conditions are met we have a mismatch and should move on.
                 mismatch = true;
                 break;
-            };
+            }
             // If there was no mismatch then we have succesfully found the address and we can go home.
             if (!mismatch) found_address = current_address;
             current_address++;
-        };
-    };
+        }
+    }
     if (found_address == 0){
         printf("failed\n");
         if (imperative){
             // Crash
-        };
+        }
     }else{
         printf("success. Found at %X\n", found_address);
-    };
+    }
     already_tried = true;
     return found_address;
 }
@@ -69,7 +69,7 @@ uintptr_t CodeSignature::address(bool recalculate){
     if (recalculate){
         found_address = 0;
         already_tried = false;
-    };
+    }
     return address();
 }
 
@@ -92,17 +92,17 @@ void CodePatch::setup_internal(void* content, size_t c_size){
             for (int i=0; i<c_size;i++){
                 reinterpret_cast<uint8_t*>(&redirect_address)[i] =
                     reinterpret_cast<uint8_t*>(content)[i];
-            };
+            }
             break;
         case MANUAL_PATCH :
             assert(c_size == patch_size);
             for (int i=0; i<c_size;i++){
                 patched_code.push_back(reinterpret_cast<uint8_t*>(content)[i]);
-            };
+            }
             break;
         case NOP_PATCH :
             break;
-    };
+    }
 }
 
 // Go to resource.hpp for the functional parts of the template based initializers.
@@ -116,7 +116,7 @@ CodePatch::CodePatch(const char* d_name,
     patch_size = patch_bytes.size();
     type = MANUAL_PATCH;
     patched_code = patch_bytes;
-};
+}
 CodePatch::CodePatch(const char* d_name,
           intptr_t p_address,
           std::vector<int16_t> patch_bytes){
@@ -125,7 +125,7 @@ CodePatch::CodePatch(const char* d_name,
     patch_size = patch_bytes.size();
     type = MANUAL_PATCH;
     patched_code = patch_bytes;
-};
+}
 
 
 bool CodePatch::build(intptr_t p_address){
@@ -172,7 +172,7 @@ bool CodePatch::build(intptr_t p_address){
                 used_area = 5;
                 write_pointer = true;
                 redirect_address = patch_address + patch_size;
-            };
+            }
             break;
         case MANUAL_PATCH :
             assert(patch_size == patched_code.size());
@@ -183,10 +183,10 @@ bool CodePatch::build(intptr_t p_address){
             used_area = patch_size;
             for (int i=0; i<patch_size; i++){
                 patched_code.push_back(reinterpret_cast<uint8_t*>(&redirect_address)[i]);
-            };
+            }
             write_pointer = false;
             break;
-    };
+    }
 
     // Write pointer to our own code.
     if (write_pointer){
@@ -197,13 +197,13 @@ bool CodePatch::build(intptr_t p_address){
         uint8_t* relative_address_bytes = reinterpret_cast<uint8_t*>(&relative_address_int);
         for (int i = 0; i < 4; i++){
             patched_code.push_back(relative_address_bytes[i]);
-        };
-    };
+        }
+    }
 
     // Pad remaining bytes.
     for (int i = used_area; i < patch_size; i++){
         patched_code.push_back(NOP_BYTE);
-    };
+    }
 
     // Copy the bytes found at the original address
     // Also mimic the mask that could have been passed in through
@@ -215,8 +215,8 @@ bool CodePatch::build(intptr_t p_address){
             original_code.push_back(patch_address_bytes[i]);
         }else{
             original_code.push_back(-1);
-        };
-    };
+        }
+    }
 
     patch_built = true;
     printf("done\n");
@@ -236,8 +236,8 @@ void CodePatch::write_patch(std::vector<int16_t> patch_code){
     for (int i = 0; i < patch_size; i++){
         if (patch_code[i] != -1){
             patch_address_bytes[i] = static_cast<uint8_t>(patch_code[i]);
-        };
-    };
+        }
+    }
     VirtualProtect(reinterpret_cast<void*>(patch_address), patch_size, prota, &protb);
 }
 
@@ -259,8 +259,8 @@ void CodePatch::revert(){
             printf("wasn't needed.\n");
         }else{
             printf("wasn't built.\n");
-        };
-    };
+        }
+    }
     patch_applied = false;
 }
 
@@ -270,7 +270,7 @@ bool CodePatch::integrity(){
     std::vector<int16_t> comparison_code;
 
     if (patch_applied){comparison_code = patched_code;}
-    else                 {comparison_code = original_code;};
+    else                 {comparison_code = original_code;}
 
     bool intact = true;
     for (int i = 0; i < patch_size; i++){
@@ -280,7 +280,7 @@ bool CodePatch::integrity(){
             intact = false;
             break;
         }
-    };
+    }
     return intact;
 }
 
@@ -293,7 +293,7 @@ std::vector<int16_t> CodePatch::bytes_at_patch_address(){
     std::vector<int16_t> found_code;
     for (int i = 0; i < patch_size; i++){
         found_code.push_back(patch_address_bytes[i]);
-    };
+    }
     return found_code;
 }
 
@@ -319,7 +319,7 @@ uintptr_t get_call_address(intptr_t call_pointer){
         return (*reinterpret_cast<uintptr_t*>(call_pointer + 1) + call_pointer + 5);
     }else if(call_bytes[0] == CONDJ_BYTE){
         return (*reinterpret_cast<uintptr_t*>(call_pointer + 2) + call_pointer + 6);
-    };
+    }
     return 0;
 }
 
@@ -335,7 +335,7 @@ void set_call_address(intptr_t call_pointer, intptr_t point_to){
         VirtualProtect(reinterpret_cast<void*>(call_pointer), 6, PAGE_EXECUTE_READWRITE, &prota);
         *reinterpret_cast<intptr_t*>(call_pointer + 2) = point_to - 6 - call_pointer;
         VirtualProtect(reinterpret_cast<void*>(call_pointer), 6, prota, &protb);
-    };
+    }
 }
 
 static uintptr_t lowest_permitted_address = 0x400000;

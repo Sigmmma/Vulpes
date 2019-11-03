@@ -26,5 +26,5 @@ void unit_speak(MemRef object, int16_t arg2, UnitSpeech* speech_data){
             :
             : "m" (func_unit_speak_ptr)
         );
-    };
+    }
 }

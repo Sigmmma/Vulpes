@@ -30,6 +30,6 @@ char* map_name(){
         name_pointer = *reinterpret_cast<char**>(sig_sp_map_name.address());
     }else{
         name_pointer = *reinterpret_cast<char**>(sig_map_name.address());
-    };
+    }
     return name_pointer;
 }

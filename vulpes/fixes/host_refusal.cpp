@@ -22,7 +22,7 @@ void init_host_refusal_fixes(){
     if (host_refusal_fix1.build() && host_refusal_fix2.build()){
         host_refusal_fix1.apply();
         host_refusal_fix2.apply();
-    };
+    }
     if (client_refusal_fix.build()) client_refusal_fix.apply();
 }
 

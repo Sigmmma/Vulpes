@@ -18,10 +18,10 @@ bool cmd_rprint_func(std::vector<VulpesArg> input){
             rprintf(player_id, input[1].str_out().data());
         }else{
             cprintf_error("Player id: %d is too high.", player_id);
-        };
+        }
     }else{
         cprintf_error("v_sv_print is a Vulpes dedicated-server-only command.");
-    };
+    }
     return true;
 }
 
@@ -32,7 +32,7 @@ bool cmd_sv_say_func(std::vector<VulpesArg> input){
               "%s", input[1].str_out().data());
     }else{
         cprintf_error("Player id: %d is too high.", player_id);
-    };
+    }
     return true;
 }
 
@@ -51,7 +51,7 @@ bool cmd_sv_hill_timer_func(std::vector<VulpesArg> input){
         cprintf("Hill timer is reset to, and will be %d seconds.", ticks/30);
     }else{
         cprintf("Hill timer will be %d seconds from the next time the hill moves.", ticks/30);
-    };
+    }
     return true;
 }
 

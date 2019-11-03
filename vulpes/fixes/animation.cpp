@@ -26,10 +26,10 @@ void init_animation_bug_fixes(){
         player_biped_mid_air_turn_fix.build();
         animation__jmp_no_turn_anim = get_call_address(sig_addr+7);
         animation__jmp_original_code = player_biped_mid_air_turn_fix.return_address();
-    };
+    }
     if (player_biped_mid_air_turn_fix.is_built()){
         player_biped_mid_air_turn_fix.apply();
-    };
+    }
 }
 
 void revert_animation_bug_fixes(){

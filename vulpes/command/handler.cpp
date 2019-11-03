@@ -50,12 +50,12 @@ void auto_complete(char* buffer[], uint16_t* current_index){
                 && developer_mode >= commands[i]->get_dev_level()){
                     buffer[j] = commands[i]->get_name_chars();
                     j++;
-                };
-            };
+                }
+            }
             i++;
-        };
+        }
         *current_index = j;
-    };
+    }
 }
 
 // Returns false if the original Halo function should not fire after this.
@@ -65,13 +65,13 @@ bool process_command(char* input){
     // A line starting with this should be ignored.
     if(input_str.find(";") == 0){
         return false;
-    };
+    }
     if(input_str.find("#") == 0){
         return false;
-    };
+    }
     if(input_str.find("//") == 0){
         return false;
-    };
+    }
 
     vector<string> matches;
 
@@ -84,9 +84,9 @@ bool process_command(char* input){
             if (semicolon_pos != string::npos){
                 if (semicolon_pos > 0){
                     matches.push_back(str.substr(0, semicolon_pos));
-                };
+                }
                 break; // We shouldn't match anything after a semicolon
-            };
+            }
             matches.push_back(str);
         }else if(arg_match[2] != ""){
             matches.push_back(arg_match[2]);
@@ -94,9 +94,9 @@ bool process_command(char* input){
             matches.push_back(arg_match[3]);
         }else {
             matches.push_back("");
-        };
+        }
         search_start = arg_match.suffix().first;
-    };
+    }
 
     uint8_t devmode = developer_mode_level();
 
@@ -114,8 +114,8 @@ bool process_command(char* input){
             matching_cmd = commands[i];
             found_match = true;
             break;
-        };
-    };
+        }
+    }
     if (found_match){
         // Log this command.
         ConsoleInputGlobals* input_globals = console_input_globals();
@@ -131,12 +131,12 @@ bool process_command(char* input){
         }catch (exception& e){
             cprintf_error("Couldn't parse command. %s", e.what());
             return false;
-        };
+        }
         if (success){
             matching_cmd->execute(parsed_args);
-        };
+        }
         return false;
-    };
+    }
     return true;
 }
 
@@ -158,7 +158,7 @@ VulpesArgDef::VulpesArgDef(string arg_name, bool required, VulpesArgType arg_typ
     } else if(arg_type==A_TIME){
         imin = 0;
         imax = 2147483647;
-    };
+    }
 
     set_display_name();
 }
@@ -190,7 +190,7 @@ VulpesArgDef::VulpesArgDef(string arg_name, bool required, VulpesArgType arg_typ
     } else if (type==A_CHAR){
         assert(min >= -127);
         assert(max <= 127);
-    };
+    }
     imin = min;
     imax = max;
 
@@ -212,7 +212,7 @@ VulpesArgDef::VulpesArgDef(string arg_name, bool required, VulpesArgType arg_typ
 string VulpesArgDef::parse_str(string input){
     if (max_characters && input.size() > max_characters){
         return input.substr(0, max_characters);
-    };
+    }
     return input;
 }
 
@@ -222,7 +222,7 @@ int64_t parse_to_integer(string input, char** leftover){
         output = strtol(input.substr(2, input.size()).data(), leftover, 16);
     }else{
         output = strtol(input.data(), leftover, 10);
-    };
+    }
     return output;
 }
 
@@ -241,7 +241,7 @@ int32_t VulpesArgDef::parse_int(string input, char** leftover){
         output = imin;
     }else{
         output = static_cast<int32_t>(parsed);
-    };
+    }
     return output;
 }
 
@@ -257,7 +257,7 @@ float VulpesArgDef::parse_flt(string input, char** leftover){
                       name.data(), fmin, output);
         cprintf_error("Setting it to %f.", fmax);
         output = fmin;
-    };
+    }
     return output;
 }
 
@@ -272,7 +272,7 @@ bool VulpesArgDef::parse_bool(string input){
         cprintf_error("Couldn't parse input \"%s\" for %s. Assuming false.",
                       input.data(), name.data());
         return false;
-    };
+    }
 }
 
 enum class Time {
@@ -300,9 +300,9 @@ int VulpesArgDef::parse_time(string input, bool* success){
             has_alpha_chars = true;
         }else if (isdigit(input_a[i])){
             has_digit_chars = true;
-        };
+        }
         i++;
-    };
+    }
 
     // Throw a fit if our input can't be valid.
     if (!has_digit_chars && !has_alpha_chars){
@@ -315,7 +315,7 @@ int VulpesArgDef::parse_time(string input, bool* success){
                       input.data(), name.data());
         *success = false;
         return 0;
-    };
+    }
 
     // Split the input into numbers and units if we got both digits and alphabetics.
     vector<string> n;
@@ -328,19 +328,19 @@ int VulpesArgDef::parse_time(string input, bool* success){
             a.push_back(time_match[2]);
 
             search_start = time_match.suffix().first;
-        };
+        }
     }else if (has_digit_chars){
         printf("Just digits.");
         n.push_back(input);
         a.push_back(string(""));
-    };
+    }
     // Throw more fits if the splitting failed.
     if (!n.size()){
         cprintf_error("Couldn't parse input \"%s\" for %s. I got nothing.",
                       input.data(), name.data());
         *success = false;
         return 0;
-    };
+    }
     // Get all integers in each string in n.
     vector<vector<int>> n_int;
     for (i = 0; i < n.size(); i++){
@@ -352,9 +352,9 @@ int VulpesArgDef::parse_time(string input, bool* success){
             char* dummy;
             numbers.push_back(strtol(string(num_match[1]).data(), &dummy, 10));
             search_start = num_match.suffix().first;
-        };
+        }
         n_int.push_back(numbers);
-    };
+    }
     // Turn all our intergers into their appropriate tick counts.
     for (i = 0; i < n_int.size() && i < a.size(); i++){
         transform(a[i].begin(), a[i].end(), a[i].begin(), ::tolower);
@@ -374,7 +374,7 @@ int VulpesArgDef::parse_time(string input, bool* success){
                               input.data(), name.data());
                 *success = false;
                 return 0;
-            };
+            }
         } else if (a[i] == "t" || a[i] == "tick" || a[i] == "ticks"){
             unit = Time::TICKS;
         } else if (a[i] == "s" || a[i] == "sec" || a[i] == "secs"
@@ -393,7 +393,7 @@ int VulpesArgDef::parse_time(string input, bool* success){
                           input.data(), name.data(), a[i].data());
             *success = false;
             return 0;
-        };
+        }
         vector<int> current_set = n_int[i];
         for (int j=0; j < current_set.size(); j++){
             // Lower the unit for the next parse.
@@ -417,9 +417,9 @@ int VulpesArgDef::parse_time(string input, bool* success){
                 case Time::TICKS :
                     output += current_set[j];
                     break;
-            };
-        };
-    };
+            }
+        }
+    }
     *success = true;
     return static_cast<int>(output);
 }
@@ -429,7 +429,7 @@ void VulpesArgDef::set_display_name(){
         display_name = name + "[";
     }else{
         display_name = name + "<";
-    };
+    }
 
     switch (type){
         case A_STRING :
@@ -453,25 +453,25 @@ void VulpesArgDef::set_display_name(){
         case A_TIME :
             display_name = display_name + "time";
             goto end;
-    };
+    }
 
     integer:
     if (min_max){
         display_name = display_name + "(" + to_string(imin) + "-" + to_string(imax) + ")";
-    };
+    }
     goto end;
 
     floating_point:
     if (min_max){
         display_name = display_name + "(" + to_string(fmin) + "-" + to_string(fmax) + ")";
-    };
+    }
 
     end:
     if (optional){
         display_name = display_name + "]";
     }else{
         display_name = display_name + ">";
-    };
+    }
 }
 
 VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
@@ -482,7 +482,7 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
     if (type != A_STRING && input == ""){
         output = false;
         return;
-    };
+    }
     char* leftover;
     switch (type){
             case A_STRING :
@@ -496,14 +496,14 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
             output = true;
             if (*leftover != '\0'){
                 *success = false;
-            };
+            }
             break;
         case A_FLOAT :
             fltout = definition->parse_flt(input, &leftover);
             output = true;
             if (*leftover != '\0'){
                 *success = false;
-            };
+            }
             break;
         case A_BOOL :
             boolout = definition->parse_bool(input);
@@ -513,7 +513,7 @@ VulpesArg::VulpesArg(VulpesArgDef def, std::string in, bool* success){
             intout = definition->parse_time(input, success);
             output = true;
             break;
-    };
+    }
 }
 
 int VulpesArg::int_out(){
@@ -549,7 +549,7 @@ VulpesCommand::VulpesCommand(string cmd_name,
     va_start(va_args, num_args);
     for (int i=0; i<num_args; i++){
         args.push_back(va_arg(va_args, VulpesArgDef));
-    };
+    }
     va_end(va_args);
     commands.push_back(this);
     printf("Command %s added at index %d\n",
@@ -564,8 +564,8 @@ VulpesCommand::~VulpesCommand(){
                    name, i, commands[i]->get_name());
             commands.erase(commands.begin() + i);
             break;
-        };
-    };
+        }
+    }
 }
 
 string VulpesCommand::get_name(){
@@ -585,8 +585,8 @@ vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings, bool* su
     for (required_args = 0; required_args<args.size(); required_args++){
         if (args[required_args].optional){
             break;
-        };
-    };
+        }
+    }
     if (arg_strings.size() < required_args){
         cprintf_error("Too few args for command: %s. Got %d, expected %d to %d.",
                       name.data(), arg_strings.size(), required_args, args.size());
@@ -595,7 +595,7 @@ vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings, bool* su
         cprintf_error("Too many args for command: %s. Got %d, expected %d to %d.",
                       name.data(), arg_strings.size(), required_args, args.size());
         throw wrong_arg_count_exception;
-    };
+    }
     vector<VulpesArg> parsed_args;
     for (int i=0; i<arg_strings.size(); i++){
         parsed_args.push_back(VulpesArg(args[i], arg_strings[i], success));
@@ -604,8 +604,8 @@ vector<VulpesArg> VulpesCommand::parse_args(vector<string> arg_strings, bool* su
                           i+1, args[i].display_name.data());
             *success = false;
             break;
-        };
-    };
+        }
+    }
     return parsed_args;
 }
 
@@ -621,6 +621,6 @@ bool VulpesCommand::execute(vector<VulpesArg> parsed_args){
         cprintf_error("Execution of command %s failed. Exception: %s",
                       name.data(), e.what());
         success = false;
-    };
+    }
     return success;
 }

@@ -58,10 +58,10 @@ static void luaV_load_scripts_for_map(){
             }else{
                 // State setup was succesful, save a reference to it globally.
                 map_state = state;
-            };
-        };
+            }
+        }
         return;
-    };
+    }
 }
 
 static void luaV_unload_scripts_for_map(){

@@ -22,7 +22,7 @@ void init_console_input_hook(){
     if(console_in_hook_patch.build()){
         console_hook__return_to_halo_con_in = console_in_hook_patch.address() + 23;
         console_in_hook_patch.apply();
-    };
+    }
 }
 
 void revert_console_input_hook(){
@@ -53,7 +53,7 @@ void init_command_auto_complete_hook(){
     }else{
         cprintf_error("Error: Couldn't perform auto complete patch. "
                       "Vulpes commands will not auto complete.");
-    };
+    }
 }
 
 void revert_command_auto_complete_hook(){
