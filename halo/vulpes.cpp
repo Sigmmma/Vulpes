@@ -3,15 +3,15 @@
 #include <cstdio>
 #include <cstdint>
 
-#include "halo/memory/gamestate/network.hpp"
+#include "memory/gamestate/network.hpp"
 
-#include "hooker/hooker.hpp"
-#include "halo/hooks/incoming_packets.hpp"
-#include "halo/hooks/king.hpp"
-#include "halo/hooks/console.hpp"
-#include "halo/hooks/tick.hpp"
-#include "halo/hooks/object.hpp"
-#include "halo/hooks/map.hpp"
+#include "../hooker/hooker.hpp"
+#include "hooks/incoming_packets.hpp"
+#include "hooks/king.hpp"
+#include "hooks/console.hpp"
+#include "hooks/tick.hpp"
+#include "hooks/object.hpp"
+#include "hooks/map.hpp"
 void init_hooks(){
     init_incoming_packet_hooks();
     init_king_hooks();
@@ -29,22 +29,22 @@ void revert_hooks(){
     revert_map_hooks();
 }
 
-#include "command/debug.hpp"
-#include "command/server.hpp"
+#include "../command/debug.hpp"
+#include "../command/server.hpp"
 void init_commands(){
     init_debug_commands();
     init_server_commands();
 }
 
-#include "halo/fixes/cpu_usage.hpp"
-#include "halo/fixes/file_handle_leak.hpp"
-#include "halo/fixes/host_refusal.hpp"
-#include "halo/fixes/string_overflows.hpp"
-#include "halo/fixes/shdr_trans_zfighting.hpp"
-#include "halo/fixes/framerate_dependent_timers.hpp"
-#include "halo/fixes/animation.hpp"
-#include "halo/tweaks/loading_screen.hpp"
-#include "halo/tweaks/tweaks.hpp"
+#include "fixes/cpu_usage.hpp"
+#include "fixes/file_handle_leak.hpp"
+#include "fixes/host_refusal.hpp"
+#include "fixes/string_overflows.hpp"
+#include "fixes/shdr_trans_zfighting.hpp"
+#include "fixes/framerate_dependent_timers.hpp"
+#include "fixes/animation.hpp"
+#include "tweaks/loading_screen.hpp"
+#include "tweaks/tweaks.hpp"
 void init_halo_bug_fixes(){
     init_cpu_usage_fixes();
     init_file_handle_leak_fixes();
@@ -71,7 +71,7 @@ void revert_halo_bug_fixes(){
     revert_tweaks();
 }
 
-#include "halo/upgrades/map.hpp"
+#include "upgrades/map.hpp"
 void init_upgrades(){
     init_map_crc_upgrades(game_is_server_executable());
 }
@@ -83,22 +83,22 @@ void revert_upgrades(){
 void init_memory(){
 }
 
-#include "halo/functions/message_delta.hpp"
+#include "functions/message_delta.hpp"
 void init_halo_functions(){
     init_message_delta_processor();
     init_message_delta_sender();
 }
 
-#include "halo/network/network_id.hpp"
+#include "network/network_id.hpp"
 void init_network(){
     init_network_id();
 }
 
-#include "halo/functions/messaging.hpp"
-#include "halo/lua/lua.hpp"
+#include "functions/messaging.hpp"
+#include "lua/lua.hpp"
 void pre_first_map_load_init();
 
-#include "includes/fox.hpp"
+#include "../includes/fox.hpp"
 
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
@@ -149,4 +149,18 @@ void destruct_vulpes(){
     revert_upgrades();
     revert_halo_bug_fixes();
     destruct_lua();
+}
+
+
+bool loaded = false;
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+    if(fdwReason == DLL_PROCESS_ATTACH && !loaded) {
+        loaded = true;
+        init_vulpes();
+    }else if(fdwReason == DLL_PROCESS_DETACH && loaded) {
+        destruct_vulpes();
+        loaded = false;
+    };
+    return true;
 }

@@ -22,9 +22,8 @@ set(CMAKE_SHARED_LINKER_FLAGS "-m32 -W -s -static-libgcc -static-libstdc++ -lker
 
 
 add_library(Vulpes SHARED
-    version.rc
-    dll_main.cpp
-    vulpes.cpp
+    halo/version.rc
+    halo/vulpes.cpp
 
     command/debug.cpp
     command/handler.cpp
