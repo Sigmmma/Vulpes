@@ -8,7 +8,7 @@
 
 #include <lua.hpp>
 
-#include "../../includes/file_helpers.hpp"
+#include "../../util/file_helpers.hpp"
 #include "../hooks/map.hpp"
 #include "../memory/global.hpp"
 #include "../memory/types.hpp"

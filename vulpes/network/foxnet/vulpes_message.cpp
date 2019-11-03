@@ -5,8 +5,8 @@
  */
 
 #include "../../functions/message_delta.hpp"
-#include "../../../includes/string_raw_data_encoder.hpp"
-#include "../../../includes/bit_buffer.hpp"
+#include "../../../util/string_raw_data_encoder.hpp"
+#include "../../../util/bit_buffer.hpp"
 #include <cstring>
 
 void send_vulpes_message(VulpesMessage* msg){

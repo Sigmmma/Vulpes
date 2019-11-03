@@ -31,8 +31,8 @@ add_library(Vulpes SHARED
 
     hooker/hooker.cpp
 
-    includes/string_raw_data_encoder.c
-    includes/crc32.c
+    util/string_raw_data_encoder.c
+    util/crc32.c
 
     vulpes/fixes/animation.cpp
     vulpes/fixes/animation.S

@@ -98,7 +98,7 @@ void init_network(){
 #include "lua/lua.hpp"
 void pre_first_map_load_init();
 
-#include "../includes/fox.hpp"
+#include "../util/fox.hpp"
 
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,

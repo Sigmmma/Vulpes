@@ -7,7 +7,7 @@
 #include "map.hpp"
 #include "../../hooker/hooker.hpp"
 #include "../memory/types.hpp"
-#include "../../includes/crc32.hpp"
+#include "../../util/crc32.hpp"
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #include <cstdio>

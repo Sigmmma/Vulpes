@@ -6,7 +6,7 @@
 
 #include <lua.hpp>
 
-#include "../../includes/file_helpers.hpp"
+#include "../../util/file_helpers.hpp"
 #include "../functions/messaging.hpp"
 
 // Call this when a lua frame encounters an error.
