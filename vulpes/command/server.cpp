@@ -6,10 +6,10 @@
 
 #include "server.hpp"
 #include "handler.hpp"
-#include "../vulpes/functions/messaging.hpp"
-#include "../vulpes/functions/message_delta.hpp"
-#include "../vulpes/memory/gamestate/network.hpp"
-#include "../vulpes/memory/gamestate/server/king.hpp"
+#include "../functions/messaging.hpp"
+#include "../functions/message_delta.hpp"
+#include "../memory/gamestate/network.hpp"
+#include "../memory/gamestate/server/king.hpp"
 
 bool cmd_rprint_func(std::vector<VulpesArg> input){
     if (game_is_server_executable()){

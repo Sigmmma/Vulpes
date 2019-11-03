@@ -29,8 +29,8 @@ void revert_hooks(){
     revert_map_hooks();
 }
 
-#include "../command/debug.hpp"
-#include "../command/server.hpp"
+#include "command/debug.hpp"
+#include "command/server.hpp"
 void init_commands(){
     init_debug_commands();
     init_server_commands();

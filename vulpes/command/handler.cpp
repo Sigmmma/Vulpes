@@ -5,14 +5,14 @@
  */
 
 #include "handler.hpp"
-#include "../vulpes/functions/messaging.hpp"
+#include "../functions/messaging.hpp"
 #include <regex>
 #include <cassert>
 #include <algorithm>
 #include <exception>
 #include <ctype.h>
-#include "../vulpes/functions/devmode.hpp"
-#include "../vulpes/memory/gamestate/console.hpp"
+#include "../functions/devmode.hpp"
+#include "../memory/gamestate/console.hpp"
 
 using namespace std;
 

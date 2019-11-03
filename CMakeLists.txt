@@ -25,9 +25,9 @@ add_library(Vulpes SHARED
     vulpes/version.rc
     vulpes/vulpes.cpp
 
-    command/debug.cpp
-    command/handler.cpp
-    command/server.cpp
+    vulpes/command/debug.cpp
+    vulpes/command/handler.cpp
+    vulpes/command/server.cpp
 
     hooker/hooker.cpp
 

@@ -6,10 +6,10 @@
 
 #include "debug.hpp"
 #include "handler.hpp"
-#include "../vulpes/functions/messaging.hpp"
-#include "../vulpes/fixes/shdr_trans_zfighting.hpp"
-#include "../vulpes/memory/gamestate/network.hpp"
-#include "../vulpes/network/network_id.hpp"
+#include "../functions/messaging.hpp"
+#include "../fixes/shdr_trans_zfighting.hpp"
+#include "../memory/gamestate/network.hpp"
+#include "../network/network_id.hpp"
 
 bool toggle_shader_trans_fix(std::vector<VulpesArg> input){
     bool on = input[0].bool_out();
