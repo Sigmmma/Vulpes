@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# CMakeFiles
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+lib/LuaJIT
+lib/LuaJIT/

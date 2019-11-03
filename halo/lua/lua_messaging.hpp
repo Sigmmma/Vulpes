@@ -6,5 +6,6 @@
 
 #pragma once
 
-char* profile_path();
-char* map_name();
+#include <lua.hpp>
+
+void luaV_reg_messaging_funcs(lua_State *state);

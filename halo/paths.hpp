@@ -6,10 +6,10 @@
 
 #pragma once
 
-#define VULPES_PATH "%s\\vulpes"
+#define VULPES_PATH "\\vulpes"
 
 #define LUA_BASE_PATH   VULPES_PATH "\\lua"
 
 #define LUA_MAP_PATH    VULPES_PATH "\\lua\\map"
 
-#define LUA_GLOBAL_PATH VULPES_PATH "\\lua\\globals"
+#define LUA_GLOBAL_PATH VULPES_PATH "\\lua\\global"

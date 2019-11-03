@@ -15,7 +15,7 @@ project(Vulpes
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-value -Wold-style-cast -masm=intel -msse2 -m32 -mfpmath=sse")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-value -Wold-style-cast -masm=intel -msse -msse2 -m32 -mfpmath=sse")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O3")
 set(CMAKE_SHARED_LINKER_FLAGS "-m32 -W -s -static-libgcc -static-libstdc++ -lkernel32")
@@ -90,12 +90,24 @@ add_library(Vulpes SHARED
     halo/upgrades/map.S
 
     halo/lua/lua.cpp
+    halo/lua/lua_messaging.cpp
+    halo/lua/lua_open.cpp
 )
 
 add_library(VulpesLoader SHARED
     loader/version.rc
     loader/dll_main.c
 )
+
+ADD_LIBRARY(LuaJIT STATIC IMPORTED)
+SET_TARGET_PROPERTIES(LuaJIT PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/LuaJIT/src/libluajit.a")
+set(LUA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/LuaJIT/src")
+
+target_include_directories(Vulpes
+    PUBLIC ${LUA_INCLUDE_DIR}
+)
+TARGET_LINK_LIBRARIES(Vulpes LuaJIT)
 
 SET_TARGET_PROPERTIES(Vulpes PROPERTIES PREFIX "")
 SET_TARGET_PROPERTIES(VulpesLoader PROPERTIES PREFIX "")
