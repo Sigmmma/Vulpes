@@ -5,6 +5,7 @@
  */
 
 #include "object_device.hpp"
+#include "../../../../hooker/hooker.hpp"
 
 GenericTable* device_groups_table(){
     static GenericTable** effect_ptrs_loc = effect_ptrs();
