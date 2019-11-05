@@ -4,9 +4,11 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
+#include <vulpes/memory/types.hpp>
+
 #include "map.hpp"
-#include "../../hooker/hooker.hpp"
-#include "../memory/types.hpp"
 
 DEFINE_EVENT_HOOK_LIST(EVENT_PRE_MAP_LOAD, pre_map);
 DEFINE_EVENT_HOOK_LIST(EVENT_MAP_LOAD, post_map);

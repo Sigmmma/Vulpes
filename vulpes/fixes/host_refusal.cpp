@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
 #include "host_refusal.hpp"
-#include "../../hooker/hooker.hpp"
 
 Signature(false, sig_host_refusal1,
     {0x88, 0x5C, 0x24, 0x2A, 0xE8, -1, -1, -1, -1, 0x50, 0xE8});

@@ -4,9 +4,10 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "../../hooker/hooker.hpp"
-#include "../functions/messaging.hpp"
-#include "../command/handler.hpp"
+#include <hooker/hooker.hpp>
+
+#include <vulpes/command/handler.hpp>
+#include <vulpes/functions/messaging.hpp>
 
 Signature(true, sig_console_input_hook,
     {0x3C, 0x23, 0x74, 0x0A, 0x3C, 0x2F, 0x75, 0x0F});

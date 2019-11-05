@@ -5,8 +5,9 @@
  */
 
 #pragma once
-#include "../../types.hpp"
-#include "../table.hpp"
+
+#include <vulpes/memory/gamestate/table.hpp>
+#include <vulpes/memory/types.hpp>
 
 struct ScenarioLocation {
     int32_t leaf_id;

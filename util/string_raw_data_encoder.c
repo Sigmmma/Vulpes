@@ -2,8 +2,8 @@
  * (c) 2019 gbMichelle
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 const uint16_t MASKS16[] = {
     1,

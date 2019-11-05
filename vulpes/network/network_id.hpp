@@ -5,7 +5,8 @@
  */
 
 #pragma once
-#include "../memory/types.hpp"
+
+#include <vulpes/memory/types.hpp>
 
 ////// These are functions for using the existing object syncing infrastructure.
 ////// I really have to stress that we shouldn't use these too much if we start

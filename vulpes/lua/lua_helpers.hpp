@@ -1,13 +1,20 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #pragma once
 
 #include <cstdio>
-#include <string>
 #include <memory>
+#include <string>
 
 #include <lua.hpp>
 
-#include "../../util/file_helpers.hpp"
-#include "../functions/messaging.hpp"
+#include <util/file_helpers.hpp>
+
+#include <vulpes/functions/messaging.hpp>
 
 // Call this when a lua frame encounters an error.
 static inline void luaV_print_error(lua_State *state){

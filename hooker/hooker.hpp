@@ -5,7 +5,9 @@
  */
 
 #pragma once
+
 #include <vector>
+
 #include "resource.hpp"
 
 // Macro for CodeSignature, this is to make it so we don't have to repeat ourselves too much.

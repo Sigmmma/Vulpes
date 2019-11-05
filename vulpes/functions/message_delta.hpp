@@ -5,8 +5,9 @@
  */
 
 #pragma once
-#include "../memory/message_delta_meta.hpp"
-#include "../memory/message_delta.hpp"
+
+#include <vulpes/memory/message_delta.hpp>
+#include <vulpes/memory/message_delta_meta.hpp>
 
 // Do not use this until all args are named.
 uint32_t mdp_encode_stateless_iterated(

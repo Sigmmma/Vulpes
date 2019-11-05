@@ -4,9 +4,11 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
+#include <vulpes/hooks/tick.hpp>
+
 #include "framerate_dependent_timers.hpp"
-#include "../../hooker/hooker.hpp"
-#include "../hooks/tick.hpp"
 
 Signature(false, sig_death_timer_framerate_dep,
     {0x38, 0x1D, -1, -1, -1, -1, 0x74, 0x33, 0xA1, -1, -1, -1, -1, 0x38, 0x58,

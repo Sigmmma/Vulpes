@@ -5,6 +5,7 @@
  */
 
 #pragma once
+
 #include "types.hpp"
 
 enum class AiCommunicationType : int16_t {

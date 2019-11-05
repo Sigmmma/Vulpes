@@ -4,14 +4,16 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "map.hpp"
-#include "../../hooker/hooker.hpp"
-#include "../memory/types.hpp"
-#include "../../util/crc32.hpp"
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
 #include <cstdio>
 #include <fstream>
+#include <windows.h>
+
+#include <hooker/hooker.hpp>
+#include <util/crc32.hpp>
+
+#include <vulpes/memory/types.hpp>
+
+#include "map.hpp"
 
 extern "C" {
     bool is_server = false;

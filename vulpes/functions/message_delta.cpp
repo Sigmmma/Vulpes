@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
 #include "message_delta.hpp"
-#include "../../hooker/hooker.hpp"
 
 Signature(true, sig_mdp_decode_stateless_iterated,
     {0x57, 0x8B, 0x38, 0x51, 0x83, 0xC0, 0x04, 0x6A, 0x00, 0x50, 0xE8});

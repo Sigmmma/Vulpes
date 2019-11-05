@@ -5,9 +5,12 @@
  */
 
 #pragma once
-#include "types.hpp"
+
+#include <vulpes/memory/tag/tag_types.hpp>
+
 #include "message_delta.hpp"
-#include "tag/tag_types.hpp"
+#include "types.hpp"
+
 
 // These are used to determine how to handle certain events for
 // objects and other gamestate things.

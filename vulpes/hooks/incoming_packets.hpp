@@ -5,8 +5,9 @@
  */
 
 #pragma once
-#include "../memory/message_delta.hpp"
-#include "../event.hpp"
+
+#include <vulpes/event.hpp>
+#include <vulpes/memory/message_delta.hpp>
 
 DEFINE_EVENT_HOOK(EVENT_RECEIVE_CHAT_MESSAGE, bool, HudChat*);
 

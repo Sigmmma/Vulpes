@@ -4,10 +4,14 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "../../functions/message_delta.hpp"
-#include "../../../util/string_raw_data_encoder.hpp"
-#include "../../../util/bit_buffer.hpp"
 #include <cstring>
+
+#include <util/string_raw_data_encoder.hpp>
+#include <util/bit_buffer.hpp>
+
+#include <vulpes/functions/message_delta.hpp>
+
+#include "vulpes_message.hpp"
 
 void send_vulpes_message(VulpesMessage* msg){
     uint8_t buffer[1024]; // Final packet buffer.

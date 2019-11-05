@@ -4,9 +4,10 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <vulpes/hooks/tick.hpp>
+#include <vulpes/memory/gamestate/console.hpp>
+
 #include "tweaks.hpp"
-#include "../hooks/tick.hpp"
-#include "../memory/gamestate/console.hpp"
 
 void init_tweaks(){
     console_input_globals()->enabled = true;

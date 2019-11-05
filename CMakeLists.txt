@@ -109,7 +109,7 @@ set_target_properties(LuaJIT PROPERTIES
 set(LUA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/LuaJIT/src")
 
 target_include_directories(Vulpes
-    PUBLIC ${LUA_INCLUDE_DIR}
+    PUBLIC "./" ${LUA_INCLUDE_DIR}
 )
 target_link_libraries(Vulpes LuaJIT)
 

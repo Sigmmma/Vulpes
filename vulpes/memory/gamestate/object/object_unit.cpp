@@ -4,8 +4,10 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <vulpes/functions/object_unit.hpp>
+
 #include "object_unit.hpp"
-#include "../../../functions/object_unit.hpp"
+
 /*
 void ObjectUnit::speak(
     AiCommunicationType type,

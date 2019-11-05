@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
 #include "game_variant.hpp"
-#include "../../../../hooker/hooker.hpp"
 
 Signature(true, sig_game_variant_settings,
     {0x80, 0x3D, -1, -1, -1, -1, 0x00, 0x74, 0x49, 0x0F,

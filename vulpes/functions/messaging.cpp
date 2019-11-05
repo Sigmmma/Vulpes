@@ -4,12 +4,15 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "messaging.hpp"
-#include "../../hooker/hooker.hpp"
-#include "../memory/gamestate/console.hpp"
 #include <cstdio>
-#include <string>
 #include <cstring>
+#include <string>
+
+#include <hooker/hooker.hpp>
+
+#include <vulpes/memory/gamestate/console.hpp>
+
+#include "messaging.hpp"
 
 Signature(true, sig_console_line_new,
     {0x8B, 0x15, -1, -1, -1, -1, 0x66, 0x83, 0x7A, 0x2E, 0x20, 0x75, 0x11});

@@ -5,9 +5,13 @@
  */
 
 #pragma once
-#include "../memory/types.hpp"
-#include "message_delta.hpp"
+
 #include <cstdarg>
+
+#include <vulpes/memory/types.hpp>
+
+#include "message_delta.hpp"
+
 
 // Print a formatted string to the Halo console.
 void vcprintf(const ARGBFloat& color, const char* format, va_list args);

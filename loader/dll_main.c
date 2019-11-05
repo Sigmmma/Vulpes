@@ -1,4 +1,9 @@
-#define WIN32_MEAN_AND_LEAN
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #include <windows.h>
 
 // TODO: Add code that downloads and updates the mod.

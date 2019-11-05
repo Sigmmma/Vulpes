@@ -5,6 +5,7 @@
  */
 
 #pragma once
+
 #include <cstdint>
 
 enum class ConnectionType : uint32_t {

@@ -5,8 +5,10 @@
  */
 
 #pragma once
+
+#include <vulpes/memory/gamestate/player.hpp>
+
 #include "types.hpp"
-#include "gamestate/player.hpp"
 
 enum MessageDeltaType : int8_t {
     NONE                               = -1,

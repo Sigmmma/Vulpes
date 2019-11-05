@@ -8,16 +8,17 @@
 
 #include <lua.hpp>
 
-#include "../../util/file_helpers.hpp"
-#include "../hooks/map.hpp"
-#include "../memory/global.hpp"
-#include "../memory/types.hpp"
-#include "../paths.hpp"
+#include <util/file_helpers.hpp>
 
+#include <vulpes/hooks/map.hpp>
+#include <vulpes/memory/global.hpp>
+#include <vulpes/memory/types.hpp>
+#include <vulpes/paths.hpp>
+
+#include "lua.hpp"
 #include "lua_helpers.hpp"
 #include "lua_messaging.hpp"
 #include "lua_open.hpp"
-#include "lua.hpp"
 
 static lua_State* map_state = NULL;
 

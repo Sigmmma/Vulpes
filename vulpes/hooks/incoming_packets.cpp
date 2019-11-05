@@ -4,9 +4,11 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
+#include <vulpes/network/foxnet/vulpes_message.hpp>
+
 #include "incoming_packets.hpp"
-#include "../../hooker/hooker.hpp"
-#include "../network/foxnet/vulpes_message.hpp"
 
 DEFINE_EVENT_HOOK_LIST(EVENT_RECEIVE_CHAT_MESSAGE, hud_chat_events);
 

@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
 #include "console.hpp"
-#include "../../../hooker/hooker.hpp"
 
 Signature(true, sig_console_out2,
     {0x83, 0xEC, 0x10, 0x57, 0x8B, 0xF8, 0xA0, -1, -1, -1, -1,

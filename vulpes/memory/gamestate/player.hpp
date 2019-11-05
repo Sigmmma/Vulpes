@@ -5,8 +5,10 @@
  */
 
 #pragma once
+
+#include <vulpes/memory/gamestate/object/object.hpp>
+
 #include "table.hpp"
-#include "object/object.hpp"
 
 enum class InteractionType : uint16_t {
     NONE                    = 0,

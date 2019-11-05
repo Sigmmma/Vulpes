@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 enum class DamageCategory : int16_t {
     NONE = 0,
     FALLING,

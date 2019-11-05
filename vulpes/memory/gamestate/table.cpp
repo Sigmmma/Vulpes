@@ -4,9 +4,11 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
+#include <vulpes/functions/table.hpp>
+
 #include "table.hpp"
-#include "../../functions/table.hpp"
-#include "../../../hooker/hooker.hpp"
 
 MemRef Table::allocate(){
     MemRef return_value;

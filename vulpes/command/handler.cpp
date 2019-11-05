@@ -4,15 +4,17 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "handler.hpp"
-#include "../functions/messaging.hpp"
-#include <regex>
-#include <cassert>
 #include <algorithm>
-#include <exception>
+#include <cassert>
 #include <ctype.h>
-#include "../functions/devmode.hpp"
-#include "../memory/gamestate/console.hpp"
+#include <exception>
+#include <regex>
+
+#include <vulpes/functions/devmode.hpp>
+#include <vulpes/functions/messaging.hpp>
+#include <vulpes/memory/gamestate/console.hpp>
+
+#include "handler.hpp"
 
 using namespace std;
 

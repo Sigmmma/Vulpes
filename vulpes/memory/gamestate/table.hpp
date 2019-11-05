@@ -5,7 +5,8 @@
  */
 
 #pragma once
-#include "../types.hpp"
+
+#include <vulpes/memory/types.hpp>
 
 class Table {
 public:

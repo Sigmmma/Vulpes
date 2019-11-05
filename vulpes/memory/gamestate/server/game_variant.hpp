@@ -5,7 +5,8 @@
  */
 
 #pragma once
-#include "../../types.hpp"
+
+#include <vulpes/memory/types.hpp>
 
 enum class GoalSignalling : uint32_t {
     MOTION_TRACKER = 0,

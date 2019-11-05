@@ -5,6 +5,7 @@
  */
 
 #pragma once
+
 #include <cstdint>
 
 // This is all depricated for now.

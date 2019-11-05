@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "types.hpp"
 #include <cmath>
+
+#include "types.hpp"
 
 float Vec2d::get_magnitude(){
     return sqrt(x*x + y*y);

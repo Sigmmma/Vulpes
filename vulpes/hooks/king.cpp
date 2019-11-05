@@ -4,9 +4,11 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
+#include <vulpes/memory/gamestate/server/king.hpp>
+
 #include "king.hpp"
-#include "../../hooker/hooker.hpp"
-#include "../memory/gamestate/server/king.hpp"
 /*
 Signature(true, sig_king_timer_start,
     {0xC7, 0x05, -1, -1, -1, 0x00, 0x08, 0x07, 0x00, 0x00, 0xC7, 0x05,

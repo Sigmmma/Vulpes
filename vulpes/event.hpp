@@ -6,6 +6,7 @@
         -Added function templates and macros for adding events to Event Holders.
          To avoid needing to rewrite the functions each time.
 */
+
 #pragma once
 
 #include <vector>

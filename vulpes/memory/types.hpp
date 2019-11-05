@@ -5,6 +5,7 @@
  */
 
 #pragma once
+
 #include <cstdint>
 
 #define CONCAT(x, y) x ## y

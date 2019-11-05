@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <utility>
+
 template<typename T, typename ... Args>
 static inline bool exec_if_valid_bool(T function, Args&& ... args) {
     if(function != NULL) {

@@ -4,13 +4,13 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "hooker.hpp"
-#define WIN32_MEAN_AND_LEAN // Keeps the amount of windows.h includes to the bare minumum.
-#include <windows.h>
 #include <cassert>
-#include <string>
 #include <cstdio>
 #include <iostream>
+#include <string>
+#include <windows.h>
+
+#include "hooker.hpp"
 
 CodeSignature::CodeSignature(bool required,
                              const char* d_name,

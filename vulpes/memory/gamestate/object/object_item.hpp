@@ -5,6 +5,7 @@
  */
 
 #pragma once
+
 #include "object.hpp"
 
 #pragma pack(push, 1)

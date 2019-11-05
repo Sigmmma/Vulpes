@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
 #include "cpu_usage.hpp"
-#include "../../hooker/hooker.hpp"
 
 extern "C" {
     extern cpu_usage_sleep_replacement();

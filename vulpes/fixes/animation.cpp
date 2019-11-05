@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
 #include "animation.hpp"
-#include "../../hooker/hooker.hpp"
 
 Signature(false, sig_player_jump_turn_fix,
     {0xF6, 0x85, 0xF4, 0x02, 0x00, 0x00, 0x01, 0x0F, 0x85});

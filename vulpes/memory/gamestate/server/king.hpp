@@ -5,7 +5,8 @@
  */
 
 #pragma once
-#include "../../types.hpp"
+
+#include <vulpes/memory/types.hpp>
 
 #pragma pack(push, 1)
 

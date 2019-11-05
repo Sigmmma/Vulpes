@@ -5,9 +5,11 @@
  */
 
 #pragma once
+
+#include <vulpes/memory/actor.hpp>
+#include <vulpes/memory/damage_effect.hpp>
+
 #include "object.hpp"
-#include "../../actor.hpp"
-#include "../../damage_effect.hpp"
 
 enum class UnitAnimationState : int8_t {
     INVALID = -1,

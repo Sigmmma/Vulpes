@@ -5,6 +5,7 @@
  */
 
 #pragma once
+
 #include "table.hpp"
 
 GenericTable* weather_particles_table();

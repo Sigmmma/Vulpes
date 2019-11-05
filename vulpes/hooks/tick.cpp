@@ -4,8 +4,9 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
 #include "tick.hpp"
-#include "../../hooker/hooker.hpp"
 
 const size_t TICKS_PER_SECOND = 30; //TODO: Move this somewhere else.
 

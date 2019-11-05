@@ -1,11 +1,17 @@
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#include <cstdio>
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
 #include <cstdint>
+#include <cstdio>
+#include <windows.h>
 
 #include "memory/gamestate/network.hpp"
 
-#include "../hooker/hooker.hpp"
+// Hooks
+
 #include "hooks/incoming_packets.hpp"
 #include "hooks/king.hpp"
 #include "hooks/console.hpp"
@@ -29,12 +35,16 @@ void revert_hooks(){
     revert_map_hooks();
 }
 
+// Commands
+
 #include "command/debug.hpp"
 #include "command/server.hpp"
 void init_commands(){
     init_debug_commands();
     init_server_commands();
 }
+
+// Fixes
 
 #include "fixes/cpu_usage.hpp"
 #include "fixes/file_handle_leak.hpp"
@@ -71,6 +81,8 @@ void revert_halo_bug_fixes(){
     revert_tweaks();
 }
 
+// Upgrades
+
 #include "upgrades/map.hpp"
 void init_upgrades(){
     init_map_crc_upgrades(game_is_server_executable());
@@ -80,8 +92,12 @@ void revert_upgrades(){
     revert_map_crc_upgrades();
 }
 
+// Memory
+
 void init_memory(){
 }
+
+// Halo functions
 
 #include "functions/message_delta.hpp"
 void init_halo_functions(){
@@ -94,12 +110,15 @@ void init_network(){
     init_network_id();
 }
 
+// Main init.
+
+#include <util/fox.hpp>
+#include <hooker/hooker.hpp>
+
 #include "functions/messaging.hpp"
 #include "lua/lua.hpp"
+
 void pre_first_map_load_init();
-
-#include "../util/fox.hpp"
-
 
 SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
     {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
@@ -151,6 +170,7 @@ void destruct_vulpes(){
     destruct_lua();
 }
 
+// DLL Entrypoint.
 
 bool loaded = false;
 

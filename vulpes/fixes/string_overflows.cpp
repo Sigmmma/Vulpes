@@ -4,10 +4,12 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <hooker/hooker.hpp>
+
+#include <vulpes/functions/devmode.hpp>
+#include <vulpes/functions/messaging.hpp>
+
 #include "string_overflows.hpp"
-#include "../../hooker/hooker.hpp"
-#include "../functions/messaging.hpp"
-#include "../functions/devmode.hpp"
 
 // HSC has a print function which does not accept extra arguments like a format print would.
 // Problem is that the string gets funnelled into a console function that does use a format string.

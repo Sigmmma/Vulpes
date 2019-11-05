@@ -5,7 +5,8 @@
  */
 
 #pragma once
-#include "../event.hpp"
+
+#include <vulpes/event.hpp>
 
 DEFINE_EVENT_HOOK(EVENT_PRE_TICK, void);
 DEFINE_EVENT_HOOK(EVENT_TICK, void);

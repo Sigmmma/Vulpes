@@ -6,7 +6,7 @@
 
 #include <lua.hpp>
 
-#include "../functions/messaging.hpp"
+#include <vulpes/functions/messaging.hpp>
 
 #include "lua_helpers.hpp"
 #include "lua_messaging.hpp"

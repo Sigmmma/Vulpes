@@ -4,13 +4,16 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include "../../hooker/hooker.hpp"
-#include "../../hooker/function_pointer_safe.hpp"
-#include "../memory/gamestate/object/object.hpp"
-#include "../memory/types.hpp"
-#include "../memory/behavior_definition.hpp"
-#include <windows.h>
 #include <cstring>
+#include <windows.h>
+
+#include <hooker/function_pointer_safe.hpp>
+#include <hooker/hooker.hpp>
+
+#include <vulpes/memory/behavior_definition.hpp>
+#include <vulpes/memory/gamestate/object/object.hpp>
+#include <vulpes/memory/types.hpp>
+
 
 // Signatures for finding stuff.
 // Currently unused. Will be used soon.

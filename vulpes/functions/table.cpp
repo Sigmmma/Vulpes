@@ -1,5 +1,14 @@
+/*
+ * Vulpes (c) 2019 gbMichelle
+ *
+ * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ */
+
+#include <cstdint>
+
+#include <hooker/hooker.hpp>
+
 #include "table.hpp"
-#include "../../hooker/hooker.hpp"
 
 Signature(true, sig_datum_new,
     {0x0F, 0xBF, 0x4A, 0x22, 0x53, 0x66, 0x8B, 0x5A, 0x2C, 0x55});

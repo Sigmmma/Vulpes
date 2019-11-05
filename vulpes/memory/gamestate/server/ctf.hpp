@@ -5,7 +5,8 @@
  */
 
 #pragma once
-#include "../../types.hpp"
+
+#include <vulpes/memory/types.hpp>
 
 struct CtfGlobals {
     Vec3d*   flag_positions[2];
