@@ -15,7 +15,12 @@ project(Vulpes
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-value -Wold-style-cast -masm=intel -msse -msse2 -m32 -mfpmath=sse")
+set(SHARED_FLAGS "-masm=intel -msse -msse2 -m32 -mfpmath=sse -DWIN32_MEAN_AND_LEAN")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SHARED_FLAGS}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SHARED_FLAGS} -Wunused-value -Wold-style-cast")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O3")
 set(CMAKE_SHARED_LINKER_FLAGS "-m32 -W -s -static-libgcc -static-libstdc++ -lkernel32")
@@ -25,14 +30,14 @@ add_library(Vulpes SHARED
     vulpes/version.rc
     vulpes/vulpes.cpp
 
-    vulpes/command/debug.cpp
-    vulpes/command/handler.cpp
-    vulpes/command/server.cpp
-
     hooker/hooker.cpp
 
     util/string_raw_data_encoder.c
     util/crc32.c
+
+    vulpes/command/debug.cpp
+    vulpes/command/handler.cpp
+    vulpes/command/server.cpp
 
     vulpes/fixes/animation.cpp
     vulpes/fixes/animation.S
@@ -98,15 +103,15 @@ add_library(VulpesLoader SHARED
     loader/dll_main.c
 )
 
-ADD_LIBRARY(LuaJIT STATIC IMPORTED)
-SET_TARGET_PROPERTIES(LuaJIT PROPERTIES
+add_library(LuaJIT STATIC IMPORTED)
+set_target_properties(LuaJIT PROPERTIES
     IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/LuaJIT/src/libluajit.a")
 set(LUA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/LuaJIT/src")
 
 target_include_directories(Vulpes
     PUBLIC ${LUA_INCLUDE_DIR}
 )
-TARGET_LINK_LIBRARIES(Vulpes LuaJIT)
+target_link_libraries(Vulpes LuaJIT)
 
-SET_TARGET_PROPERTIES(Vulpes PROPERTIES PREFIX "")
-SET_TARGET_PROPERTIES(VulpesLoader PROPERTIES PREFIX "")
+set_target_properties(Vulpes PROPERTIES PREFIX "")
+set_target_properties(VulpesLoader PROPERTIES PREFIX "")
