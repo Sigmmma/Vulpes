@@ -5,6 +5,7 @@
  */
 
 #pragma once
+
 #include <cstdint>
 
 enum InstructionBytes : uint8_t {
