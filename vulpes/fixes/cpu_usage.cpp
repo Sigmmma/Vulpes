@@ -25,7 +25,7 @@ Patch(cpu_usage_fix_patch3, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_
 Patch(cpu_usage_fix_patch4, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
 Patch(cpu_usage_fix_patch5, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
 
-void init_cpu_usage_fixes(){
+void init_cpu_usage_fixes() {
     if (cpu_usage_fix_patch1.build()) cpu_usage_fix_patch1.apply();
     if (cpu_usage_fix_patch2.build()) cpu_usage_fix_patch2.apply();
     if (cpu_usage_fix_patch3.build()) cpu_usage_fix_patch3.apply();
@@ -33,7 +33,7 @@ void init_cpu_usage_fixes(){
     if (cpu_usage_fix_patch5.build()) cpu_usage_fix_patch5.apply();
 }
 
-void revert_cpu_usage_fixes(){
+void revert_cpu_usage_fixes() {
     cpu_usage_fix_patch1.revert();
     cpu_usage_fix_patch2.revert();
     cpu_usage_fix_patch3.revert();

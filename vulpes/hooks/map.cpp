@@ -28,24 +28,24 @@ Signature(true, sig_map_load_mp,
 
 Signature(true, sig_event_map_reset_hook, {0x5B, 0x68, -1, -1, -1, -1, 0x33, 0xC0});
 
-extern "C" bool before_map_load_sp(){
+extern "C" bool before_map_load_sp() {
     call_in_order(pre_map);
     call_in_order(pre_sp);
     return true;
 }
 
-extern "C" void after_map_load_sp(){
+extern "C" void after_map_load_sp() {
     call_in_order(post_map);
     call_in_order(post_sp);
 }
 
-extern "C" bool before_map_load_mp(){
+extern "C" bool before_map_load_mp() {
     call_in_order(pre_map);
     call_in_order(pre_mp);
     return true;
 }
 
-extern "C" void after_map_load_mp(){
+extern "C" void after_map_load_mp() {
     call_in_order(post_map);
     call_in_order(post_mp);
 }
@@ -71,8 +71,8 @@ Patch(
     JMP_PATCH, &map_load_mp_wrapper
 );
 
-void init_map_hooks(bool is_server){
-    if (!is_server){
+void init_map_hooks(bool is_server) {
+    if (!is_server) {
         map_load_ui_sp_hook_patch.build();
         map_load_ui_sp_hook_patch.apply();
         map_load_sp_actual_jmp = map_load_ui_sp_hook_patch.return_address();
@@ -82,7 +82,7 @@ void init_map_hooks(bool is_server){
     map_load_mp_actual_jmp = map_load_mp_hook_patch.return_address();
 }
 
-void revert_map_hooks(){
+void revert_map_hooks() {
     map_load_ui_sp_hook_patch.revert();
     map_load_mp_hook_patch.revert();
 }

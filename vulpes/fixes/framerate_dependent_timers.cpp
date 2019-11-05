@@ -19,29 +19,29 @@ Patch(death_timer_framerate_dep_fix, 0, 2, NOP_PATCH, 0);
 bool*    player_dead;
 int32_t* player_respawn_timer;
 
-void increment_respawn_timer(){
-    if (*player_dead){
+void increment_respawn_timer() {
+    if (*player_dead) {
         *player_respawn_timer = *player_respawn_timer + 1;
     }
 }
 
 static bool initialized = false;
 
-void init_checkpoint_revert_fix(){
+void init_checkpoint_revert_fix() {
     static intptr_t sig_addr = sig_death_timer_framerate_dep.address();
-    if (!initialized && sig_addr){
+    if (!initialized && sig_addr) {
         death_timer_framerate_dep_fix.build(sig_addr+27);
         player_dead = *reinterpret_cast<bool**>(sig_addr+2);
         player_respawn_timer = *reinterpret_cast<int32_t**>(sig_addr+20);
         initialized = true;
     }
-    if (initialized){
+    if (initialized) {
         death_timer_framerate_dep_fix.apply();
         ADD_CALLBACK(EVENT_TICK, increment_respawn_timer);
     }
 }
 
-void revert_checkpoint_revert_fix(){
+void revert_checkpoint_revert_fix() {
     death_timer_framerate_dep_fix.revert();
     DEL_CALLBACK(EVENT_TICK, increment_respawn_timer);
 }
@@ -67,12 +67,12 @@ Patch(patch_scoreboard_framerate_dep3a, sig_scoreboard_framerate_dep3,  2, 4, IN
 Patch(patch_scoreboard_framerate_dep3b, sig_scoreboard_framerate_dep3, 14, 4, INT_PATCH, &fade);
 Patch(patch_ruleboard_intro_nop, sig_scoreboard_ruleboard_intro_nop,    6, 4, INT_PATCH, 0);
 
-void init_scoreboard_fix(){
+void init_scoreboard_fix() {
     if (patch_scoreboard_framerate_dep1a.build()
     &&  patch_scoreboard_framerate_dep1b.build()
     &&  patch_scoreboard_framerate_dep2a.build()
     &&  patch_scoreboard_framerate_dep3a.build()
-    &&  patch_scoreboard_framerate_dep3b.build()){
+    &&  patch_scoreboard_framerate_dep3b.build()) {
         patch_scoreboard_framerate_dep1a.apply();
         patch_scoreboard_framerate_dep1b.apply();
         patch_scoreboard_framerate_dep2a.apply();
@@ -82,7 +82,7 @@ void init_scoreboard_fix(){
     if (patch_ruleboard_intro_nop.build()) patch_ruleboard_intro_nop.apply();
 }
 
-void revert_scoreboard_fix(){
+void revert_scoreboard_fix() {
     patch_scoreboard_framerate_dep1a.revert();
     patch_scoreboard_framerate_dep1b.revert();
     patch_scoreboard_framerate_dep2a.revert();
@@ -104,15 +104,15 @@ static void (*fade_console_halo)();
 
 Patch(patch_console_framerate_dep, sig_console_framerate_dep, 6, 5, NOP_PATCH, 0);
 
-void fade_console(){
-    if (!*console_open){
+void fade_console() {
+    if (!*console_open) {
         fade_console_halo();
     }
 }
 
-void init_console_fix(){
+void init_console_fix() {
     static intptr_t sig_addr1 = sig_console_fade_call.address();
-    if (sig_addr1 && patch_console_framerate_dep.build()){
+    if (sig_addr1 && patch_console_framerate_dep.build()) {
         fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
         console_open = *reinterpret_cast<bool**>(patch_console_framerate_dep.address()-6);
         patch_console_framerate_dep.apply();
@@ -120,18 +120,18 @@ void init_console_fix(){
     }
 }
 
-void revert_console_fix(){
+void revert_console_fix() {
     patch_console_framerate_dep.revert();
     DEL_CALLBACK(EVENT_TICK, fade_console);
 }
 
-void init_framerate_dependent_timer_fixes(){
+void init_framerate_dependent_timer_fixes() {
     init_checkpoint_revert_fix();
     init_scoreboard_fix();
     init_console_fix();
 }
 
-void revert_framerate_dependent_timer_fixes(){
+void revert_framerate_dependent_timer_fixes() {
     revert_checkpoint_revert_fix();
     revert_scoreboard_fix();
     revert_console_fix();

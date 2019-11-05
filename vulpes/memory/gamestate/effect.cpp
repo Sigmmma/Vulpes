@@ -7,42 +7,42 @@
 #include "effect.hpp"
 #include "table.hpp"
 
-GenericTable* weather_particles_table(){
+GenericTable* weather_particles_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[0];
 }
 
-GenericTable* particle_table(){
+GenericTable* particle_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[1];
 }
 
-GenericTable* particle_system_particles_table(){
+GenericTable* particle_system_particles_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[2];
 }
 
-GenericTable* effect_table(){
+GenericTable* effect_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[3];
 }
 
-GenericTable* effect_locations_table(){
+GenericTable* effect_locations_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[4];
 }
 
-GenericTable* decals_table(){
+GenericTable* decals_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[5];
 }
 
-GenericTable* contrail_points_table(){
+GenericTable* contrail_points_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[6];
 }
 
-GenericTable* contrail_table(){
+GenericTable* contrail_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[7];
 }

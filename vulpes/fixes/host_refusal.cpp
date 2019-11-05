@@ -19,15 +19,15 @@ Patch(host_refusal_fix1, sig_host_refusal1, 0xA, 5, NOP_PATCH, 0);
 Patch(host_refusal_fix2, sig_host_refusal2, 5, {0xEB});
 Patch(client_refusal_fix, sig_client_refusal, 0, {0xEB, 0x13});
 
-void init_host_refusal_fixes(){
-    if (host_refusal_fix1.build() && host_refusal_fix2.build()){
+void init_host_refusal_fixes() {
+    if (host_refusal_fix1.build() && host_refusal_fix2.build()) {
         host_refusal_fix1.apply();
         host_refusal_fix2.apply();
     }
     if (client_refusal_fix.build()) client_refusal_fix.apply();
 }
 
-void revert_host_refusal_fixes(){
+void revert_host_refusal_fixes() {
     host_refusal_fix1.revert();
     host_refusal_fix2.revert();
     client_refusal_fix.revert();

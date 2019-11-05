@@ -22,7 +22,7 @@ data_iterator_next(<edi> TableIterator)
 66 8B 4F 04 53 55 56 8B 37 0F BF 6E 22
 */
 
-uint32_t datum_new(void* data){
+uint32_t datum_new(void* data) {
     static intptr_t func_datum_new = sig_datum_new.address();
     uint32_t return_value;
     asm (
@@ -37,7 +37,7 @@ uint32_t datum_new(void* data){
     return return_value;
 }
 
-uint32_t datum_new_at_index(void* data, uint32_t id){
+uint32_t datum_new_at_index(void* data, uint32_t id) {
     static intptr_t func_datum_new_at_index = sig_datum_new_at_index.address();
     uint32_t return_value;
     asm (
@@ -53,7 +53,7 @@ uint32_t datum_new_at_index(void* data, uint32_t id){
     return return_value;
 }
 
-uint32_t datum_delete(void* data, uint32_t id){
+uint32_t datum_delete(void* data, uint32_t id) {
     static intptr_t func_datum_delete = sig_datum_delete.address();
     uint32_t return_value;
     asm (

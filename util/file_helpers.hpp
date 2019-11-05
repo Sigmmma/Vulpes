@@ -5,7 +5,7 @@
 #include <string>
 #include <windows.h>
 
-static inline size_t file_get_size(FILE* f){
+static inline size_t file_get_size(FILE* f) {
     // Get current position.
     size_t pos = ftell(f);
     // Go to the end.
@@ -19,7 +19,7 @@ static inline size_t file_get_size(FILE* f){
 }
 
 template<typename T>
-static inline void file_read_into_buffer(T buff, FILE* f){
+static inline void file_read_into_buffer(T buff, FILE* f) {
     // Get current position.
     size_t pos = ftell(f);
     // Get size
@@ -32,20 +32,20 @@ static inline void file_read_into_buffer(T buff, FILE* f){
     fseek(f, pos, SEEK_SET);
 }
 
-static inline bool is_dir(std::string path){
+static inline bool is_dir(std::string path) {
     DWORD ftyp = GetFileAttributes(path.data());
     if (ftyp == INVALID_FILE_ATTRIBUTES) return false;
     if (ftyp & FILE_ATTRIBUTE_DIRECTORY) return true;
     return false;
 }
 
-static inline bool is_file(std::string path){
+static inline bool is_file(std::string path) {
     DWORD ftyp = GetFileAttributes(path.data());
     if (ftyp == INVALID_FILE_ATTRIBUTES) return false;
     if (ftyp & FILE_ATTRIBUTE_DIRECTORY) return false;
     return true;
 }
 
-static inline void make_dir(std::string path){
+static inline void make_dir(std::string path) {
     CreateDirectory(path.data() , 0);
 }

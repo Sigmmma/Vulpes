@@ -25,9 +25,9 @@ uintptr_t func_unregister_network_index;
 // So we want to read what is in the game's pointer to make sure we're safe.
 SyncedObjectHeader** synced_objects_header = NULL;
 
-int32_t server_register_network_index(MemRef object){
+int32_t server_register_network_index(MemRef object) {
     SyncedObjectHeader* synced_objects = *synced_objects_header;
-    if (synced_objects->count >= synced_objects->max_count){
+    if (synced_objects->count >= synced_objects->max_count) {
         // Just don't even try if we're at max capacity.
         return -1;
     }
@@ -48,7 +48,7 @@ int32_t server_register_network_index(MemRef object){
     return network_id;
 }
 
-void register_network_index_from_remote(int32_t network_id, MemRef object){
+void register_network_index_from_remote(int32_t network_id, MemRef object) {
     SyncedObjectHeader* synced_objects = *synced_objects_header;
     asm (
         // Put arguments where Halo's custom calling convention expects them.
@@ -65,7 +65,7 @@ void register_network_index_from_remote(int32_t network_id, MemRef object){
     );
 }
 
-void unregister_network_index(MemRef object){
+void unregister_network_index(MemRef object) {
     SyncedObjectHeader* synced_objects = *synced_objects_header;
     asm (
         // Put arguments where Halo's custom calling convention expects them.
@@ -92,22 +92,22 @@ void unregister_network_index(MemRef object){
     );
 }
 
-MemRef get_object_from_network_index(int32_t network_id){
+MemRef get_object_from_network_index(int32_t network_id) {
     SyncedObjectHeader* synced_objects = *synced_objects_header;
     return synced_objects->translation_index[network_id];
 }
 
-int32_t get_network_id_from_object(MemRef object){
+int32_t get_network_id_from_object(MemRef object) {
     SyncedObjectHeader* synced_objects = *synced_objects_header;
-    for (int i=1; i < synced_objects->max_count; i++){
-        if (synced_objects->translation_index[i].raw == object.raw){
+    for (int i=1; i < synced_objects->max_count; i++) {
+        if (synced_objects->translation_index[i].raw == object.raw) {
             return i;
         }
     }
     return -1;
 }
 
-void init_network_id(){
+void init_network_id() {
     // *** - * = **
     /* If we dereference what the signature address comes up with we end up at
      * some code that has a reference to the pointer to the thing that we want.
@@ -124,6 +124,6 @@ void init_network_id(){
     func_unregister_network_index = sig_func_unregister_network_index.address() + 5;
 }
 
-SyncedObjectHeader* synced_objects(){
+SyncedObjectHeader* synced_objects() {
     return *synced_objects_header;
 }

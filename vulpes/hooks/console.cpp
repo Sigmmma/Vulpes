@@ -19,14 +19,14 @@ extern "C" {
 
 Patch(console_in_hook_patch, sig_console_input_hook, 0, 6, JMP_PATCH, &console_hook__console_in);
 
-void init_console_input_hook(){
-    if(console_in_hook_patch.build()){
+void init_console_input_hook() {
+    if(console_in_hook_patch.build()) {
         console_hook__return_to_halo_con_in = console_in_hook_patch.address() + 23;
         console_in_hook_patch.apply();
     }
 }
 
-void revert_console_input_hook(){
+void revert_console_input_hook() {
     console_in_hook_patch.revert();
 }
 
@@ -44,20 +44,20 @@ extern "C" {
 
 Patch(auto_complete_patch, sig_auto_complete_hook, 0, 7, CALL_PATCH, &console_hook__auto_complete);
 
-void init_command_auto_complete_hook(){
+void init_command_auto_complete_hook() {
     static uintptr_t sig_addr3 = sig_auto_complete_collected_list.address();
 
-    if (auto_complete_patch.build() && sig_addr3){
+    if (auto_complete_patch.build() && sig_addr3) {
         console_hook__results_ptr = *reinterpret_cast<intptr_t*>(sig_addr3);
         console_hook__count_ptr   = *reinterpret_cast<intptr_t*>(sig_addr3+14);
         auto_complete_patch.apply();
-    }else{
+    } else {
         cprintf_error("Error: Couldn't perform auto complete patch. "
                       "Vulpes commands will not auto complete.");
     }
 }
 
-void revert_command_auto_complete_hook(){
+void revert_command_auto_complete_hook() {
     auto_complete_patch.revert();
 }
 
@@ -68,12 +68,12 @@ void revert_command_auto_complete_hook(){
 // execute from rcon
 // 6A 00 A3 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 04 C7 05 ?? ?? ?? ?? FF FF FF FF C3
 
-void init_console_hooks(){
+void init_console_hooks() {
     init_console_input_hook();
     init_command_auto_complete_hook();
 }
 
-void revert_console_hooks(){
+void revert_console_hooks() {
     revert_console_input_hook();
     revert_command_auto_complete_hook();
 }

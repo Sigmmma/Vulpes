@@ -44,14 +44,14 @@ Patch(patch_shader_trans_zfighting3b_fix, sig_shader_trans_zfighting3,        0x
 Patch(patch_shader_trans_zfighting3c_fix, sig_shader_trans_zfighting3,  0xE + 0x50, 4, INT_PATCH, &val_DecalZBiasValue);
 Patch(patch_shader_trans_zfighting3d_fix, sig_shader_trans_zfighting3, 0x34 + 0x50, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
 
-void init_shdr_trans_zfighting_fixes(){
-    if (patch_shader_trans_zfighting2_fix.build()){
+void init_shdr_trans_zfighting_fixes() {
+    if (patch_shader_trans_zfighting2_fix.build()) {
         patch_shader_trans_zfighting2_fix.apply();
     };
     if (patch_shader_trans_zfighting3a_fix.build()
      && patch_shader_trans_zfighting3b_fix.build()
      && patch_shader_trans_zfighting3c_fix.build()
-     && patch_shader_trans_zfighting3d_fix.build()){
+     && patch_shader_trans_zfighting3d_fix.build()) {
         patch_shader_trans_zfighting3a_fix.apply();
         patch_shader_trans_zfighting3b_fix.apply();
         patch_shader_trans_zfighting3c_fix.apply();
@@ -59,7 +59,7 @@ void init_shdr_trans_zfighting_fixes(){
     };
 }
 
-void revert_shdr_trans_zfighting_fixes(){
+void revert_shdr_trans_zfighting_fixes() {
     patch_shader_trans_zfighting2_fix.revert();
     patch_shader_trans_zfighting3a_fix.revert();
     patch_shader_trans_zfighting3b_fix.revert();

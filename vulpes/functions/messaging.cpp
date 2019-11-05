@@ -21,32 +21,32 @@ Signature(false, sig_console_to_terminal_and_network,
 
 typedef uint32_t (*FpReturnsInt)();
 
-ConsoleOutput* console_new_line(){
+ConsoleOutput* console_new_line() {
     ConsoleGlobals* globals = console_globals();
     static auto console_line_new =
         reinterpret_cast<FpReturnsInt>(sig_console_line_new.address());
     MemRef line;
     line.raw = console_line_new();
 
-    if (line.raw != 0xFFFFFFFF){
+    if (line.raw != 0xFFFFFFFF) {
         ConsoleOutput* output = &globals->output->entries[line.id.local];
         output->fade_frames = 0;
         return output;
-    }else{
+    } else {
         return NULL;
     }
 }
 
 typedef __attribute__((regparm(1)))void (*ConsoleToTerminalAndNetworkCall)(void*);
 
-void vcprintf(const ARGBFloat& color, const char* format, va_list args){
+void vcprintf(const ARGBFloat& color, const char* format, va_list args) {
     static auto console_to_terminal_and_network =
         reinterpret_cast<ConsoleToTerminalAndNetworkCall>(
         sig_console_to_terminal_and_network.address());
     ConsoleGlobals* globals = console_globals();
-    if (globals->initialized){
+    if (globals->initialized) {
         ConsoleOutput* output = console_new_line();
-        if (output){
+        if (output) {
             vsnprintf(&output->text[0], 255, format, args);
             output->color = color;
             output->tab_stops   = strstr(output->text, "|t") != NULL;
@@ -55,42 +55,42 @@ void vcprintf(const ARGBFloat& color, const char* format, va_list args){
     }
 }
 
-void cprintf(const ARGBFloat& color, const char* format, ...){
+void cprintf(const ARGBFloat& color, const char* format, ...) {
     va_list args;
     va_start(args, format);
     vcprintf(color, format, args);
     va_end(args);
 }
 
-void cprintf(const char* format, ...){
+void cprintf(const char* format, ...) {
     va_list args;
     va_start(args, format);
     vcprintf(ARGBFloat(1.0, 0.7, 0.7, 0.7), format, args);
     va_end(args);
 }
 
-void cprintf_info (const char* format, ...){
+void cprintf_info (const char* format, ...) {
     va_list args;
     va_start(args, format);
     vcprintf(ARGBFloat(1.0, 0.0, 1.0, 0.0), format, args);
     va_end(args);
 }
 
-void cprintf_warn (const char* format, ...){
+void cprintf_warn (const char* format, ...) {
     va_list args;
     va_start(args, format);
     vcprintf(ARGBFloat(1.0, 1.0, 0.835, 0.0), format, args);
     va_end(args);
 }
 
-void cprintf_error(const char* format, ...){
+void cprintf_error(const char* format, ...) {
     va_list args;
     va_start(args, format);
     vcprintf(ARGBFloat(1.0, 1.0, 0.0, 0.0), format, args);
     va_end(args);
 }
 
-void rprintf(int player_id, const char* format, ...){
+void rprintf(int player_id, const char* format, ...) {
     va_list args;
     va_start(args, format);
     char buffer[80+16];
@@ -98,16 +98,16 @@ void rprintf(int player_id, const char* format, ...){
     memset(&message.text[0], 0, 80);
     vsnprintf(&message.text[0], 80, format, args);
     uint32_t size = mdp_encode_stateless_iterated(buffer, RCON_RESPONSE, &message);
-    if (player_id < 0){
+    if (player_id < 0) {
         send_delta_message_to_all(&buffer, size, true, true, false, true, 2);
-    }else if (player_id < 16){
+    } else if (player_id < 16) {
         send_delta_message_to_player(player_id, &buffer, size, true, true, false, true, 2);
     }
     va_end(args);
 }
 
 void chatf(HudChatType type, int src_player, int dest_player,
-           const char* format, ...){
+           const char* format, ...) {
     va_list args;
     va_start(args, format);
     char buffer[512+16];
@@ -116,9 +116,9 @@ void chatf(HudChatType type, int src_player, int dest_player,
     std::mbstowcs(output, buffer, 256);
     HudChat message(type, src_player, &output[0]);
     uint32_t size = mdp_encode_stateless_iterated(buffer, HUD_CHAT, &message);
-    if (dest_player < 0){
+    if (dest_player < 0) {
         send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
-    }else if (dest_player < 16){
+    } else if (dest_player < 16) {
         send_delta_message_to_player(dest_player, &buffer, size, true, true, false, true, 3);
     }
     va_end(args);

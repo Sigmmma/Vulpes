@@ -21,7 +21,7 @@ static uintptr_t func_bitstream_read_ptr;
 __attribute__((naked))
 void bitstream_write(void* const iteration_header,
                  uint32_t* const write_this,
-                         int32_t num_bits){
+                         int32_t num_bits) {
     asm (
         "pushad;"
         "mov ecx, [esp+0x20+4];"
@@ -40,7 +40,7 @@ void bitstream_write(void* const iteration_header,
 __attribute__((naked))
 void bitstream_read(void* const iteration_header,
                 uint32_t* const write_here,
-                        int32_t num_bits){
+                        int32_t num_bits) {
     asm (
         "pushad;"
         "mov edx, [esp+0x20+4];"
@@ -56,7 +56,7 @@ void bitstream_read(void* const iteration_header,
     );
 }
 
-void init_bitstream(){
+void init_bitstream() {
     func_bitstream_write_ptr = sig_bitstream_write.address();
     func_bitstream_read_ptr  = sig_bitstream_read.address();
 }

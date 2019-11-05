@@ -17,7 +17,7 @@
 #include <vulpes/functions/messaging.hpp>
 
 // Call this when a lua frame encounters an error.
-static inline void luaV_print_error(lua_State *state){
+static inline void luaV_print_error(lua_State *state) {
     // Print whatever is at the top of the lua stack.
     // This should be an error when this function is called.
     auto text = lua_tostring(state, -1);
@@ -30,18 +30,18 @@ static inline void luaV_print_error(lua_State *state){
 // Don't use this function if your input arg really needs to be a string.
 // This is just to get a string representation of whatever basic datatype is
 // being read from the stack.
-static inline std::string luaV_check_as_string(lua_State *state, int stackpos){
-    if(lua_isboolean(state, stackpos)){
+static inline std::string luaV_check_as_string(lua_State *state, int stackpos) {
+    if(lua_isboolean(state, stackpos)) {
         return std::string(lua_toboolean(state, stackpos) ? "true" : "false");
-    }else if(lua_isnil(state, stackpos)){
+    } else if(lua_isnil(state, stackpos)) {
         return std::string("nil");
-    }else{
+    } else {
         return std::string(luaL_checkstring(state, stackpos));
     }
 }
 
 // Like LuaL_loadfile but it lets you specify a name for the error messages.
-static inline int luaV_loadfile_as(lua_State *state, std::string path, std::string name){
+static inline int luaV_loadfile_as(lua_State *state, std::string path, std::string name) {
     FILE* lua_file = fopen(path.data(), "r");
     // Can't load file, positive return value in line with existing lua c convention.
     if (!lua_file) return 1;

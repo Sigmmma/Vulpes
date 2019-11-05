@@ -21,17 +21,17 @@ Patch(file_handle_leak_patch1, sig_file_handle_leak1, 1, 4, INT_PATCH, NEW_ALLOC
 Patch(file_handle_leak_patch2, sig_file_handle_leak2, 2, 4, INT_PATCH, NEW_ALLOCATION_SIZE);
 Patch(file_handle_leak_patch3, sig_file_handle_leak3, 1, 4, INT_PATCH, NEW_ALLOCATION_SIZE);
 
-void init_file_handle_leak_fixes(){
+void init_file_handle_leak_fixes() {
     if (file_handle_leak_patch1.build()
     &&  file_handle_leak_patch2.build()
-    &&  file_handle_leak_patch3.build()){
+    &&  file_handle_leak_patch3.build()) {
         file_handle_leak_patch1.apply();
         file_handle_leak_patch2.apply();
         file_handle_leak_patch3.apply();
     }
 }
 
-void revert_file_handle_leak_fixes(){
+void revert_file_handle_leak_fixes() {
     file_handle_leak_patch1.revert();
     file_handle_leak_patch2.revert();
     file_handle_leak_patch3.revert();

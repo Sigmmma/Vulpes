@@ -14,10 +14,10 @@ Signature(false, sig_loading_screen_background_render_call,
 Patch(loading_screen_background_removal,
     sig_loading_screen_background_render_call, 0, 5, NOP_PATCH, 0);
 
-void init_loading_screen_fixes(){
+void init_loading_screen_fixes() {
     if (loading_screen_background_removal.build()) loading_screen_background_removal.apply();
 }
 
-void revert_loading_screen_fixes(){
+void revert_loading_screen_fixes() {
     loading_screen_background_removal.revert();
 }

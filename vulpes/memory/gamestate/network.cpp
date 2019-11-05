@@ -19,19 +19,19 @@ Signature(true, sig_connection_type,
 Signature(false, sig_allow_client_side_projectiles,
     {0x80, 0x3D, -1, -1, -1, -1, 0x01, 0x74, 0x15, 0x33, 0xC0, 0xEB});
 
-ConnectionType* connection_type(){
+ConnectionType* connection_type() {
     static ConnectionType* connection_type_ptr =
         *reinterpret_cast<ConnectionType**>(sig_connection_type.address() + 3);
     return connection_type_ptr;
 }
 
-bool* allow_client_side_projectiles(){
+bool* allow_client_side_projectiles() {
     static bool* allow_client_side_projectiles_ptr =
         *reinterpret_cast<bool**>(sig_allow_client_side_projectiles.address() + 2);
     return allow_client_side_projectiles_ptr;
 }
 
-bool game_is_server_executable(){
+bool game_is_server_executable() {
     static bool is_server = sig_server.address() != 0;
     return is_server;
 }

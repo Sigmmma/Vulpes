@@ -18,9 +18,9 @@ Signature(false, sig_unit_speak_func,
     {0x53, 0x56, 0x8B, 0xF1, 0x8B, 0x0D, -1, -1, -1, -1, 0x8B, 0x49, 0x34});
 
 __attribute__((regparm(3)))
-void unit_speak(MemRef object, int16_t arg2, UnitSpeech* speech_data){
+void unit_speak(MemRef object, int16_t arg2, UnitSpeech* speech_data) {
     static uintptr_t func_unit_speak_ptr = sig_unit_speak_func.address();
-    if (func_unit_speak_ptr){
+    if (func_unit_speak_ptr) {
         asm (
             "push edi;"
             "call %0;"

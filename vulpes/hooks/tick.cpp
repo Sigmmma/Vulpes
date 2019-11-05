@@ -14,12 +14,12 @@ DEFINE_EVENT_HOOK_LIST(EVENT_PRE_TICK, pre_events);
 DEFINE_EVENT_HOOK_LIST(EVENT_TICK, events);
 
 
-extern "C" bool before_tick(uint32_t* last_tick_index){
+extern "C" bool before_tick(uint32_t* last_tick_index) {
     call_in_order(pre_events);
     return true;
 }
 
-extern "C" void after_tick(){
+extern "C" void after_tick() {
     call_in_order(events);
 }
 
@@ -40,12 +40,12 @@ Patch(
     JMP_PATCH, &game_tick_wrapper
 );
 
-void init_tick_hook(){
+void init_tick_hook() {
     tick_hook_patch.build();
     tick_hook_patch.apply();
     game_tick_actual_jmp = tick_hook_patch.return_address();
 }
 
-void revert_tick_hook(){
+void revert_tick_hook() {
     tick_hook_patch.revert();
 }

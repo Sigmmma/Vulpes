@@ -110,4 +110,4 @@ static inline void del_event(EventsHolder e_hook(), EventFunc &event_function) {
 #define DEL_CALLBACK(e_hook, event_func) del_event(e_hook ## _list, event_func)
 
 #define DEFINE_EVENT_HOOK(name, return_type, ...) typedef return_type (*name)(__VA_ARGS__); std::vector<Event<name>>* name ## _list()
-#define DEFINE_EVENT_HOOK_LIST(name, reference_name) static std::vector<Event<name>> reference_name; std::vector<Event<name>>* name ## _list(){return &reference_name;}
+#define DEFINE_EVENT_HOOK_LIST(name, reference_name) static std::vector<Event<name>> reference_name; std::vector<Event<name>>* name ## _list() {return &reference_name;}

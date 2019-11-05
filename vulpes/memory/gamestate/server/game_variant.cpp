@@ -12,7 +12,7 @@ Signature(true, sig_game_variant_settings,
     {0x80, 0x3D, -1, -1, -1, -1, 0x00, 0x74, 0x49, 0x0F,
      0xBF, 0xC9, 0x83, 0xF9, 0x01, 0x74, 0x2B});
 
-GameVariantData* game_variant_settings(){
+GameVariantData* game_variant_settings() {
     static GameVariantData* game_variant_ptr =
         *reinterpret_cast<GameVariantData**>(sig_game_variant_settings.address()+2);
     return game_variant_ptr;

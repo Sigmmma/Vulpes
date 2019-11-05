@@ -145,14 +145,14 @@ struct ObjectCreateArgs {
     int unknown2;
 };
 
-extern "C" bool before_object_create(ObjectCreateArgs* args){
+extern "C" bool before_object_create(ObjectCreateArgs* args) {
 
     // Stub: Hook current unused.
 
     return true;
 }
 
-extern "C" void after_object_create(uint32_t* obj){
+extern "C" void after_object_create(uint32_t* obj) {
 
     // Stub: Hook current unused.
 
@@ -168,14 +168,14 @@ Patch(
 
 // Only called when a biped actually jumps
 
-extern "C" bool before_biped_jump(uint32_t* obj){
+extern "C" bool before_biped_jump(uint32_t* obj) {
 
     // Stub: Hook current unused.
 
     return true;
 }
 
-extern "C" void after_biped_jump(uint32_t* obj){
+extern "C" void after_biped_jump(uint32_t* obj) {
 
     // Stub: Hook current unused.
 
@@ -195,14 +195,14 @@ struct WeaponPullTriggerArgs {
     int trigger_id;
 };
 
-extern "C" bool before_weapon_pull_trigger(WeaponPullTriggerArgs* args){
+extern "C" bool before_weapon_pull_trigger(WeaponPullTriggerArgs* args) {
 
     // Stub: Hook current unused.
 
     return true;
 }
 
-extern "C" void after_weapon_pull_trigger(){
+extern "C" void after_weapon_pull_trigger() {
 
     // Stub: Hook current unused.
 
@@ -218,7 +218,7 @@ Patch(
 );
 
 
-void init_object_hooks(){
+void init_object_hooks() {
     auto game_defs = object_behavior_defs();
 
     // Copy data to our new defs.
@@ -409,7 +409,7 @@ void init_object_hooks(){
 
 }
 
-void revert_object_hooks(){
+void revert_object_hooks() {
 
     auto game_defs = object_behavior_defs();
 

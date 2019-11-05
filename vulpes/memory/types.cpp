@@ -8,26 +8,26 @@
 
 #include "types.hpp"
 
-float Vec2d::get_magnitude(){
+float Vec2d::get_magnitude() {
     return sqrt(x*x + y*y);
 }
 
-float Vec3d::get_magnitude(){
+float Vec3d::get_magnitude() {
     return sqrt(x*x + y*y + z*z);
 }
 
-void Euler2d::normalize(){
+void Euler2d::normalize() {
     i += fmod(i + 1.0, 2.0) - 1.0;
     j += fmod(j + 1.0, 2.0) - 1.0;
 }
 
-void Euler3d::normalize(){
+void Euler3d::normalize() {
     i += fmod(i + 1.0, 2.0) - 1.0;
     j += fmod(j + 1.0, 2.0) - 1.0;
     k += fmod(k + 1.0, 2.0) - 1.0;
 }
 
-void Quaternion::normalize(){
+void Quaternion::normalize() {
     float magnitude = sqrt(i*i + j*j + k*k + w*w);
     i = i*magnitude;
     j = j*magnitude;

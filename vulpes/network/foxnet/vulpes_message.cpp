@@ -13,7 +13,7 @@
 
 #include "vulpes_message.hpp"
 
-void send_vulpes_message(VulpesMessage* msg){
+void send_vulpes_message(VulpesMessage* msg) {
     uint8_t buffer[1024]; // Final packet buffer.
     wchar_t output[1024/2]; // Pre-processed chat packet buffer.
 
@@ -33,10 +33,10 @@ void send_vulpes_message(VulpesMessage* msg){
     send_delta_message_to_all(&buffer, size, true, true, false, true, 3);
 }
 
-void handle_vulpes_message(VulpesMessage* msg){
+void handle_vulpes_message(VulpesMessage* msg) {
 }
 
-void handle_hud_chat_vulpes_message(const wchar_t* msg){
+void handle_hud_chat_vulpes_message(const wchar_t* msg) {
     VulpesMessage output; // Vulpes message.
 
     // Set up the size for the message handler.

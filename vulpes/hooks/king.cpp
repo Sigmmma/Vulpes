@@ -17,7 +17,7 @@ Signature(true, sig_hill_timer_reset,
     {0xC7, 0x05, -1, -1, -1, 0x00, 0x08, 0x07, 0x00, 0x00,
      0xE8, -1, -1, 0xFF, 0xFF});
 
-extern "C" void king_timer_reset(){
+extern "C" void king_timer_reset() {
     king_globals()->current_hill_time_left = king_globals_upgrade()->hill_length;
 }
 
@@ -32,14 +32,14 @@ Patch(king_timer_reset_hook_patch, sig_hill_timer_reset, 0, 10,
     CALL_PATCH, &king_timer_reset_hook);
 
 
-void init_king_hooks(){
+void init_king_hooks() {
     //if (king_timer_start_hook.build()) = king_timer_start_hook.apply();
     if (king_timer_reset_hook_patch.build()) king_timer_reset_hook_patch.apply();
     KingGlobalsUpgrade* king_upgrade_globals = king_globals_upgrade();
     king_upgrade_globals->hill_length = 60*30;
 }
 
-void revert_king_hooks(){
+void revert_king_hooks() {
     //king_timer_start_hook.revert();
     king_timer_reset_hook_patch.revert();
 }

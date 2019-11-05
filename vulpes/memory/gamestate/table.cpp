@@ -10,19 +10,19 @@
 
 #include "table.hpp"
 
-MemRef Table::allocate(){
+MemRef Table::allocate() {
     MemRef return_value;
     return_value.raw = datum_new(this);
     return return_value;
 }
 /*
-MemRef Table::new_at(MemRef id){
+MemRef Table::new_at(MemRef id) {
     MemRef return_value;
     return_value.raw = datum_new_at_index(this, id.raw);
     return return_value;
 }
 */
-bool Table::remove(MemRef id){
+bool Table::remove(MemRef id) {
     return (datum_delete(this, id.raw) != 0xFFFFFFFF);
 }
 
@@ -33,9 +33,9 @@ Signature(true, sig_weather_particle_table,
 
 GenericTable** effect_ptrs_lst;
 
-GenericTable** effect_ptrs(){
+GenericTable** effect_ptrs() {
     static uintptr_t sig_addr1 = sig_weather_particle_table.address();
-    if (!effect_ptrs_lst){
+    if (!effect_ptrs_lst) {
         effect_ptrs_lst = reinterpret_cast<GenericTable**>(sig_addr1);
     }
     return effect_ptrs_lst;

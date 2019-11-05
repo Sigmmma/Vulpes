@@ -24,7 +24,7 @@ static uintptr_t func_mdp_discard;
 
 uint32_t mdp_encode_stateless_iterated(
     void* output_buffer, int32_t arg1, MessageDeltaType type,
-    uint32_t arg3, void* unencoded_message, uint32_t arg5, uint32_t arg6, uint32_t arg7){
+    uint32_t arg3, void* unencoded_message, uint32_t arg5, uint32_t arg6, uint32_t arg7) {
 
     uint32_t output_size;
     int32_t type_int = type;
@@ -59,12 +59,12 @@ uint32_t mdp_encode_stateless_iterated(
 }
 
 uint32_t mdp_encode_stateless_iterated(
-    void* output_buffer, MessageDeltaType type, void* unencoded_message){
+    void* output_buffer, MessageDeltaType type, void* unencoded_message) {
 
     return mdp_encode_stateless_iterated(output_buffer, 0, type, 0, unencoded_message, 0, 1, 0);
 }
 // Test this // Wrong, eax is also an input for the type.
-bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header){
+bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* message_header) {
     bool success;
     asm (
         "mov ecx, %1;"
@@ -79,7 +79,7 @@ bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* messag
     return success;
 }
 // Test this
-void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
+void mdp_discard_iteration_body(MessageDeltaHeader* message_header) {
     asm (
         "pushad;"
         "mov eax, %1;"
@@ -90,7 +90,7 @@ void mdp_discard_iteration_body(MessageDeltaHeader* message_header){
     );
 }
 
-void init_message_delta_processor(){
+void init_message_delta_processor() {
     func_mdp_encode = sig_mdp_encode_stateless_iterated.address();
     func_mdp_decode = sig_mdp_decode_stateless_iterated.address();
     func_mdp_discard = sig_mdp_discard_iteration_body.address();
@@ -111,9 +111,9 @@ static uintptr_t func_send_message_to_player;
 
 void send_delta_message_to_all(void* message, uint32_t message_size,
     bool ingame_only, bool write_to_local_connection,
-    bool flush_queue, bool unbuffered, int32_t buffer_priority){
+    bool flush_queue, bool unbuffered, int32_t buffer_priority) {
 
-    if(*socket_ready){
+    if(*socket_ready) {
         int32_t bool_ingame_only = ingame_only;
         int32_t bool_write_to_local_connection = write_to_local_connection;
         int32_t bool_flush_queue = flush_queue;
@@ -153,9 +153,9 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
 
 void send_delta_message_to_player(int32_t player_id, void* message, uint32_t message_size,
     bool ingame_only, bool write_to_local_connection,
-    bool flush_queue, bool unbuffered, int32_t buffer_priority){
+    bool flush_queue, bool unbuffered, int32_t buffer_priority) {
 
-    if(*socket_ready){
+    if(*socket_ready) {
         int32_t bool_ingame_only = ingame_only;
         int32_t bool_write_to_local_connection = write_to_local_connection;
         int32_t bool_flush_queue = flush_queue;
@@ -197,10 +197,10 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
 
 void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t message_size,
     bool ingame_only, bool write_to_local_connection,
-    bool flush_queue, bool unbuffered, int32_t buffer_priority){
+    bool flush_queue, bool unbuffered, int32_t buffer_priority) {
 
-    for (int i = 0; i<16; i++){
-        if (i != player_id){
+    for (int i = 0; i<16; i++) {
+        if (i != player_id) {
             send_delta_message_to_player(i, message, message_size,
                 ingame_only, write_to_local_connection,
                 flush_queue, unbuffered, buffer_priority);
@@ -208,7 +208,7 @@ void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t
     }
 }
 
-void init_message_delta_sender(){
+void init_message_delta_sender() {
     socket_ready = *reinterpret_cast<uintptr_t**>(sig_send_message_socket_ready.address());
     func_send_message_to_all = sig_send_message_to_all.address() - 56;
     func_send_message_to_player = sig_send_message_to_player.address();

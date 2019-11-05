@@ -26,13 +26,13 @@ static bool initialized = false;
 
 const auto INDEX = std::string("index.lua");
 
-static void luaV_register_functions(lua_State *state, bool sandboxed){
+static void luaV_register_functions(lua_State *state, bool sandboxed) {
     luaV_openlibs(state, !sandboxed);
     luaV_reg_messaging_funcs(state);
 }
 
 //TODO: Make this load scripts from maps.
-static void luaV_load_scripts_for_map(){
+static void luaV_load_scripts_for_map() {
     // Get path to where the lua scripts should be stored.
     auto cur_map_name = std::string(map_name());
     auto path_str = std::string(profile_path()) + LUA_MAP_PATH + "\\" + cur_map_name + "\\";
@@ -41,11 +41,11 @@ static void luaV_load_scripts_for_map(){
     // This is done so that we don't go in and create a whole lua state
     // and register all the functions just to destroy it again if there
     // isn't even a folder to load index.lua from.
-    if (is_dir(path_str)){
+    if (is_dir(path_str)) {
         // Check if there is an index.lua
         auto file_str = path_str + INDEX;
 
-        if (is_file(file_str)){
+        if (is_file(file_str)) {
             // Create a new lua state.
             auto *state = luaL_newstate();
 
@@ -53,10 +53,10 @@ static void luaV_load_scripts_for_map(){
             luaV_register_functions(state, true);
 
             if(luaV_loadfile_as(state, path_str + INDEX, cur_map_name + ":" + INDEX)
-            || lua_pcall(state, 0, 0, 0)){
+            || lua_pcall(state, 0, 0, 0)) {
                 luaV_print_error(state);
                 lua_close(state);
-            }else{
+            } else {
                 // State setup was succesful, save a reference to it globally.
                 map_state = state;
             }
@@ -65,15 +65,15 @@ static void luaV_load_scripts_for_map(){
     }
 }
 
-static void luaV_unload_scripts_for_map(){
-    if (map_state != NULL){
+static void luaV_unload_scripts_for_map() {
+    if (map_state != NULL) {
         cprintf_info("Closing previous map-lua state.");
         lua_close(map_state);
         map_state = NULL;
     }
 }
 
-void init_lua(){
+void init_lua() {
     initialized = true;
 
     // Create folders if they don't exist.
@@ -87,7 +87,7 @@ void init_lua(){
     ADD_CALLBACK(EVENT_PRE_MAP_LOAD, luaV_unload_scripts_for_map);
 }
 
-void destruct_lua(){
+void destruct_lua() {
     initialized = false;
     luaV_unload_scripts_for_map();
     DEL_CALLBACK(EVENT_MAP_LOAD,     luaV_load_scripts_for_map);

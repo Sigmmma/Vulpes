@@ -8,7 +8,7 @@
 
 #include "object_device.hpp"
 
-GenericTable* device_groups_table(){
+GenericTable* device_groups_table() {
     static GenericTable** effect_ptrs_loc = effect_ptrs();
     return effect_ptrs_loc[8];
 }

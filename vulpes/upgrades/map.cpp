@@ -139,13 +139,13 @@ uint32_t calculate_crc32_of_map_file(FILE *f) noexcept {
     return crc;
 }
 
-FILE* open_map_file(const char* name){
+FILE* open_map_file(const char* name) {
     FILE* map_file;
     char map_path[MAX_PATH];
     int i;
     int j;
-    for (i=0; i<map_folders.size(); i++){
-        for (j=0; j<map_extensions.size(); j++){
+    for (i=0; i<map_folders.size(); i++) {
+        for (j=0; j<map_extensions.size(); j++) {
             snprintf(&map_path[0], MAX_PATH, "%s%s.%s",
                      map_folders[i].data(), name, map_extensions[j].data());
             map_file = fopen(&map_path[0], "rb");
@@ -159,26 +159,26 @@ FILE* open_map_file(const char* name){
 // And we allow for multiple folders and extensions.
 extern "C" __attribute__((regparm(2)))
 bool read_map_file_header_from_file(const char* map_name,
-                          HaloMapHeader* header){
+                          HaloMapHeader* header) {
     bool approved = false;
 
     FILE* map_file = open_map_file(map_name);
-    if (map_file != NULL){
+    if (map_file != NULL) {
         // Confirm if we actually got enough data from the file.
-        if (fread(header, 1, sizeof(HaloMapHeader), map_file)){
+        if (fread(header, 1, sizeof(HaloMapHeader), map_file)) {
             // Do all the checks Halo normally does except for the size check.
             if (header->head == HALO_MAP_HEADER_HEAD
             &&  header->foot == HALO_MAP_HEADER_FOOT
             &&  strlen(header->name) < 32
-            &&  header->halo_version == HALO_CE_MAP_VERSION){
+            &&  header->halo_version == HALO_CE_MAP_VERSION) {
                 // Purposefully write 0 to this number for
                 // if any function calls this to get this data.
                 header->map_size = 0;
                 approved = true;
-            }else{
+            } else {
                 approved = false;
             }
-        }else{
+        } else {
             approved = false;
         }
         fclose(map_file);
@@ -195,13 +195,13 @@ struct MapListEntry {
 };
 
 extern "C" __attribute__((regparm(1)))
-bool get_map_crc(MapListEntry* entry){
-    if (entry->crc == 0xFFFFFFFF){
+bool get_map_crc(MapListEntry* entry) {
+    if (entry->crc == 0xFFFFFFFF) {
         FILE* map_file = open_map_file(entry->name);
-        if (map_file != NULL){
+        if (map_file != NULL) {
             entry->crc = ~calculate_crc32_of_map_file(map_file);
             fclose(map_file);
-        }else{
+        } else {
             return false;
         }
     }
@@ -224,29 +224,29 @@ Patch(patch_startup_crc_calc_nop, sig_game_startup_crc_call, 0, 5, NOP_PATCH, 0)
 Patch(patch_get_map_crc, sig_get_crc_from_table, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
 Patch(patch_get_map_crc_server, sig_server_map_crc, 5, 7, CALL_PATCH, &get_map_crc_wrapper_server);
 
-void init_map_crc_upgrades(bool server){
+void init_map_crc_upgrades(bool server) {
     is_server = server;
     if (patch_read_map_file_header_replacement.build()) patch_read_map_file_header_replacement.apply();
     if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
-    if (patch_get_map_crc.build()){
-        if (!map_upgrades_initialized){
+    if (patch_get_map_crc.build()) {
+        if (!map_upgrades_initialized) {
             multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(patch_get_map_crc.address()+2);
             jmp_skip_chimera = patch_get_map_crc.address()+13;
         }
         patch_get_map_crc.apply();
     }
-    if (patch_get_map_crc_server.build()){
+    if (patch_get_map_crc_server.build()) {
         patch_get_map_crc_server.apply();
         if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
     }
-    if (!map_upgrades_initialized){
+    if (!map_upgrades_initialized) {
         map_folders.push_back(default_map_folder);
         map_extensions.push_back(default_map_extension);
         map_upgrades_initialized = true;
     }
 }
 
-void revert_map_crc_upgrades(){
+void revert_map_crc_upgrades() {
     patch_read_map_file_header_replacement.revert();
     patch_startup_crc_calc_nop.revert();
     patch_get_map_crc.revert();

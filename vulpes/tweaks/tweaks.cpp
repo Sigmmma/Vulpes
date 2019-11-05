@@ -9,11 +9,11 @@
 
 #include "tweaks.hpp"
 
-void init_tweaks(){
+void init_tweaks() {
     console_input_globals()->enabled = true;
     DEL_CALLBACK(EVENT_TICK, init_tweaks);
 }
 
-void revert_tweaks(){
+void revert_tweaks() {
     DEL_CALLBACK(EVENT_TICK, init_tweaks);
 }

@@ -29,7 +29,7 @@
 static int sentinel_ = 0;
 #define sentinel reinterpret_cast<void *>(&sentinel_)
 
-static int LuaV_sandboxed_require(lua_State *L){
+static int LuaV_sandboxed_require(lua_State *L) {
     // Get the name from the stack:
     auto name = luaL_checkstring(L, 1);
     // LuaJIT source (Added some comments and made an error more clear):
@@ -39,7 +39,7 @@ static int LuaV_sandboxed_require(lua_State *L){
     // Check if the requested name is in the table:
     lua_getfield(L, 2, name);
     if (lua_toboolean(L, -1)) {
-        if (lua_touserdata(L, -1) == sentinel){
+        if (lua_touserdata(L, -1) == sentinel) {
             luaL_error(L, "Recursive loop or previous error loading module %s", name);
         }
         return 1;
@@ -49,7 +49,7 @@ static int LuaV_sandboxed_require(lua_State *L){
     // In sandboxed mode we're not allowing anything but alphanumerics
     // underscores, dashes and dots for file extensions.
     for (char & c : std::string(name)) {
-        if ((!isalnum(c)) && (c != '.') && (c != '_') && (c != '-')){
+        if ((!isalnum(c)) && (c != '.') && (c != '_') && (c != '-')) {
             char character[2] = {c, 0x00};
             auto error = std::string("Illegal character in sandboxed require statement: \"") + character + "\"";
             return luaL_error(L, error.data());
@@ -60,17 +60,17 @@ static int LuaV_sandboxed_require(lua_State *L){
     // Convert the path to a full path.
     auto full_path = std::string(profile_path()) + LUA_MAP_PATH + "\\" + map_name() + "\\" + name;
 
-    if (!is_file(full_path)){
+    if (!is_file(full_path)) {
         return luaL_error(L, "File does not exist or is not a file.");
     }
     // Load the script with its name set to map_name:script_name
-    if(luaV_loadfile_as(L, full_path, std::string(map_name()) + ":" + name)){
+    if(luaV_loadfile_as(L, full_path, std::string(map_name()) + ":" + name)) {
         luaV_print_error(L);
         return luaL_error(L, "Something went wrong loading the file.");
     }
 
     // More LuaJIT source (Original comments):
-    if (lua_isfunction(L, -1)){ // did it find module?
+    if (lua_isfunction(L, -1)) { // did it find module?
         lua_pushlightuserdata(L, sentinel);
         lua_setfield(L, 2, name); // _LOADED[name] = sentinel
         lua_pushstring(L, name); // pass name as argument to module
@@ -78,22 +78,22 @@ static int LuaV_sandboxed_require(lua_State *L){
         if (!lua_isnil(L, -1)) // non-nil return?
             lua_setfield(L, 2, name); // _LOADED[name] = returned value
         lua_getfield(L, 2, name);
-        if (lua_touserdata(L, -1) == sentinel){ // module did not set a value?
+        if (lua_touserdata(L, -1) == sentinel) { // module did not set a value?
             lua_pushboolean(L, 1); // use true as result
             lua_pushvalue(L, -1); // extra copy to be returned
             lua_setfield(L, 2, name); // _LOADED[name] = true
         }
-    }else{
+    } else {
         // Pop the return value off the stack as it sucks!
         lua_pop(L, 1);
     }
     return 1;
 }
 
-LUALIB_API void luaV_openlibs(lua_State *state, bool unlocked){
+LUALIB_API void luaV_openlibs(lua_State *state, bool unlocked) {
     luaL_openlibs(state);
 
-    if (!unlocked){
+    if (!unlocked) {
         auto sandbox = std::string(
             "dofile = nil\
             load = nil\

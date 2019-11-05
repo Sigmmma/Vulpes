@@ -23,7 +23,7 @@
 template<typename T, typename A>
 static inline T sum(A array, size_t size) {
     T sum = 0;
-    for (int i=0; i<size; i++){
+    for (int i=0; i<size; i++) {
         sum += array[i];
     };
     return sum;
@@ -32,7 +32,7 @@ static inline T sum(A array, size_t size) {
 template<typename T, typename A>
 static inline T avg(A array, size_t size) {
     T sum = 0;
-    for (int i=0; i<size; i++){
+    for (int i=0; i<size; i++) {
         sum += array[i];
     };
     return sum / size;
@@ -95,7 +95,7 @@ public:
     float k;
     float w;
 
-    Quaternion(){
+    Quaternion() {
         i=0.0;j=0.0;k=0.0;w=1.0;
     }
 
@@ -108,7 +108,7 @@ public:
     float green;
     float blue;
 
-    RGBFloat(float r = 1.0, float g = 1.0, float b = 1.0){red=r;green=g;blue=b;}
+    RGBFloat(float r = 1.0, float g = 1.0, float b = 1.0) {red=r;green=g;blue=b;}
 };
 
 class ARGBFloat {
@@ -118,7 +118,7 @@ public:
     float green;
     float blue;
 
-    ARGBFloat(float a = 1.0, float r = 1.0, float g = 1.0, float b = 1.0){alpha=a;red=r;green=g;blue=b;}
+    ARGBFloat(float a = 1.0, float r = 1.0, float g = 1.0, float b = 1.0) {alpha=a;red=r;green=g;blue=b;}
 };
 
 class Rectangle2d {
