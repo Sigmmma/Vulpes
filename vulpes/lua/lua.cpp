@@ -40,7 +40,7 @@ static void luaV_load_scripts_for_map() {
     // Check if it is actually a directory / even exists.
     // This is done so that we don't go in and create a whole lua state
     // and register all the functions just to destroy it again if there
-    // isn't even a folder to load index.lua from.
+    // isn't even a folder to load main.lua from.
     if (is_dir(path_str)) {
         // Check if there is an main.lua
         auto file_str = path_str + MAIN;
