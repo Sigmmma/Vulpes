@@ -32,8 +32,9 @@ add_library(Vulpes SHARED
 
     hooker/hooker.cpp
 
-    util/string_raw_data_encoder.c
     util/crc32.c
+    util/nanoluadict.cpp
+    util/string_raw_data_encoder.c
 
     vulpes/command/debug.cpp
     vulpes/command/handler.cpp
