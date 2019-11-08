@@ -16,8 +16,8 @@
 #include <vulpes/paths.hpp>
 
 #include "lua.hpp"
+#include "lua_console.hpp"
 #include "lua_helpers.hpp"
-#include "lua_messaging.hpp"
 #include "lua_open.hpp"
 
 static lua_State* map_state = NULL;
@@ -28,7 +28,7 @@ const auto INDEX = std::string("index.lua");
 
 static void luaV_register_functions(lua_State *state, bool sandboxed) {
     luaV_openlibs(state, !sandboxed);
-    luaV_reg_messaging_funcs(state);
+    luaV_register_console(state);
 }
 
 //TODO: Make this load scripts from maps.

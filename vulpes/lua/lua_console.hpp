@@ -8,4 +8,4 @@
 
 #include <lua.hpp>
 
-void luaV_reg_messaging_funcs(lua_State *state);
+void luaV_register_console(lua_State *state);

@@ -95,7 +95,7 @@ add_library(Vulpes SHARED
     vulpes/upgrades/map.S
 
     vulpes/lua/lua.cpp
-    vulpes/lua/lua_messaging.cpp
+    vulpes/lua/lua_console.cpp
     vulpes/lua/lua_open.cpp
 )
 

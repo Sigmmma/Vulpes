@@ -12,8 +12,8 @@
 
 #include <vulpes/functions/messaging.hpp>
 
+#include "lua_console.hpp"
 #include "lua_helpers.hpp"
-#include "lua_messaging.hpp"
 
 static int luaV_cprint(lua_State *state) noexcept {
     int num_args = lua_gettop(state);
@@ -37,7 +37,7 @@ static int luaV_console_clear(lua_State *state){
     return 0;
 }
 
-void luaV_reg_messaging_funcs(lua_State *state) {
+void luaV_register_console(lua_State *state) {
     luaDict(state,
         "console",
         2,
