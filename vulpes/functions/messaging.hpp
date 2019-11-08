@@ -12,6 +12,8 @@
 
 #include "message_delta.hpp"
 
+// Clears console
+void console_clear();
 
 // Print a formatted string to the Halo console.
 void vcprintf(const ARGBFloat& color, const char* format, va_list args);
