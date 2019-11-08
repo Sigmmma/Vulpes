@@ -1,0 +1,4 @@
+# Place to install our libraries to
+game_folder: /home/michelle/Halo/Games/Halo Custom Edition/
+# If true, VulpesLoader will overwrite strings.dll, if false VulpesLoader will end up in the controls folder.
+strings_build: true
