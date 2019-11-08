@@ -1,3 +1,5 @@
+//  Standalone can be found at:
+//  https://github.com/gbMichelle/Nano-Lua-Dictionary-CPP
 #pragma once
 
 extern "C" {
