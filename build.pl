@@ -51,20 +51,20 @@ sub build_luajit {
     }
 }
 
-if (@ARGV && $ARGV[0] eq "--help"){usage()}
+if (@ARGV && $ARGV[0] eq "--help") { usage() }
 
 my %options;
 getopts("bchj", \%options);
 
-if ($options{h} || @ARGV){usage()}
+if ($options{h} || @ARGV) { usage() }
 
 if ($options{c}) {
-    if ($options{j}){delete_luajit_build_files;}
+    if ($options{j}) { delete_luajit_build_files; }
     delete_build_files;
-    if (!$options{b}) {exit;}
+    if (!$options{b}) { exit; }
 }
 
-if ($options{j}){
+if ($options{j}) {
     build_luajit;
 }
 
