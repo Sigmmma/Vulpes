@@ -32,8 +32,9 @@ add_library(Vulpes SHARED
 
     hooker/hooker.cpp
 
-    util/string_raw_data_encoder.c
     util/crc32.c
+    util/nanoluadict.cpp
+    util/string_raw_data_encoder.c
 
     vulpes/command/debug.cpp
     vulpes/command/handler.cpp
@@ -94,7 +95,7 @@ add_library(Vulpes SHARED
     vulpes/upgrades/map.S
 
     vulpes/lua/lua.cpp
-    vulpes/lua/lua_messaging.cpp
+    vulpes/lua/lua_console.cpp
     vulpes/lua/lua_open.cpp
 )
 

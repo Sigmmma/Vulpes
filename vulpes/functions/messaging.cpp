@@ -37,6 +37,15 @@ ConsoleOutput* console_new_line() {
     }
 }
 
+void console_clear() {
+    // This is not the best way to do it. But it serves the purpose.
+    // We're nulling out all the first chars so Halo doesn't actually see text!
+    ConsoleOutputTable* output = console_output_table();
+    for (size_t i = 0; i < output->max_count; i++) {
+        output->entries[i].text[0] = 0;
+    }
+}
+
 typedef __attribute__((regparm(1)))void (*ConsoleToTerminalAndNetworkCall)(void*);
 
 void vcprintf(const ARGBFloat& color, const char* format, va_list args) {
@@ -49,7 +58,7 @@ void vcprintf(const ARGBFloat& color, const char* format, va_list args) {
         if (output) {
             vsnprintf(&output->text[0], 255, format, args);
             output->color = color;
-            output->tab_stops   = strstr(output->text, "|t") != NULL;
+            output->tab_stops = strstr(output->text, "|t") != NULL;
             console_to_terminal_and_network(&output->text);
         }
     }
