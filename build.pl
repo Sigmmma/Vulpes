@@ -6,6 +6,9 @@ use File::Path qw( rmtree );
 use File::pushd qw( pushd );
 use File::Copy qw( copy );
 use Getopt::Std;
+use YAML::XS qw( LoadFile );
+
+my $config = LoadFile("build_config.yaml");
 
 sub usage {
     print
@@ -48,24 +51,33 @@ sub build_luajit {
     }
 }
 
-if (@ARGV && $ARGV[0] eq "--help"){usage()}
+if (@ARGV && $ARGV[0] eq "--help") { usage() }
 
 my %options;
 getopts("bchj", \%options);
 
-if ($options{h} || @ARGV){usage()}
+if ($options{h} || @ARGV) { usage() }
 
 if ($options{c}) {
-    if ($options{j}){delete_luajit_build_files;}
+    if ($options{j}) { delete_luajit_build_files; }
     delete_build_files;
-    if (!$options{b}) {exit;}
+    if (!$options{b}) { exit; }
 }
 
-if ($options{j}){build_luajit;}
+if ($options{j}) {
+    build_luajit;
+}
+
 build;
 
-# Uncomment and edit these to your needs if you want the build script to
-# autoinstall the built files.
-
-#copy("./Vulpes.dll", "/home/michelle/Halo/Games/Halo Custom Edition/Vulpes.dll");
-#copy("./VulpesLoader.dll", "/home/michelle/Halo/Games/Halo Custom Edition/strings.dll");
+if ($config->{game_folder}) {
+    printf "Installing Vulpes to %s\n", $config->{game_folder};
+    copy("./Vulpes.dll", $config->{game_folder}."/Vulpes.dll");
+    if ($config->{strings_build}) {
+        print "Using strings.dll configuration\n";
+        copy("./VulpesLoader.dll", $config->{game_folder}."/strings.dll");
+    } else {
+        print "Using controls/ configuration\n";
+        copy("./VulpesLoader.dll", $config->{game_folder}."/controls/VulpesLoader.dll");
+    }
+}
