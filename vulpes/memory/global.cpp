@@ -26,9 +26,17 @@ Signature(true, sig_sp_map_name,
     {-1,-1,-1,-1, 0xC6, 0x05,-1,-1,-1,-1, 0x00, 0xE8,-1,-1,-1,-1,
      0x8A, 0x44, 0x24, 0x1F});
 
+Signature(true, sig_at_main_menu,
+    {-1,-1,-1,-1, 0x84, 0xC0, 0x75, -1, 0x66, 0xFF, 0x0D});
+
+char ui_name[] = "ui";
+
 char* map_name() {
     char* name_pointer = NULL;
-    if (*connection_type() == ConnectionType::NONE) {
+    // TODO: We'll deal with this disgrace when we move all signatures into one file.
+    if (*reinterpret_cast<bool*>(sig_at_main_menu.address())){
+        name_pointer = &ui_name[0];
+    } else if (*connection_type() == ConnectionType::NONE) {
         name_pointer = *reinterpret_cast<char**>(sig_sp_map_name.address());
     } else {
         name_pointer = *reinterpret_cast<char**>(sig_map_name.address());
