@@ -20,7 +20,7 @@ static int luaV_cprint(lua_State *state) noexcept {
 
     std::string combined = "";
     // Arguments from the lua state start at index 1.
-    for (size_t i = 1; i <= num_args; i++){
+    for (size_t i = 1; i <= num_args; i++) {
          combined += luaV_check_as_string(state, i) + " ";
     }
 
