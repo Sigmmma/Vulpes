@@ -24,7 +24,7 @@ static lua_State* map_state = NULL;
 
 static bool initialized = false;
 
-const auto INDEX = std::string("index.lua");
+static const auto LUA_MAIN_FILE = std::string("main.lua");
 
 static void luaV_register_functions(lua_State *state, bool sandboxed) {
     luaV_openlibs(state, !sandboxed);
@@ -40,10 +40,10 @@ static void luaV_load_scripts_for_map() {
     // Check if it is actually a directory / even exists.
     // This is done so that we don't go in and create a whole lua state
     // and register all the functions just to destroy it again if there
-    // isn't even a folder to load index.lua from.
+    // isn't even a folder to load main.lua from.
     if (is_dir(path_str)) {
-        // Check if there is an index.lua
-        auto file_str = path_str + INDEX;
+        // Check if there is an main.lua
+        auto file_str = path_str + LUA_MAIN_FILE;
 
         if (is_file(file_str)) {
             // Create a new lua state.
@@ -52,7 +52,9 @@ static void luaV_load_scripts_for_map() {
             // Register functions.
             luaV_register_functions(state, true);
 
-            if(luaV_loadfile_as(state, path_str + INDEX, cur_map_name + ":" + INDEX)
+            if(luaV_loadfile_as(state,
+                path_str + LUA_MAIN_FILE,
+                cur_map_name + ":" + LUA_MAIN_FILE)
             || lua_pcall(state, 0, 0, 0)) {
                 luaV_print_error(state);
                 lua_close(state);
