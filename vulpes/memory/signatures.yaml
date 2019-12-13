@@ -1,0 +1,249 @@
+signatures:
+
+    #### PATCH SIGNATURES FOR FIXES
+    ## These signatures are mostly used for editing code.
+
+    # fixes/animation
+
+  - name: fix_player_jump_turn
+    bytes: F6 85 F4 02 00 00 01 0F 85
+    crucial: false
+
+    # fixes/cpu_usage
+
+  - name: fix_cpu_usage_pattern1
+    bytes: FF D6 8A 44 24 13 84 C0 74
+    crucial: false
+
+  - name: fix_cpu_usage_pattern2
+    bytes: FF 15 ?? ?? ?? ?? 8A 44 24 13 84 C0 74
+    crucial: false
+
+    # fixes/file_handle_leak
+
+  - name: fix_file_handle_leak1
+    bytes: 05 00 00 00 08 3B 44
+    crucial: false
+
+  - name: fix_file_handle_leak2
+    bytes: 81 C1 00 00 00 08
+    crucial: false
+
+  - name: fix_file_handle_leak3
+    bytes: 05 00 00 00 08 3B C8
+    crucial: false
+
+    # fixes/framerate_dependent_timers
+
+  - name: fix_death_timer_framerate_dep
+    bytes: 38 1D ?? ?? ?? ?? 74 33 A1 ?? ?? ?? ?? 38 58 02 75 29 66 A1 ?? ?? ?? ?? 66 8B C8 66 40
+    crucial: false
+
+  - name: fix_scoreboard_framerate_dep1
+    bytes: D8 25 ?? ?? ?? ?? EB 06 D8 05
+    crucial: false
+
+  - name: fix_scoreboard_framerate_dep2
+    bytes: D8 05 ?? ?? ?? ?? EB 42
+    crucial: false
+
+  - name: fix_scoreboard_framerate_dep3
+    bytes: D8 05 ?? ?? ?? ?? EB 0A D9 44 24 14 D8 25
+    crucial: false
+
+  - name: fix_scoreboard_ruleboard_intro_nop
+    bytes: C7 05 ?? ?? ?? 00 96 00 00 00 5B
+    crucial: false
+
+  - name: fix_console_fade_call
+    bytes: 8B 15 ?? ?? ?? ?? 83 FA FF 74
+    crucial: false
+
+  - name: fix_console_framerate_dep
+    bytes: ?? ?? ?? 00 75 05 E8 ?? ?? ?? FF E8 ?? ?? ?? FF
+    crucial: false
+
+    # fixes/host_refusal
+
+  - name: fix_host_refusal1
+    bytes: 88 5C 24 2A E8 ?? ?? ?? ?? 50 E8
+    crucial: false
+
+  - name: fix_host_refusal2
+    bytes: 8B 7F 08 3B FD 74 5F 8D 9B 00 00 00 00
+    crucial: false
+
+  - name: fix_client_refusal
+    bytes: ?? ?? 75 11 6A 01 6A 7E 68 A0 00 00 00
+    crucial: false
+
+    # fixes/shader_trans_zfighting
+
+  - name: fix_shader_trans_zfighting2
+    bytes: E8 ?? ?? ?? ?? 84 C0 74 ?? E8 ?? ?? ?? ?? 33 C0 89 44 24 34 EB
+    crucial: false
+
+  - name: fix_shader_trans_zfighting3
+    bytes: F7 05 ?? ?? ?? ?? 00 00 00 04 74 ?? 8B 15 ?? ?? ?? ?? A1 ?? ?? ?? ?? 8B 08 52
+    crucial: false
+
+  - name: fix_hs_print_overflow
+    bytes: 83 C4 10 85 C0 74 ?? 8B 08 A1 ?? ?? ?? ?? 51 E8
+    crucial: false
+
+    # fixes/mp_crashes
+
+  - name: fix_vehicle_respawn_crash
+    bytes: 66 85 C9 74 06 0F BF D9 6B DB 1E 03 D8
+    crucial: false
+
+  #### SIGNATURES FOR FUNCTIONS
+  ## These signatures are used for (wrapped) function calls to game functions.
+
+  # functions/bitstream
+
+  - name: func_bitstream_write
+    bytes: 53 55 8B 6C 24 0C 85 ED 56 57 8B F0 8B D9 8B FD 7E
+    crucial: true
+
+  - name: func_bitstream_read
+    bytes: 53 55 8B 6C 24 0C 56 8B F0 33 DB 85 F6 57 8B F9 7E
+    crucial: true
+
+  # functions/devmode
+
+  - name: developer_mode_level
+    bytes: ?? ?? ?? ?? 04 72 ?? 8D 54 24 0C 52
+    crucial: false
+
+  # functions/message_delta
+
+  - name: func_mdp_decode_stateless_iterated
+    bytes: 57 8B 38 51 83 C0 04 6A 00 50 E8
+    crucial: true
+
+  - name: func_mdp_encode_stateless_iterated
+    bytes: 81 EC A4 00 00 00 53 55 8B AC 24 BC 00 00 00
+    crucial: true
+
+  - name: func_mdp_discard_iteration_body
+    bytes: 81 EC 00 08 00 00 56 57 8B 38 8B 37
+    crucial: true
+
+  - name: func_net_send_message_to_all
+    bytes: 66 8B 46 0E 8A D0 D0 EA F6 C2 01
+    crucial: true
+
+  - name: func_net_send_message_to_player # Machine id, not player id
+    bytes: 51 53 57 8B F8 32 C0 33 C9
+    crucial: true
+
+  - name: func_net_send_message_socket_ready
+    bytes: ?? ?? ?? ?? 3B C3 74 1A 83 C0 08 3B C3 74 13
+    crucial: true
+
+  # functions/object_unit
+
+  - name: func_unit_speak
+    bytes: 53 56 8B F1 8B 0D ?? ?? ?? ?? 8B 49 34
+    crucial: false
+
+  # functions/table
+
+  - name: func_datum_new
+    bytes: 0F BF 4A 22 53 66 8B 5A 2C 55
+    crucial: true
+
+  - name: func_datum_new_at_index
+    bytes: 57 8B F8 C1 FF 10 66 85 C0 7C
+    crucial: true
+
+  - name: func_datum_delete
+    bytes: 56 8B F2 C1 FE 10 66 85 D2 57
+    crucial: true
+
+  # hooks/console
+
+  - name: hook_console_input
+    bytes: 3C 23 74 0A 3C 2F 75 0F
+    crucial: true
+
+  - name: hook_auto_complete
+    bytes: 0F BF 15 ?? ?? ?? ?? 68 ?? ?? ?? ?? 6A 04 52 55 E8
+    crucial: false
+
+  - name: hook_auto_complete_collected_list
+    bytes: ?? ?? ?? ?? 0F BF C8 66 40 89 34 8A 66 A3 ?? ?? ?? ?? 83 C3 04 4D 75 98 5F
+    crucial: false
+
+  # hooks/projectile
+
+  - name: hook_projectile_detonation_spawn_effect
+    bytes: E8 ?? ?? ?? ?? 8B D8 83 CF FF 83 C4 0C 3B DF
+    crucial: true
+
+  # hooks/incoming_messages
+
+  - name: hook_hud_chat
+    bytes: 84 C0 0F 84 ?? ?? ?? ?? 8A 44 24 10 3C FF 0F 84
+    crucial: true
+
+  # hooks/map
+
+  - name: hook_hill_timer_reset
+    bytes: C7 05 ?? ?? ?? 00 08 07 00 00 E8 ?? ?? FF FF
+    crucial: true
+
+  - name: hook_map_load_ui_sp
+    bytes: 83 EC 0C 53 55 56 57 8B F0 E8
+    crucial: true
+
+  - name: hook_map_load_mp
+    bytes: 81 EC 10 01 00 00 53 55 8B AC 24 1C 01 00 00
+    crucial: true
+
+  - name: hook_event_map_reset
+    bytes: 5B 68 ?? ?? ?? ?? 33 C0
+    crucial: true
+
+  # hooks/object
+
+  - name: hook_object_create
+    bytes: 81 EC 1C 02 00 00 8B 0D
+    crucial: true
+
+  - name: hook_biped_jump
+    bytes: 8B 0D ?? ?? ?? 00 8B 51 34 83 EC 10 53 55
+    crucial: true
+
+  - name: hook_weapon_pull_trigger
+    bytes: 81 EC 94 00 00 00 8B 84 24 98 00 00 00 8B 0D
+    crucial: true
+
+  # hooks/player
+
+  - name: hook_player_teleport
+    bytes: 8D 54 24 20 52 50 8B FE # Offset result by +8
+    crucial: true
+
+  - name: hook_func_team_balance_reject
+    bytes: B9 91 00 00 00 E8 ?? ?? ?? ?? 83 C4 04 # Offset result by +5
+    crucial: true
+
+  - name: hook_team_change_block
+    bytes: 53 0F B6 5C 24 05
+    crucial: true
+
+  - name: hook_team_balance
+    bytes: E8 ?? ?? ?? ?? 83 C4 04 84 C0 0F 85 ?? ?? ?? ?? 0F B6 ?? ?? 08
+    crucial: true
+
+  - name: hook_event_team_change
+    bytes: E8 ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 6A 03 6A 01 53 6A 01 68
+    crucial: true
+
+  # hooks/tick
+
+  - name: hook_tick
+    bytes: 51 53 68 FF FF 0F 00 68 1F 00 09 00 C6 05 ?? ?? ?? ?? 01
+    crucial: true
