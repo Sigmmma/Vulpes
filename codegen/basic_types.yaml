@@ -1,0 +1,33 @@
+types:
+    bool: 1
+    bool8: 1
+    bool16: 2
+    bool32: 4
+
+    float: 4
+    double: 8
+
+    int8_t: 1
+    int16_t: 2
+    int32_t: 4
+
+    uint8_t: 1
+    uint16_t: 2
+    uint32_t: 4
+
+    intptr_t: 4
+    uintptr_t: 4
+
+    MemRef: 4
+
+    Euler2d: 8
+    Euler3d: 12
+
+    Quaternion: 16
+
+    RGBFloat: 12
+    ARGBFloat: 16
+
+    Vector2d: 8
+    Vector3d: 12
+    Vector4d: 16
