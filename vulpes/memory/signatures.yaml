@@ -25,20 +25,6 @@ signatures:
     bytes: FF 15 ?? ?? ?? ?? 8A 44 24 13 84 C0 74
     crucial: false
 
-  # fixes/file_handle_leak
-
-  - name: fix_file_handle_leak1
-    bytes: 05 00 00 00 08 3B 44
-    crucial: false
-
-  - name: fix_file_handle_leak2
-    bytes: 81 C1 00 00 00 08
-    crucial: false
-
-  - name: fix_file_handle_leak3
-    bytes: 05 00 00 00 08 3B C8
-    crucial: false
-
   # fixes/framerate_dependent_timers
 
   - name: fix_death_timer_framerate_dep
