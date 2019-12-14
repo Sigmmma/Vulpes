@@ -6,16 +6,16 @@
 
 signatures:
 
-    #### PATCH SIGNATURES FOR FIXES
-    ## These signatures are mostly used for editing code.
+  #### PATCH SIGNATURES FOR FIXES
+  ## These signatures are mostly used for editing code.
 
-    # fixes/animation
+  # fixes/animation
 
   - name: fix_player_jump_turn
     bytes: F6 85 F4 02 00 00 01 0F 85
     crucial: false
 
-    # fixes/cpu_usage
+  # fixes/cpu_usage
 
   - name: fix_cpu_usage_pattern1
     bytes: FF D6 8A 44 24 13 84 C0 74
@@ -25,7 +25,7 @@ signatures:
     bytes: FF 15 ?? ?? ?? ?? 8A 44 24 13 84 C0 74
     crucial: false
 
-    # fixes/file_handle_leak
+  # fixes/file_handle_leak
 
   - name: fix_file_handle_leak1
     bytes: 05 00 00 00 08 3B 44
@@ -39,7 +39,7 @@ signatures:
     bytes: 05 00 00 00 08 3B C8
     crucial: false
 
-    # fixes/framerate_dependent_timers
+  # fixes/framerate_dependent_timers
 
   - name: fix_death_timer_framerate_dep
     bytes: 38 1D ?? ?? ?? ?? 74 33 A1 ?? ?? ?? ?? 38 58 02 75 29 66 A1 ?? ?? ?? ?? 66 8B C8 66 40
@@ -69,7 +69,7 @@ signatures:
     bytes: ?? ?? ?? 00 75 05 E8 ?? ?? ?? FF E8 ?? ?? ?? FF
     crucial: false
 
-    # fixes/host_refusal
+  # fixes/host_refusal
 
   - name: fix_host_refusal1
     bytes: 88 5C 24 2A E8 ?? ?? ?? ?? 50 E8
@@ -83,7 +83,7 @@ signatures:
     bytes: ?? ?? 75 11 6A 01 6A 7E 68 A0 00 00 00
     crucial: false
 
-    # fixes/shader_trans_zfighting
+  # fixes/shader_trans_zfighting
 
   - name: fix_shader_trans_zfighting2
     bytes: E8 ?? ?? ?? ?? 84 C0 74 ?? E8 ?? ?? ?? ?? 33 C0 89 44 24 34 EB
@@ -97,7 +97,7 @@ signatures:
     bytes: 83 C4 10 85 C0 74 ?? 8B 08 A1 ?? ?? ?? ?? 51 E8
     crucial: false
 
-    # fixes/mp_crashes
+  # fixes/mp_crashes
 
   - name: fix_vehicle_respawn_crash
     bytes: 66 85 C9 74 06 0F BF D9 6B DB 1E 03 D8
