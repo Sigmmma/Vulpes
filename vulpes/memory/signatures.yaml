@@ -154,6 +154,10 @@ signatures:
     bytes: 56 8B F2 C1 FE 10 66 85 D2 57
     crucial: true
 
+  #### PATCH SIGNATURES FOR CODE HOOKS
+  ## While the patches can also do this, these are specifically made for use
+  ## with code addons.
+
   # hooks/console
 
   - name: hook_console_input
