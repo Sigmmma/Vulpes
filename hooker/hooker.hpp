@@ -41,6 +41,21 @@ private:
     const char* name;
 };
 
+#define NOT_SEARCHED(address) (!address)
+#define NOT_FOUND(address)    (reinterpret_cast<uintptr_t>(address) == UINTPTR_MAX)
+
+class LiteSignature {
+public:
+    const char* name;
+    const size_t size;
+    const int16_t bytes[];
+
+    uintptr_t search(
+        uintptr_t start_address = 0, uintptr_t end_address = 0);
+    std::vector<uintptr_t> search_multiple(
+        uintptr_t start_address = 0, uintptr_t end_address = 0);
+};
+
 enum PatchTypes {
     NOP_PATCH,  // NOPs out the code so it does nothing.
     CALL_PATCH, // Makes a function call to redirect_to.

@@ -73,6 +73,72 @@ uintptr_t CodeSignature::address(bool recalculate) {
     return address();
 }
 
+uintptr_t LiteSignature::search(
+        uintptr_t start_address, uintptr_t end_address) {
+
+    if (!start_address) start_address = get_lowest_permitted_address();
+    if (!end_address) end_address = get_highest_permitted_address();
+
+    printf("Search for sig %s\nAddress range: %8X - %8X\n", name, start_address, end_address);
+
+    // TODO: Use constant.
+    uintptr_t result = UINTPTR_MAX;
+
+    uintptr_t current_address = start_address;
+    while (result == UINTPTR_MAX && current_address - size <= end_address) {
+        bool mismatch = false;
+        // For each address we go through our set of bytes until
+        // we get a mismatch or we reach the end of our signature.
+        for (int j=0; j < size; j++) {
+            // If the current element in our sig is -1 we skip this byte as -1
+            // is our wildcard. If our current byte matches our current sig
+            // element, start the next iteration.
+            if (bytes[j] == -1 || reinterpret_cast<uint8_t*>(current_address)[j] == bytes[j]) {
+                continue;
+            }
+            // If neither of the conditions are met we have a mismatch and should move on.
+            mismatch = true;
+            break;
+        }
+        // If there was no mismatch then we have succesfully found the address.
+        if (!mismatch) {
+            result = current_address;
+        }
+        // If not, then keep searching.
+        current_address++;
+    }
+
+    if (result == UINTPTR_MAX) {
+        printf("Not found.\n\n");
+    } else {
+        printf("Found at: %8X\n\n", result);
+    }
+
+    return result;
+}
+
+std::vector<uintptr_t> LiteSignature::search_multiple(
+        uintptr_t start_address, uintptr_t end_address) {
+
+    if (!start_address) start_address = get_lowest_permitted_address();
+    if (!end_address) end_address = get_highest_permitted_address();
+
+    printf("Multi sig search for %s\n\n", name);
+
+    std::vector<uintptr_t> addresses;
+    // TODO: Use constant.
+    uintptr_t last_result = 0;
+    while(last_result != UINTPTR_MAX && start_address + size < end_address) {
+        last_result = search(start_address, end_address);
+        if (last_result != UINTPTR_MAX) {
+            addresses.push_back(last_result);
+        }
+        start_address = last_result + 1;
+    }
+    printf("Found %d addresses.\n", addresses.size());
+}
+
+
 ////////////
 
 void CodePatch::setup_internal(void* content, size_t c_size) {
