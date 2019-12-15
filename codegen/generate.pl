@@ -231,9 +231,11 @@ if (exists $file->{signatures}) {
     my $init_name = $name;
     $init_name =~ s/\.\w+$//;
     my $initializer = "void init_$init_name\_signatures() {\n";
-    $initializer .= "    std::vector<const char*> crucial_missing;\n";
-    $initializer .= "    std::vector<const char*> non_crucial_missing;\n";
-    $initializer .= "\n";
+    my $initializer_validator = qq{
+    std::vector<const char*> crucial_missing;
+    std::vector<const char*> non_crucial_missing;
+
+};
 
     my $addresses = "";
     my $signatures = "";
@@ -252,34 +254,29 @@ if (exists $file->{signatures}) {
 
         if (exists $_->{multi} && $_->{multi}) {
             $initializer .= "    PTRS_$upper_case_name = sig_$_->{name}.search_multiple();\n";
-            $initializer .= "    if (!PTRS_$upper_case_name.size()) { ";
-            if (exists $_->{crucial} && $_->{crucial}) {
-                $initializer .= "crucial_missing.push_back(sig_$_->{name}.name); }\n";
-            } else {
-                $initializer .= "non_crucial_missing.push_back(sig_$_->{name}.name); }\n";
-            }
+            $initializer_validator .= "    if (!PTRS_$upper_case_name.size()) ";
             $addresses .= "static std::vector<uintptr_t> PTRS_" . (uc $_->{name}) . ";\n"
         } else {
             $initializer .= "    PTR_$upper_case_name = sig_$_->{name}.search();\n";
-            $initializer .= "    if (NOT_FOUND(PTR_$upper_case_name)) { ";
-            if (exists $_->{crucial} && $_->{crucial}) {
-                $initializer .= "crucial_missing.push_back(sig_$_->{name}.name); }\n";
-            } else {
-                $initializer .= "non_crucial_missing.push_back(sig_$_->{name}.name); }\n";
-            }
+            $initializer_validator .= "    if (NOT_FOUND(PTR_$upper_case_name)) ";
             $addresses .= "static uintptr_t PTR_$upper_case_name;\n"
         }
-        $initializer .= "\n"
+        if (exists $_->{crucial} && $_->{crucial}) {
+            $initializer_validator .= "crucial_missing.push_back(sig_$_->{name}.name);\n";
+        } else {
+            $initializer_validator .= "non_crucial_missing.push_back(sig_$_->{name}.name);\n";
+        }
 
     }
 
+    $initializer .= $initializer_validator;
     $initializer .= qq{
     if (crucial_missing.size()) {
         printf("Vulpes connot find the following crucial signatures:\\n");
         for (size_t i=0;i<crucial_missing.size();i++) {
             printf("\%s\\n", crucial_missing[i]);
         };
-        if (non_crucial_missing.size()) { printf("And less importantly, "); }
+        if (non_crucial_missing.size()) printf("And less importantly, ");
     }
     if (non_crucial_missing.size()) {
         printf("Vulpes connot find the following non-crucial signatures:\\n");
