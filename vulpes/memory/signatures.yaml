@@ -20,10 +20,12 @@ signatures:
   - name: fix_cpu_usage_pattern1
     bytes: FF D6 8A 44 24 13 84 C0 74
     crucial: false
+    multi: true
 
   - name: fix_cpu_usage_pattern2
     bytes: FF 15 ?? ?? ?? ?? 8A 44 24 13 84 C0 74
     crucial: false
+    multi: true
 
   # fixes/framerate_dependent_timers
 
