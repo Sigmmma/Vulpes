@@ -234,27 +234,27 @@ if (exists $file->{signatures}) {
     print OUTPUT_SRC "#include <cstdio>\n\n";
     print OUTPUT_SRC "#include <cstdlib>\n\n";
 
+    my @sigs = map { preprocess_signature } @{$file->{signatures}};
+
+    # Signature definitions.
+    print OUTPUT_SRC (join "", map { yaml_sig_to_c_sig } @sigs), "\n";
+    # Address holding variables.
+    print OUTPUT_SRC (join "", map { yaml_sig_to_c_address_var } @sigs), "\n";
+    # Getters that apply offsets if needed.
+    print OUTPUT_SRC (join "", map { yaml_sig_to_c_getter } @sigs), "\n";
+
+    # Initialization function.
     my $init_name = $name;
     $init_name =~ s/\.\w+$//;
-    my $initializer = "void init_$init_name\_signatures() {\n";
-    my $initializer_validator = qq{
+    print OUTPUT_SRC "void init_$init_name\_signatures() {\n";
+    print OUTPUT_SRC join "", map { yaml_sig_to_c_initializer } @sigs;
+    print OUTPUT_SRC qq{
     std::vector<const char*> crucial_missing;
     std::vector<const char*> non_crucial_missing;
 
 };
-
-    my @sigs = map { preprocess_signature } @{$file->{signatures}};
-
-    my $addresses = join "", map { yaml_sig_to_c_address_var } @sigs;
-    my $signatures = join "", map { yaml_sig_to_c_sig } @sigs;
-    $initializer .= join "", map { yaml_sig_to_c_initializer } @sigs;
-    $initializer_validator .= join "", map { yaml_sig_to_c_validator } @sigs;
-    my @getters = join "", map { yaml_sig_to_c_getter } @sigs;
-    my @getters_header = join "", map { yaml_sig_to_c_getter_header } @sigs;
-
-
-    $initializer .= $initializer_validator;
-    $initializer .= qq{
+    print OUTPUT_SRC join "", map { yaml_sig_to_c_validator } @sigs;
+    print OUTPUT_SRC qq{
     if (crucial_missing.size()) {
         printf("Vulpes connot find the following crucial signatures:\\n");
         for (size_t i=0;i<crucial_missing.size();i++) {
@@ -275,13 +275,9 @@ if (exists $file->{signatures}) {
     }
 };
 
+    print OUTPUT_SRC "}\n";
 
-    print OUTPUT_SRC $signatures, "\n";
-    print OUTPUT_SRC $addresses, "\n";
-    print OUTPUT_SRC (sort @getters), "\n";
-    print OUTPUT_SRC $initializer, "}\n";
-
-    print OUTPUT_HEAD @getters_header;
+    print OUTPUT_HEAD join "", map { yaml_sig_to_c_getter_header } @sigs;
     print OUTPUT_HEAD "\n";
     print OUTPUT_HEAD "void init_$init_name\_signatures();\n";
 }
