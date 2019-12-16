@@ -96,8 +96,13 @@ my $license_header = qq{/*
 
 };
 
-print OUTPUT_SRC $license_header;
+print OUTPUT_SRC $license_header, qq{#include <$output_header_name>
+
+};
 print OUTPUT_HEAD $license_header, qq{#pragma once
+
+#include <cstdint>
+#include <vector>
 
 };
 
@@ -239,6 +244,8 @@ if (exists $file->{signatures}) {
 
     my $addresses = "";
     my $signatures = "";
+    my @getters = "";
+    my @getters_header = "";
 
     foreach (@{$file->{signatures}}) {
         # Convert string to individual parts and then convert them into C++ format.
@@ -251,15 +258,21 @@ if (exists $file->{signatures}) {
         $signatures .= "static LiteSignature sig_$_->{name} = { \"$_->{name}\", $len, { $byte_str } };\n";
 
         my $upper_case_name = uc $_->{name};
+        my $type = $_->{type} || "uintptr_t";
+        my $offset = $_->{offset} || 0;
 
         if (exists $_->{multi} && $_->{multi}) {
             $initializer .= "    PTRS_$upper_case_name = sig_$_->{name}.search_multiple();\n";
             $initializer_validator .= "    if (!PTRS_$upper_case_name.size()) ";
-            $addresses .= "static std::vector<uintptr_t> PTRS_" . (uc $_->{name}) . ";\n"
+            $addresses .= "static std::vector<uintptr_t> PTRS_" . (uc $_->{name}) . ";\n";
+            push @getters, "std::vector<uintptr_t> $_->{name}() { return PTRS_$upper_case_name; }\n";
+            push @getters_header, "std::vector<uintptr_t> $_->{name}();\n";
         } else {
             $initializer .= "    PTR_$upper_case_name = sig_$_->{name}.search();\n";
             $initializer_validator .= "    if (NOT_FOUND(PTR_$upper_case_name)) ";
-            $addresses .= "static uintptr_t PTR_$upper_case_name;\n"
+            $addresses .= "static uintptr_t PTR_$upper_case_name;\n";
+            push @getters, "$type $_->{name}() { return reinterpret_cast<$type>(NOT_FOUND(PTR_$upper_case_name) ? 0 : PTR_$upper_case_name + $offset); }\n";
+            push @getters_header, "$type $_->{name}();\n";
         }
         if (exists $_->{crucial} && $_->{crucial}) {
             $initializer_validator .= "crucial_missing.push_back(sig_$_->{name}.name);\n";
@@ -294,7 +307,10 @@ if (exists $file->{signatures}) {
 
     print OUTPUT_SRC $signatures, "\n";
     print OUTPUT_SRC $addresses, "\n";
+    print OUTPUT_SRC (sort @getters), "\n";
     print OUTPUT_SRC $initializer, "}\n";
 
+    print OUTPUT_HEAD @getters_header;
+    print OUTPUT_HEAD "\n";
     print OUTPUT_HEAD "void init_$init_name\_signatures();\n";
 }
