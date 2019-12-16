@@ -84,6 +84,7 @@ signatures:
   - name: fix_hs_print_overflow
     bytes: 83 C4 10 85 C0 74 ?? 8B 08 A1 ?? ?? ?? ?? 51 E8
     crucial: false
+    offset: 15
 
   # fixes/mp_crashes
 
@@ -109,6 +110,7 @@ signatures:
   - name: developer_mode_level
     bytes: ?? ?? ?? ?? 04 72 ?? 8D 54 24 0C 52
     crucial: false
+    type: uint8_t*
 
   # functions/message_delta
 
