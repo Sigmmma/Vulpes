@@ -4,6 +4,9 @@
 # This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
 #
 
+use strict;
+use warnings;
+
 sub trim { # Takes a string and trims the whitespace from both ends.
     my $s = shift;
     $s =~ s/^\s+|\s+$//g;

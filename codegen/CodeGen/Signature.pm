@@ -69,7 +69,7 @@ sub yaml_sig_to_c_getter {
     return "$_->{type} $_->{name}() {\n".
            "    return reinterpret_cast<$_->{type}>(\n".
            "        NOT_FOUND(PTR_$_->{uc_name}) ?\n".
-           "            0 : PTR_$_->{uc_name} + $_->{offset});\n".
+           "            0 : (PTR_$_->{uc_name} + $_->{offset}));\n".
            "}\n";
 
 }
