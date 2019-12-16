@@ -15,6 +15,7 @@ use YAML::XS qw( LoadFile );
 
 use lib dirname(__FILE__); # Include own directory
 use CodeGen::TextHelpers qw( trim is_number lpad rpad pad_strings pad_struct_strings as_decimal );
+use CodeGen::Signature qw( preprocess_signature yaml_sig_to_c_sig yaml_sig_to_c_initializer );
 
 sub process_enum_member { # Returns a listref containing all the parts needed
                           # for an enum member.
@@ -242,44 +243,15 @@ if (exists $file->{signatures}) {
 
 };
 
-    my $addresses = "";
-    my $signatures = "";
-    my @getters = "";
-    my @getters_header = "";
+    my @sigs = map { preprocess_signature } @{$file->{signatures}};
 
-    foreach (@{$file->{signatures}}) {
-        # Convert string to individual parts and then convert them into C++ format.
-        my @bytes = map {$_ eq "??" ? "-1" : "0x$_"}
-                    split /\s+/, $_->{bytes};
-        # Combine the bytes into a single string.
-        my $byte_str = join ", ", @bytes;
-        # Get amount of bytes.
-        my $len = scalar @bytes;
-        $signatures .= "static LiteSignature sig_$_->{name} = { \"$_->{name}\", $len, { $byte_str } };\n";
+    my $addresses = join "", map { yaml_sig_to_c_address_var } @sigs;
+    my $signatures = join "", map { yaml_sig_to_c_sig } @sigs;
+    $initializer .= join "", map { yaml_sig_to_c_initializer } @sigs;
+    $initializer_validator .= join "", map { yaml_sig_to_c_validator } @sigs;
+    my @getters = join "", map { yaml_sig_to_c_getter } @sigs;
+    my @getters_header = join "", map { yaml_sig_to_c_getter_header } @sigs;
 
-        my $uc_name = uc $_->{name};
-        my $type = $_->{type} || "uintptr_t";
-        my $offset = $_->{offset} || 0;
-
-        if (exists $_->{multi} && $_->{multi}) {
-            $initializer .= "    PTRS_$uc_name = sig_$_->{name}.search_multiple();\n";
-            $initializer_validator .= "    if (!PTRS_$uc_name.size())\n";
-            $addresses .= "static std::vector<uintptr_t> PTRS_$uc_name;\n";
-            push @getters, "std::vector<uintptr_t> $_->{name}() {\n    return PTRS_$uc_name;\n}\n";
-            push @getters_header, "std::vector<uintptr_t> $_->{name}();\n";
-        } else {
-            $initializer .= "    PTR_$uc_name = sig_$_->{name}.search();\n";
-            $initializer_validator .= "    if (NOT_FOUND(PTR_$uc_name))\n";
-            $addresses .= "static uintptr_t PTR_$uc_name;\n";
-            push @getters, "$type $_->{name}() {\n    return reinterpret_cast<$type>(\n        NOT_FOUND(PTR_$uc_name) ?\n            0 : PTR_$uc_name + $offset);\n}\n";
-            push @getters_header, "$type $_->{name}();\n";
-        }
-        if (exists $_->{crucial} && $_->{crucial}) {
-            $initializer_validator .= "        crucial_missing.push_back(sig_$_->{name}.name);\n";
-        } else {
-            $initializer_validator .= "        non_crucial_missing.push_back(sig_$_->{name}.name);\n";
-        }
-    }
 
     $initializer .= $initializer_validator;
     $initializer .= qq{
