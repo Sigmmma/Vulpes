@@ -14,7 +14,7 @@ use List::AllUtils qw( max );
 use YAML::XS qw( LoadFile );
 
 use lib dirname(__FILE__); # Include own directory
-use codegen_text_helpers qw( trim is_number lpad rpad pad_strings pad_struct_strings as_decimal );
+use CodeGen::TextHelpers qw( trim is_number lpad rpad pad_strings pad_struct_strings as_decimal );
 
 sub process_enum_member { # Returns a listref containing all the parts needed
                           # for an enum member.
