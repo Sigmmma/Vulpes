@@ -14,52 +14,12 @@ use List::AllUtils qw( max );
 use YAML::XS qw( LoadFile );
 
 use lib dirname(__FILE__); # Include own directory
-use CodeGen::TextHelpers qw( trim is_number lpad rpad pad_strings pad_struct_strings as_decimal );
-use CodeGen::Signature qw( preprocess_signature yaml_sig_to_c_sig yaml_sig_to_c_initializer );
+use CodeGen::TextHelpers qw( trim is_number lpad rpad pad_strings
+    pad_struct_strings as_decimal );
+use CodeGen::Signature qw( yaml_signatures_to_cpp_definitions );
 
-sub process_enum_member { # Returns a listref containing all the parts needed
-                          # for an enum member.
-    # Split by + sign while keeping + signs.
-    my @enum_values = (split /(\+)/, ($_->{value}) // "");
-    # upper case the values if they are references
-    @enum_values = map { (is_number $_) ? $_ : uc $_ } @enum_values;
-
-    my @enum = ( (uc $_->{name}), @enum_values );
-    # Trim the whitespace that we got from our ugly regex split.
-    return [map { trim $_ } @enum];
-}
-
-my $types = LoadFile catfile(dirname(__FILE__), "basic_types.yaml");
+my $types = LoadFile catfile(dirname(__FILE__), "CodeGen", "basic_types.yaml");
 $types = $types->{types};
-
-sub process_struct_member { # Returns a listref containing all the parts needed
-                            # for a struct member.
-
-    # Figure out the size that this element would be in memory.
-    my $size = $_->{size} // 1;
-    $size = ($types->{$_->{type}} // 1) * $size;
-
-    my $text = [""];
-    # Padding should under no circumstance be used for anything.
-    # Use the macro to make it inaccessible.
-    if ($_->{type} eq "pad") {
-        $text = [ "PAD($_->{size})" ];
-    # Unknowns should under no circumstance be used for anything.
-    # Define as padding.
-    } elsif ($_->{name} eq "unknown") {
-        $text = [ "UNKNOWN", "($_->{type})" ];
-    # Handle arrays.
-    } elsif (exists $_->{size}) {
-        $text = [ $_->{type}, "$_->{name}\[$_->{size}\]" ]
-    # Default.
-    } else {
-        $text = [ $_->{type}, $_->{name} ];
-    }
-    return {
-        text => $text,
-        size => $size
-    }
-}
 
 ##########################
 # Main starts here!
@@ -72,11 +32,6 @@ my $file = LoadFile($filename);
 unless ( $file ) {
     die "Couldn't load file.";
 }
-=pod
-unless(open OUTPUT, "object.hh"){
-    die "Unable to open output file.";
-}
-=cut
 
 my $output_source_name = $filename;
 $output_source_name =~ s/\.\w+$//;
@@ -96,6 +51,9 @@ my $license_header = qq{/*
  */
 
 };
+
+my $bare_name = $name;
+$bare_name =~ s/\.\w+$//;
 
 print OUTPUT_SRC $license_header, qq{#include <$output_header_name>
 
@@ -230,54 +188,15 @@ if (exists $file->{structs}) {
 
 
 if (exists $file->{signatures}) {
-    print OUTPUT_SRC "#include <hooker/hooker.hpp>\n\n";
-    print OUTPUT_SRC "#include <cstdio>\n\n";
-    print OUTPUT_SRC "#include <cstdlib>\n\n";
+    my $output = yaml_signatures_to_cpp_definitions $bare_name, $file->{signatures};
+    print OUTPUT_SRC join "\n", @{$output->{source}->{std_includes}}, "";
+    print OUTPUT_SRC join "\n", @{$output->{source}->{includes}}, "";
+    print OUTPUT_SRC $output->{source}->{defs};
+    print OUTPUT_SRC $output->{source}->{initializer};
 
-    my @sigs = map { preprocess_signature } @{$file->{signatures}};
-
-    # Signature definitions.
-    print OUTPUT_SRC (map { yaml_sig_to_c_sig } @sigs), "\n";
-    # Address holding variables.
-    print OUTPUT_SRC (map { yaml_sig_to_c_address_var } @sigs), "\n";
-    # Getters that apply offsets if needed.
-    print OUTPUT_SRC (map { yaml_sig_to_c_getter } @sigs), "\n";
-
-    # Initialization function.
-    my $init_name = $name;
-    $init_name =~ s/\.\w+$//;
-    print OUTPUT_SRC "void init_$init_name\_signatures() {\n";
-    print OUTPUT_SRC map { yaml_sig_to_c_initializer } @sigs;
-    print OUTPUT_SRC qq{
-    std::vector<const char*> crucial_missing;
-    std::vector<const char*> non_crucial_missing;
-
-};
-    print OUTPUT_SRC map { yaml_sig_to_c_validator } @sigs;
-    print OUTPUT_SRC qq{
-    if (crucial_missing.size()) {
-        printf("Vulpes connot find the following crucial signatures:\\n");
-        for (size_t i=0;i<crucial_missing.size();i++) {
-            printf("\%s\\n", crucial_missing[i]);
-        };
-        if (non_crucial_missing.size()) printf("And less importantly, ");
-    }
-    if (non_crucial_missing.size()) {
-        printf("Vulpes connot find the following non-crucial signatures:\\n");
-        for (size_t i=0;i<non_crucial_missing.size();i++) {
-            printf("\%s\\n", non_crucial_missing[i]);
-        };
-    }
-    if (crucial_missing.size()) {
-        printf("\\nSince there is crucial signatures that we cannot find Vulpes cannot continue loading.\\n");
-        printf("Please submit your error log to the Github issues page.\\n");
-        exit(0);
-    }
-};
-
-    print OUTPUT_SRC "}\n";
-
-    print OUTPUT_HEAD map { yaml_sig_to_c_getter_header } @sigs;
-    print OUTPUT_HEAD "\n";
-    print OUTPUT_HEAD "void init_$init_name\_signatures();\n";
+    print OUTPUT_HEAD join "\n", @{$output->{header}->{std_includes}}, "";
+    print OUTPUT_HEAD join "\n", @{$output->{header}->{includes}}, "";
+    print OUTPUT_HEAD $output->{header}->{defs};
+    print OUTPUT_HEAD $output->{header}->{initializer};
+    #print Dumper $output;
 }

@@ -81,4 +81,86 @@ sub yaml_sig_to_c_getter_header {
     return "$_->{type} $_->{name}();\n";
 }
 
-return 1;
+sub yaml_signatures_to_cpp_definitions {
+    my $name = shift;
+    my $sigs = shift;
+    my @sigs = map { preprocess_signature } @{$sigs};
+
+    #### Source file stuff.
+    my $std_includes = [
+        "#include <cstdio>",
+        "#include <cstdint>",
+        "#include <cstdlib>",
+        "#include <vector>",
+        ];
+    my $includes = [
+        "#include <hooker/hooker.hpp>",
+    ];
+    my $source_defs = join "",
+        # Actual signature definitions
+        (map { yaml_sig_to_c_sig } @sigs), "\n",
+        # The variables that hold the addresses.
+        (map { yaml_sig_to_c_address_var } @sigs), "\n",
+        # Getters for these addresses.
+        (map { yaml_sig_to_c_getter } @sigs), "\n";
+
+    my $initialization_code = join "", map { yaml_sig_to_c_initializer } @sigs;
+    my $validation_code = join "", map { yaml_sig_to_c_validator } @sigs;
+
+    # Function called on initialization.
+    my $init_function = qq{void init_$name\_signatures() {
+    // Write signature results to our variables for safekeeping.
+$initialization_code
+
+    // Find out if we failed to find any signatures.
+    std::vector<const char*> crucial_missing;
+    std::vector<const char*> non_crucial_missing;
+
+$validation_code
+
+    // Report to the user that we are missing signatures if we are.
+    if (crucial_missing.size()) {
+        printf("Vulpes connot find the following crucial signatures:\\n");
+        for (size_t i=0;i<crucial_missing.size();i++) {
+            printf("\%s\\n", crucial_missing[i]);
+        };
+        if (non_crucial_missing.size()) printf("And less importantly, ");
+    }
+    if (non_crucial_missing.size()) {
+        printf("Vulpes connot find the following non-crucial signatures:\\n");
+        for (size_t i=0;i<non_crucial_missing.size();i++) {
+            printf("\%s\\n", non_crucial_missing[i]);
+        };
+    }
+    // Close the program if we missed any crucial signatures.
+    if (crucial_missing.size()) {
+        printf("\\n"
+        "Since there is crucial signatures that we cannot find Vulpes "
+        "cannot continue loading.\\n"
+        "Please submit your error log to the Github issues page.\\n");
+        exit(0);
+    }
+}
+};
+
+    #### Header stuff
+    my $header_getters = join "", (map { yaml_sig_to_c_getter_header } @sigs), "\n";
+    my $header_initializer = "void init_$name\_signatures();\n";
+
+    return {
+        source => {
+            std_includes    => $std_includes,
+            includes        => $includes,
+            defs            => $source_defs,
+            initializer     => $init_function,
+        },
+        header => {
+            std_includes    => [],
+            includes        => [],
+            defs            => $header_getters,
+            initializer     => $header_initializer,
+        },
+    };
+}
+
+1;

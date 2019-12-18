@@ -86,4 +86,51 @@ sub as_decimal {
     return $value;
 }
 
-return 1;
+
+### TODO: TO BE DEPRICATED
+
+sub process_enum_member { # Returns a listref containing all the parts needed
+                          # for an enum member.
+    # Split by + sign while keeping + signs.
+    my @enum_values = (split /(\+)/, ($_->{value}) // "");
+    # upper case the values if they are references
+    @enum_values = map { (is_number $_) ? $_ : uc $_ } @enum_values;
+
+    my @enum = ( (uc $_->{name}), @enum_values );
+    # Trim the whitespace that we got from our ugly regex split.
+    return [map { trim $_ } @enum];
+}
+
+my $types = LoadFile catfile(dirname(__FILE__), "basic_types.yaml");
+$types = $types->{types};
+
+sub process_struct_member { # Returns a listref containing all the parts needed
+                            # for a struct member.
+
+    # Figure out the size that this element would be in memory.
+    my $size = $_->{size} // 1;
+    $size = ($types->{$_->{type}} // 1) * $size;
+
+    my $text = [""];
+    # Padding should under no circumstance be used for anything.
+    # Use the macro to make it inaccessible.
+    if ($_->{type} eq "pad") {
+        $text = [ "PAD($_->{size})" ];
+    # Unknowns should under no circumstance be used for anything.
+    # Define as padding.
+    } elsif ($_->{name} eq "unknown") {
+        $text = [ "UNKNOWN", "($_->{type})" ];
+    # Handle arrays.
+    } elsif (exists $_->{size}) {
+        $text = [ $_->{type}, "$_->{name}\[$_->{size}\]" ]
+    # Default.
+    } else {
+        $text = [ $_->{type}, $_->{name} ];
+    }
+    return {
+        text => $text,
+        size => $size
+    }
+}
+
+1;
