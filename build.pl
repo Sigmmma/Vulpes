@@ -57,7 +57,7 @@ sub build_from_yaml {
 
     print "Building headers and sources for yaml files!\n";
     # execute codegen
-    my $arg_str = join " ", map {"\"".$_."\""} @yaml_files;
+    my $arg_str = join " ", map {"\"$_\""} @yaml_files;
     system "perl ./codegen/generate.pl $arg_str";
 
     print "Updating .gitignore!\n";
