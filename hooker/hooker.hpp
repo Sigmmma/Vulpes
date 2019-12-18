@@ -97,7 +97,7 @@ public:
     // or use a code signature to try and find an address.
     // Returns true if success, false at fail, true if already built.
     // This does not apply the patch.
-    bool build(intptr_t p_address = 0);
+    bool build(uintptr_t p_address = 0);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.

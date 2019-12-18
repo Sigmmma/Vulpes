@@ -136,6 +136,8 @@ std::vector<uintptr_t> LiteSignature::search_multiple(
         start_address = last_result + 1;
     }
     printf("Found %d addresses.\n", addresses.size());
+
+    return addresses;
 }
 
 
@@ -194,7 +196,7 @@ CodePatch::CodePatch(const char* d_name,
 }
 
 
-bool CodePatch::build(intptr_t p_address) {
+bool CodePatch::build(uintptr_t p_address) {
     if (patch_built) return true;
     printf("Building CodePatch %s...", name);
     if (p_address && !patch_built) patch_address = p_address;
