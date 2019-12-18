@@ -56,6 +56,7 @@ signatures:
   - name: fix_console_framerate_dep
     bytes: ?? ?? ?? 00 75 05 E8 ?? ?? ?? FF E8 ?? ?? ?? FF
     crucial: false
+    offset: 6
 
   # fixes/host_refusal
 
