@@ -198,10 +198,13 @@ CodePatch::CodePatch(const char* d_name,
 
 bool CodePatch::build(uintptr_t p_address) {
     if (patch_built) return true;
-    printf("Building CodePatch %s...", name);
+    printf("Build CodePatch %s\n", name);
     if (p_address && !patch_built) patch_address = p_address;
     if (!patch_address && !patch_built) patch_address = sig.address() + offset;
-    if (patch_address - offset <= 0) return false;
+    if (patch_address - offset <= 0) {
+        printf("Couldn't build. Invalid address.");
+        return false;
+    }
     assert(patch_address >= get_lowest_permitted_address());
 
     // Setup for the different types of patches.
@@ -287,7 +290,7 @@ bool CodePatch::build(uintptr_t p_address) {
     }
 
     patch_built = true;
-    printf("done\n");
+    printf("Built.\n");
     return patch_built;
 }
 
@@ -310,24 +313,20 @@ void CodePatch::write_patch(std::vector<int16_t> patch_code) {
 }
 
 void CodePatch::apply() {
-    printf("Applying CodePatch %s...", name);
+    printf("Apply CodePatch %s\n", name);
     assert(patch_built);
     write_patch(patched_code);
     patch_applied = true;
-    printf("done\n");
+    printf("Applied.\n");
 }
 
 void CodePatch::revert() {
-    printf("Reverting CodePatch %s...", name);
+    printf("Revert CodePatch %s", name);
     if (patch_applied) {
         write_patch(original_code);
-        printf("done\n");
+        printf("Reverted.\n");
     } else {
-        if (patch_built) {
-            printf("wasn't needed.\n");
-        } else {
-            printf("wasn't built.\n");
-        }
+        printf("No need.\n");
     }
     patch_applied = false;
 }
