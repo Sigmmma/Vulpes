@@ -10,7 +10,7 @@
 #include <exception>
 #include <regex>
 
-#include <vulpes/functions/devmode.hpp>
+#include <vulpes/memory/signatures.hpp>
 #include <vulpes/functions/messaging.hpp>
 #include <vulpes/memory/gamestate/console.hpp>
 
@@ -40,7 +40,11 @@ void auto_complete(char* buffer[], uint16_t* current_index) {
     if (input && input[0]) {
         string input_str(input);
 
-        uint8_t developer_mode = developer_mode_level();
+        uint8_t developer_mode = 0;
+        if (developer_mode_level()){
+            developer_mode = *developer_mode_level();
+        }
+
 
         int i = 0;
         int j = *current_index;
@@ -100,8 +104,6 @@ bool process_command(char* input) {
         search_start = arg_match.suffix().first;
     }
 
-    uint8_t devmode = developer_mode_level();
-
     string cmd_to_find = matches[0];
     matches.erase(matches.begin());
     transform(cmd_to_find.begin(), cmd_to_find.end(), cmd_to_find.begin(), ::tolower);
@@ -111,8 +113,7 @@ bool process_command(char* input) {
                               // for matching_cmd !=0 has weird behavior.
 
     for (int i=0; i<commands.size(); i++) {
-        if (commands[i]->get_name() == cmd_to_find
-        && devmode >= developer_mode_level()) {
+        if (commands[i]->get_name() == cmd_to_find) {
             matching_cmd = commands[i];
             found_match = true;
             break;

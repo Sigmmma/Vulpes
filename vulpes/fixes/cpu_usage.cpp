@@ -6,6 +6,8 @@
 
 #include <hooker/hooker.hpp>
 
+#include <vulpes/memory/signatures.hpp>
+
 #include "cpu_usage.hpp"
 
 extern "C" {
@@ -19,18 +21,31 @@ Signature(false, sig_cpu_usage_fix_pattern1,
 Signature(false, sig_cpu_usage_fix_pattern2,
     {0xFF, 0x15, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x13, 0x84, 0xC0, 0x74});
 
-Patch(cpu_usage_fix_patch1, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
-Patch(cpu_usage_fix_patch2, sig_cpu_usage_fix_pattern1, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
-Patch(cpu_usage_fix_patch3, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
-Patch(cpu_usage_fix_patch4, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
-Patch(cpu_usage_fix_patch5, sig_cpu_usage_fix_pattern2, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch1, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch2, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch3, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch4, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
+Patch(cpu_usage_fix_patch5, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
 
 void init_cpu_usage_fixes() {
-    if (cpu_usage_fix_patch1.build()) cpu_usage_fix_patch1.apply();
-    if (cpu_usage_fix_patch2.build()) cpu_usage_fix_patch2.apply();
-    if (cpu_usage_fix_patch3.build()) cpu_usage_fix_patch3.apply();
-    if (cpu_usage_fix_patch4.build()) cpu_usage_fix_patch4.apply();
-    if (cpu_usage_fix_patch5.build()) cpu_usage_fix_patch5.apply();
+
+    auto pat1 = fix_cpu_usage_pattern1();
+    auto pat2 = fix_cpu_usage_pattern2();
+    if (pat1->size() >= 1) {
+        if (cpu_usage_fix_patch1.build(pat1->at(0))) cpu_usage_fix_patch1.apply();
+    }
+    if (pat1->size() >= 2) {
+        if (cpu_usage_fix_patch2.build(pat1->at(1))) cpu_usage_fix_patch2.apply();
+    }
+    if (pat2->size() >= 1) {
+        if (cpu_usage_fix_patch3.build(pat2->at(0))) cpu_usage_fix_patch3.apply();
+    }
+    if (pat2->size() >= 2) {
+        if (cpu_usage_fix_patch4.build(pat2->at(1))) cpu_usage_fix_patch3.apply();
+    }
+    if (pat2->size() >= 3) {
+        if (cpu_usage_fix_patch5.build(pat2->at(2))) cpu_usage_fix_patch3.apply();
+    }
 }
 
 void revert_cpu_usage_fixes() {

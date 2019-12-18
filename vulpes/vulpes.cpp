@@ -126,6 +126,8 @@ struct ImageSectionHeader {
     uint32_t bullshit2[4];
 };
 
+#include <vulpes/memory/signatures.hpp>
+
 void init_vulpes() {
     // Get safe search bounds for CodeSignature.
     ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.address());
@@ -133,6 +135,8 @@ void init_vulpes() {
     set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
 
     printf(_FOX);
+
+    init_signatures_signatures();
 
     init_hooks();
     init_halo_bug_fixes();

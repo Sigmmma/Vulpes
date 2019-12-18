@@ -96,6 +96,9 @@ add_library(Vulpes SHARED
     vulpes/lua/lua.cpp
     vulpes/lua/lua_console.cpp
     vulpes/lua/lua_open.cpp
+
+    # Generated files
+    vulpes/memory/signatures.cpp
 )
 
 add_library(VulpesLoader SHARED

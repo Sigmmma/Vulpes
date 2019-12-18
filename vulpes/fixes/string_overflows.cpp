@@ -6,7 +6,7 @@
 
 #include <hooker/hooker.hpp>
 
-#include <vulpes/functions/devmode.hpp>
+#include <vulpes/memory/signatures.hpp>
 #include <vulpes/functions/messaging.hpp>
 
 #include "string_overflows.hpp"
@@ -17,15 +17,13 @@
 
 __attribute__((fastcall))
 void hs_print_cleanser(char* string) {
-    if (developer_mode_level() >= 4) cprintf_info("%s", string);
+    if (developer_mode_level() && *developer_mode_level() >= 4) cprintf_info("%s", string);
 }
 
-Signature(false, sig_hs_print_overflow_fix,
-    {0x83, 0xC4, 0x10, 0x85, 0xC0, 0x74, -1, 0x8B, 0x08, 0xA1, -1, -1, -1, -1, 0x51, 0xE8});
-Patch(hs_print_overflow_fix, sig_hs_print_overflow_fix, 15, 5, CALL_PATCH, &hs_print_cleanser);
+Patch(hs_print_overflow_fix, 0, 5, CALL_PATCH, &hs_print_cleanser);
 
 void init_string_overflow_fixes() {
-    if (hs_print_overflow_fix.build()) hs_print_overflow_fix.apply();
+    if (hs_print_overflow_fix.build(fix_hs_print_overflow())) hs_print_overflow_fix.apply();
 }
 
 void revert_string_overflow_fixes() {
