@@ -93,6 +93,10 @@ sub yaml_signatures_to_cpp_definitions {
         "#include <cstdlib>",
         "#include <vector>",
         ];
+    my $std_header_includes = [
+        "#include <cstdint>",
+        "#include <vector>",
+        ];
     my $includes = [
         "#include <hooker/hooker.hpp>",
     ];
@@ -155,7 +159,7 @@ $validation_code
             initializer     => $init_function,
         },
         header => {
-            std_includes    => [],
+            std_includes    => $std_header_includes,
             includes        => [],
             defs            => $header_getters,
             initializer     => $header_initializer,

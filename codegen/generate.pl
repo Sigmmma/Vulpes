@@ -18,6 +18,8 @@ use CodeGen::Signature qw( yaml_signatures_to_cpp_definitions );
 ##########################
 
 foreach my $filename (@ARGV) {
+    print "Converting $filename\n";
+
     # Load yaml definition.
     my $file = LoadFile($filename);
 
@@ -26,8 +28,8 @@ foreach my $filename (@ARGV) {
     $output_stem =~ s/\.\w+$//;
 
     # Open new source and headers for writing.
-    open(OUTPUT_SRC,  '>'."$output_stem.cpp");
-    open(OUTPUT_HEAD, '>'."$output_stem.hpp");
+    open(OUTPUT_SRC,  ">$output_stem.cpp");
+    open(OUTPUT_HEAD, ">$output_stem.hpp");
 
     # basename with yaml extension
     my $yaml_basename = basename($filename);
@@ -43,7 +45,7 @@ foreach my $filename (@ARGV) {
 };
 
     print OUTPUT_SRC $license_header, "#include <$output_stem.hpp>\n";
-    print OUTPUT_HEAD $license_header, "#pragma once";
+    print OUTPUT_HEAD $license_header, "#pragma once\n";
 
     # Just the isolated name.
     my $name = basename($output_stem);
