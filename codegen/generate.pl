@@ -13,12 +13,14 @@ use YAML::XS qw( LoadFile );
 use lib dirname(__FILE__); # Include own directory
 use CodeGen::Signature qw( yaml_signatures_to_cpp_definitions );
 
-##########################
-# Main starts here!
-##########################
+my $input_file_count = scalar @ARGV;
+my $i = 0;
 
 foreach my $filename (@ARGV) {
-    print "Converting $filename\n";
+    # Terminal output non-sense.
+    $i++;
+    my $progress = int(($i*100)/$input_file_count);
+    printf "[%3d\%] Building CPP files for %s\n", $progress, $filename;
 
     # Load yaml definition.
     my $file = LoadFile($filename);
