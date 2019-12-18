@@ -19,7 +19,7 @@ sub preprocess_signature {
     return $_;
 }
 
-sub yaml_sig_to_c_sig {
+sub yaml_sig_to_cpp_sig {
     # Convert string to individual parts and then convert them into C++ format.
     my @bytes = map {$_ eq "??" ? "-1" : "0x$_"} split /\s+/, $_->{bytes};
     # Combine the bytes into a single string.
@@ -30,14 +30,14 @@ sub yaml_sig_to_c_sig {
            "{ \"$_->{name}\", $len, { $byte_str } };\n";
 }
 
-sub yaml_sig_to_c_initializer {
+sub yaml_sig_to_cpp_initializer {
     if ($_->{multi}) {
         return "    PTRS_$_->{uc_name} = sig_$_->{name}.search_multiple();\n";
     }
     return "    PTR_$_->{uc_name} = sig_$_->{name}.search();\n";
 }
 
-sub yaml_sig_to_c_validator {
+sub yaml_sig_to_cpp_validator {
     my $validator = "";
     if ($_->{multi}) {
         $validator .= "    if (!PTRS_$_->{uc_name}.size())\n";
@@ -53,14 +53,14 @@ sub yaml_sig_to_c_validator {
     return $validator;
 }
 
-sub yaml_sig_to_c_address_var {
+sub yaml_sig_to_cpp_address_var {
     if ($_->{multi} || 0) {
         return "static std::vector<uintptr_t> PTRS_$_->{uc_name};\n";
     }
     return "static uintptr_t PTR_$_->{uc_name};\n";
 }
 
-sub yaml_sig_to_c_getter {
+sub yaml_sig_to_cpp_getter {
     if ($_->{multi}) {
         return "std::vector<uintptr_t> $_->{name}() {\n".
                "    return PTRS_$_->{uc_name};\n".
@@ -74,7 +74,7 @@ sub yaml_sig_to_c_getter {
 
 }
 
-sub yaml_sig_to_c_getter_header {
+sub yaml_sig_to_cpp_getter_header {
     if ($_->{multi}) {
         return "std::vector<uintptr_t> $_->{name}();\n";
     }
@@ -98,14 +98,14 @@ sub yaml_signatures_to_cpp_definitions {
     ];
     my $source_defs = join "",
         # Actual signature definitions
-        (map { yaml_sig_to_c_sig } @sigs), "\n",
+        (map { yaml_sig_to_cpp_sig } @sigs), "\n",
         # The variables that hold the addresses.
-        (map { yaml_sig_to_c_address_var } @sigs), "\n",
+        (map { yaml_sig_to_cpp_address_var } @sigs), "\n",
         # Getters for these addresses.
-        (map { yaml_sig_to_c_getter } @sigs), "\n";
+        (map { yaml_sig_to_cpp_getter } @sigs), "\n";
 
-    my $initialization_code = join "", map { yaml_sig_to_c_initializer } @sigs;
-    my $validation_code = join "", map { yaml_sig_to_c_validator } @sigs;
+    my $initialization_code = join "", map { yaml_sig_to_cpp_initializer } @sigs;
+    my $validation_code = join "", map { yaml_sig_to_cpp_validator } @sigs;
 
     # Function called on initialization.
     my $init_function = qq{void init_$name\_signatures() {
@@ -144,7 +144,7 @@ $validation_code
 };
 
     #### Header stuff
-    my $header_getters = join "", (map { yaml_sig_to_c_getter_header } @sigs), "\n";
+    my $header_getters = join "", (map { yaml_sig_to_cpp_getter_header } @sigs), "\n";
     my $header_initializer = "void init_$name\_signatures();\n";
 
     return {
