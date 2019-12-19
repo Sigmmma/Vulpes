@@ -134,7 +134,7 @@ signatures:
   - name: func_net_send_message_to_all
     bytes: 66 8B 46 0E 8A D0 D0 EA F6 C2 01
     crucial: true
-    offset: >- 56
+    offset: "-56"
 
   - name: func_net_send_message_to_player # Machine id, not player id
     bytes: 51 53 57 8B F8 32 C0 33 C9
@@ -144,6 +144,16 @@ signatures:
     bytes: ?? ?? ?? ?? 3B C3 74 1A 83 C0 08 3B C3 74 13
     crucial: true
     type: uintptr_t**
+
+  # functions/messaging
+
+  - name: func_console_line_new
+    bytes: 8B 15 ?? ?? ?? ?? 66 83 7A 2E 20 75 11
+    crucial: true
+
+  - name: func_console_to_terminal_and_network
+    bytes: 55 8B EC 83 E4 F8 81 EC 10 01 00 00 56
+    crucial: false
 
   # functions/object_unit
 
