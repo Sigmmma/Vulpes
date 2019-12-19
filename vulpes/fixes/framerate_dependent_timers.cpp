@@ -43,19 +43,10 @@ void revert_checkpoint_revert_fix() {
     DEL_CALLBACK(EVENT_TICK, increment_respawn_timer);
 }
 
-Signature(false, sig_scoreboard_framerate_dep,
-    {0xD8, 0x25, -1, -1, -1, -1, 0xEB, 0x06, 0xD8, 0x05});
-
-Signature(false, sig_scoreboard_framerate_dep2,
-    {0xD8, 0x05, -1, -1, -1, -1, 0xEB, 0x42});
-
-Signature(false, sig_scoreboard_framerate_dep3,
-    {0xD8, 0x05, -1, -1, -1, -1, 0xEB, 0x0A, 0xD9, 0x44, 0x24, 0x14, 0xD8, 0x25});
-
-Signature(false, sig_scoreboard_ruleboard_intro_nop,
-    {0xC7, 0x05, -1, -1, -1, 0x00, 0x96, 0x00, 0x00, 0x00, 0x5B});
-
-const float fade = 1.0;
+// In assembly floats are referenced by pointers.
+// This means we need a space to hold the value that the code will be using.
+// Aka, this float.
+static const float fade = 1.0;
 
 Patch(patch_scoreboard_framerate_dep1a, 0, 4, INT_PATCH, &fade);
 Patch(patch_scoreboard_framerate_dep1b, 0, 4, INT_PATCH, &fade);

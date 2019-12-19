@@ -63,10 +63,12 @@ signatures:
   - name: fix_host_refusal1
     bytes: 88 5C 24 2A E8 ?? ?? ?? ?? 50 E8
     crucial: false
+    offset: 0xA
 
   - name: fix_host_refusal2
     bytes: 8B 7F 08 3B FD 74 5F 8D 9B 00 00 00 00
     crucial: false
+    offset: 5
 
   - name: fix_client_refusal
     bytes: ?? ?? 75 11 6A 01 6A 7E 68 A0 00 00 00
@@ -81,6 +83,8 @@ signatures:
   - name: fix_shader_trans_zfighting3
     bytes: F7 05 ?? ?? ?? ?? 00 00 00 04 74 ?? 8B 15 ?? ?? ?? ?? A1 ?? ?? ?? ?? 8B 08 52
     crucial: false
+
+  # fixes/string_overflows
 
   - name: fix_hs_print_overflow
     bytes: 83 C4 10 85 C0 74 ?? 8B 08 A1 ?? ?? ?? ?? 51 E8
@@ -130,6 +134,7 @@ signatures:
   - name: func_net_send_message_to_all
     bytes: 66 8B 46 0E 8A D0 D0 EA F6 C2 01
     crucial: true
+    offset: >- 56
 
   - name: func_net_send_message_to_player # Machine id, not player id
     bytes: 51 53 57 8B F8 32 C0 33 C9
@@ -138,6 +143,7 @@ signatures:
   - name: func_net_send_message_socket_ready
     bytes: ?? ?? ?? ?? 3B C3 74 1A 83 C0 08 3B C3 74 13
     crucial: true
+    type: uintptr_t**
 
   # functions/object_unit
 

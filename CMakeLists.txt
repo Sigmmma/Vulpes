@@ -49,7 +49,7 @@ add_library(Vulpes SHARED
     vulpes/fixes/shdr_trans_zfighting.cpp
     vulpes/fixes/string_overflows.cpp
 
-    vulpes/functions/devmode.cpp
+    vulpes/functions/bitstream.cpp
     vulpes/functions/message_delta.cpp
     vulpes/functions/messaging.cpp
     vulpes/functions/object_unit.cpp

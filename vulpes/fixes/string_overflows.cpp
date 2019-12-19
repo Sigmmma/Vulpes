@@ -17,13 +17,15 @@
 
 __attribute__((fastcall))
 void hs_print_cleanser(char* string) {
-    if (developer_mode_level() && *developer_mode_level() >= 4) cprintf_info("%s", string);
+    if (developer_mode_level() && *developer_mode_level() >= 4)
+        cprintf_info("%s", string);
 }
 
 Patch(hs_print_overflow_fix, 0, 5, CALL_PATCH, &hs_print_cleanser);
 
 void init_string_overflow_fixes() {
-    if (hs_print_overflow_fix.build(fix_hs_print_overflow())) hs_print_overflow_fix.apply();
+    if (hs_print_overflow_fix.build(fix_hs_print_overflow()))
+        hs_print_overflow_fix.apply();
 }
 
 void revert_string_overflow_fixes() {

@@ -6,6 +6,8 @@
 
 #include <hooker/hooker.hpp>
 
+#include <vulpes/memory/signatures.hpp>
+
 #include "shdr_trans_zfighting.hpp"
 
 // These are the values from config.txt
@@ -14,18 +16,10 @@
 //float* TransparentDecalZBiasValue;
 //float* TransparentDecalSlopeZBiasValue;
 
-const float val_DecalZBiasValue = -0.000055;
-const float val_DecalSlopeZBiasValue = -2.0;
-const float val_TransZBiasValue = -0.000005;
-const float val_TransSlopeZBiasValue = -1.0;
-
-Signature(false, sig_shader_trans_zfighting2,
-    {0xE8, -1, -1, -1, -1, 0x84, 0xC0, 0x74, -1, 0xE8,
-     -1, -1, -1, -1, 0x33, 0xC0, 0x89, 0x44, 0x24, 0x34, 0xEB});
-
-Signature(false, sig_shader_trans_zfighting3,
-    {0xF7, 0x05, -1, -1, -1, -1, 0x00, 0x00, 0x00, 0x04, 0x74,
-     -1, 0x8B, 0x15, -1, -1, -1, -1, 0xA1, -1, -1, -1, -1, 0x8B, 0x08, 0x52});
+static const float val_DecalZBiasValue = -0.000055;
+static const float val_DecalSlopeZBiasValue = -2.0;
+static const float val_TransZBiasValue = -0.000005;
+static const float val_TransSlopeZBiasValue = -1.0;
 
 // All of these patches can work independently, for the sake of covering as
 // many bases as possible I have implementesd them all.
@@ -36,27 +30,31 @@ Signature(false, sig_shader_trans_zfighting3,
 //Patch(patch_shader_trans_zfighting1_fix);
 // This patch makes it so that all shader transparent types are rendered with
 // these bias values. Essentually as if all of them have the 'decal' flag set.
-Patch(patch_shader_trans_zfighting2_fix, sig_shader_trans_zfighting2, 0, 9, SKIP_PATCH, 0);
+Patch(patch_shader_trans_zfighting2_fix, 0, 9, SKIP_PATCH, 0);
 // These patches forces the decal bias pointers to be explicitly overwritten
 // so weird config.txt setups can't break this fix.
-Patch(patch_shader_trans_zfighting3a_fix, sig_shader_trans_zfighting3,         0xE, 4, INT_PATCH, &val_DecalZBiasValue);
-Patch(patch_shader_trans_zfighting3b_fix, sig_shader_trans_zfighting3,        0x34, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
-Patch(patch_shader_trans_zfighting3c_fix, sig_shader_trans_zfighting3,  0xE + 0x50, 4, INT_PATCH, &val_DecalZBiasValue);
-Patch(patch_shader_trans_zfighting3d_fix, sig_shader_trans_zfighting3, 0x34 + 0x50, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
+Patch(patch_shader_trans_zfighting3a_fix, 0, 4, INT_PATCH, &val_DecalZBiasValue);
+Patch(patch_shader_trans_zfighting3b_fix, 0, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
+Patch(patch_shader_trans_zfighting3c_fix, 0, 4, INT_PATCH, &val_DecalZBiasValue);
+Patch(patch_shader_trans_zfighting3d_fix, 0, 4, INT_PATCH, &val_DecalSlopeZBiasValue);
 
 void init_shdr_trans_zfighting_fixes() {
-    if (patch_shader_trans_zfighting2_fix.build()) {
+    if (patch_shader_trans_zfighting2_fix.build(
+            fix_shader_trans_zfighting2())) {
         patch_shader_trans_zfighting2_fix.apply();
-    };
-    if (patch_shader_trans_zfighting3a_fix.build()
-     && patch_shader_trans_zfighting3b_fix.build()
-     && patch_shader_trans_zfighting3c_fix.build()
-     && patch_shader_trans_zfighting3d_fix.build()) {
-        patch_shader_trans_zfighting3a_fix.apply();
-        patch_shader_trans_zfighting3b_fix.apply();
-        patch_shader_trans_zfighting3c_fix.apply();
-        patch_shader_trans_zfighting3d_fix.apply();
-    };
+    }
+    auto sig_addr3 = fix_shader_trans_zfighting3();
+    if (sig_addr3) {
+        if (patch_shader_trans_zfighting3a_fix.build(sig_addr3 +  0xE)
+         && patch_shader_trans_zfighting3b_fix.build(sig_addr3 + 0x34)
+         && patch_shader_trans_zfighting3c_fix.build(sig_addr3 +  0xE + 0x50)
+         && patch_shader_trans_zfighting3d_fix.build(sig_addr3 + 0x34 + 0x50)) {
+            patch_shader_trans_zfighting3a_fix.apply();
+            patch_shader_trans_zfighting3b_fix.apply();
+            patch_shader_trans_zfighting3c_fix.apply();
+            patch_shader_trans_zfighting3d_fix.apply();
+        }
+    }
 }
 
 void revert_shdr_trans_zfighting_fixes() {
