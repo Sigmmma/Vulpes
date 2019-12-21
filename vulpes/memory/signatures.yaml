@@ -205,11 +205,23 @@ signatures:
     bytes: 84 C0 0F 84 ?? ?? ?? ?? 8A 44 24 10 3C FF 0F 84
     crucial: true
 
-  # hooks/map
+  # hooks/effect
+
+  - name: hook_projectile_detonation_effect_spawn
+    bytes: E8 ?? ?? ?? ?? 8B D8 83 CF FF 83 C4 0C 3B DF
+    crucial: true
+
+  # hooks/king
+
+#  - name: hook_king_timer_start
+#    bytes: C7 05 ?? ?? ?? 00 08 07 00 00 C7 05 ?? ?? ?? 00 FF FF FF FF A3 ?? ?? ?? ?? E8
+#    crucial: true
 
   - name: hook_hill_timer_reset
     bytes: C7 05 ?? ?? ?? 00 08 07 00 00 E8 ?? ?? FF FF
     crucial: true
+
+  # hooks/map
 
   - name: hook_map_load_ui_sp
     bytes: 83 EC 0C 53 55 56 57 8B F0 E8

@@ -6,24 +6,12 @@
 
 #include <cstdint>
 
-#include <hooker/hooker.hpp>
+#include <vulpes/memory/signatures.hpp>
 
 #include "table.hpp"
 
-Signature(true, sig_datum_new,
-    {0x0F, 0xBF, 0x4A, 0x22, 0x53, 0x66, 0x8B, 0x5A, 0x2C, 0x55});
-Signature(true, sig_datum_new_at_index,
-    {0x57, 0x8B, 0xF8, 0xC1, 0xFF, 0x10, 0x66, 0x85, 0xC0, 0x7C});
-Signature(true, sig_datum_delete,
-    {0x56, 0x8B, 0xF2, 0xC1, 0xFE, 0x10, 0x66, 0x85, 0xD2, 0x57});
-
-/*
-data_iterator_next(<edi> TableIterator)
-66 8B 4F 04 53 55 56 8B 37 0F BF 6E 22
-*/
-
 uint32_t datum_new(void* data) {
-    static intptr_t func_datum_new = sig_datum_new.address();
+    uintptr_t func_datum_new_ptr = func_datum_new();
     uint32_t return_value;
     asm (
         "pushad;"
@@ -32,13 +20,13 @@ uint32_t datum_new(void* data) {
         "mov %2, eax;"
         "popad;"
         :
-        : "m" (func_datum_new), "m" (data), "m" (return_value)
+        : "m" (func_datum_new_ptr), "m" (data), "m" (return_value)
     );
     return return_value;
 }
 
 uint32_t datum_new_at_index(void* data, uint32_t id) {
-    static intptr_t func_datum_new_at_index = sig_datum_new_at_index.address();
+    uintptr_t func_datum_new_at_index_ptr = func_datum_new_at_index();
     uint32_t return_value;
     asm (
         "pushad;"
@@ -48,13 +36,13 @@ uint32_t datum_new_at_index(void* data, uint32_t id) {
         "mov %2, eax;"
         "popad;"
         :
-        : "m" (func_datum_new_at_index), "m" (data), "m" (return_value), "m" (id)
+        : "m" (func_datum_new_at_index_ptr), "m" (data), "m" (return_value), "m" (id)
     );
     return return_value;
 }
 
 uint32_t datum_delete(void* data, uint32_t id) {
-    static intptr_t func_datum_delete = sig_datum_delete.address();
+    uintptr_t func_datum_delete_ptr = func_datum_delete();
     uint32_t return_value;
     asm (
         "pushad;"
@@ -64,7 +52,7 @@ uint32_t datum_delete(void* data, uint32_t id) {
         "mov %2, eax;"
         "popad;"
         :
-        : "m" (func_datum_delete), "m" (data), "m" (return_value), "m" (id)
+        : "m" (func_datum_delete_ptr), "m" (data), "m" (return_value), "m" (id)
     );
     return return_value;
 }
