@@ -244,12 +244,17 @@ signatures:
   - name: hook_biped_jump
     bytes: 8B 0D ?? ?? ?? 00 8B 51 34 83 EC 10 53 55
     crucial: true
+    offset: 6
 
   - name: hook_weapon_pull_trigger
     bytes: 81 EC 94 00 00 00 8B 84 24 98 00 00 00 8B 0D
     crucial: true
 
   # hooks/player
+
+  - name: hook_player_spawn
+    bytes: 81 EC ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 53 8B D8
+    crucial: true
 
   - name: hook_player_teleport
     bytes: 8D 54 24 20 52 50 8B FE # Offset result by +8
@@ -275,4 +280,10 @@ signatures:
 
   - name: hook_tick
     bytes: 51 53 68 FF FF 0F 00 68 1F 00 09 00 C6 05 ?? ?? ?? ?? 01
+    crucial: true
+
+  # tables
+
+  - name: object_table_ref
+    bytes: ?? ?? ?? ?? 8B 51 34 25 FF FF 00 00 8D 04 40 8B 44 82 08 8B 08
     crucial: true

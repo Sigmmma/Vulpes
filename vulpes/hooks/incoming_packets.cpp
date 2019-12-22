@@ -7,6 +7,7 @@
 #include <hooker/hooker.hpp>
 
 #include <vulpes/network/foxnet/vulpes_message.hpp>
+#include <vulpes/memory/signatures.hpp>
 
 #include "incoming_packets.hpp"
 
@@ -33,13 +34,15 @@ extern "C" {
     extern incoming_packets__hook_hud_chat_intercept();
 }
 
-Signature(true, hud_chat_hook_signature,
-    {0x84, 0xC0, 0x0F, 0x84, -1, -1, -1, -1, 0x8A, 0x44, 0x24, 0x10, 0x3C, 0xFF, 0x0F, 0x84 });
-Patch(hud_chat_hook, hud_chat_hook_signature, 0, 8, JMP_PATCH, &incoming_packets__hook_hud_chat_intercept);
+Patch(
+    hud_chat_hook, 0, 8,
+    JMP_PATCH, &incoming_packets__hook_hud_chat_intercept
+);
 
 void init_hud_chat_hook() {
-    hud_chat_hook.build();
-    incoming_packets__jmp_hud_chat_original_code = hud_chat_hook.return_address();
+    hud_chat_hook.build(hook_hud_chat());
+    incoming_packets__jmp_hud_chat_original_code =
+        hud_chat_hook.return_address();
     hud_chat_hook.apply();
 }
 

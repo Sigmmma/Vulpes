@@ -5,6 +5,7 @@
  */
 
 #include <hooker/hooker.hpp>
+#include <vulpes/memory/signatures.hpp>
 
 #include "tick.hpp"
 
@@ -23,10 +24,6 @@ extern "C" void after_tick() {
     call_in_order(events);
 }
 
-Signature(true, sig_tick,
-    {0x51, 0x53, 0x68, 0xFF, 0xFF, 0x0F, 0x00, 0x68, 0x1F, 0x00, 0x09,
-     0x00, 0xC6, 0x05, -1, -1, -1, -1, 0x01});
-
 extern "C" {
 
     uintptr_t game_tick_actual_jmp;
@@ -35,13 +32,12 @@ extern "C" {
 }
 
 Patch(
-    tick_hook_patch,
-    sig_tick, 0, 7,
+    tick_hook_patch, 0, 7,
     JMP_PATCH, &game_tick_wrapper
 );
 
 void init_tick_hook() {
-    tick_hook_patch.build();
+    tick_hook_patch.build(hook_tick());
     tick_hook_patch.apply();
     game_tick_actual_jmp = tick_hook_patch.return_address();
 }

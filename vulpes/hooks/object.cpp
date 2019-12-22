@@ -13,6 +13,7 @@
 #include <vulpes/memory/behavior_definition.hpp>
 #include <vulpes/memory/gamestate/object/object.hpp>
 #include <vulpes/memory/types.hpp>
+#include <vulpes/memory/signatures.hpp>
 
 
 // Signatures for finding stuff.
@@ -42,26 +43,27 @@ Signature(true, sig_weapon_fire_object_new_call,
 // one of these functions is as simple as re-assigning
 // the pointer to a replacement function.
 
-ObjectBehaviorDefinition new_obje_beh;
-ObjectBehaviorDefinition new_devi_beh;
-ObjectBehaviorDefinition new_item_beh;
-ObjectBehaviorDefinition new_unit_beh;
 
-ObjectBehaviorDefinition new_bipd_beh;
-ObjectBehaviorDefinition new_vehi_beh;
-ObjectBehaviorDefinition new_weap_beh;
+ObjectBehaviorDefinition new_obje_behavior_def;
+ObjectBehaviorDefinition new_devi_behavior_def;
+ObjectBehaviorDefinition new_item_behavior_def;
+ObjectBehaviorDefinition new_unit_behavior_def;
 
-ObjectBehaviorDefinition new_eqip_beh;
-ObjectBehaviorDefinition new_garb_beh;
-ObjectBehaviorDefinition new_proj_beh;
+ObjectBehaviorDefinition new_bipd_behavior_def;
+ObjectBehaviorDefinition new_vehi_behavior_def;
+ObjectBehaviorDefinition new_weap_behavior_def;
 
-ObjectBehaviorDefinition new_scen_beh;
-ObjectBehaviorDefinition new_mach_beh;
-ObjectBehaviorDefinition new_ctrl_beh;
-ObjectBehaviorDefinition new_lifi_beh;
+ObjectBehaviorDefinition new_eqip_behavior_def;
+ObjectBehaviorDefinition new_garb_behavior_def;
+ObjectBehaviorDefinition new_proj_behavior_def;
 
-ObjectBehaviorDefinition new_plac_beh;
-ObjectBehaviorDefinition new_ssce_beh;
+ObjectBehaviorDefinition new_scen_behavior_def;
+ObjectBehaviorDefinition new_mach_behavior_def;
+ObjectBehaviorDefinition new_ctrl_behavior_def;
+ObjectBehaviorDefinition new_lifi_behavior_def;
+
+ObjectBehaviorDefinition new_plac_behavior_def;
+ObjectBehaviorDefinition new_ssce_behavior_def;
 
 
 extern "C" { // Demangle naming for ASM.
@@ -158,11 +160,8 @@ extern "C" void after_object_create(uint32_t* obj) {
 
 }
 
-Signature(true, sig_object_create,
-    {0x81, 0xEC, 0x1C, 0x02, 0x00, 0x00, 0x8B, 0x0D});
 Patch(
-    object_create_hook_patch,
-    sig_object_create, 0, 6,
+    object_create_hook_patch, 0, 6,
     JMP_PATCH, &object_create_wrapper
 );
 
@@ -170,23 +169,19 @@ Patch(
 
 extern "C" bool before_biped_jump(uint32_t* obj) {
 
-    // Stub: Hook current unused.
+    // Stub: Hook currently unused.
 
     return true;
 }
 
 extern "C" void after_biped_jump(uint32_t* obj) {
 
-    // Stub: Hook current unused.
+    // Stub: Hook currently unused.
 
 }
 
-Signature(true, sig_biped_jump,
-    {0x8B, 0x0D, -1, -1, -1, 0x00,
-     0x8B, 0x51, 0x34, 0x83, 0xEC, 0x10, 0x53, 0x55});
 Patch(
-    biped_jump_hook_patch,
-    sig_biped_jump, 6, 6,
+    biped_jump_hook_patch, 0, 6,
     JMP_PATCH, &biped_jump_wrapper
 );
 
@@ -208,12 +203,8 @@ extern "C" void after_weapon_pull_trigger() {
 
 }
 
-Signature(true, sig_weapon_pull_trigger,
-    {0x81, 0xEC, 0x94, 0x00, 0x00, 0x00, 0x8B, 0x84,
-     0x24, 0x98, 0x00, 0x00, 0x00, 0x8B, 0x0D});
 Patch(
-    weapon_pull_trigger_hook_patch,
-    sig_weapon_pull_trigger, 0, 6,
+    weapon_pull_trigger_hook_patch, 0, 6,
     JMP_PATCH, &weapon_pull_trigger_wrapper
 );
 
@@ -230,78 +221,116 @@ void init_object_hooks() {
     // found here though, so we get that data by looking through the parent
     // type definitions.
 
-    memcpy(&new_obje_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[0], def_size);
-    new_obje_beh.parent_definitions[0] = &new_obje_beh;
+    memcpy(
+        &new_obje_behavior_def,
+        game_defs[etoi(ObjectType::BIPED)]->parent_definitions[0],
+        def_size);
+    new_obje_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
 
-    memcpy(&new_devi_beh, game_defs[etoi(ObjectType::MACHINE)]->parent_definitions[1], def_size);
-    new_devi_beh.parent_definitions[0] = &new_obje_beh;
-    new_devi_beh.parent_definitions[1] = &new_devi_beh;
+    memcpy(
+        &new_devi_behavior_def,
+        game_defs[etoi(ObjectType::MACHINE)]->parent_definitions[1],
+        def_size);
+    new_devi_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_devi_behavior_def.parent_definitions[1] = &new_devi_behavior_def;
 
-    memcpy(&new_item_beh, game_defs[etoi(ObjectType::WEAPON)]->parent_definitions[1], def_size);
-    new_item_beh.parent_definitions[0] = &new_obje_beh;
-    new_item_beh.parent_definitions[1] = &new_item_beh;
+    memcpy(
+        &new_item_behavior_def,
+        game_defs[etoi(ObjectType::WEAPON)]->parent_definitions[1],
+        def_size);
+    new_item_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_item_behavior_def.parent_definitions[1] = &new_item_behavior_def;
 
-    memcpy(&new_unit_beh, game_defs[etoi(ObjectType::BIPED)]->parent_definitions[1], def_size);
-    new_unit_beh.parent_definitions[0] = &new_obje_beh;
-    new_unit_beh.parent_definitions[1] = &new_unit_beh;
+    memcpy(
+        &new_unit_behavior_def,
+        game_defs[etoi(ObjectType::BIPED)]->parent_definitions[1],
+        def_size);
+    new_unit_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_unit_behavior_def.parent_definitions[1] = &new_unit_behavior_def;
 
     // 0 and up
 
-    memcpy(&new_bipd_beh, game_defs[etoi(ObjectType::BIPED)], def_size);
-    new_bipd_beh.parent_definitions[0] = &new_obje_beh;
-    new_bipd_beh.parent_definitions[1] = &new_unit_beh;
-    new_bipd_beh.parent_definitions[2] = &new_bipd_beh;
+    memcpy(&new_bipd_behavior_def,
+        game_defs[etoi(ObjectType::BIPED)],
+        def_size);
+    new_bipd_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_bipd_behavior_def.parent_definitions[1] = &new_unit_behavior_def;
+    new_bipd_behavior_def.parent_definitions[2] = &new_bipd_behavior_def;
 
-    memcpy(&new_vehi_beh, game_defs[etoi(ObjectType::VEHICLE)], def_size);
-    new_vehi_beh.parent_definitions[0] = &new_obje_beh;
-    new_vehi_beh.parent_definitions[1] = &new_unit_beh;
-    new_vehi_beh.parent_definitions[2] = &new_vehi_beh;
+    memcpy(&new_vehi_behavior_def,
+        game_defs[etoi(ObjectType::VEHICLE)],
+        def_size);
+    new_vehi_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_vehi_behavior_def.parent_definitions[1] = &new_unit_behavior_def;
+    new_vehi_behavior_def.parent_definitions[2] = &new_vehi_behavior_def;
 
-    memcpy(&new_weap_beh, game_defs[etoi(ObjectType::WEAPON)], def_size);
-    new_weap_beh.parent_definitions[0] = &new_obje_beh;
-    new_weap_beh.parent_definitions[1] = &new_item_beh;
-    new_weap_beh.parent_definitions[2] = &new_weap_beh;
+    memcpy(
+        &new_weap_behavior_def,
+        game_defs[etoi(ObjectType::WEAPON)],
+        def_size);
+    new_weap_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_weap_behavior_def.parent_definitions[1] = &new_item_behavior_def;
+    new_weap_behavior_def.parent_definitions[2] = &new_weap_behavior_def;
 
-    memcpy(&new_eqip_beh, game_defs[etoi(ObjectType::EQUIPMENT)], def_size);
-    new_eqip_beh.parent_definitions[0] = &new_obje_beh;
-    new_eqip_beh.parent_definitions[1] = &new_item_beh;
-    new_eqip_beh.parent_definitions[2] = &new_eqip_beh;
+    memcpy(
+        &new_eqip_behavior_def,
+        game_defs[etoi(ObjectType::EQUIPMENT)],
+        def_size);
+    new_eqip_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_eqip_behavior_def.parent_definitions[1] = &new_item_behavior_def;
+    new_eqip_behavior_def.parent_definitions[2] = &new_eqip_behavior_def;
 
-    memcpy(&new_garb_beh, game_defs[etoi(ObjectType::GARBAGE)], def_size);
-    new_garb_beh.parent_definitions[0] = &new_obje_beh;
-    new_garb_beh.parent_definitions[1] = &new_item_beh;
-    new_garb_beh.parent_definitions[2] = &new_garb_beh;
+    memcpy(&new_garb_behavior_def,
+        game_defs[etoi(ObjectType::GARBAGE)],
+        def_size);
+    new_garb_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_garb_behavior_def.parent_definitions[1] = &new_item_behavior_def;
+    new_garb_behavior_def.parent_definitions[2] = &new_garb_behavior_def;
 
-    memcpy(&new_proj_beh, game_defs[etoi(ObjectType::PROJECTILE)], def_size);
-    new_proj_beh.parent_definitions[0] = &new_obje_beh;
-    new_proj_beh.parent_definitions[1] = &new_proj_beh;
+    memcpy(&new_proj_behavior_def,
+        game_defs[etoi(ObjectType::PROJECTILE)],
+        def_size);
+    new_proj_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_proj_behavior_def.parent_definitions[1] = &new_proj_behavior_def;
 
-    memcpy(&new_scen_beh, game_defs[etoi(ObjectType::SCENERY)], def_size);
-    new_scen_beh.parent_definitions[0] = &new_obje_beh;
-    new_scen_beh.parent_definitions[1] = &new_scen_beh;
+    memcpy(&new_scen_behavior_def,
+        game_defs[etoi(ObjectType::SCENERY)],
+        def_size);
+    new_scen_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_scen_behavior_def.parent_definitions[1] = &new_scen_behavior_def;
 
-    memcpy(&new_mach_beh, game_defs[etoi(ObjectType::MACHINE)], def_size);
-    new_mach_beh.parent_definitions[0] = &new_obje_beh;
-    new_mach_beh.parent_definitions[1] = &new_devi_beh;
-    new_mach_beh.parent_definitions[2] = &new_mach_beh;
+    memcpy(&new_mach_behavior_def,
+        game_defs[etoi(ObjectType::MACHINE)],
+        def_size);
+    new_mach_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_mach_behavior_def.parent_definitions[1] = &new_devi_behavior_def;
+    new_mach_behavior_def.parent_definitions[2] = &new_mach_behavior_def;
 
-    memcpy(&new_ctrl_beh, game_defs[etoi(ObjectType::CONTROL)], def_size);
-    new_ctrl_beh.parent_definitions[0] = &new_obje_beh;
-    new_ctrl_beh.parent_definitions[1] = &new_devi_beh;
-    new_ctrl_beh.parent_definitions[2] = &new_ctrl_beh;
+    memcpy(&new_ctrl_behavior_def,
+        game_defs[etoi(ObjectType::CONTROL)],
+        def_size);
+    new_ctrl_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_ctrl_behavior_def.parent_definitions[1] = &new_devi_behavior_def;
+    new_ctrl_behavior_def.parent_definitions[2] = &new_ctrl_behavior_def;
 
-    memcpy(&new_lifi_beh, game_defs[etoi(ObjectType::LIGHT_FIXTURE)], def_size);
-    new_lifi_beh.parent_definitions[0] = &new_obje_beh;
-    new_lifi_beh.parent_definitions[1] = &new_devi_beh;
-    new_lifi_beh.parent_definitions[2] = &new_lifi_beh;
+    memcpy(&new_lifi_behavior_def,
+        game_defs[etoi(ObjectType::LIGHT_FIXTURE)],
+        def_size);
+    new_lifi_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_lifi_behavior_def.parent_definitions[1] = &new_devi_behavior_def;
+    new_lifi_behavior_def.parent_definitions[2] = &new_lifi_behavior_def;
 
-    memcpy(&new_plac_beh, game_defs[etoi(ObjectType::PLACEHOLDER)], def_size);
-    new_plac_beh.parent_definitions[0] = &new_obje_beh;
-    new_plac_beh.parent_definitions[1] = &new_plac_beh;
+    memcpy(&new_plac_behavior_def,
+        game_defs[etoi(ObjectType::PLACEHOLDER)],
+        def_size);
+    new_plac_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_plac_behavior_def.parent_definitions[1] = &new_plac_behavior_def;
 
-    memcpy(&new_ssce_beh, game_defs[etoi(ObjectType::SOUND_SCENERY)], def_size);
-    new_ssce_beh.parent_definitions[0] = &new_obje_beh;
-    new_ssce_beh.parent_definitions[1] = &new_ssce_beh;
+    memcpy(&new_ssce_behavior_def,
+        game_defs[etoi(ObjectType::SOUND_SCENERY)],
+        def_size);
+    new_ssce_behavior_def.parent_definitions[0] = &new_obje_behavior_def;
+    new_ssce_behavior_def.parent_definitions[1] = &new_ssce_behavior_def;
 
     // Backup old array of def pointers for when the DLL needs to unload.
 
@@ -314,18 +343,18 @@ void init_object_hooks() {
     DWORD prota, protb;
     VirtualProtect(game_defs, array_size, PAGE_EXECUTE_READWRITE, &prota);
 
-    game_defs[etoi(ObjectType::BIPED)]          = &new_bipd_beh;
-    game_defs[etoi(ObjectType::VEHICLE)]        = &new_vehi_beh;
-    game_defs[etoi(ObjectType::WEAPON)]         = &new_weap_beh;
-    game_defs[etoi(ObjectType::EQUIPMENT)]      = &new_eqip_beh;
-    game_defs[etoi(ObjectType::GARBAGE)]        = &new_garb_beh;
-    game_defs[etoi(ObjectType::PROJECTILE)]     = &new_proj_beh;
-    game_defs[etoi(ObjectType::SCENERY)]        = &new_scen_beh;
-    game_defs[etoi(ObjectType::MACHINE)]        = &new_mach_beh;
-    game_defs[etoi(ObjectType::CONTROL)]        = &new_ctrl_beh;
-    game_defs[etoi(ObjectType::LIGHT_FIXTURE)]  = &new_lifi_beh;
-    game_defs[etoi(ObjectType::PLACEHOLDER)]    = &new_plac_beh;
-    game_defs[etoi(ObjectType::SOUND_SCENERY)]  = &new_ssce_beh;
+    game_defs[etoi(ObjectType::BIPED)]          = &new_bipd_behavior_def;
+    game_defs[etoi(ObjectType::VEHICLE)]        = &new_vehi_behavior_def;
+    game_defs[etoi(ObjectType::WEAPON)]         = &new_weap_behavior_def;
+    game_defs[etoi(ObjectType::EQUIPMENT)]      = &new_eqip_behavior_def;
+    game_defs[etoi(ObjectType::GARBAGE)]        = &new_garb_behavior_def;
+    game_defs[etoi(ObjectType::PROJECTILE)]     = &new_proj_behavior_def;
+    game_defs[etoi(ObjectType::SCENERY)]        = &new_scen_behavior_def;
+    game_defs[etoi(ObjectType::MACHINE)]        = &new_mach_behavior_def;
+    game_defs[etoi(ObjectType::CONTROL)]        = &new_ctrl_behavior_def;
+    game_defs[etoi(ObjectType::LIGHT_FIXTURE)]  = &new_lifi_behavior_def;
+    game_defs[etoi(ObjectType::PLACEHOLDER)]    = &new_plac_behavior_def;
+    game_defs[etoi(ObjectType::SOUND_SCENERY)]  = &new_ssce_behavior_def;
 
     VirtualProtect(game_defs, array_size, prota, &protb);
 
@@ -357,23 +386,23 @@ void init_object_hooks() {
         type ## _set_last_update_time = def.set_last_update_time; \
         // End of Macro
 
-    COPY_EVENT_DEF(object,          new_obje_beh);
-    COPY_EVENT_DEF(device,          new_devi_beh);
-    COPY_EVENT_DEF(item,            new_item_beh);
-    COPY_EVENT_DEF(unit,            new_unit_beh);
+    COPY_EVENT_DEF(object,          new_obje_behavior_def);
+    COPY_EVENT_DEF(device,          new_devi_behavior_def);
+    COPY_EVENT_DEF(item,            new_item_behavior_def);
+    COPY_EVENT_DEF(unit,            new_unit_behavior_def);
 
-    COPY_EVENT_DEF(biped,           new_bipd_beh);
-    COPY_EVENT_DEF(vehicle,         new_vehi_beh);
-    COPY_EVENT_DEF(weapon,          new_weap_beh);
-    COPY_EVENT_DEF(equipment,       new_eqip_beh);
-    COPY_EVENT_DEF(garbage,         new_garb_beh);
-    COPY_EVENT_DEF(projectile,      new_proj_beh);
-    COPY_EVENT_DEF(scenery,         new_scen_beh);
-    COPY_EVENT_DEF(machine,         new_mach_beh);
-    COPY_EVENT_DEF(control,         new_ctrl_beh);
-    COPY_EVENT_DEF(light_fixture,   new_lifi_beh);
-    COPY_EVENT_DEF(placeholder,     new_plac_beh);
-    COPY_EVENT_DEF(sound_scenery,   new_ssce_beh);
+    COPY_EVENT_DEF(biped,           new_bipd_behavior_def);
+    COPY_EVENT_DEF(vehicle,         new_vehi_behavior_def);
+    COPY_EVENT_DEF(weapon,          new_weap_behavior_def);
+    COPY_EVENT_DEF(equipment,       new_eqip_behavior_def);
+    COPY_EVENT_DEF(garbage,         new_garb_behavior_def);
+    COPY_EVENT_DEF(projectile,      new_proj_behavior_def);
+    COPY_EVENT_DEF(scenery,         new_scen_behavior_def);
+    COPY_EVENT_DEF(machine,         new_mach_behavior_def);
+    COPY_EVENT_DEF(control,         new_ctrl_behavior_def);
+    COPY_EVENT_DEF(light_fixture,   new_lifi_behavior_def);
+    COPY_EVENT_DEF(placeholder,     new_plac_behavior_def);
+    COPY_EVENT_DEF(sound_scenery,   new_ssce_behavior_def);
 
     #undef COPY_EVENT_DEF
 
@@ -388,24 +417,27 @@ void init_object_hooks() {
 
     // Objects:
 
-    if (object_create_hook_patch.build()) {
-        object_create_hook_patch.apply();
-        after_object_hook__create = object_create_hook_patch.return_address();
-    }
+    object_create_hook_patch.build(hook_object_create());
+    object_create_hook_patch.apply();
+    after_object_hook__create =
+        object_create_hook_patch.return_address();
+
 
     // Bipeds:
 
-    if (biped_jump_hook_patch.build()) {
-        biped_jump_hook_patch.apply();
-        after_biped_hook__jump = biped_jump_hook_patch.return_address();
-    }
+    biped_jump_hook_patch.build(hook_biped_jump());
+    biped_jump_hook_patch.apply();
+    after_biped_hook__jump =
+        biped_jump_hook_patch.return_address();
+
 
     // Weapons:
 
-    if (weapon_pull_trigger_hook_patch.build()) {
-        weapon_pull_trigger_hook_patch.apply();
-        after_weapon_hook__pull_trigger = weapon_pull_trigger_hook_patch.return_address();
-    }
+    weapon_pull_trigger_hook_patch.build(hook_weapon_pull_trigger());
+    weapon_pull_trigger_hook_patch.apply();
+    after_weapon_hook__pull_trigger =
+        weapon_pull_trigger_hook_patch.return_address();
+
 
 }
 
