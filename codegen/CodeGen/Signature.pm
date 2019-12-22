@@ -26,15 +26,15 @@ sub yaml_sig_to_cpp_sig {
     my $byte_str = join ", ", @bytes;
     # Get amount of bytes.
     my $len = scalar @bytes;
-    return "static LiteSignature sig_$_->{name} = ".
+    return "static LiteSignature signature_$_->{name} = ".
            "{ \"$_->{name}\", $len, { $byte_str } };\n";
 }
 
 sub yaml_sig_to_cpp_initializer {
     if ($_->{multi}) {
-        return "    PTRS_$_->{uc_name} = sig_$_->{name}.search_multiple();\n";
+        return "    PTRS_$_->{uc_name} = signature_$_->{name}.search_multiple();\n";
     }
-    return "    PTR_$_->{uc_name} = sig_$_->{name}.search();\n";
+    return "    PTR_$_->{uc_name} = signature_$_->{name}.search();\n";
 }
 
 sub yaml_sig_to_cpp_validator {
@@ -46,9 +46,9 @@ sub yaml_sig_to_cpp_validator {
     }
 
     if ($_->{crucial}) {
-        $validator .= "        crucial_missing.push_back(sig_$_->{name}.name);\n";
+        $validator .= "        crucial_missing.push_back(signature_$_->{name}.name);\n";
     } else {
-        $validator .= "        non_crucial_missing.push_back(sig_$_->{name}.name);\n";
+        $validator .= "        non_crucial_missing.push_back(signature_$_->{name}.name);\n";
     }
     return $validator;
 }
@@ -62,11 +62,11 @@ sub yaml_sig_to_cpp_address_var {
 
 sub yaml_sig_to_cpp_getter {
     if ($_->{multi}) {
-        return "std::vector<uintptr_t> $_->{name}() {\n".
+        return "std::vector<uintptr_t> sig_$_->{name}() {\n".
                "    return PTRS_$_->{uc_name};\n".
                "}\n";
     }
-    return "$_->{type} $_->{name}() {\n".
+    return "$_->{type} sig_$_->{name}() {\n".
            "    return reinterpret_cast<$_->{type}>(\n".
            "        NOT_FOUND(PTR_$_->{uc_name}) ?\n".
            "            0 : (PTR_$_->{uc_name} + $_->{offset}));\n".
@@ -76,9 +76,9 @@ sub yaml_sig_to_cpp_getter {
 
 sub yaml_sig_to_cpp_getter_header {
     if ($_->{multi}) {
-        return "std::vector<uintptr_t> $_->{name}();\n";
+        return "std::vector<uintptr_t> sig_$_->{name}();\n";
     }
-    return "$_->{type} $_->{name}();\n";
+    return "$_->{type} sig_$_->{name}();\n";
 }
 
 sub yaml_signatures_to_cpp_definitions {

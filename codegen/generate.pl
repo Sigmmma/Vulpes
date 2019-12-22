@@ -20,7 +20,7 @@ foreach my $filename (@ARGV) {
     # Terminal output non-sense.
     $i++;
     my $progress = int(($i*100)/$input_file_count);
-    printf "[%3d\%] Building CPP files for %s\n", $progress, $filename;
+    printf "[%3d%s] Building CPP files for %s\n", $progress, "%", $filename;
 
     # Load yaml definition.
     my $file = LoadFile($filename);
