@@ -62,11 +62,11 @@ Patch(
 
 void init_map_hooks(bool is_server) {
     if (!is_server) {
-        map_load_ui_sp_hook_patch.build(hook_map_load_ui_sp());
+        map_load_ui_sp_hook_patch.build(sig_hook_map_load_ui_sp());
         map_load_ui_sp_hook_patch.apply();
         map_load_sp_actual_jmp = map_load_ui_sp_hook_patch.return_address();
     }
-    map_load_mp_hook_patch.build(hook_map_load_mp());
+    map_load_mp_hook_patch.build(sig_hook_map_load_mp());
     map_load_mp_hook_patch.apply();
     map_load_mp_actual_jmp = map_load_mp_hook_patch.return_address();
 }

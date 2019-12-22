@@ -47,6 +47,6 @@ void bitstream_read(void* const iteration_header,
 }
 
 void init_bitstream() {
-    func_bitstream_write_ptr = func_bitstream_write();
-    func_bitstream_read_ptr  = func_bitstream_read();
+    func_bitstream_write_ptr = sig_func_bitstream_write();
+    func_bitstream_read_ptr  = sig_func_bitstream_read();
 }

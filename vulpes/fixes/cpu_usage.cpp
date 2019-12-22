@@ -21,8 +21,8 @@ Patch(cpu_usage_fix_patch4, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
 Patch(cpu_usage_fix_patch5, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
 
 void init_cpu_usage_fixes() {
-    auto pat1 = fix_cpu_usage_pattern1();
-    auto pat2 = fix_cpu_usage_pattern2();
+    auto pat1 = sig_fix_cpu_usage_pattern1();
+    auto pat2 = sig_fix_cpu_usage_pattern2();
     if (pat1.size() >= 1) {
         if (cpu_usage_fix_patch1.build(pat1[0])) cpu_usage_fix_patch1.apply();
     }

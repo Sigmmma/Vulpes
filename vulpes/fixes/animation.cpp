@@ -21,7 +21,7 @@ Patch(player_biped_mid_air_turn_fix, 0, 13, JMP_PATCH, &player_biped_mid_air_tur
 
 void init_animation_bug_fixes() {
     // Player Biped Mid-Air turn fix.
-    auto sig_addr = fix_player_jump_turn();
+    auto sig_addr = sig_fix_player_jump_turn();
     if (sig_addr && !player_biped_mid_air_turn_fix.is_built()) {
         player_biped_mid_air_turn_fix.build(sig_addr);
         animation__jmp_no_turn_anim = get_call_address(sig_addr+7);

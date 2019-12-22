@@ -40,7 +40,7 @@ Patch(
 );
 
 void init_hud_chat_hook() {
-    hud_chat_hook.build(hook_hud_chat());
+    hud_chat_hook.build(sig_hook_hud_chat());
     incoming_packets__jmp_hud_chat_original_code =
         hud_chat_hook.return_address();
     hud_chat_hook.apply();

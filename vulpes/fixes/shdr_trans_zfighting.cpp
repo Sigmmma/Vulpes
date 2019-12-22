@@ -40,10 +40,10 @@ Patch(patch_shader_trans_zfighting3d_fix, 0, 4, INT_PATCH, &val_DecalSlopeZBiasV
 
 void init_shdr_trans_zfighting_fixes() {
     if (patch_shader_trans_zfighting2_fix.build(
-            fix_shader_trans_zfighting2())) {
+            sig_fix_shader_trans_zfighting2())) {
         patch_shader_trans_zfighting2_fix.apply();
     }
-    auto sig_addr3 = fix_shader_trans_zfighting3();
+    auto sig_addr3 = sig_fix_shader_trans_zfighting3();
     if (sig_addr3) {
         if (patch_shader_trans_zfighting3a_fix.build(sig_addr3 +  0xE)
          && patch_shader_trans_zfighting3b_fix.build(sig_addr3 + 0x34)

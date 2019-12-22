@@ -417,7 +417,7 @@ void init_object_hooks() {
 
     // Objects:
 
-    object_create_hook_patch.build(hook_object_create());
+    object_create_hook_patch.build(sig_hook_object_create());
     object_create_hook_patch.apply();
     after_object_hook__create =
         object_create_hook_patch.return_address();
@@ -425,7 +425,7 @@ void init_object_hooks() {
 
     // Bipeds:
 
-    biped_jump_hook_patch.build(hook_biped_jump());
+    biped_jump_hook_patch.build(sig_hook_biped_jump());
     biped_jump_hook_patch.apply();
     after_biped_hook__jump =
         biped_jump_hook_patch.return_address();
@@ -433,7 +433,7 @@ void init_object_hooks() {
 
     // Weapons:
 
-    weapon_pull_trigger_hook_patch.build(hook_weapon_pull_trigger());
+    weapon_pull_trigger_hook_patch.build(sig_hook_weapon_pull_trigger());
     weapon_pull_trigger_hook_patch.apply();
     after_weapon_hook__pull_trigger =
         weapon_pull_trigger_hook_patch.return_address();

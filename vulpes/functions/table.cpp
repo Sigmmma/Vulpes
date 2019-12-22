@@ -11,7 +11,7 @@
 #include "table.hpp"
 
 uint32_t datum_new(void* data) {
-    uintptr_t func_datum_new_ptr = func_datum_new();
+    uintptr_t func_datum_new_ptr = sig_func_datum_new();
     uint32_t return_value;
     asm (
         "pushad;"
@@ -26,7 +26,7 @@ uint32_t datum_new(void* data) {
 }
 
 uint32_t datum_new_at_index(void* data, uint32_t id) {
-    uintptr_t func_datum_new_at_index_ptr = func_datum_new_at_index();
+    uintptr_t func_datum_new_at_index_ptr = sig_func_datum_new_at_index();
     uint32_t return_value;
     asm (
         "pushad;"
@@ -42,7 +42,7 @@ uint32_t datum_new_at_index(void* data, uint32_t id) {
 }
 
 uint32_t datum_delete(void* data, uint32_t id) {
-    uintptr_t func_datum_delete_ptr = func_datum_delete();
+    uintptr_t func_datum_delete_ptr = sig_func_datum_delete();
     uint32_t return_value;
     asm (
         "pushad;"

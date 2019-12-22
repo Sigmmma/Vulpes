@@ -24,7 +24,7 @@ Patch(king_timer_reset_hook_patch, 0, 10,
     CALL_PATCH, &king_timer_reset_hook);
 
 void init_king_hooks() {
-    king_timer_reset_hook_patch.build(hook_hill_timer_reset());
+    king_timer_reset_hook_patch.build(sig_hook_hill_timer_reset());
     king_timer_reset_hook_patch.apply();
     KingGlobalsUpgrade* king_upgrade_globals = king_globals_upgrade();
     king_upgrade_globals->hill_length = 60*30;

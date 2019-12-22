@@ -25,7 +25,7 @@ void increment_respawn_timer() {
 static bool initialized = false;
 
 void init_checkpoint_revert_fix() {
-    static intptr_t sig_addr = fix_death_timer_framerate_dep();
+    static intptr_t sig_addr = sig_fix_death_timer_framerate_dep();
     if (!initialized && sig_addr) {
         death_timer_framerate_dep_fix.build(sig_addr+27);
         player_dead = *reinterpret_cast<bool**>(sig_addr+2);
@@ -56,9 +56,9 @@ Patch(patch_scoreboard_framerate_dep3b, 0, 4, INT_PATCH, &fade);
 Patch(patch_ruleboard_intro_nop, 0, 4, INT_PATCH, 0);
 
 void init_scoreboard_fix() {
-    auto p_addr1 = fix_scoreboard_framerate_dep1();
-    auto p_addr2 = fix_scoreboard_framerate_dep2();
-    auto p_addr3 = fix_scoreboard_framerate_dep3();
+    auto p_addr1 = sig_fix_scoreboard_framerate_dep1();
+    auto p_addr2 = sig_fix_scoreboard_framerate_dep2();
+    auto p_addr3 = sig_fix_scoreboard_framerate_dep3();
     if (!(p_addr1 && p_addr2 && p_addr3)) {
         return;
     }
@@ -73,8 +73,9 @@ void init_scoreboard_fix() {
         patch_scoreboard_framerate_dep3a.apply();
         patch_scoreboard_framerate_dep3b.apply();
     }
-    if (fix_scoreboard_ruleboard_intro_nop()) {
-        if (patch_ruleboard_intro_nop.build(fix_scoreboard_ruleboard_intro_nop()+6))
+    if (sig_fix_scoreboard_ruleboard_intro_nop()) {
+        if (patch_ruleboard_intro_nop.build(
+                sig_fix_scoreboard_ruleboard_intro_nop()+6))
             patch_ruleboard_intro_nop.apply();
     }
 
@@ -103,8 +104,8 @@ void fade_console() {
 }
 
 void init_console_fix() {
-    auto sig_addr1 = fix_console_fade_call();
-    auto sig_addr2 = fix_console_framerate_dep();
+    auto sig_addr1 = sig_fix_console_fade_call();
+    auto sig_addr2 = sig_fix_console_framerate_dep();
     if (sig_addr1 && patch_console_framerate_dep.build(sig_addr2)) {
         fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
         console_open = *reinterpret_cast<bool**>(sig_addr2-6);

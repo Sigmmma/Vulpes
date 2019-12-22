@@ -15,12 +15,13 @@ Patch(host_refusal_fix2, 0, {0xEB});
 Patch(client_refusal_fix, 0, {0xEB, 0x13});
 
 void init_host_refusal_fixes() {
-    if (host_refusal_fix1.build(fix_host_refusal1())
-    &&  host_refusal_fix2.build(fix_host_refusal2())) {
+    if (host_refusal_fix1.build(sig_fix_host_refusal1())
+    &&  host_refusal_fix2.build(sig_fix_host_refusal2())) {
         host_refusal_fix1.apply();
         host_refusal_fix2.apply();
     }
-    if (client_refusal_fix.build(fix_client_refusal())) client_refusal_fix.apply();
+    if (client_refusal_fix.build(sig_fix_client_refusal()))
+        client_refusal_fix.apply();
 }
 
 void revert_host_refusal_fixes() {

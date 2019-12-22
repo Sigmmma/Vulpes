@@ -41,8 +41,8 @@ void auto_complete(char* buffer[], uint16_t* current_index) {
         string input_str(input);
 
         uint8_t developer_mode = 0;
-        if (developer_mode_level()){
-            developer_mode = *developer_mode_level();
+        if (sig_developer_mode_level()){
+            developer_mode = *sig_developer_mode_level();
         }
 
 

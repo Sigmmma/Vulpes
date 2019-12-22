@@ -18,7 +18,7 @@ typedef uint32_t (*FpReturnsInt)();
 ConsoleOutput* console_new_line() {
     ConsoleGlobals* globals = console_globals();
     static auto console_line_new =
-        reinterpret_cast<FpReturnsInt>(func_console_line_new());
+        reinterpret_cast<FpReturnsInt>(sig_func_console_line_new());
     MemRef line;
     line.raw = console_line_new();
 
@@ -45,7 +45,7 @@ typedef __attribute__((regparm(1)))void (*ConsoleToTerminalAndNetworkCall)(void*
 void vcprintf(const ARGBFloat& color, const char* format, va_list args) {
     static auto console_to_terminal_and_network =
         reinterpret_cast<ConsoleToTerminalAndNetworkCall>(
-                func_console_to_terminal_and_network());
+                sig_func_console_to_terminal_and_network());
     ConsoleGlobals* globals = console_globals();
     if (globals->initialized) {
         ConsoleOutput* output = console_new_line();

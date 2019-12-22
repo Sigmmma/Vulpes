@@ -15,7 +15,7 @@
 
 __attribute__((regparm(3)))
 void unit_speak(MemRef object, int16_t arg2, UnitSpeech* speech_data) {
-    uintptr_t func_unit_speak_ptr = func_unit_speak();
+    uintptr_t func_unit_speak_ptr = sig_func_unit_speak();
     if (func_unit_speak_ptr) {
         asm (
             "push edi;"

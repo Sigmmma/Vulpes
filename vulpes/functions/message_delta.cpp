@@ -85,9 +85,9 @@ void mdp_discard_iteration_body(MessageDeltaHeader* message_header) {
 }
 
 void init_message_delta_processor() {
-    func_mdp_encode_ptr = func_mdp_decode_stateless_iterated();
-    func_mdp_decode_ptr = func_mdp_encode_stateless_iterated();
-    func_mdp_discard_ptr = func_mdp_discard_iteration_body();
+    func_mdp_encode_ptr = sig_func_mdp_decode_stateless_iterated();
+    func_mdp_decode_ptr = sig_func_mdp_encode_stateless_iterated();
+    func_mdp_discard_ptr = sig_func_mdp_discard_iteration_body();
 }
 
 extern "C" {
@@ -196,7 +196,7 @@ void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t
 }
 
 void init_message_delta_sender() {
-    socket_ready_ptr = *func_net_send_message_socket_ready();
-    func_send_message_to_all_ptr = func_net_send_message_to_all();
-    func_send_message_to_player_ptr = func_net_send_message_to_player();
+    socket_ready_ptr = *sig_func_net_send_message_socket_ready();
+    func_send_message_to_all_ptr = sig_func_net_send_message_to_all();
+    func_send_message_to_player_ptr = sig_func_net_send_message_to_player();
 }

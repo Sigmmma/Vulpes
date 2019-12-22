@@ -37,7 +37,7 @@ Patch(
 );
 
 void init_tick_hook() {
-    tick_hook_patch.build(hook_tick());
+    tick_hook_patch.build(sig_hook_tick());
     tick_hook_patch.apply();
     game_tick_actual_jmp = tick_hook_patch.return_address();
 }
