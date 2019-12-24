@@ -20,19 +20,6 @@ extern "C" {
     bool is_server = false;
 }
 
-// Server map CRC
-Signature(true, sig_server_map_crc,
-    {0xA1, -1, -1, -1, -1, 0xC1, 0xE1, 0x04, 0x8B, 0x44, 0x01, 0x0C, 0xC3, 0xCC});
-
-// I think this can be used for adding maps to the table
-Signature(true, sig_add_map_to_list,
-    {0x8B, 0x0D, -1, -1, -1, -1, 0x81, 0xEC, 0x00, 0x08, 0x00, 0x00});
-
-// Returns -1 if not found
-Signature(true, sig_get_map_from_maps_list,
-    {0x56, 0x33, 0xF6, 0xEB, 0x0B, 0x8D, 0xA4, 0x24, 0x00,
-     0x00, 0x00, 0x00, 0x8D, 0x64, 0x24, 0x00});
-
 std::vector<std::string> map_folders;
 std::vector<std::string> map_extensions;
 
@@ -212,7 +199,7 @@ Patch(patch_startup_crc_calc_nop, 0, 5, NOP_PATCH, 0);
 // Put our little hook in here that intercepts it when halo asks for a crc
 // (Watch out for chimera!)
 Patch(patch_get_map_crc, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
-Patch(patch_get_map_crc_server, sig_server_map_crc, 5, 7, CALL_PATCH, &get_map_crc_wrapper_server);
+Patch(patch_get_map_crc_server, 0, 7, CALL_PATCH, &get_map_crc_wrapper_server);
 
 void init_map_crc_upgrades(bool server) {
     // TODO: How many of these if statements are actually NOPs?
@@ -226,12 +213,14 @@ void init_map_crc_upgrades(bool server) {
         patch_startup_crc_calc_nop.apply();
     if (patch_get_map_crc.build(sig_map_crc_get_crc_from_table_hook())) {
         if (!map_upgrades_initialized) {
-            multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(patch_get_map_crc.address()+2);
+            multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(
+                patch_get_map_crc.address()+2);
             jmp_skip_chimera = patch_get_map_crc.address()+13;
         }
         patch_get_map_crc.apply();
     }
-    if (patch_get_map_crc_server.build()) {
+    if (patch_get_map_crc_server.build(
+            sig_map_crc_server_get_crc_from_table_hook())) {
         patch_get_map_crc_server.apply();
         if (patch_startup_crc_calc_nop.build(sig_addr1))
             patch_startup_crc_calc_nop.apply();
