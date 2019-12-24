@@ -117,8 +117,9 @@ void init_network() {
 
 void pre_first_map_load_init();
 
-SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
-    {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
+static LiteSignature signature_text_segment_data = {
+    "text_segment_data", 8, { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 } };
+
 struct ImageSectionHeader {
     uint32_t bullshit1[4];
     uint32_t size_of_segment;
@@ -130,9 +131,18 @@ struct ImageSectionHeader {
 
 void init_vulpes() {
     // Get safe search bounds for CodeSignature.
-    ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.address());
-    set_lowest_permitted_address(0x400000 + header->offset_to_segment);
-    set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
+    ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(
+        signature_text_segment_data.search(0x400000, 0x401000));
+    if (!header) {
+        printf("Couldn't find text_segment_data, we won't know where to search "
+               "for our signatures now.\n This is unacceptable and we need to "
+               "close!\n");
+        exit(0);
+    }
+    set_lowest_permitted_address(
+        0x400000 + header->offset_to_segment);
+    set_highest_permitted_address(
+        0x400000 + header->offset_to_segment + header->size_of_segment);
 
     printf(_FOX);
 
@@ -144,7 +154,6 @@ void init_vulpes() {
     init_halo_functions();
     init_network();
     init_commands();
-
 
     // Final initialization step for things that act on data that isn't valid
     // until way later when the game has loaded more.

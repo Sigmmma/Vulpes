@@ -6,16 +6,16 @@
 
 #include <hooker/hooker.hpp>
 
+#include <vulpes/memory/signatures.hpp>
+
 #include "loading_screen.hpp"
 
-Signature(false, sig_loading_screen_background_render_call,
-    {0xE8, -1, -1, -1, -1, 0x83, 0xC4, 0x0C, 0x55, 0x6A, 0x02, 0x6A, 0xFF});
-
-Patch(loading_screen_background_removal,
-    sig_loading_screen_background_render_call, 0, 5, NOP_PATCH, 0);
+Patch(loading_screen_background_removal, 0, 5, NOP_PATCH, 0);
 
 void init_loading_screen_fixes() {
-    if (loading_screen_background_removal.build()) loading_screen_background_removal.apply();
+    if (loading_screen_background_removal.build(
+            sig_loading_screen_background_render_call()))
+        loading_screen_background_removal.apply();
 }
 
 void revert_loading_screen_fixes() {

@@ -330,3 +330,84 @@ signatures:
     bytes: B9 6B 00 00 00 BF ?? ?? ?? ?? F3 AB B9 6B 00 00 00
     crucial: true
     offset: 6
+
+  - name: path
+    bytes: 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 04 88 1D ?? ?? ?? ?? C6 05 ?? ?? ?? ?? 01 C6 05
+    crucial: true
+    offset: 1
+    type: const char**
+
+  - name: map_name
+    bytes: ?? ?? ?? ?? E8 ?? ?? ?? ?? 32 C9 83 F8 13 7D
+    crucial: true
+    type: const char**
+
+  - name: sp_map_name
+    bytes: ?? ?? ?? ?? C6 05 ?? ?? ?? ?? 00 E8 ?? ?? ?? ?? 8A 44 24 1F
+    crucial: true
+    type: const char**
+
+  - name: at_main_menu
+    bytes: ?? ?? ?? ?? 84 C0 75 ?? 66 FF 0D
+    crucial: true
+    type: bool*
+
+  - name: object_behavior_defs
+    bytes: 8B 0C 95 ?? ?? ?? 00 39 71 10 74 02 33 C0
+    crucial: true
+    offset: 3
+
+  # tweaks/loading screen
+
+  - name: loading_screen_background_render_call
+    bytes: E8 ?? ?? ?? ?? 83 C4 0C 55 6A 02 6A FF
+    crucial: false
+
+  # Network ID tracking functions.
+
+  - name: func_server_register_network_index
+    bytes: 55 56 8B 70 58 8A 46 0C 8D 6E 0C 57 83 CF FF 3C 01 75
+    crucial: true
+    offset: 3
+
+  - name: func_client_register_network_index_from_remote
+    bytes: 8B 40 58 8B 50 28 53 55 8B 6C 24 0C 57 8D 3C AA 8B 17 32 DB 83 FA FF 75
+    crucial: true
+    offset: 3
+
+  - name: func_unregister_network_index
+    bytes: 53 57 8B 78 58 8A 47 0C 8D 4F 0C 32 DB 3C 01 75
+    crucial: true
+    offset: 5
+
+  - name: network_translation_table
+    bytes: ?? ?? ?? ?? 8B 52 28 8B 34 8A
+    crucial: true
+
+  # upgrades/map
+
+  - name: map_crc_game_startup_call
+    bytes: E8 ?? ?? ?? FF 83 C4 ?? FF 05 ?? ?? ?? ?? 81 C4 00 08 00 00 C3
+    crucial: false
+
+  - name: map_crc_read_map_file_header
+    bytes: 81 EC 04 01 00 00 53 57
+    crucial: true
+
+    # There is a lot of wildcard here so we can encapsulate the Chimera hook
+  - name: map_crc_get_crc_from_table_hook
+    bytes: 8B 15 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 51 89 8C 24 AC 00 00 00
+    crucial: true
+
+  - name: map_crc_server_get_crc_from_table_hook
+    bytes: A1 ?? ?? ?? ?? C1 E1 04 8B 44 01 0C C3 CC
+    crucial: true
+    offset: 5
+
+# I think this can be used for adding maps to the table
+# - name: func_add_map_to_list
+# - bytes: 8B 0D ?? ?? ?? ?? 81 EC 00 08 00 00
+
+# Returns -1 if not found
+# - name: func_get_map_from_maps_list
+# - bytes: 56 33 F6 EB 0B 8D A4 24 00 00 00 00 8D 64 24 00
