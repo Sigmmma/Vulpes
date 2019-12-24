@@ -19,28 +19,22 @@ uintptr_t LiteSignature::search(
     if (!end_address) end_address = get_highest_permitted_address();
 
     printf("Search for sig %s\nAddress range: %8X - %8X\n",
-        name, start_address, end_address);
+        this->name, start_address, end_address);
 
-    // TODO: Use constant.
-    uintptr_t result = UINTPTR_MAX;
+    uintptr_t result = NULL;
 
     uintptr_t current_address = start_address;
-    while (result == UINTPTR_MAX && current_address - size <= end_address) {
+    while (!result && current_address - this->size <= end_address) {
         bool mismatch = false;
+        uint8_t* cur_bytes = reinterpret_cast<uint8_t*>(current_address);
         // For each address we go through our set of bytes until
         // we get a mismatch or we reach the end of our signature.
-        for (int j=0; j < size; j++) {
+        for (size_t j=0; j < this->size && !mismatch; j++) {
             // If the current element in our sig is -1 we skip this byte as -1
-            // is our wildcard. If our current byte matches our current sig
-            // element, start the next iteration.
-            if (bytes[j] == -1 || reinterpret_cast<uint8_t*>(
-                    current_address)[j] == bytes[j]) {
-                continue;
+            // is our wildcard.
+            if (bytes[j] != -1 && cur_bytes[j] != this->bytes[j]) {
+                mismatch = true;
             }
-            // If neither of the conditions are met we have a mismatch
-            // and should continue searching
-            mismatch = true;
-            break;
         }
         // If there was no mismatch then we have succesfully found the address.
         if (!mismatch) {
@@ -50,7 +44,7 @@ uintptr_t LiteSignature::search(
         current_address++;
     }
 
-    if (result == UINTPTR_MAX) {
+    if (!result) {
         printf("Not found.\n\n");
     } else {
         printf("Found at: %8X\n\n", result);
@@ -69,10 +63,10 @@ std::vector<uintptr_t> LiteSignature::search_multiple(
 
     std::vector<uintptr_t> addresses;
     // TODO: Use constant.
-    uintptr_t last_result = 0;
-    while(last_result != UINTPTR_MAX && start_address + size < end_address) {
+    uintptr_t last_result = 1;
+    while(last_result && start_address + size < end_address) {
         last_result = search(start_address, end_address);
-        if (last_result != UINTPTR_MAX) {
+        if (last_result) {
             addresses.push_back(last_result);
         }
         start_address = last_result + 1;

@@ -52,33 +52,10 @@ sub build_luajit {
     }
 }
 sub build_from_yaml {
-    # Get filenames
-    my @yaml_files = @{$config->{yaml_files}};
-
     print "Building headers and sources for yaml files!\n";
     # execute codegen
-    my $arg_str = join " ", map {"\"$_\""} @yaml_files;
+    my $arg_str = join " ", map {"\"$_\""} @{$config->{yaml_files}};
     system "perl ./codegen/generate.pl $arg_str";
-
-    print "Updating .gitignore!\n";
-    # Prepare patterns for gitignore.
-    my @pp_files = map {
-        $_ =~ s/\.\w+$//;
-        $_ .= ".*pp"
-    } @yaml_files;
-
-    # Read gitignore
-    my $gitignore = read_text ".gitignore";
-    # Try to find <codegen output> marker.
-    my $start_pos = index $gitignore, "<codegen output>";
-    if ($start_pos == -1) {
-        die "No \"<codegen output>\" marker in gitignore file"
-    }
-    # Find newline after the comment that contained the marker.
-    $start_pos = index $gitignore, "\n", $start_pos;
-    # Print new gitignore with the expected cpp and hpp files at the end
-    open(GITIGNORE, ">.gitignore");
-    print GITIGNORE (substr ($gitignore, 0, $start_pos)),"\n", (join "\n", @pp_files), "\n";
 }
 
 if (@ARGV && $ARGV[0] eq "--help") { usage() }
@@ -109,6 +86,6 @@ if ($config->{game_folder}) {
         copy("./VulpesLoader.dll", $config->{game_folder}."/strings.dll");
     } else {
         print "Using controls/ configuration\n";
-        copy("./VulpesLoader.dll", $config->{game_folder}."/controls/VulpesLoader.dll");
+        copy("./VulpesLoader.dll", $config->{game_folder}."/mods/VulpesLoader.dll");
     }
 }

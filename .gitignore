@@ -39,6 +39,5 @@ Makefile
 lib/LuaJIT
 lib/LuaJIT/
 
-
-# <codegen output> DO NOT REMOVE THIS COMMENT.
-vulpes/memory/signatures.*pp
+# Ignore auto generated code
+generated/

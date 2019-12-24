@@ -27,9 +27,6 @@ enum InstructionBytes : uint8_t {
     JA_BYTE    = 0x87
 };
 
-#define NOT_SEARCHED(address) (!address)
-#define NOT_FOUND(address) (reinterpret_cast<uintptr_t>(address)==UINTPTR_MAX)
-
 class LiteSignature {
 public:
     const char* name;
