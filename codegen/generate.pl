@@ -8,6 +8,8 @@
 use strict;
 use warnings;
 use File::Basename qw( dirname basename );
+use File::Spec::Functions qw( catfile );
+use File::Path qw( make_path );
 use YAML::XS qw( LoadFile );
 
 use lib dirname(__FILE__); # Include own directory
@@ -36,15 +38,22 @@ foreach my $filename (@ARGV) {
     printf "[%3d%s] Building CPP files for %s\n", $progress, "%", $filename;
 
     # Load yaml definition.
-    my $file = LoadFile($filename);
+    my $file = LoadFile $filename;
 
     # Get path without file extension.
     my $output_stem = $filename;
     $output_stem =~ s/\.\w+$//;
 
+    # Just the isolated name.
+    my $name = basename $output_stem;
+
+    # Get output directory and make it.
+    my $dir = catfile catfile (dirname $output_stem), "generated";
+    make_path $dir;
+
     # Open new source and headers for writing.
-    open(OUTPUT_SRC,  ">$output_stem.cpp");
-    open(OUTPUT_HEAD, ">$output_stem.hpp");
+    open(OUTPUT_SRC,  ">".(catfile $dir, "$name.cpp"));
+    open(OUTPUT_HEAD, ">".(catfile $dir, "$name.hpp"));
 
     # basename with yaml extension
     my $yaml_basename = basename($filename);
@@ -53,9 +62,6 @@ foreach my $filename (@ARGV) {
 
     print OUTPUT_SRC $license_header, "#include <$output_stem.hpp>\n";
     print OUTPUT_HEAD $license_header, "#pragma once\n";
-
-    # Just the isolated name.
-    my $name = basename($output_stem);
 
     # Writes all cpp data to the opened files.
     # TODO: Update this when more types of things get written to these.
