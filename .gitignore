@@ -39,5 +39,5 @@ Makefile
 lib/LuaJIT
 lib/LuaJIT/
 
-
+# Ignore auto generated code
 generated/
