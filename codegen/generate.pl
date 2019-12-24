@@ -67,13 +67,13 @@ foreach my $filename (@ARGV) {
     # TODO: Update this when more types of things get written to these.
     if (exists $file->{signatures}) {
         my $output = yaml_signatures_to_cpp_definitions $name, $file->{signatures};
-        print OUTPUT_SRC join "\n", @{$output->{source}->{std_includes}}, "";
-        print OUTPUT_SRC join "\n", @{$output->{source}->{includes}}, "";
+        print OUTPUT_SRC join "\n", @{$output->{source}->{std_includes}}, "\n";
+        print OUTPUT_SRC join "\n", @{$output->{source}->{includes}}, "\n";
         print OUTPUT_SRC $output->{source}->{defs};
         print OUTPUT_SRC $output->{source}->{initializer};
 
-        print OUTPUT_HEAD join "\n", @{$output->{header}->{std_includes}}, "";
-        print OUTPUT_HEAD join "\n", @{$output->{header}->{includes}}, "";
+        print OUTPUT_HEAD join "\n", @{$output->{header}->{std_includes}}, "\n";
+        print OUTPUT_HEAD join "\n", @{$output->{header}->{includes}}, "\n";
         print OUTPUT_HEAD $output->{header}->{defs};
         print OUTPUT_HEAD $output->{header}->{initializer};
     }
