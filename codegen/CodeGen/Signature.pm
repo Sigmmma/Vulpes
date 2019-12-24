@@ -8,14 +8,11 @@ use strict;
 use warnings;
 
 sub preprocess_signature {
-    $_->{uc_name} = $_->{uc_name} || uc $_->{name};
-    $_->{offset}  = $_->{offset}  || 0;
-    $_->{type}    = $_->{type}    || "uintptr_t";
-    $_->{multi}   = $_->{multi}   || 0;
-    # crucial can be
-    if (not exists $_->{crucial}) {
-        $_->{crucial} = 0;
-    }
+    $_->{uc_name} //= uc $_->{name};
+    $_->{offset}  //= 0;
+    $_->{type}    //= "uintptr_t";
+    $_->{multi}   //= 0;
+    $_->{crucial} //= 0;
     return $_;
 }
 
@@ -40,9 +37,9 @@ sub yaml_sig_to_cpp_initializer {
 sub yaml_sig_to_cpp_validator {
     my $validator = "";
     if ($_->{multi}) {
-        $validator .= "    if (!PTRS_$_->{uc_name}.size())\n";
+        $validator .= "    if (PTRS_$_->{uc_name}.empty())\n";
     } else {
-        $validator .= "    if (NOT_FOUND(PTR_$_->{uc_name}))\n";
+        $validator .= "    if (!PTR_$_->{uc_name})\n";
     }
 
     if ($_->{crucial}) {
@@ -54,7 +51,7 @@ sub yaml_sig_to_cpp_validator {
 }
 
 sub yaml_sig_to_cpp_address_var {
-    if ($_->{multi} || 0) {
+    if ($_->{multi}) {
         return "static std::vector<uintptr_t> PTRS_$_->{uc_name};\n";
     }
     return "static uintptr_t PTR_$_->{uc_name};\n";
@@ -68,8 +65,8 @@ sub yaml_sig_to_cpp_getter {
     }
     return "$_->{type} sig_$_->{name}() {\n".
            "    return reinterpret_cast<$_->{type}>(\n".
-           "        NOT_FOUND(PTR_$_->{uc_name}) ?\n".
-           "            0 : (PTR_$_->{uc_name} + $_->{offset}));\n".
+           "        PTR_$_->{uc_name} ?\n".
+           "            (PTR_$_->{uc_name} + $_->{offset}) : NULL);\n".
            "}\n";
 
 }
@@ -82,8 +79,7 @@ sub yaml_sig_to_cpp_getter_header {
 }
 
 sub yaml_signatures_to_cpp_definitions {
-    my $name = shift;
-    my $sigs = shift;
+    my ($name, $sigs) = @_;
     my @sigs = map { preprocess_signature } @{$sigs};
 
     #### Source file stuff.

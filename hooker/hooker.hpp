@@ -41,9 +41,6 @@ private:
     const char* name;
 };
 
-#define NOT_SEARCHED(address) (!address)
-#define NOT_FOUND(address)    (reinterpret_cast<uintptr_t>(address) == UINTPTR_MAX)
-
 class LiteSignature {
 public:
     const char* name;
