@@ -392,16 +392,16 @@ signatures:
 
   - name: map_crc_read_map_file_header
     bytes: 81 EC 04 01 00 00 53 57
-    crucial: true
+    crucial: false
 
     # There is a lot of wildcard here so we can encapsulate the Chimera hook
   - name: map_crc_get_crc_from_table_hook
     bytes: 8B 15 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 51 89 8C 24 AC 00 00 00
-    crucial: true
+    crucial: false
 
   - name: map_crc_server_get_crc_from_table_hook
     bytes: A1 ?? ?? ?? ?? C1 E1 04 8B 44 01 0C C3 CC
-    crucial: true
+    crucial: false
     offset: 5
 
 # I think this can be used for adding maps to the table

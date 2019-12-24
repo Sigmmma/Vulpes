@@ -202,8 +202,6 @@ Patch(patch_get_map_crc, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
 Patch(patch_get_map_crc_server, 0, 7, CALL_PATCH, &get_map_crc_wrapper_server);
 
 void init_map_crc_upgrades(bool server) {
-    // TODO: How many of these if statements are actually NOPs?
-    // I think it might be a few.
     auto sig_addr1 = sig_map_crc_game_startup_call();
     auto sig_addr2 = sig_map_crc_read_map_file_header();
     is_server = server;
