@@ -20,7 +20,7 @@ extern "C" {
     extern king_timer_reset_hook();
 }
 
-Patch(king_timer_reset_hook_patch, 0, 10,
+static Patch(king_timer_reset_hook_patch, 0, 10,
     CALL_PATCH, &king_timer_reset_hook);
 
 void init_king_hooks() {

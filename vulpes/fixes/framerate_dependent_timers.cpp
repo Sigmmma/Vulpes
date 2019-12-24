@@ -11,7 +11,7 @@
 
 #include "framerate_dependent_timers.hpp"
 
-Patch(death_timer_framerate_dep_fix, 0, 2, NOP_PATCH, 0);
+static Patch(death_timer_framerate_dep_fix, 0, 2, NOP_PATCH, 0);
 
 bool*    player_dead;
 int32_t* player_respawn_timer;
@@ -48,12 +48,12 @@ void revert_checkpoint_revert_fix() {
 // Aka, this float.
 static const float fade = 1.0;
 
-Patch(patch_scoreboard_framerate_dep1a, 0, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep1b, 0, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep2a, 0, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep3a, 0, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep3b, 0, 4, INT_PATCH, &fade);
-Patch(patch_ruleboard_intro_nop, 0, 4, INT_PATCH, 0);
+static Patch(patch_scoreboard_framerate_dep1a, 0, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep1b, 0, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep2a, 0, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep3a, 0, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep3b, 0, 4, INT_PATCH, &fade);
+static Patch(patch_ruleboard_intro_nop, 0, 4, INT_PATCH, 0);
 
 void init_scoreboard_fix() {
     auto p_addr1 = sig_fix_scoreboard_framerate_dep1();
@@ -95,7 +95,7 @@ static bool console_initialized = false;
 static bool* console_open;
 static void (*fade_console_halo)();
 
-Patch(patch_console_framerate_dep, 0, 5, NOP_PATCH, 0);
+static Patch(patch_console_framerate_dep, 0, 5, NOP_PATCH, 0);
 
 void fade_console() {
     if (!*console_open) {

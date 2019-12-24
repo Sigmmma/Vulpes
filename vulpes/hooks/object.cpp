@@ -137,7 +137,7 @@ extern "C" void after_object_create(uint32_t* obj) {
 
 }
 
-Patch(
+static Patch(
     object_create_hook_patch, 0, 6,
     JMP_PATCH, &object_create_wrapper
 );
@@ -157,7 +157,7 @@ extern "C" void after_biped_jump(uint32_t* obj) {
 
 }
 
-Patch(
+static Patch(
     biped_jump_hook_patch, 0, 6,
     JMP_PATCH, &biped_jump_wrapper
 );
@@ -180,7 +180,7 @@ extern "C" void after_weapon_pull_trigger() {
 
 }
 
-Patch(
+static Patch(
     weapon_pull_trigger_hook_patch, 0, 6,
     JMP_PATCH, &weapon_pull_trigger_wrapper
 );

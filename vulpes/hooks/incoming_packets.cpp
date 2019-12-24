@@ -34,7 +34,7 @@ extern "C" {
     extern incoming_packets__hook_hud_chat_intercept();
 }
 
-Patch(
+static Patch(
     hud_chat_hook, 0, 8,
     JMP_PATCH, &incoming_packets__hook_hud_chat_intercept
 );

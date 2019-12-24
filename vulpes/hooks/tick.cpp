@@ -31,7 +31,7 @@ extern "C" {
 
 }
 
-Patch(
+static Patch(
     tick_hook_patch, 0, 7,
     JMP_PATCH, &game_tick_wrapper
 );

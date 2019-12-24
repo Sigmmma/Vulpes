@@ -17,7 +17,7 @@ extern "C" {
     extern player_biped_mid_air_turn_fix_code();
 }
 
-Patch(player_biped_mid_air_turn_fix, 0, 13, JMP_PATCH, &player_biped_mid_air_turn_fix_code);
+static Patch(player_biped_mid_air_turn_fix, 0, 13, JMP_PATCH, &player_biped_mid_air_turn_fix_code);
 
 void init_animation_bug_fixes() {
     // Player Biped Mid-Air turn fix.

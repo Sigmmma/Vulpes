@@ -15,7 +15,7 @@ extern "C" {
     extern console_hook__console_in();
 }
 
-Patch(console_in_hook_patch, 0, 6, JMP_PATCH, &console_hook__console_in);
+static Patch(console_in_hook_patch, 0, 6, JMP_PATCH, &console_hook__console_in);
 
 void init_console_input_hook() {
     auto addr = sig_hook_console_input();
@@ -34,7 +34,7 @@ extern "C" {
     extern console_hook__auto_complete();
 }
 
-Patch(auto_complete_patch, 0, 7, CALL_PATCH, &console_hook__auto_complete);
+static Patch(auto_complete_patch, 0, 7, CALL_PATCH, &console_hook__auto_complete);
 
 void init_command_auto_complete_hook() {
     auto adrr = sig_hook_auto_complete_collected_list();

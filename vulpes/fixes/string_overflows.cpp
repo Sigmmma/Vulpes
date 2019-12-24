@@ -21,7 +21,7 @@ void hs_print_cleanser(char* string) {
         cprintf_info("%s", string);
 }
 
-Patch(hs_print_overflow_fix, 0, 5, CALL_PATCH, &hs_print_cleanser);
+static Patch(hs_print_overflow_fix, 0, 5, CALL_PATCH, &hs_print_cleanser);
 
 void init_string_overflow_fixes() {
     if (hs_print_overflow_fix.build(sig_fix_hs_print_overflow()))
