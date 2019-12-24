@@ -17,6 +17,10 @@ sub preprocess_signature {
 }
 
 sub yaml_sig_to_cpp_sig {
+    # Validate the string
+    unless ($_->{bytes} =~ /^(?:(?:\?\?|[a-fA-F0-9]{2})\s??)+$/) {
+        die "Signature $_->{name} has an invalid byte pattern."
+    }
     # Convert string to individual parts and then convert them into C++ format.
     my @bytes = map {$_ eq "??" ? "-1" : "0x$_"} split /\s+/, $_->{bytes};
     # Combine the bytes into a single string.
