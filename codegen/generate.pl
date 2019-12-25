@@ -12,7 +12,7 @@ use warnings;
 # have a change for this constant you should ready the firing squad.
 use constant VERSION => "1.1.0";
 
-use Digest::SHA1  qw( sha1_base64 );
+use Digest::SHA1 qw( sha1_base64 );
 use File::Basename qw( dirname basename );
 use File::Slurper qw( read_text );
 use File::Spec::Functions qw( catfile );
