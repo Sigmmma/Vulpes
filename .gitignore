@@ -41,3 +41,6 @@ lib/LuaJIT/
 
 # Ignore auto generated code
 generated/
+
+# Ignore cache that has hashes of all the generated files.
+*.tmp
