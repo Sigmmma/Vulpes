@@ -20,7 +20,7 @@ set(SHARED_FLAGS "-masm=intel -msse -msse2 -m32 -mfpmath=sse -DWIN32_MEAN_AND_LE
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SHARED_FLAGS}")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SHARED_FLAGS} -Wunused-value -Wold-style-cast")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SHARED_FLAGS} -Wunused-value -Wold-style-cast -Wno-conversion-null")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O3")
 set(CMAKE_SHARED_LINKER_FLAGS "-m32 -W -s -static-libgcc -static-libstdc++ -lkernel32")
@@ -44,7 +44,6 @@ add_library(Vulpes SHARED
     vulpes/fixes/animation.S
     vulpes/fixes/cpu_usage.cpp
     vulpes/fixes/cpu_usage.S
-    vulpes/fixes/file_handle_leak.cpp
     vulpes/fixes/framerate_dependent_timers.cpp
     vulpes/fixes/host_refusal.cpp
     vulpes/fixes/shdr_trans_zfighting.cpp
@@ -97,6 +96,8 @@ add_library(Vulpes SHARED
     vulpes/lua/lua.cpp
     vulpes/lua/lua_console.cpp
     vulpes/lua/lua_open.cpp
+
+    vulpes/memory/signatures.cpp
 )
 
 add_library(VulpesLoader SHARED

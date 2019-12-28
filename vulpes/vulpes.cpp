@@ -47,7 +47,6 @@ void init_commands() {
 // Fixes
 
 #include "fixes/cpu_usage.hpp"
-#include "fixes/file_handle_leak.hpp"
 #include "fixes/host_refusal.hpp"
 #include "fixes/string_overflows.hpp"
 #include "fixes/shdr_trans_zfighting.hpp"
@@ -57,7 +56,6 @@ void init_commands() {
 #include "tweaks/tweaks.hpp"
 void init_halo_bug_fixes() {
     init_cpu_usage_fixes();
-    init_file_handle_leak_fixes();
     init_host_refusal_fixes();
     init_string_overflow_fixes();
     ADD_CALLBACK(EVENT_MAP_LOAD_MP, revert_animation_bug_fixes);
@@ -71,7 +69,6 @@ void init_halo_bug_fixes() {
 
 void revert_halo_bug_fixes() {
     revert_cpu_usage_fixes();
-    revert_file_handle_leak_fixes();
     revert_host_refusal_fixes();
     revert_string_overflow_fixes();
     revert_shdr_trans_zfighting_fixes();

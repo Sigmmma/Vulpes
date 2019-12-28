@@ -38,3 +38,6 @@ cmake_install.cmake
 Makefile
 lib/LuaJIT
 lib/LuaJIT/
+
+# Ignore auto generated code
+generated/

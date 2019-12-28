@@ -73,6 +73,72 @@ uintptr_t CodeSignature::address(bool recalculate) {
     return address();
 }
 
+uintptr_t LiteSignature::search(
+        uintptr_t start_address, uintptr_t end_address) {
+
+    if (!start_address) start_address = get_lowest_permitted_address();
+    if (!end_address) end_address = get_highest_permitted_address();
+
+    printf("Search for sig %s\nAddress range: %8X - %8X\n",
+        this->name, start_address, end_address);
+
+    // TODO: Use constant.
+    uintptr_t result = NULL;
+
+    uintptr_t current_address = start_address;
+    while (!result && current_address - this->size <= end_address) {
+        bool mismatch = false;
+        uint8_t* cur_bytes = reinterpret_cast<uint8_t*>(current_address);
+        // For each address we go through our set of bytes until
+        // we get a mismatch or we reach the end of our signature.
+        for (size_t j=0; j < this->size && !mismatch; j++) {
+            // If the current element in our sig is -1 we skip this byte as -1
+            // is our wildcard.
+            if (bytes[j] != -1 && cur_bytes[j] != this->bytes[j]) {
+                mismatch = true;
+            }
+        }
+        // If there was no mismatch then we have succesfully found the address.
+        if (!mismatch) {
+            result = current_address;
+        }
+        // If not, then keep searching.
+        current_address++;
+    }
+
+    if (!result) {
+        printf("Not found.\n\n");
+    } else {
+        printf("Found at: %8X\n\n", result);
+    }
+
+    return result;
+}
+
+std::vector<uintptr_t> LiteSignature::search_multiple(
+        uintptr_t start_address, uintptr_t end_address) {
+
+    if (!start_address) start_address = get_lowest_permitted_address();
+    if (!end_address) end_address = get_highest_permitted_address();
+
+    printf("Multi sig search for %s\n\n", name);
+
+    std::vector<uintptr_t> addresses;
+    // TODO: Use constant.
+    uintptr_t last_result = 1;
+    while(last_result && start_address + size < end_address) {
+        last_result = search(start_address, end_address);
+        if (last_result) {
+            addresses.push_back(last_result);
+        }
+        start_address = last_result + 1;
+    }
+    printf("Found %d addresses.\n", addresses.size());
+
+    return addresses;
+}
+
+
 ////////////
 
 void CodePatch::setup_internal(void* content, size_t c_size) {
@@ -128,7 +194,7 @@ CodePatch::CodePatch(const char* d_name,
 }
 
 
-bool CodePatch::build(intptr_t p_address) {
+bool CodePatch::build(uintptr_t p_address) {
     if (patch_built) return true;
     printf("Building CodePatch %s...", name);
     if (p_address && !patch_built) patch_address = p_address;

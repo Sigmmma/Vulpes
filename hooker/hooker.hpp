@@ -41,6 +41,18 @@ private:
     const char* name;
 };
 
+class LiteSignature {
+public:
+    const char* name;
+    const size_t size;
+    const int16_t bytes[];
+
+    uintptr_t search(
+        uintptr_t start_address = 0, uintptr_t end_address = 0);
+    std::vector<uintptr_t> search_multiple(
+        uintptr_t start_address = 0, uintptr_t end_address = 0);
+};
+
 enum PatchTypes {
     NOP_PATCH,  // NOPs out the code so it does nothing.
     CALL_PATCH, // Makes a function call to redirect_to.
@@ -82,7 +94,7 @@ public:
     // or use a code signature to try and find an address.
     // Returns true if success, false at fail, true if already built.
     // This does not apply the patch.
-    bool build(intptr_t p_address = 0);
+    bool build(uintptr_t p_address = 0);
     // Applies the patch.
     void apply();
     // Reverts the code to the original bytes.

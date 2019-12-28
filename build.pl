@@ -5,6 +5,7 @@ use warnings;
 use File::Path qw( rmtree );
 use File::pushd qw( pushd );
 use File::Copy qw( copy );
+use File::Slurper qw( read_text );
 use Getopt::Std;
 use YAML::XS qw( LoadFile );
 
@@ -50,6 +51,12 @@ sub build_luajit {
         system "make HOST_CC=\"gcc -m32\" CROSS=i686-w64-mingw32- TARGET_SYS=Windows";
     }
 }
+sub build_from_yaml {
+    print "Building headers and sources for yaml files!\n";
+    # execute codegen
+    my $arg_str = join " ", map {"\"$_\""} @{$config->{yaml_files}};
+    system "perl ./codegen/generate.pl $arg_str";
+}
 
 if (@ARGV && $ARGV[0] eq "--help") { usage() }
 
@@ -68,6 +75,7 @@ if ($options{j}) {
     build_luajit;
 }
 
+build_from_yaml;
 build;
 
 if ($config->{game_folder}) {
@@ -78,6 +86,6 @@ if ($config->{game_folder}) {
         copy("./VulpesLoader.dll", $config->{game_folder}."/strings.dll");
     } else {
         print "Using controls/ configuration\n";
-        copy("./VulpesLoader.dll", $config->{game_folder}."/controls/VulpesLoader.dll");
+        copy("./VulpesLoader.dll", $config->{game_folder}."/mods/VulpesLoader.dll");
     }
 }
