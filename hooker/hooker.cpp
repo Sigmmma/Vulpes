@@ -12,67 +12,6 @@
 
 #include "hooker.hpp"
 
-CodeSignature::CodeSignature(bool required,
-                             const char* d_name,
-                             uintptr_t lowest_search_address,
-                             uintptr_t highest_search_address,
-                             std::vector<int16_t> signature) {
-    imperative = required;
-    lowest_allowed = lowest_search_address;
-    highest_allowed = highest_search_address;
-    sig = signature;
-    name = d_name;
-}
-
-uintptr_t CodeSignature::address(uintptr_t start_address, uintptr_t end_address) {
-    if (found_address == 0 && !already_tried) {
-        if (start_address) lowest_allowed = start_address;
-        if (end_address) highest_allowed = end_address;
-        if (!lowest_allowed) lowest_allowed = get_lowest_permitted_address();
-        if (!highest_allowed) highest_allowed = get_highest_permitted_address();
-        assert(lowest_allowed >= get_lowest_permitted_address());
-        printf("Searching for CodeSignature %s...", name);
-        size_t size_of_block_to_find = sig.size();
-        uintptr_t current_address = lowest_allowed;
-        // Traverse from the lowest to highest address allowed searching for the set of bytes that we want.
-        while (found_address == 0 && current_address - size_of_block_to_find <= highest_allowed) {
-            bool mismatch = false;
-            // For each address we go through our set of bytes until we get a mismatch or we reach the end of our signature.
-            for (int j=0; j < size_of_block_to_find; j++) {
-                // If the current element in our sig is -1 we skip this byte as -1 is our wildcard.
-                // If our current byte matches our current sig element, start the next iteration.
-                if (sig[j] == -1 || reinterpret_cast<uint8_t*>(current_address)[j] == sig[j]) {
-                    continue;
-                }
-                // If neither of the conditions are met we have a mismatch and should move on.
-                mismatch = true;
-                break;
-            }
-            // If there was no mismatch then we have succesfully found the address and we can go home.
-            if (!mismatch) found_address = current_address;
-            current_address++;
-        }
-    }
-    if (found_address == 0) {
-        printf("failed\n");
-        if (imperative) {
-            // Crash
-        }
-    } else {
-        printf("success. Found at %X\n", found_address);
-    }
-    already_tried = true;
-    return found_address;
-}
-
-uintptr_t CodeSignature::address(bool recalculate) {
-    if (recalculate) {
-        found_address = 0;
-        already_tried = false;
-    }
-    return address();
-}
-
 uintptr_t LiteSignature::search(
         uintptr_t start_address, uintptr_t end_address) {
 
@@ -82,7 +21,6 @@ uintptr_t LiteSignature::search(
     printf("Search for sig %s\nAddress range: %8X - %8X\n",
         this->name, start_address, end_address);
 
-    // TODO: Use constant.
     uintptr_t result = NULL;
 
     uintptr_t current_address = start_address;
@@ -174,17 +112,7 @@ void CodePatch::setup_internal(void* content, size_t c_size) {
 // Go to resource.hpp for the functional parts of the template based initializers.
 
 CodePatch::CodePatch(const char* d_name,
-          CodeSignature& p_sig, int p_sig_offset,
-          std::vector<int16_t> patch_bytes) {
-    name = d_name;
-    sig = p_sig;
-    offset = p_sig_offset;
-    patch_size = patch_bytes.size();
-    type = MANUAL_PATCH;
-    patched_code = patch_bytes;
-}
-CodePatch::CodePatch(const char* d_name,
-          intptr_t p_address,
+          uintptr_t p_address,
           std::vector<int16_t> patch_bytes) {
     name = d_name;
     patch_address = p_address;
@@ -196,10 +124,12 @@ CodePatch::CodePatch(const char* d_name,
 
 bool CodePatch::build(uintptr_t p_address) {
     if (patch_built) return true;
-    printf("Building CodePatch %s...", name);
+    printf("Build CodePatch %s\n", name);
     if (p_address && !patch_built) patch_address = p_address;
-    if (!patch_address && !patch_built) patch_address = sig.address() + offset;
-    if (patch_address - offset <= 0) return false;
+    if (!patch_address) {
+        printf("Couldn't build. Invalid address.\n");
+        return false;
+    }
     assert(patch_address >= get_lowest_permitted_address());
 
     // Setup for the different types of patches.
@@ -285,12 +215,11 @@ bool CodePatch::build(uintptr_t p_address) {
     }
 
     patch_built = true;
-    printf("done\n");
+    printf("Built.\n");
     return patch_built;
 }
 
-intptr_t CodePatch::address() {
-    if (!patch_address) patch_address = sig.address();
+uintptr_t CodePatch::address() {
     return patch_address;
 }
 
@@ -308,24 +237,20 @@ void CodePatch::write_patch(std::vector<int16_t> patch_code) {
 }
 
 void CodePatch::apply() {
-    printf("Applying CodePatch %s...", name);
+    printf("Apply CodePatch %s\n", name);
     assert(patch_built);
     write_patch(patched_code);
     patch_applied = true;
-    printf("done\n");
+    printf("Applied.\n");
 }
 
 void CodePatch::revert() {
-    printf("Reverting CodePatch %s...", name);
+    printf("Revert CodePatch %s", name);
     if (patch_applied) {
         write_patch(original_code);
-        printf("done\n");
+        printf("Reverted.\n");
     } else {
-        if (patch_built) {
-            printf("wasn't needed.\n");
-        } else {
-            printf("wasn't built.\n");
-        }
+        printf("No need.\n");
     }
     patch_applied = false;
 }

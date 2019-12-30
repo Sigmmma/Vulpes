@@ -4,23 +4,17 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
-#include <hooker/hooker.hpp>
+#include <vulpes/memory/signatures.hpp>
 
 #include "message_delta.hpp"
 
-Signature(true, sig_mdp_decode_stateless_iterated,
-    {0x57, 0x8B, 0x38, 0x51, 0x83, 0xC0, 0x04, 0x6A, 0x00, 0x50, 0xE8});
+// TODO: Clean up function pointers that are passed to code.
 
-Signature(true, sig_mdp_encode_stateless_iterated,
-    {0x81, 0xEC, 0xA4, 0x00, 0x00, 0x00, 0x53, 0x55, 0x8B, 0xAC, 0x24,
-     0xBC, 0x00, 0x00, 0x00});
-
-Signature(true, sig_mdp_discard_iteration_body,
-    {0x81, 0xEC, 0x00, 0x08, 0x00, 0x00, 0x56, 0x57, 0x8B, 0x38, 0x8B, 0x37});
-
-static uintptr_t func_mdp_encode;
-static uintptr_t func_mdp_decode;
-static uintptr_t func_mdp_discard;
+extern "C" {
+    uintptr_t func_mdp_encode_ptr;
+    uintptr_t func_mdp_decode_ptr;
+    uintptr_t func_mdp_discard_ptr;
+}
 
 uint32_t mdp_encode_stateless_iterated(
     void* output_buffer, int32_t arg1, MessageDeltaType type,
@@ -40,11 +34,11 @@ uint32_t mdp_encode_stateless_iterated(
         "push %2;"
         "mov edx, 0x7FF8;"
         "mov eax, %1;"
-        "call %0;"
+        "call [_func_mdp_encode_ptr];"
         "add esp, 0x1C;"
         "mov %9, eax;"
         "popad;"
-        : "+m" (func_mdp_encode)
+        : "+m" (func_mdp_encode_ptr)
         : "m" (output_buffer),
           "m" (arg1),
           "m" (type_int),
@@ -69,9 +63,9 @@ bool mdp_decode_stateless_iterated(void* destination, MessageDeltaHeader* messag
     asm (
         "mov ecx, %1;"
         "mov eax, %2;"
-        "call %0;"
+        "call [_func_mdp_decode_ptr];"
         "mov %3, al;"
-        : "+m" (func_mdp_decode)
+        : "+m" (func_mdp_decode_ptr)
         : "m" (destination),
           "m" (message_header),
           "m" (success)
@@ -83,37 +77,30 @@ void mdp_discard_iteration_body(MessageDeltaHeader* message_header) {
     asm (
         "pushad;"
         "mov eax, %1;"
-        "call %0;"
+        "call [_func_mdp_discard_ptr];"
         "popad;"
         :
-        : "m" (func_mdp_discard), "m" (message_header)
+        : "m" (func_mdp_discard_ptr), "m" (message_header)
     );
 }
 
 void init_message_delta_processor() {
-    func_mdp_encode = sig_mdp_encode_stateless_iterated.address();
-    func_mdp_decode = sig_mdp_decode_stateless_iterated.address();
-    func_mdp_discard = sig_mdp_discard_iteration_body.address();
+    func_mdp_encode_ptr = sig_func_mdp_decode_stateless_iterated();
+    func_mdp_decode_ptr = sig_func_mdp_encode_stateless_iterated();
+    func_mdp_discard_ptr = sig_func_mdp_discard_iteration_body();
 }
 
-Signature(true, sig_send_message_to_all,
-    {0x66, 0x8B, 0x46, 0x0E, 0x8A, 0xD0, 0xD0, 0xEA, 0xF6, 0xC2, 0x01}); // -56
-
-Signature(true, sig_send_message_to_player,
-    {0x51, 0x53, 0x57, 0x8B, 0xF8, 0x32, 0xC0, 0x33, 0xC9});
-
-Signature(true, sig_send_message_socket_ready,
-    {-1, -1, -1, -1, 0x3B, 0xC3, 0x74, 0x1A, 0x83, 0xC0, 0x08, 0x3B, 0xC3, 0x74, 0x13});
-
-static uintptr_t* socket_ready;
-static uintptr_t func_send_message_to_all;
-static uintptr_t func_send_message_to_player;
+extern "C" {
+    uintptr_t* socket_ready_ptr;
+    uintptr_t func_send_message_to_all_ptr;
+    uintptr_t func_send_message_to_player_ptr;
+}
 
 void send_delta_message_to_all(void* message, uint32_t message_size,
     bool ingame_only, bool write_to_local_connection,
     bool flush_queue, bool unbuffered, int32_t buffer_priority) {
 
-    if(*socket_ready) {
+    if(*socket_ready_ptr) {
         int32_t bool_ingame_only = ingame_only;
         int32_t bool_write_to_local_connection = write_to_local_connection;
         int32_t bool_flush_queue = flush_queue;
@@ -129,17 +116,17 @@ void send_delta_message_to_all(void* message, uint32_t message_size,
             "push %5;"
             "push %2;"
             "push %4;"
-            "mov ecx, %1;"
+            "mov ecx, [_socket_ready_ptr];"
             "mov ecx, [ecx];"
             "mov eax, %3;"
-            "call %0;"
+            "call [_func_send_message_to_all_ptr];"
             "add esp, 0x18;"
 
             "pop eax;"
             "pop ecx;"
             :
-            : "m" (func_send_message_to_all),   // 0
-              "m" (socket_ready),               // 1
+            : "m" (func_send_message_to_all_ptr),   // 0
+              "m" (socket_ready_ptr),               // 1
               "m" (message),                    // 2
               "m" (message_size),               // 3
               "m" (bool_ingame_only),           // 4
@@ -155,7 +142,7 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
     bool ingame_only, bool write_to_local_connection,
     bool flush_queue, bool unbuffered, int32_t buffer_priority) {
 
-    if(*socket_ready) {
+    if(*socket_ready_ptr) {
         int32_t bool_ingame_only = ingame_only;
         int32_t bool_write_to_local_connection = write_to_local_connection;
         int32_t bool_flush_queue = flush_queue;
@@ -172,17 +159,17 @@ void send_delta_message_to_player(int32_t player_id, void* message, uint32_t mes
             "push %3;"
             "push %2;"
             "push %4;"
-            "mov esi, %1;"
+            "mov esi, [_socket_ready_ptr];"
             "mov esi, [esi];"
             "mov eax, %9;"
-            "call %0;"
+            "call [_func_send_message_to_player_ptr];"
             "add esp, 0x1C;"
 
             "pop eax;"
             "pop esi;"
             :
-            : "m" (func_send_message_to_player),// 0
-              "m" (socket_ready),               // 1
+            : "m" (func_send_message_to_player_ptr),// 0
+              "m" (socket_ready_ptr),               // 1
               "m" (message),                    // 2
               "m" (message_size),               // 3
               "m" (bool_ingame_only),           // 4
@@ -209,7 +196,7 @@ void send_delta_message_to_all_except(int32_t player_id, void* message, uint32_t
 }
 
 void init_message_delta_sender() {
-    socket_ready = *reinterpret_cast<uintptr_t**>(sig_send_message_socket_ready.address());
-    func_send_message_to_all = sig_send_message_to_all.address() - 56;
-    func_send_message_to_player = sig_send_message_to_player.address();
+    socket_ready_ptr = *sig_func_net_send_message_socket_ready();
+    func_send_message_to_all_ptr = sig_func_net_send_message_to_all();
+    func_send_message_to_player_ptr = sig_func_net_send_message_to_player();
 }
