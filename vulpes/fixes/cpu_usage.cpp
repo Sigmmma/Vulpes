@@ -14,11 +14,16 @@ extern "C" {
     extern cpu_usage_sleep_replacement();
 }
 
-static Patch(cpu_usage_fix_patch1, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
-static Patch(cpu_usage_fix_patch2, 0,  6, CALL_PATCH, &cpu_usage_sleep_replacement);
-static Patch(cpu_usage_fix_patch3, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
-static Patch(cpu_usage_fix_patch4, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
-static Patch(cpu_usage_fix_patch5, 0, 10, CALL_PATCH, &cpu_usage_sleep_replacement);
+static Patch(cpu_usage_fix_patch1, NULL,  6,
+    CALL_PATCH, &cpu_usage_sleep_replacement);
+static Patch(cpu_usage_fix_patch2, NULL,  6,
+    CALL_PATCH, &cpu_usage_sleep_replacement);
+static Patch(cpu_usage_fix_patch3, NULL, 10,
+    CALL_PATCH, &cpu_usage_sleep_replacement);
+static Patch(cpu_usage_fix_patch4, NULL, 10,
+    CALL_PATCH, &cpu_usage_sleep_replacement);
+static Patch(cpu_usage_fix_patch5, NULL, 10,
+    CALL_PATCH, &cpu_usage_sleep_replacement);
 
 void init_cpu_usage_fixes() {
     auto pat1 = sig_fix_cpu_usage_pattern1();

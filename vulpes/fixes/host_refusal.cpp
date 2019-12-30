@@ -10,9 +10,9 @@
 
 #include "host_refusal.hpp"
 
-static Patch(host_refusal_fix1, 0, 5, NOP_PATCH, 0);
-static Patch(host_refusal_fix2, 0, {0xEB});
-static Patch(client_refusal_fix, 0, {0xEB, 0x13});
+static Patch(host_refusal_fix1, NULL, 5, NOP_PATCH, 0);
+static Patch(host_refusal_fix2, NULL, {0xEB});
+static Patch(client_refusal_fix, NULL, {0xEB, 0x13});
 
 void init_host_refusal_fixes() {
     if (host_refusal_fix1.build(sig_fix_host_refusal1())

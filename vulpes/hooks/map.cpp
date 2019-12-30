@@ -52,11 +52,11 @@ extern "C" {
 }
 
 static Patch(
-    map_load_ui_sp_hook_patch, 0, 5,
+    map_load_ui_sp_hook_patch, NULL, 5,
     JMP_PATCH, &map_load_sp_wrapper
 );
 static Patch(
-    map_load_mp_hook_patch, 0, 6,
+    map_load_mp_hook_patch, NULL, 6,
     JMP_PATCH, &map_load_mp_wrapper
 );
 

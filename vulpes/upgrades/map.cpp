@@ -192,14 +192,17 @@ extern "C" {
 static bool map_upgrades_initialized = false;
 // The Ballmer peak is followed by a slope twice
 // as steep as the one leading up to it.
-static Patch(patch_read_map_file_header_replacement, 0, 6,
+static Patch(patch_read_map_file_header_replacement, NULL, 6,
     JMP_PATCH, &read_map_file_header_wrapper);
 // NOP this call if other sigs are found
-static Patch(patch_startup_crc_calc_nop, 0, 5, NOP_PATCH, 0);
+static Patch(patch_startup_crc_calc_nop, NULL, 5,
+    NOP_PATCH, 0);
 // Put our little hook in here that intercepts it when halo asks for a crc
 // (Watch out for chimera!)
-static Patch(patch_get_map_crc, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
-static Patch(patch_get_map_crc_server, 0, 7, CALL_PATCH, &get_map_crc_wrapper_server);
+static Patch(patch_get_map_crc, NULL, 6,
+    CALL_PATCH, &get_map_crc_wrapper);
+static Patch(patch_get_map_crc_server, NULL, 7,
+    CALL_PATCH, &get_map_crc_wrapper_server);
 
 void init_map_crc_upgrades(bool server) {
     auto sig_addr1 = sig_map_crc_game_startup_call();

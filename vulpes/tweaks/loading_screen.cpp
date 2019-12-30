@@ -10,7 +10,7 @@
 
 #include "loading_screen.hpp"
 
-static Patch(loading_screen_background_removal, 0, 5, NOP_PATCH, 0);
+static Patch(loading_screen_background_removal, NULL, 5, NOP_PATCH, 0);
 
 void init_loading_screen_fixes() {
     if (loading_screen_background_removal.build(
