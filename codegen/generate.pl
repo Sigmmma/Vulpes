@@ -10,7 +10,7 @@ use warnings;
 
 # If you see a pull request that changes this system and it does not
 # have a change for this constant you should ready the firing squad.
-use constant VERSION => "1.1.0";
+our $VERSION = '1.1.0';
 
 use Digest::SHA1 qw( sha1_base64 );
 use File::Basename qw( dirname basename );
@@ -38,7 +38,7 @@ qq{/*
 use constant GEN_INFO_FILE => "./codegen_hashes.tmp";
 # Compile info
 my %info = (
-    version => VERSION,
+    version => $VERSION,
 );
 # Load info from previous compilation if it exists
 if (-e GEN_INFO_FILE) {
