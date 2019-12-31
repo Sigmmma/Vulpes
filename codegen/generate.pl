@@ -35,7 +35,7 @@ qq{/*
 };
 }
 
-use constant GEN_INFO_FILE => "./codegen_hashes.tmp";
+use constant GEN_INFO_FILE => "./.codegen_hashes.tmp";
 # Compile info
 my %info = (
     version => $VERSION,
@@ -56,9 +56,7 @@ if (-e GEN_INFO_FILE) {
         } else {
             print "not usable.\n";
         } 1;
-    } or do {
-        print "fail.\n"
-    }
+    } or print "fail.\n";
 }
 
 my $input_file_count = scalar @ARGV;
