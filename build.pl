@@ -95,7 +95,14 @@ if ($config->{game_folder}) {
         copy("./VulpesLoader.dll",
             $config->{game_folder}."/mods/VulpesLoader.dll");
     } else {
-        print "Invalid build_type";
+        print qq{Invalid build_type '$config->{build_type}'.
+
+Valid build types are:
+    - 'strings'  (Saves loader as strings.dll)
+    - 'controls' (Saves loader in controls/ folder)
+    - 'mods'     (Saves loader as mods/ folder)
+
+};
         exit 1;
     }
 }
