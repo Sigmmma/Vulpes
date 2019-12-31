@@ -13,7 +13,7 @@ use warnings;
 our $VERSION = '1.1.0';
 
 use Digest::SHA1 qw( sha1_base64 );
-use File::Basename qw( dirname basename );
+use File::Basename qw( dirname basename fileparse );
 use File::Slurper qw( read_text );
 use File::Spec::Functions qw( catfile );
 use File::Path qw( make_path );
@@ -62,21 +62,21 @@ if (-e GEN_INFO_FILE) {
 my $input_file_count = scalar @ARGV;
 my $i = 0;
 
-foreach my $filename (@ARGV) {
+foreach my $filepath (@ARGV) {
     # Terminal output non-sense.
     $i++;
     my $progress = int(($i*100)/$input_file_count);
-    printf "[%3d%%] Building CPP files for %s...", $progress, $filename;
+    printf "[%3d%%] Building CPP files for %s...", $progress, $filepath;
+
+    my ($name, $dir, $suffix) = fileparse $filepath;
+    # Remove extension from name.
+    $name =~ s/\.\w+$//;
 
     # Get path without file extension.
-    my $output_stem = $filename;
-    $output_stem =~ s/\.\w+$//;
-
-    # Just the isolated name.
-    my $name = basename $output_stem;
+    my $output_stem = catfile $dir, $name;
 
     # Get output directory and make it.
-    my $dir = catfile catfile (dirname $output_stem), "generated";
+    $dir = catfile catfile $dir, "generated";
     make_path $dir;
 
     # get names of our output files.
@@ -84,18 +84,18 @@ foreach my $filename (@ARGV) {
     my $output_head = catfile $dir, "$name.hpp";
 
     # Load yaml definition as text
-    my $file = read_text $filename;
+    my $file = read_text $filepath;
 
     # Check if file is the same as the last time
     my $sha = sha1_base64 $file;
-    my $old_sha = $info{hashes}{$filename} // "";
+    my $old_sha = $info{hashes}{$filepath} // "";
     if ($sha eq $old_sha and -e $output_src and -e $output_head) {
         # Skip if the same and both output files exist.
         print "skipped.\n";
         next;
     }
     # Overwrite old hash.
-    $info{hashes}{$filename} = $sha;
+    $info{hashes}{$filepath} = $sha;
 
     # Actually load the yaml
     $file = Load $file;
@@ -104,10 +104,7 @@ foreach my $filename (@ARGV) {
     open(OUTPUT_SRC,  ">$output_src");
     open(OUTPUT_HEAD, ">$output_head");
 
-    # basename with yaml extension
-    my $yaml_basename = basename($filename);
-
-    my $license_header = gen_header $yaml_basename;
+    my $license_header = gen_header basename($filepath);
 
     print OUTPUT_SRC $license_header, "#include <$output_stem.hpp>\n";
     print OUTPUT_HEAD $license_header, "#pragma once\n";
