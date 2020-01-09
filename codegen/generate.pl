@@ -7,10 +7,17 @@
 
 use strict;
 use warnings;
-use File::Basename qw( dirname basename );
+
+# If you see a pull request that changes this system and it does not
+# have a change for this constant you should ready the firing squad.
+our $VERSION = '1.1.0';
+
+use Digest::SHA1 qw( sha1_base64 );
+use File::Basename qw( dirname basename fileparse );
+use File::Slurper qw( read_text );
 use File::Spec::Functions qw( catfile );
 use File::Path qw( make_path );
-use YAML::XS qw( LoadFile );
+use YAML::XS qw( LoadFile Load Dump );
 
 use lib dirname(__FILE__); # Include own directory
 use CodeGen::Signature qw( yaml_signatures_to_cpp_definitions );
@@ -28,37 +35,76 @@ qq{/*
 };
 }
 
+use constant GEN_INFO_FILE => "./.codegen_hashes.tmp";
+# Compile info
+my %info = (
+    version => $VERSION,
+);
+# Load info from previous compilation if it exists
+if (-e GEN_INFO_FILE) {
+    print "[prep] Loading data from previous compilation...";
+    # eval to catch it if the GEN_INFO_FILE is corrupt.
+    # Insane edge case as no one should ever edit it.
+    # But, better safe than sorry.
+    eval {
+        my $old_info = LoadFile GEN_INFO_FILE;
+        if ($old_info->{version} eq $info{version}) {
+            print "usable!\n";
+            # There is a potential for carrying over arbitrary data here.
+            # But not in any dangerous way because of the use case.
+            $info{hashes} = $old_info->{hashes};
+        } else {
+            print "not usable.\n";
+        } 1;
+    } or print "fail.\n";
+}
+
 my $input_file_count = scalar @ARGV;
 my $i = 0;
 
-foreach my $filename (@ARGV) {
+foreach my $filepath (@ARGV) {
     # Terminal output non-sense.
     $i++;
     my $progress = int(($i*100)/$input_file_count);
-    printf "[%3d%s] Building CPP files for %s\n", $progress, "%", $filename;
+    printf "[%3d%%] Building CPP files for %s...", $progress, $filepath;
 
-    # Load yaml definition.
-    my $file = LoadFile $filename;
+    my ($name, $dir, $suffix) = fileparse $filepath;
+    # Remove extension from name.
+    $name =~ s/\.\w+$//;
 
     # Get path without file extension.
-    my $output_stem = $filename;
-    $output_stem =~ s/\.\w+$//;
-
-    # Just the isolated name.
-    my $name = basename $output_stem;
+    my $output_stem = catfile $dir, $name;
 
     # Get output directory and make it.
-    my $dir = catfile catfile (dirname $output_stem), "generated";
+    $dir = catfile catfile $dir, "generated";
     make_path $dir;
 
+    # get names of our output files.
+    my $output_src  = catfile $dir, "$name.cpp";
+    my $output_head = catfile $dir, "$name.hpp";
+
+    # Load yaml definition as text
+    my $file = read_text $filepath;
+
+    # Check if file is the same as the last time
+    my $sha = sha1_base64 $file;
+    my $old_sha = $info{hashes}{$filepath} // "";
+    if ($sha eq $old_sha and -e $output_src and -e $output_head) {
+        # Skip if the same and both output files exist.
+        print "skipped.\n";
+        next;
+    }
+    # Overwrite old hash.
+    $info{hashes}{$filepath} = $sha;
+
+    # Actually load the yaml
+    $file = Load $file;
+
     # Open new source and headers for writing.
-    open(OUTPUT_SRC,  ">".(catfile $dir, "$name.cpp"));
-    open(OUTPUT_HEAD, ">".(catfile $dir, "$name.hpp"));
+    open(OUTPUT_SRC,  ">$output_src");
+    open(OUTPUT_HEAD, ">$output_head");
 
-    # basename with yaml extension
-    my $yaml_basename = basename($filename);
-
-    my $license_header = gen_header $yaml_basename;
+    my $license_header = gen_header basename($filepath);
 
     print OUTPUT_SRC $license_header, "#include <$output_stem.hpp>\n";
     print OUTPUT_HEAD $license_header, "#pragma once\n";
@@ -80,4 +126,14 @@ foreach my $filename (@ARGV) {
 
     close(OUTPUT_SRC);
     close(OUTPUT_HEAD);
+
+    print "done.\n";
 };
+
+# Save info from this compile to make future compiles quicker. If the
+# script fails anywhere before this this info can obviously not be saved.
+# That's intentional.
+print "[100%] Saving compile info.\n";
+open(COMPILE_INFO, ">".GEN_INFO_FILE);
+print COMPILE_INFO Dump \%info;
+close(COMPILE_INFO);
