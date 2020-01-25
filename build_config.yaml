@@ -1,9 +1,10 @@
 # Place to install our libraries to.
 # Change to "" if you don't want to auto install.
 game_folder: /home/michelle/Halo/Games/Halo Custom Edition/
-# If true, VulpesLoader will overwrite strings.dll.
-# If false VulpesLoader will end up in the controls folder.
-strings_build: true
+# If strings, VulpesLoader will overwrite strings.dll.
+# If controls VulpesLoader will end up in the controls folder.
+# If mods VulpesLoader will end up in the mods folder.
+build_type: mods
 
 # These files will get generated into cpp and hpp files.
 yaml_files:
