@@ -77,42 +77,6 @@ std::vector<uintptr_t> LiteSignature::search_multiple(uintptr_t start_address,
 }
 
 
-////////////
-
-void CodePatch::setup_internal(void* content, size_t c_size) {
-    switch(type) {
-        case JA_PATCH :
-        case JMP_PATCH :
-        case CALL_PATCH :
-            // Every 4 byte type is technically valid for this type of
-            // patch. Every time you define a function with slightly
-            // different arguments that is seen as a completely different
-            // type. So, this is the sane alternative to converting in the
-            // files that initialize the patches.
-            redirect_address = *reinterpret_cast<intptr_t*>(content);
-            break;
-        case INT_PATCH :
-            // Int patches are arbitrary size and just write an integer
-            // to the patch location. We can just write these byte by byte
-            // so to save on code we do so.
-            type = MANUAL_PATCH;
-            /* Use MANUAL_PATCH setup */
-        case MANUAL_PATCH :
-            // Manual patches are just arrays of bytes.
-            // We copy those for safety.
-            for (int i=0; i<c_size;i++) {
-                patched_code.push_back(reinterpret_cast<uint8_t*>(content)[i]);
-            }
-            break;
-        default:
-            // Every other patch type is covered by the part above this
-            // switch.
-            break;
-    }
-}
-
-// Go to resource.hpp for the functional parts of the template based initializers.
-
 CodePatch::CodePatch(const char* d_name,
                      uintptr_t p_address,
                      std::vector<int16_t> patch_bytes) {
