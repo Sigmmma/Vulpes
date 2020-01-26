@@ -20,6 +20,9 @@ static Patch(console_in_hook_patch,
 
 void init_console_input_hook() {
     auto addr = sig_hook_console_input();
+    // Jump to this code after our console hook has been executed.
+    // This skips the original code that checks if the line is a comment.
+    // We can do this because we've implemented this exact check into our hook.
     console_hook__return_to_halo_con_in = addr + 23;
     console_in_hook_patch.build(addr);
     console_in_hook_patch.apply();
