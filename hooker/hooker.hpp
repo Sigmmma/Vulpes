@@ -78,11 +78,7 @@ public:
                 redirect_address = *reinterpret_cast<const uintptr_t*>(&content);
                 break;
             case INT_PATCH :
-                // Int patches are arbitrary size and just write an integer
-                // to the patch location. We can just write these byte by byte
-                // so to save on code we do so.
                 type = MANUAL_PATCH;
-                /* Use MANUAL_PATCH setup */
             case MANUAL_PATCH :
                 // Manual patches are just arrays of bytes.
                 // We copy those for safety.
@@ -101,7 +97,7 @@ public:
     // MANUAL_PATCH initializers.
     // These are used for self specifying patch bytes in vectors.
     // Similarily to CodeSignature you can use -1 in the vector for wildcards
-    // that do not have their data changed.
+    // that should not have their data changed.
     CodePatch(const char* d_name,
               uintptr_t p_address,
               std::vector<int16_t> patch_bytes);
@@ -165,8 +161,10 @@ uintptr_t get_call_address(T call_pointer) {
 
 template<typename T, typename T2>
 void set_call_address(T call_pointer, T2 point_to) {
-    set_call_address(*reinterpret_cast<intptr_t*>(&call_pointer),
-                     *reinterpret_cast<intptr_t*>(&point_to));
+    set_call_address(
+        *reinterpret_cast<intptr_t*>(&call_pointer),
+        *reinterpret_cast<intptr_t*>(&point_to)
+    );
 }
 
 // These are initialization functions, these should rarely actually be called.
