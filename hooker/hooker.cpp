@@ -86,25 +86,33 @@ void CodePatch::setup_internal(void* content, size_t c_size) {
         case JMP_PATCH :
         case CALL_PATCH :
             assert(patch_size >= 5);
+            // Every 4 byte type is technically valid for this type of
+            // patch. Every time you define a function with slightly
+            // different arguments that is seen as a completely different
+            // type. So, this is the sane alternative to converting in the
+            // files that initialize the patches.
             redirect_address = *reinterpret_cast<intptr_t*>(content);
             break;
         case SKIP_PATCH :
             assert(patch_size >= 2);
             break;
         case INT_PATCH :
-            assert(c_size == patch_size && c_size <= 4);
-            for (int i=0; i<c_size;i++) {
-                reinterpret_cast<uint8_t*>(&redirect_address)[i] =
-                    reinterpret_cast<uint8_t*>(content)[i];
-            }
-            break;
+            // Int patches are arbitrary size and just write an integer
+            // to the patch location. We can just write these byte by byte
+            // so to save on code we do so.
+            type = MANUAL_PATCH;
+            /* Use MANUAL_PATCH setup */
         case MANUAL_PATCH :
+            // Manual patches are just arrays of bytes.
+            // We copy those for safety.
             assert(c_size == patch_size);
             for (int i=0; i<c_size;i++) {
                 patched_code.push_back(reinterpret_cast<uint8_t*>(content)[i]);
             }
             break;
-        case NOP_PATCH :
+        default:
+            // Every other patch type is covered by the part above this
+            // switch.
             break;
     }
 }
