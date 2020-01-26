@@ -82,10 +82,8 @@ std::vector<uintptr_t> LiteSignature::search_multiple(
 void CodePatch::setup_internal(void* content, size_t c_size) {
     switch(type) {
         case JA_PATCH :
-            assert(patch_size >= 6);
         case JMP_PATCH :
         case CALL_PATCH :
-            assert(patch_size >= 5);
             // Every 4 byte type is technically valid for this type of
             // patch. Every time you define a function with slightly
             // different arguments that is seen as a completely different
@@ -94,7 +92,6 @@ void CodePatch::setup_internal(void* content, size_t c_size) {
             redirect_address = *reinterpret_cast<intptr_t*>(content);
             break;
         case SKIP_PATCH :
-            assert(patch_size >= 2);
             break;
         case INT_PATCH :
             // Int patches are arbitrary size and just write an integer
@@ -105,7 +102,6 @@ void CodePatch::setup_internal(void* content, size_t c_size) {
         case MANUAL_PATCH :
             // Manual patches are just arrays of bytes.
             // We copy those for safety.
-            assert(c_size == patch_size);
             for (int i=0; i<c_size;i++) {
                 patched_code.push_back(reinterpret_cast<uint8_t*>(content)[i]);
             }
@@ -150,6 +146,8 @@ bool CodePatch::build(uintptr_t p_address) {
             write_pointer = false;
             break;
         case CALL_PATCH :
+            assert(patch_size >= 5);
+
             patched_code.push_back(CALL_BYTE);
             used_area = 5;
             write_pointer = true;
@@ -160,12 +158,16 @@ bool CodePatch::build(uintptr_t p_address) {
             write_pointer = true;
             break;
         case JA_PATCH :
+            assert(patch_size >= 6);
+
             patched_code.push_back(CONDJ_BYTE);
             patched_code.push_back(JA_BYTE);
             used_area = 6;
             write_pointer = true;
             break;
         case SKIP_PATCH :
+            assert(patch_size >= 2);
+
             if(patch_size < 128) {
                 patched_code.push_back(JMP_SMALL_BYTE);
                 patched_code.push_back(uint8_t(patch_size - 2));
