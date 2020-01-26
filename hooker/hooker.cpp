@@ -91,8 +91,6 @@ void CodePatch::setup_internal(void* content, size_t c_size) {
             // files that initialize the patches.
             redirect_address = *reinterpret_cast<intptr_t*>(content);
             break;
-        case SKIP_PATCH :
-            break;
         case INT_PATCH :
             // Int patches are arbitrary size and just write an integer
             // to the patch location. We can just write these byte by byte
@@ -180,16 +178,11 @@ bool CodePatch::build(uintptr_t p_address) {
                 redirect_address = patch_address + patch_size;
             }
             break;
+        case INT_PATCH :
+        /* Int patches are manual patches */
         case MANUAL_PATCH :
             assert(patch_size == patched_code.size());
             used_area = patch_size;
-            write_pointer = false;
-            break;
-        case INT_PATCH :
-            used_area = patch_size;
-            for (int i=0; i<patch_size; i++) {
-                patched_code.push_back(reinterpret_cast<uint8_t*>(&redirect_address)[i]);
-            }
             write_pointer = false;
             break;
     }
