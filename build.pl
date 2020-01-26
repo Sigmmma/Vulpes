@@ -5,7 +5,6 @@ use warnings;
 use File::Path qw( rmtree );
 use File::pushd qw( pushd );
 use File::Copy qw( copy );
-use File::Slurper qw( read_text );
 use Getopt::Std;
 use YAML::XS qw( LoadFile );
 
@@ -48,7 +47,7 @@ sub build_luajit {
     copy("./lib/LuaJIT_Makefile", "./lib/LuaJIT/src/Makefile");
     {
         my $wd = pushd "./lib/LuaJIT/src";
-        system "make HOST_CC=\"gcc -m32\" CROSS=i686-w64-mingw32- TARGET_SYS=Windows";
+        system 'make HOST_CC="gcc -m32" CROSS=i686-w64-mingw32- TARGET_SYS=Windows';
     }
 }
 sub build_from_yaml {
@@ -81,11 +80,29 @@ build;
 if ($config->{game_folder}) {
     printf "Installing Vulpes to %s\n", $config->{game_folder};
     copy("./Vulpes.dll", $config->{game_folder}."/Vulpes.dll");
-    if ($config->{strings_build}) {
+    # This used to have this cool given - when - default structure.
+    # But turns out that that is expirimental and unstable. I'm sad now.
+    if ($config->{build_type} eq "strings") {
         print "Using strings.dll configuration\n";
-        copy("./VulpesLoader.dll", $config->{game_folder}."/strings.dll");
-    } else {
+        copy("./VulpesLoader.dll",
+            $config->{game_folder}."/strings.dll");
+    } elsif ($config->{build_type} eq "controls") {
         print "Using controls/ configuration\n";
-        copy("./VulpesLoader.dll", $config->{game_folder}."/mods/VulpesLoader.dll");
+        copy("./VulpesLoader.dll",
+            $config->{game_folder}."/controls/VulpesLoader.dll");
+    } elsif ($config->{build_type} eq "mods") {
+        print "Using mods/ configuration\n";
+        copy("./VulpesLoader.dll",
+            $config->{game_folder}."/mods/VulpesLoader.dll");
+    } else {
+        print qq{Invalid build_type '$config->{build_type}'.
+
+Valid build types are:
+    - 'strings'  (Saves loader as strings.dll)
+    - 'controls' (Saves loader in controls/ folder)
+    - 'mods'     (Saves loader as mods/ folder)
+
+};
+        exit 1;
     }
 }
