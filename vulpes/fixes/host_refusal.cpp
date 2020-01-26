@@ -11,8 +11,8 @@
 #include "host_refusal.hpp"
 
 static Patch(host_refusal_fix1, NULL, 5, NOP_PATCH, 0);
-static Patch(host_refusal_fix2, NULL, {0xEB});
-static Patch(client_refusal_fix, NULL, {0xEB, 0x13});
+static Patch(host_refusal_fix2, NULL, {JMP_SMALL_BYTE});
+static Patch(client_refusal_fix, NULL, {JMP_SMALL_BYTE, 0x13}); // Relative jump 0x13 bytes forward.
 
 void init_host_refusal_fixes() {
     if (host_refusal_fix1.build(sig_fix_host_refusal1())

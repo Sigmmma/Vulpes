@@ -32,7 +32,7 @@ static const float val_TransSlopeZBiasValue = -1.0;
 // these bias values. Essentually as if all of them have the 'decal' flag set.
 static Patch(patch_shader_trans_zfighting2_fix, NULL, 9,
     SKIP_PATCH, 0);
-// These patches forces the decal bias pointers to be explicitly overwritten
+// These patches force the decal bias pointers to be explicitly overwritten
 // so weird config.txt setups can't break this fix.
 static Patch(patch_shader_trans_zfighting3a_fix, NULL, 4,
     INT_PATCH, &val_DecalZBiasValue);
@@ -44,16 +44,19 @@ static Patch(patch_shader_trans_zfighting3d_fix, NULL, 4,
     INT_PATCH, &val_DecalSlopeZBiasValue);
 
 void init_shdr_trans_zfighting_fixes() {
+    // TODO: Maybe just rewrite these parts of the game code with fully C++ code?
     if (patch_shader_trans_zfighting2_fix.build(
             sig_fix_shader_trans_zfighting2())) {
         patch_shader_trans_zfighting2_fix.apply();
     }
-    auto sig_addr3 = sig_fix_shader_trans_zfighting3();
-    if (sig_addr3) {
-        if (patch_shader_trans_zfighting3a_fix.build(sig_addr3 +  0xE)
-         && patch_shader_trans_zfighting3b_fix.build(sig_addr3 + 0x34)
-         && patch_shader_trans_zfighting3c_fix.build(sig_addr3 +  0xE + 0x50)
-         && patch_shader_trans_zfighting3d_fix.build(sig_addr3 + 0x34 + 0x50)) {
+    auto z_offset_code = sig_fix_shader_trans_zfighting3();
+    if (z_offset_code) {
+        // All of these offsets are references to
+        // DecalZBiasValue or DecalSlopeZBiasValue.
+        if (patch_shader_trans_zfighting3a_fix.build(z_offset_code +  0xE)
+         && patch_shader_trans_zfighting3b_fix.build(z_offset_code + 0x34)
+         && patch_shader_trans_zfighting3c_fix.build(z_offset_code +  0xE + 0x50)
+         && patch_shader_trans_zfighting3d_fix.build(z_offset_code + 0x34 + 0x50)) {
             patch_shader_trans_zfighting3a_fix.apply();
             patch_shader_trans_zfighting3b_fix.apply();
             patch_shader_trans_zfighting3c_fix.apply();

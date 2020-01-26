@@ -130,21 +130,40 @@ struct ImageSectionHeader {
 #include <vulpes/memory/signatures.hpp>
 
 void init_vulpes() {
+    // Let our friend say hello <3
+    printf(_FOX);
+
     // Get safe search bounds for CodeSignature.
-    ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(
-        signature_text_segment_data.search(0x400000, 0x401000));
-    if (!header) {
+
+    auto base_module_memory_location = 0x400000;
+    auto module_header_size = 0x401000;
+
+    ImageSectionHeader* segment_header = reinterpret_cast<ImageSectionHeader*>(
+        signature_text_segment_data.search(
+            base_module_memory_location, module_header_size)
+    );
+
+    if (!segment_header) {
         printf("Couldn't find text_segment_data, we won't know where to search "
                "for our signatures now.\n This is unacceptable and we need to "
                "close!\n");
         exit(0);
     }
-    set_lowest_permitted_address(
-        0x400000 + header->offset_to_segment);
-    set_highest_permitted_address(
-        0x400000 + header->offset_to_segment + header->size_of_segment);
 
-    printf(_FOX);
+    // These are the addresses that the base module's code starts and ends.
+    // There is no reason to search anywhere else. That's just dangerous.
+
+    set_lowest_permitted_address(
+        base_module_memory_location
+        + segment_header->offset_to_segment
+    );
+    set_highest_permitted_address(
+        base_module_memory_location
+        + segment_header->offset_to_segment
+        + segment_header->size_of_segment
+    );
+
+    // Initialize the mod
 
     init_signatures_signatures();
 

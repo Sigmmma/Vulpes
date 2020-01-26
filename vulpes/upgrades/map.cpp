@@ -214,9 +214,14 @@ void init_map_crc_upgrades(bool server) {
         patch_startup_crc_calc_nop.apply();
     if (patch_get_map_crc.build(sig_map_crc_get_crc_from_table_hook())) {
         if (!map_upgrades_initialized) {
+            // Get pointer to the map list from the original code before we
+            // overwrite it.
             multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(
-                patch_get_map_crc.address()+2);
-            jmp_skip_chimera = patch_get_map_crc.address()+13;
+                patch_get_map_crc.address() + 2);
+            // This marks the location we need to jump to to avoid chimera
+            // doing the same if we were succesful.
+            // Its patch lives before this!
+            jmp_skip_chimera = patch_get_map_crc.address() + 13;
         }
         patch_get_map_crc.apply();
     }
