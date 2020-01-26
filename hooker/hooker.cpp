@@ -53,8 +53,8 @@ uintptr_t LiteSignature::search(
     return result;
 }
 
-std::vector<uintptr_t> LiteSignature::search_multiple(
-        uintptr_t start_address, uintptr_t end_address) {
+std::vector<uintptr_t> LiteSignature::search_multiple(uintptr_t start_address,
+                                                      uintptr_t end_address) {
 
     if (!start_address) start_address = get_lowest_permitted_address();
     if (!end_address) end_address = get_highest_permitted_address();
@@ -62,7 +62,7 @@ std::vector<uintptr_t> LiteSignature::search_multiple(
     printf("Multi sig search for %s\n\n", name);
 
     std::vector<uintptr_t> addresses;
-    // TODO: Use constant.
+
     uintptr_t last_result = 1;
     while(last_result && start_address + size < end_address) {
         last_result = search(start_address, end_address);
@@ -114,8 +114,8 @@ void CodePatch::setup_internal(void* content, size_t c_size) {
 // Go to resource.hpp for the functional parts of the template based initializers.
 
 CodePatch::CodePatch(const char* d_name,
-          uintptr_t p_address,
-          std::vector<int16_t> patch_bytes) {
+                     uintptr_t p_address,
+                     std::vector<int16_t> patch_bytes) {
     name = d_name;
     patch_address = p_address;
     patch_size = patch_bytes.size();
@@ -179,7 +179,7 @@ bool CodePatch::build(uintptr_t p_address) {
             }
             break;
         case INT_PATCH :
-        /* Int patches are manual patches */
+            /* Int patches are manual patches */
         case MANUAL_PATCH :
             assert(patch_size == patched_code.size());
             used_area = patch_size;
@@ -230,13 +230,23 @@ void CodePatch::write_patch(std::vector<int16_t> patch_code) {
     assert(patch_built);
     uint8_t* patch_address_bytes = reinterpret_cast<uint8_t*>(patch_address);
     DWORD prota, protb;
-    VirtualProtect(reinterpret_cast<void*>(patch_address), patch_size, PAGE_EXECUTE_READWRITE, &prota);
+    VirtualProtect(
+        reinterpret_cast<void*>(patch_address),
+        patch_size,
+        PAGE_EXECUTE_READWRITE,
+        &prota
+    );
     for (int i = 0; i < patch_size; i++) {
         if (patch_code[i] != -1) {
             patch_address_bytes[i] = static_cast<uint8_t>(patch_code[i]);
         }
     }
-    VirtualProtect(reinterpret_cast<void*>(patch_address), patch_size, prota, &protb);
+    VirtualProtect(
+        reinterpret_cast<void*>(patch_address),
+        patch_size,
+        prota,
+        &protb
+    );
 }
 
 void CodePatch::apply() {

@@ -58,21 +58,30 @@ private:
     void setup_internal(void* content, size_t c_size);
 public:
     template<typename T>
-    CodePatch(const char* d_name, uintptr_t p_address,
-              size_t p_size, PatchTypes p_type, T content) {
-        name = d_name; patch_address = p_address;
-        patch_size = p_size; type = p_type;
+    CodePatch(const char* d_name,
+              uintptr_t p_address,
+              size_t p_size,
+              PatchTypes p_type,
+              T content) {
+        name = d_name;
+        patch_address = p_address;
+        patch_size = p_size;
+        type = p_type;
         setup_internal(reinterpret_cast<void*>(&content), sizeof(T));
     }
     // MANUAL_PATCH initializers.
     // These are used for self specifying patch bytes in vectors.
     // Similarily to CodeSignature you can use -1 in the vector for wildcards
     // that do not have their data changed.
-    CodePatch(const char* d_name, uintptr_t p_address,
+    CodePatch(const char* d_name,
+              uintptr_t p_address,
               std::vector<int16_t> patch_bytes);
 
-    uintptr_t address();
+
     ////// Runtime functions.
+
+    // Gets the address the patch intends to write to.
+    uintptr_t address();
     // Builds the patch at based on the data found at the current address.
     // If no address is put in it will use the address passed earlier,
     // or use a code signature to try and find an address.
