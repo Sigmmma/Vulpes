@@ -12,42 +12,13 @@
 #include <util/crc32.hpp>
 
 #include <vulpes/memory/types.hpp>
+#include <vulpes/memory/signatures.hpp>
 
 #include "map.hpp"
 
 extern "C" {
     bool is_server = false;
 }
-
-// NOP this call if other sigs are found
-Signature(false, sig_game_startup_crc_call,
-    {0xE8, -1, -1, -1, 0xFF, 0x83, 0xC4, -1, 0xFF, 0x05, -1, -1, -1, -1,
-     0x81, 0xC4, 0x00, 0x08, 0x00, 0x00, 0xC3});
-
-// Put our little hook in here that intercepts it when halo asks for a crc
-// (Watch out for chimera!)
-Signature(true, sig_get_crc_from_table,
-    {0x8B, 0x15,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-     0x51, 0x89, 0x8C, 0x24, 0xAC, 0x00, 0x00, 0x00});
-
-// Server map CRC
-Signature(true, sig_server_map_crc,
-    {0xA1, -1, -1, -1, -1, 0xC1, 0xE1, 0x04, 0x8B, 0x44, 0x01, 0x0C, 0xC3, 0xCC});
-
-// I think this can be used for adding maps to the table
-Signature(true, sig_add_map_to_list,
-    {0x8B, 0x0D, -1, -1, -1, -1, 0x81, 0xEC, 0x00, 0x08, 0x00, 0x00});
-
-// Returns -1 if not found
-Signature(true, sig_get_map_from_maps_list,
-    {0x56, 0x33, 0xF6, 0xEB, 0x0B, 0x8D, 0xA4, 0x24, 0x00,
-     0x00, 0x00, 0x00, 0x8D, 0x64, 0x24, 0x00});
-
-// Replace this function
-// This function could be the key to an alternative way
-// to fix file handle leaks.
-Signature(true, sig_read_map_file_header,
-    {0x81, 0xEC, 0x04, 0x01, 0x00, 0x00, 0x53, 0x57});
 
 std::vector<std::string> map_folders;
 std::vector<std::string> map_extensions;
@@ -219,25 +190,46 @@ extern "C" {
 }
 
 static bool map_upgrades_initialized = false;
-Patch(patch_read_map_file_header_replacement, sig_read_map_file_header, 0, 6, JMP_PATCH, &read_map_file_header_wrapper);
-Patch(patch_startup_crc_calc_nop, sig_game_startup_crc_call, 0, 5, NOP_PATCH, 0);
-Patch(patch_get_map_crc, sig_get_crc_from_table, 0, 6, CALL_PATCH, &get_map_crc_wrapper);
-Patch(patch_get_map_crc_server, sig_server_map_crc, 5, 7, CALL_PATCH, &get_map_crc_wrapper_server);
+// The Ballmer peak is followed by a slope twice
+// as steep as the one leading up to it.
+static Patch(patch_read_map_file_header_replacement, NULL, 6,
+    JMP_PATCH, &read_map_file_header_wrapper);
+// NOP this call if other sigs are found
+static Patch(patch_startup_crc_calc_nop, NULL, 5,
+    NOP_PATCH, 0);
+// Put our little hook in here that intercepts it when halo asks for a crc
+// (Watch out for chimera!)
+static Patch(patch_get_map_crc, NULL, 6,
+    CALL_PATCH, &get_map_crc_wrapper);
+static Patch(patch_get_map_crc_server, NULL, 7,
+    CALL_PATCH, &get_map_crc_wrapper_server);
 
 void init_map_crc_upgrades(bool server) {
+    auto sig_addr1 = sig_map_crc_game_startup_call();
+    auto sig_addr2 = sig_map_crc_read_map_file_header();
     is_server = server;
-    if (patch_read_map_file_header_replacement.build()) patch_read_map_file_header_replacement.apply();
-    if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
-    if (patch_get_map_crc.build()) {
+    if (patch_read_map_file_header_replacement.build(sig_addr2))
+        patch_read_map_file_header_replacement.apply();
+    if (patch_startup_crc_calc_nop.build(sig_addr1))
+        patch_startup_crc_calc_nop.apply();
+    if (patch_get_map_crc.build(sig_map_crc_get_crc_from_table_hook())) {
         if (!map_upgrades_initialized) {
-            multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(patch_get_map_crc.address()+2);
-            jmp_skip_chimera = patch_get_map_crc.address()+13;
+            // Get pointer to the map list from the original code before we
+            // overwrite it.
+            multiplayer_maps_list_ptr = *reinterpret_cast<uintptr_t**>(
+                patch_get_map_crc.address() + 2);
+            // This marks the location we need to jump to to avoid chimera
+            // doing the same if we were succesful.
+            // Its patch lives before this!
+            jmp_skip_chimera = patch_get_map_crc.address() + 13;
         }
         patch_get_map_crc.apply();
     }
-    if (patch_get_map_crc_server.build()) {
+    if (patch_get_map_crc_server.build(
+            sig_map_crc_server_get_crc_from_table_hook())) {
         patch_get_map_crc_server.apply();
-        if (patch_startup_crc_calc_nop.build()) patch_startup_crc_calc_nop.apply();
+        if (patch_startup_crc_calc_nop.build(sig_addr1))
+            patch_startup_crc_calc_nop.apply();
     }
     if (!map_upgrades_initialized) {
         map_folders.push_back(default_map_folder);
@@ -250,4 +242,5 @@ void revert_map_crc_upgrades() {
     patch_read_map_file_header_replacement.revert();
     patch_startup_crc_calc_nop.revert();
     patch_get_map_crc.revert();
+    patch_get_map_crc_server.revert();
 }

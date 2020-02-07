@@ -117,8 +117,9 @@ void init_network() {
 
 void pre_first_map_load_init();
 
-SignatureBounded(true, sig_text_segment_data, 0x400000, 0x401000,
-    {0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00});
+static LiteSignature signature_text_segment_data = {
+    "text_segment_data", 8, { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 } };
+
 struct ImageSectionHeader {
     uint32_t bullshit1[4];
     uint32_t size_of_segment;
@@ -126,13 +127,45 @@ struct ImageSectionHeader {
     uint32_t bullshit2[4];
 };
 
-void init_vulpes() {
-    // Get safe search bounds for CodeSignature.
-    ImageSectionHeader* header = reinterpret_cast<ImageSectionHeader*>(sig_text_segment_data.address());
-    set_lowest_permitted_address(0x400000 + header->offset_to_segment);
-    set_highest_permitted_address(0x400000 + header->offset_to_segment + header->size_of_segment);
+#include <vulpes/memory/signatures.hpp>
 
+void init_vulpes() {
+    // Let our friend say hello <3
     printf(_FOX);
+
+    // Get safe search bounds for CodeSignature.
+
+    auto base_module_memory_location = 0x400000;
+    auto module_header_size = 0x401000;
+
+    ImageSectionHeader* segment_header = reinterpret_cast<ImageSectionHeader*>(
+        signature_text_segment_data.search(
+            base_module_memory_location, module_header_size)
+    );
+
+    if (!segment_header) {
+        printf("Couldn't find text_segment_data, we won't know where to search "
+               "for our signatures now.\n This is unacceptable and we need to "
+               "close!\n");
+        exit(0);
+    }
+
+    // These are the addresses that the base module's code starts and ends.
+    // There is no reason to search anywhere else. That's just dangerous.
+
+    set_lowest_permitted_address(
+        base_module_memory_location
+        + segment_header->offset_to_segment
+    );
+    set_highest_permitted_address(
+        base_module_memory_location
+        + segment_header->offset_to_segment
+        + segment_header->size_of_segment
+    );
+
+    // Initialize the mod
+
+    init_signatures_signatures();
 
     init_hooks();
     init_halo_bug_fixes();
@@ -140,7 +173,6 @@ void init_vulpes() {
     init_halo_functions();
     init_network();
     init_commands();
-
 
     // Final initialization step for things that act on data that isn't valid
     // until way later when the game has loaded more.

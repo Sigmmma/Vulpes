@@ -34,5 +34,3 @@ class GenericTable : public Table {
 public:
     void* first;
 };
-
-GenericTable** effect_ptrs();

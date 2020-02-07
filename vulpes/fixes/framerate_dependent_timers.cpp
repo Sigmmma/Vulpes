@@ -7,14 +7,11 @@
 #include <hooker/hooker.hpp>
 
 #include <vulpes/hooks/tick.hpp>
+#include <vulpes/memory/signatures.hpp>
 
 #include "framerate_dependent_timers.hpp"
 
-Signature(false, sig_death_timer_framerate_dep,
-    {0x38, 0x1D, -1, -1, -1, -1, 0x74, 0x33, 0xA1, -1, -1, -1, -1, 0x38, 0x58,
-     0x02, 0x75, 0x29, 0x66, 0xA1, -1, -1, -1, -1, 0x66, 0x8B, 0xC8, 0x66, 0x40});
-
-Patch(death_timer_framerate_dep_fix, 0, 2, NOP_PATCH, 0);
+static Patch(death_timer_framerate_dep_fix, NULL, 2, NOP_PATCH, 0);
 
 bool*    player_dead;
 int32_t* player_respawn_timer;
@@ -28,7 +25,7 @@ void increment_respawn_timer() {
 static bool initialized = false;
 
 void init_checkpoint_revert_fix() {
-    static intptr_t sig_addr = sig_death_timer_framerate_dep.address();
+    static intptr_t sig_addr = sig_fix_death_timer_framerate_dep();
     if (!initialized && sig_addr) {
         death_timer_framerate_dep_fix.build(sig_addr+27);
         player_dead = *reinterpret_cast<bool**>(sig_addr+2);
@@ -46,40 +43,42 @@ void revert_checkpoint_revert_fix() {
     DEL_CALLBACK(EVENT_TICK, increment_respawn_timer);
 }
 
-Signature(false, sig_scoreboard_framerate_dep,
-    {0xD8, 0x25, -1, -1, -1, -1, 0xEB, 0x06, 0xD8, 0x05});
+// In assembly floats are referenced by pointers.
+// This means we need a space to hold the value that the code will be using.
+// Aka, this float.
+static const float fade = 1.0;
 
-Signature(false, sig_scoreboard_framerate_dep2,
-    {0xD8, 0x05, -1, -1, -1, -1, 0xEB, 0x42});
-
-Signature(false, sig_scoreboard_framerate_dep3,
-    {0xD8, 0x05, -1, -1, -1, -1, 0xEB, 0x0A, 0xD9, 0x44, 0x24, 0x14, 0xD8, 0x25});
-
-Signature(false, sig_scoreboard_ruleboard_intro_nop,
-    {0xC7, 0x05, -1, -1, -1, 0x00, 0x96, 0x00, 0x00, 0x00, 0x5B});
-
-const float fade = 1.0;
-
-Patch(patch_scoreboard_framerate_dep1a, sig_scoreboard_framerate_dep,   2, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep1b, sig_scoreboard_framerate_dep,  10, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep2a, sig_scoreboard_framerate_dep2,  2, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep3a, sig_scoreboard_framerate_dep3,  2, 4, INT_PATCH, &fade);
-Patch(patch_scoreboard_framerate_dep3b, sig_scoreboard_framerate_dep3, 14, 4, INT_PATCH, &fade);
-Patch(patch_ruleboard_intro_nop, sig_scoreboard_ruleboard_intro_nop,    6, 4, INT_PATCH, 0);
+static Patch(patch_scoreboard_framerate_dep1a, NULL, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep1b, NULL, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep2a, NULL, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep3a, NULL, 4, INT_PATCH, &fade);
+static Patch(patch_scoreboard_framerate_dep3b, NULL, 4, INT_PATCH, &fade);
+static Patch(patch_ruleboard_intro_nop, NULL, 4, INT_PATCH, 0);
 
 void init_scoreboard_fix() {
-    if (patch_scoreboard_framerate_dep1a.build()
-    &&  patch_scoreboard_framerate_dep1b.build()
-    &&  patch_scoreboard_framerate_dep2a.build()
-    &&  patch_scoreboard_framerate_dep3a.build()
-    &&  patch_scoreboard_framerate_dep3b.build()) {
+    auto p_addr1 = sig_fix_scoreboard_framerate_dep1();
+    auto p_addr2 = sig_fix_scoreboard_framerate_dep2();
+    auto p_addr3 = sig_fix_scoreboard_framerate_dep3();
+    if (!(p_addr1 && p_addr2 && p_addr3)) {
+        return;
+    }
+    if (patch_scoreboard_framerate_dep1a.build(p_addr1+2)
+    &&  patch_scoreboard_framerate_dep1b.build(p_addr1+10)
+    &&  patch_scoreboard_framerate_dep2a.build(p_addr2+2)
+    &&  patch_scoreboard_framerate_dep3a.build(p_addr3+2)
+    &&  patch_scoreboard_framerate_dep3b.build(p_addr3+14)) {
         patch_scoreboard_framerate_dep1a.apply();
         patch_scoreboard_framerate_dep1b.apply();
         patch_scoreboard_framerate_dep2a.apply();
         patch_scoreboard_framerate_dep3a.apply();
         patch_scoreboard_framerate_dep3b.apply();
     }
-    if (patch_ruleboard_intro_nop.build()) patch_ruleboard_intro_nop.apply();
+    if (sig_fix_scoreboard_ruleboard_intro_nop()) {
+        if (patch_ruleboard_intro_nop.build(
+                sig_fix_scoreboard_ruleboard_intro_nop()+6))
+            patch_ruleboard_intro_nop.apply();
+    }
+
 }
 
 void revert_scoreboard_fix() {
@@ -91,18 +90,12 @@ void revert_scoreboard_fix() {
     patch_ruleboard_intro_nop.revert();
 }
 
-Signature(false, sig_console_fade_call,
-    {0x8B, 0x15, -1, -1, -1, -1, 0x83, 0xFA, 0xFF, 0x74});
-Signature(false, sig_console_framerate_dep,
-    {-1, -1, -1, 0x00, 0x75, 0x05, 0xE8, -1, -1, -1, 0xFF,
-     0xe8, -1, -1, -1, 0xFF});
-
 static bool console_initialized = false;
 
 static bool* console_open;
 static void (*fade_console_halo)();
 
-Patch(patch_console_framerate_dep, sig_console_framerate_dep, 6, 5, NOP_PATCH, 0);
+static Patch(patch_console_framerate_dep, NULL, 5, NOP_PATCH, 0);
 
 void fade_console() {
     if (!*console_open) {
@@ -111,10 +104,11 @@ void fade_console() {
 }
 
 void init_console_fix() {
-    static intptr_t sig_addr1 = sig_console_fade_call.address();
-    if (sig_addr1 && patch_console_framerate_dep.build()) {
+    auto sig_addr1 = sig_fix_console_fade_call();
+    auto sig_addr2 = sig_fix_console_framerate_dep();
+    if (sig_addr1 && patch_console_framerate_dep.build(sig_addr2)) {
         fade_console_halo = reinterpret_cast<void (*)()>(sig_addr1);
-        console_open = *reinterpret_cast<bool**>(patch_console_framerate_dep.address()-6);
+        console_open = *reinterpret_cast<bool**>(sig_addr2-6);
         patch_console_framerate_dep.apply();
         ADD_CALLBACK(EVENT_TICK, fade_console);
     }

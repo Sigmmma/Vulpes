@@ -6,5 +6,6 @@
 
 #pragma once
 
-char* profile_path();
-char* map_name();
+const char* profile_path();
+const char* map_name();
+bool at_main_menu();

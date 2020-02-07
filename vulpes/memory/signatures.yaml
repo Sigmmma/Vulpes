@@ -56,16 +56,19 @@ signatures:
   - name: fix_console_framerate_dep
     bytes: ?? ?? ?? 00 75 05 E8 ?? ?? ?? FF E8 ?? ?? ?? FF
     crucial: false
+    offset: 6
 
   # fixes/host_refusal
 
   - name: fix_host_refusal1
     bytes: 88 5C 24 2A E8 ?? ?? ?? ?? 50 E8
     crucial: false
+    offset: 0xA
 
   - name: fix_host_refusal2
     bytes: 8B 7F 08 3B FD 74 5F 8D 9B 00 00 00 00
     crucial: false
+    offset: 5
 
   - name: fix_client_refusal
     bytes: ?? ?? 75 11 6A 01 6A 7E 68 A0 00 00 00
@@ -80,6 +83,8 @@ signatures:
   - name: fix_shader_trans_zfighting3
     bytes: F7 05 ?? ?? ?? ?? 00 00 00 04 74 ?? 8B 15 ?? ?? ?? ?? A1 ?? ?? ?? ?? 8B 08 52
     crucial: false
+
+  # fixes/string_overflows
 
   - name: fix_hs_print_overflow
     bytes: 83 C4 10 85 C0 74 ?? 8B 08 A1 ?? ?? ?? ?? 51 E8
@@ -129,6 +134,7 @@ signatures:
   - name: func_net_send_message_to_all
     bytes: 66 8B 46 0E 8A D0 D0 EA F6 C2 01
     crucial: true
+    offset: "-56"
 
   - name: func_net_send_message_to_player # Machine id, not player id
     bytes: 51 53 57 8B F8 32 C0 33 C9
@@ -137,6 +143,17 @@ signatures:
   - name: func_net_send_message_socket_ready
     bytes: ?? ?? ?? ?? 3B C3 74 1A 83 C0 08 3B C3 74 13
     crucial: true
+    type: uintptr_t**
+
+  # functions/messaging
+
+  - name: func_console_line_new
+    bytes: 8B 15 ?? ?? ?? ?? 66 83 7A 2E 20 75 11
+    crucial: true
+
+  - name: func_console_to_terminal_and_network
+    bytes: 55 8B EC 83 E4 F8 81 EC 10 01 00 00 56
+    crucial: false
 
   # functions/object_unit
 
@@ -188,11 +205,23 @@ signatures:
     bytes: 84 C0 0F 84 ?? ?? ?? ?? 8A 44 24 10 3C FF 0F 84
     crucial: true
 
-  # hooks/map
+  # hooks/effect
+
+  - name: hook_projectile_detonation_effect_spawn
+    bytes: E8 ?? ?? ?? ?? 8B D8 83 CF FF 83 C4 0C 3B DF
+    crucial: true
+
+  # hooks/king
+
+#  - name: hook_king_timer_start
+#    bytes: C7 05 ?? ?? ?? 00 08 07 00 00 C7 05 ?? ?? ?? 00 FF FF FF FF A3 ?? ?? ?? ?? E8
+#    crucial: true
 
   - name: hook_hill_timer_reset
     bytes: C7 05 ?? ?? ?? 00 08 07 00 00 E8 ?? ?? FF FF
     crucial: true
+
+  # hooks/map
 
   - name: hook_map_load_ui_sp
     bytes: 83 EC 0C 53 55 56 57 8B F0 E8
@@ -215,12 +244,17 @@ signatures:
   - name: hook_biped_jump
     bytes: 8B 0D ?? ?? ?? 00 8B 51 34 83 EC 10 53 55
     crucial: true
+    offset: 6
 
   - name: hook_weapon_pull_trigger
     bytes: 81 EC 94 00 00 00 8B 84 24 98 00 00 00 8B 0D
     crucial: true
 
   # hooks/player
+
+  - name: hook_player_spawn
+    bytes: 81 EC ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 53 8B D8
+    crucial: true
 
   - name: hook_player_teleport
     bytes: 8D 54 24 20 52 50 8B FE # Offset result by +8
@@ -247,3 +281,133 @@ signatures:
   - name: hook_tick
     bytes: 51 53 68 FF FF 0F 00 68 1F 00 09 00 C6 05 ?? ?? ?? ?? 01
     crucial: true
+
+  # tables
+
+  - name: object_table_ref
+    bytes: ?? ?? ?? ?? 8B 51 34 25 FF FF 00 00 8D 04 40 8B 44 82 08 8B 08
+    crucial: true
+
+  - name: console_globals
+    bytes: 83 EC 10 57 8B F8 A0 ?? ?? ?? ?? 84 C0 C7 44 24 04 00 00 80 3F
+    crucial: true
+    offset: 7
+
+  - name: console_input_globals
+    bytes: 38 1D ?? ?? ?? ?? 0F 85 ?? ?? 00 00 A1 ?? ?? ?? ?? 38 18 74
+    crucial: true
+    offset: 2
+
+  - name: effect_table_refs
+    bytes: ?? ?? ?? ?? 89 2D ?? ?? ?? ?? 66 89 3D ?? ?? ?? ?? 88 5E 24
+    crucial: true
+
+  - name: player_table_ref
+    bytes: ?? ?? ?? 00 89 44 24 48 35 72 65 74 69
+    crucial: true
+
+    # If this is present then that means we're on a 1.10 dedicated server EXE
+  - name: server
+    bytes: 75 2D 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 68 ?? ?? ?? ?? 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 68 ?? ?? ?? ?? 68 ?? ?? ?? ?? 33 C0 E8 ?? ?? ?? ?? 83 C4 14 8B 44 24 04 68 ?? ?? ?? ?? 68 ?? ?? ?? ?? 50
+    crucial: false
+
+  - name: connection_type_enum
+    bytes: 66 83 3D ?? ?? ?? ?? 02 75 ?? 8B
+    crucial: true
+    offset: 3
+
+  - name: allow_client_side_projectiles_bool
+    bytes: 80 3D ?? ?? ?? ?? 01 74 15 33 C0 EB
+    crucial: false
+    offset: 3
+
+  - name: game_variant_settings
+    bytes: 80 3D ?? ?? ?? ?? 00 74 49 0F BF C9 83 F9 01 74 2B
+    crucial: true
+    offset: 2
+
+  - name: king_globals
+    bytes: B9 6B 00 00 00 BF ?? ?? ?? ?? F3 AB B9 6B 00 00 00
+    crucial: true
+    offset: 6
+
+  - name: path
+    bytes: 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 04 88 1D ?? ?? ?? ?? C6 05 ?? ?? ?? ?? 01 C6 05
+    crucial: true
+    offset: 1
+    type: const char**
+
+  - name: map_name
+    bytes: ?? ?? ?? ?? E8 ?? ?? ?? ?? 32 C9 83 F8 13 7D
+    crucial: true
+    type: const char**
+
+  - name: sp_map_name
+    bytes: ?? ?? ?? ?? C6 05 ?? ?? ?? ?? 00 E8 ?? ?? ?? ?? 8A 44 24 1F
+    crucial: true
+    type: const char**
+
+  - name: at_main_menu
+    bytes: ?? ?? ?? ?? 84 C0 75 ?? 66 FF 0D
+    crucial: true
+    type: bool*
+
+  - name: object_behavior_defs
+    bytes: 8B 0C 95 ?? ?? ?? 00 39 71 10 74 02 33 C0
+    crucial: true
+    offset: 3
+
+  # tweaks/loading screen
+
+  - name: loading_screen_background_render_call
+    bytes: E8 ?? ?? ?? ?? 83 C4 0C 55 6A 02 6A FF
+    crucial: false
+
+  # Network ID tracking functions.
+
+  - name: func_server_register_network_index
+    bytes: 55 56 8B 70 58 8A 46 0C 8D 6E 0C 57 83 CF FF 3C 01 75
+    crucial: true
+    offset: 3
+
+  - name: func_client_register_network_index_from_remote
+    bytes: 8B 40 58 8B 50 28 53 55 8B 6C 24 0C 57 8D 3C AA 8B 17 32 DB 83 FA FF 75
+    crucial: true
+    offset: 3
+
+  - name: func_unregister_network_index
+    bytes: 53 57 8B 78 58 8A 47 0C 8D 4F 0C 32 DB 3C 01 75
+    crucial: true
+    offset: 5
+
+  - name: network_translation_table
+    bytes: ?? ?? ?? ?? 8B 52 28 8B 34 8A
+    crucial: true
+
+  # upgrades/map
+
+  - name: map_crc_game_startup_call
+    bytes: E8 ?? ?? ?? FF 83 C4 ?? FF 05 ?? ?? ?? ?? 81 C4 00 08 00 00 C3
+    crucial: false
+
+  - name: map_crc_read_map_file_header
+    bytes: 81 EC 04 01 00 00 53 57
+    crucial: false
+
+    # There is a lot of wildcard here so we can encapsulate the Chimera hook
+  - name: map_crc_get_crc_from_table_hook
+    bytes: 8B 15 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 51 89 8C 24 AC 00 00 00
+    crucial: false
+
+  - name: map_crc_server_get_crc_from_table_hook
+    bytes: A1 ?? ?? ?? ?? C1 E1 04 8B 44 01 0C C3 CC
+    crucial: false
+    offset: 5
+
+# I think this can be used for adding maps to the table
+# - name: func_add_map_to_list
+# - bytes: 8B 0D ?? ?? ?? ?? 81 EC 00 08 00 00
+
+# Returns -1 if not found
+# - name: func_get_map_from_maps_list
+# - bytes: 56 33 F6 EB 0B 8D A4 24 00 00 00 00 8D 64 24 00
