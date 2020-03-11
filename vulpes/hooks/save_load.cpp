@@ -63,6 +63,7 @@ static bool hook_save_load_initialized = false;
 
 void init_save_load_hook() {
     if (!hook_save_load_initialized) {
+        hook_save_load_initialized = true;
         auto function_pointers = *sig_hook_save_load();
 
         typedef void (*fp_type)();
@@ -94,6 +95,7 @@ void init_save_load_hook() {
 
 void revert_save_load_hook() {
     if (hook_save_load_initialized) {
+        hook_save_load_initialized = false;
         auto function_pointers = *sig_hook_save_load();
 
         auto area = reinterpret_cast<size_t>(function_pointers[15]) - reinterpret_cast<size_t>(function_pointers[0]);
