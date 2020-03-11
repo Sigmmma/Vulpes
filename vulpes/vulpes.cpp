@@ -18,6 +18,7 @@
 #include "hooks/tick.hpp"
 #include "hooks/object.hpp"
 #include "hooks/map.hpp"
+#include "hooks/save_load.hpp"
 void init_hooks() {
     init_incoming_packet_hooks();
     init_king_hooks();
@@ -25,6 +26,7 @@ void init_hooks() {
     init_tick_hook();
     init_object_hooks();
     init_map_hooks(game_is_server_executable());
+    init_save_load_hook();
 }
 void revert_hooks() {
     revert_incoming_packet_hooks();
@@ -33,6 +35,7 @@ void revert_hooks() {
     revert_tick_hook();
     revert_object_hooks();
     revert_map_hooks();
+    revert_save_load_hook();
 }
 
 // Commands

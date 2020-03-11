@@ -282,6 +282,14 @@ signatures:
     bytes: 51 53 68 FF FF 0F 00 68 1F 00 09 00 C6 05 ?? ?? ?? ?? 01
     crucial: true
 
+  # hooks/save_load
+
+  - name: hook_save_load
+    bytes: FF 15 ?? ?? ?? ?? 32 C0 A2 ?? ?? ?? ?? A2
+    offset: 2
+    type: uintptr_t**
+    crucial: true
+
   # tables
 
   - name: object_table_ref
