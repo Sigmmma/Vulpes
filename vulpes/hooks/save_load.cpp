@@ -22,21 +22,23 @@ static void (*after_load_proc_orig)();
 static int (*core_load_orig)(char*);
 
 static void before_save_proc_hook() {
-    cprintf_info("Before save hook ping!");
+    // Stub. execute before save logic here.
     exec_if_valid(before_save_proc_orig);
 }
 
 static void before_load_proc_hook() {
     if (!doing_core) {
-        cprintf_info("Before load hook ping!");
+        // Stub, execute before load logic here.
     }
     exec_if_valid(before_load_proc_orig);
+    // When this function finishes executing the vanilla gamestate is loaded
+    // from disk/in-memory copy.
 }
 
 static void after_load_proc_hook() {
     exec_if_valid(after_load_proc_orig);
     if (!doing_core) {
-        cprintf_info("After load hook ping!");
+        // Stub, execute after load logic here.
     }
 }
 
