@@ -41,6 +41,9 @@ static void after_load_proc_hook() {
 }
 
 // https://github.com/Sigmmma/Vulpes/issues/68
+// This function was a wrapper to avoid calling checkpoint load logic during
+// a core_load. Because there is distinction.
+// But core loading and saving is kind of a hack.
 __attribute__((regparm(1)))
 static int core_load_hook(char* name) {
     cprintf_error("core_load is disabled");
