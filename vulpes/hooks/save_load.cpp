@@ -28,6 +28,7 @@ static core_load_type core_load_orig;
 
 static void before_save_proc_hook() {
     call_in_order(before_save_events);
+    // Execute the original function.
     exec_if_valid(before_save_proc_orig);
 }
 
@@ -35,12 +36,14 @@ static void before_load_proc_hook() {
     if (!doing_core) {
         call_in_order(before_load_events);
     }
+    // Execute the original function.
     exec_if_valid(before_load_proc_orig);
     // When this function finishes executing the vanilla gamestate is loaded
     // from disk/in-memory copy.
 }
 
 static void after_load_proc_hook() {
+    // Execute the original function.
     exec_if_valid(after_load_proc_orig);
     if (!doing_core) {
         call_in_order(after_load_events);
@@ -73,11 +76,13 @@ void init_save_load_hook() {
         auto function_pointers = reinterpret_cast<fp_type*>(*sig_hook_save_load());
         // All of these are stored in arrays that in both 1.10 client and
         // server (our only targets) are right next to each other.
-        before_save_proc_orig = function_pointers[0];
-        before_load_proc_orig = function_pointers[1];
-        after_load_proc_orig  = function_pointers[14];
+        before_save_proc_orig = function_pointers[0];  // The only before_save function pointer.
+        before_load_proc_orig = function_pointers[1];  // The only before_load function pointer.
+        after_load_proc_orig  = function_pointers[14]; // The last after_load function pointer.
 
-        auto area = reinterpret_cast<size_t>(function_pointers[15]) - reinterpret_cast<size_t>(function_pointers[0]);
+        // The area of our protection change should include all the function pointers.
+        // Including the bytes of element 14.
+        auto area = reinterpret_cast<size_t>(&function_pointers[14+1]) - reinterpret_cast<size_t>(&function_pointers[0]);
 
         DWORD prota, protb;
         VirtualProtect(&function_pointers[0], area, PAGE_EXECUTE_READWRITE, &prota);
@@ -102,7 +107,7 @@ void revert_save_load_hook() {
         hook_save_load_initialized = false;
         auto function_pointers = reinterpret_cast<fp_type*>(*sig_hook_save_load());
 
-        auto area = reinterpret_cast<size_t>(function_pointers[15]) - reinterpret_cast<size_t>(function_pointers[0]);
+        auto area = reinterpret_cast<size_t>(&function_pointers[14+1]) - reinterpret_cast<size_t>(&function_pointers[0]);
 
         DWORD prota, protb;
         VirtualProtect(&function_pointers[0], area, PAGE_EXECUTE_READWRITE, &prota);
