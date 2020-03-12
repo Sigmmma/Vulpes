@@ -5,7 +5,7 @@ are designed the way they are.
 There is a lot of nuance that goes into these decisions at times. And that
 should not be lost.
 
-# VirtualProtect
+## VirtualProtect
 Virtual protect is needed because under certain circumstances it can be
 important to make sure that when we're writing things to memory that that
 memory is properly marked.
@@ -18,3 +18,6 @@ using a single Windows API function.
 Some mods like Opensauce and HAC2 change the protection of the entire
 executable to read-write-execute. This is bad, and we should never consider
 doing this. This opens up attacks from other LUA APIs, malformed maps etc.
+Not even for performance reasons should we consider doing this. If we are
+constantly rewriting portions of code multiple times a second we're doing
+something wrong.
