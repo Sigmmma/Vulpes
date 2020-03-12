@@ -6,5 +6,11 @@
 
 #pragma once
 
+#include <vulpes/event.hpp>
+
+DEFINE_EVENT_HOOK(EVENT_BEFORE_SAVE, void);
+DEFINE_EVENT_HOOK(EVENT_BEFORE_LOAD, void);
+DEFINE_EVENT_HOOK(EVENT_AFTER_LOAD,  void);
+
 void init_save_load_hook();
 void revert_save_load_hook();

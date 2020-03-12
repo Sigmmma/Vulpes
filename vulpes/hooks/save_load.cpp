@@ -14,6 +14,10 @@
 
 #include "save_load.hpp"
 
+DEFINE_EVENT_HOOK_LIST(EVENT_BEFORE_SAVE, before_save_events);
+DEFINE_EVENT_HOOK_LIST(EVENT_BEFORE_LOAD, before_load_events);
+DEFINE_EVENT_HOOK_LIST(EVENT_AFTER_LOAD,  after_load_events);
+
 static bool doing_core = false;
 
 static void (*before_save_proc_orig)();
@@ -22,13 +26,13 @@ static void (*after_load_proc_orig)();
 static int (*core_load_orig)(char*);
 
 static void before_save_proc_hook() {
-    // Stub. execute before save logic here.
+    call_in_order(before_save_events);
     exec_if_valid(before_save_proc_orig);
 }
 
 static void before_load_proc_hook() {
     if (!doing_core) {
-        // Stub, execute before load logic here.
+        call_in_order(before_load_events);
     }
     exec_if_valid(before_load_proc_orig);
     // When this function finishes executing the vanilla gamestate is loaded
@@ -38,7 +42,7 @@ static void before_load_proc_hook() {
 static void after_load_proc_hook() {
     exec_if_valid(after_load_proc_orig);
     if (!doing_core) {
-        // Stub, execute after load logic here.
+        call_in_order(after_load_events);
     }
 }
 
