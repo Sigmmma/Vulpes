@@ -1,0 +1,20 @@
+# Introduction
+These docs are about the internal working of Vulpes and why certain things
+are designed the way they are.
+
+There is a lot of nuance that goes into these decisions at times. And that
+should not be lost.
+
+# VirtualProtect
+Virtual protect is needed because under certain circumstances it can be
+important to make sure that when we're writing things to memory that that
+memory is properly marked.
+
+I said under certain circumstances because it can differ per environment.
+On earlier versions of Windows this protection was not in place. It also
+doesn't exist in wine. And it can be retroactively enabled by other mods
+using a single Windows API function.
+
+Some mods like Opensauce and HAC2 change the protection of the entire
+executable to read-write-execute. This is bad, and we should never consider
+doing this. This opens up attacks from other LUA APIs, malformed maps etc.
