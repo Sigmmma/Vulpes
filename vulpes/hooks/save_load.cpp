@@ -20,10 +20,11 @@ DEFINE_EVENT_HOOK_LIST(EVENT_AFTER_LOAD,  after_load_events);
 static bool doing_core = false;
 
 typedef void (*fp_type)();
-static void (*before_save_proc_orig)();
-static void (*before_load_proc_orig)();
-static void (*after_load_proc_orig)();
-static int (*core_load_orig)(char*);
+typedef __attribute__((regparm(1))) int (*core_load_type)(char*);
+static fp_type before_save_proc_orig;
+static fp_type before_load_proc_orig;
+static fp_type after_load_proc_orig;
+static core_load_type core_load_orig;
 
 static void before_save_proc_hook() {
     call_in_order(before_save_events);
@@ -52,12 +53,10 @@ static void after_load_proc_hook() {
 // But core loading and saving is kind of a hack.
 __attribute__((regparm(1)))
 static int core_load_hook(char* name) {
-    cprintf_error("core_load is disabled");
-    //doing_core = true;
-    //int result = core_load_orig(name);
-    //doing_core = false;
-    //cprintf_info("After core_load ping!");
-    return 0;//result;
+    doing_core = true;
+    int result = core_load_orig(name);
+    doing_core = false;
+    return result;
 }
 
 static Patch(
@@ -91,7 +90,7 @@ void init_save_load_hook() {
 
         auto core_load_fix_hack_addr = sig_hook_core_load();
         if (core_load_fix_hack_addr) {
-            core_load_orig = reinterpret_cast<int(*)(char*)>(get_call_address(core_load_fix_hack_addr));
+            core_load_orig = reinterpret_cast<core_load_type>(get_call_address(core_load_fix_hack_addr));
             core_load_hook_patch.build(core_load_fix_hack_addr);
             core_load_hook_patch.apply();
         }
