@@ -9,7 +9,6 @@
 #include <hooker/hooker.hpp>
 #include <hooker/function_pointer_safe.hpp>
 
-#include <vulpes/functions/messaging.hpp>
 #include <vulpes/memory/signatures.hpp>
 
 #include "save_load.hpp"
