@@ -40,6 +40,8 @@ add_library(Vulpes SHARED
     vulpes/command/handler.cpp
     vulpes/command/server.cpp
 
+    vulpes/debug/budget.cpp
+
     vulpes/fixes/animation.cpp
     vulpes/fixes/animation.S
     vulpes/fixes/cpu_usage.cpp

@@ -4,10 +4,12 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <vulpes/hooks/tick.hpp>
 #include <vulpes/fixes/shdr_trans_zfighting.hpp>
 #include <vulpes/functions/messaging.hpp>
 #include <vulpes/memory/gamestate/network.hpp>
 #include <vulpes/network/network_id.hpp>
+#include <vulpes/debug/budget.hpp>
 
 #include "debug.hpp"
 #include "handler.hpp"
@@ -56,6 +58,18 @@ bool get_object_id_from_network_id(std::vector<VulpesArg> input) {
     return true;
 }
 
+bool toggle_cprint_budget(std::vector<VulpesArg> input) {
+    bool on = input[0].bool_out();
+
+    if (on) {
+        ADD_CALLBACK_P(EVENT_TICK, cprint_budget, EVENT_PRIORITY_FINAL);
+    } else {
+        DEL_CALLBACK(EVENT_TICK, cprint_budget);
+    }
+
+    return true;
+}
+
 void init_debug_commands() {
     static VulpesCommand cmd_dev_shader_transparent_fix(
         "v_dev_shader_transparent_fix",
@@ -76,6 +90,12 @@ void init_debug_commands() {
     static VulpesCommand cmd_get_object_id_from_network_id(
         "v_dev_get_object_id_from_network_id",
         &get_object_id_from_network_id, 4, 1,
+        VulpesArgDef("", true, A_LONG)
+    );
+
+    static VulpesCommand cmd_toggle_cprint_budget(
+        "v_dev_show_budget",
+        &toggle_cprint_budget, 0, 1,
         VulpesArgDef("", true, A_LONG)
     );
 }
