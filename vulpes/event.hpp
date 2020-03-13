@@ -105,7 +105,7 @@ static inline void del_event(EventsHolder e_hook(), EventFunc &event_function) {
     }
 }
 
-#define ADD_CALLBACK_P(e_hook, event_func, priority) add_event<e_hook>(e_hook ## _list, event_func, priority)
+#define ADD_CALLBACK_P(e_hook, event_func, priority) add_event(e_hook ## _list, event_func, priority)
 #define ADD_CALLBACK(e_hook, event_func) add_event(e_hook ## _list, event_func)
 #define DEL_CALLBACK(e_hook, event_func) del_event(e_hook ## _list, event_func)
 
