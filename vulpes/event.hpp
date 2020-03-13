@@ -109,5 +109,18 @@ static inline void del_event(EventsHolder e_hook(), EventFunc &event_function) {
 #define ADD_CALLBACK(e_hook, event_func) add_event(e_hook ## _list, event_func)
 #define DEL_CALLBACK(e_hook, event_func) del_event(e_hook ## _list, event_func)
 
-#define DEFINE_EVENT_HOOK(name, return_type, ...) typedef return_type (*name)(__VA_ARGS__); std::vector<Event<name>>* name ## _list()
-#define DEFINE_EVENT_HOOK_LIST(name, reference_name) static std::vector<Event<name>> reference_name; std::vector<Event<name>>* name ## _list() {return &reference_name;}
+// Use this one in the header.
+// DEFINE_EVENT_HOOK(hook_identifier, return_type, input types)
+#define DEFINE_EVENT_HOOK(name, return_type, ...)       \
+        typedef return_type (*name)(__VA_ARGS__);       \
+        std::vector<Event<name>>* name ## _list()
+
+// Use this one in the source.
+// Creates a list variable in the current scope that can be used to call all
+// hooked events.
+// DEFINE_EVENT_HOOK_LIST(hook_identifier, list_identifier)
+#define DEFINE_EVENT_HOOK_LIST(name, reference_name)    \
+        static std::vector<Event<name>> reference_name; \
+        std::vector<Event<name>>* name ## _list() {     \
+            return &reference_name;                     \
+        }
