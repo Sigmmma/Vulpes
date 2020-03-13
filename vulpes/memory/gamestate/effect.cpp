@@ -13,7 +13,7 @@ static GenericTable** effect_ptrs_lst;
 
 static inline GenericTable** effect_ptrs() {
     if (!effect_ptrs_lst) {
-        effect_ptrs_lst = reinterpret_cast<GenericTable**>(
+        effect_ptrs_lst = *reinterpret_cast<GenericTable***>(
             sig_effect_table_refs());
     }
     return effect_ptrs_lst;

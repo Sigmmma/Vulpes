@@ -23,3 +23,16 @@ MemRef Table::new_at(MemRef id) {
 bool Table::remove(MemRef id) {
     return (datum_delete(this, id.raw) != 0xFFFFFFFF);
 }
+
+size_t Table::count() {
+    size_t count = 0;
+    auto table = reinterpret_cast<GenericTable*>(this);
+    for (int i = 0; i < max_elements; i++) {
+        int32_t offset = element_size * i;
+        int32_t base = reinterpret_cast<int32_t>(table->first);
+        int16_t salt = *reinterpret_cast<int16_t*>(base + offset);
+        if (salt) count++;
+    }
+
+    return count;
+}
