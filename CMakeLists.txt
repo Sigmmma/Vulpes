@@ -93,6 +93,8 @@ add_library(Vulpes SHARED
     vulpes/tweaks/loading_screen.cpp
     vulpes/tweaks/tweaks.cpp
 
+    vulpes/upgrades/gamestate.cpp
+    vulpes/upgrades/gamestate.S
     vulpes/upgrades/map.cpp
     vulpes/upgrades/map.S
 

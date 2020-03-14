@@ -420,6 +420,12 @@ signatures:
     crucial: false
     offset: 5
 
+  # upgrades/gamestate
+
+  - name: game_state_data_new
+    bytes: 8B 15 ?? ?? ?? ?? 55 66 8B 6C 24 0C
+    crucial: true
+
 # I think this can be used for adding maps to the table
 # - name: func_add_map_to_list
 # - bytes: 8B 0D ?? ?? ?? ?? 81 EC 00 08 00 00

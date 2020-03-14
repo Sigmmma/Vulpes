@@ -84,12 +84,15 @@ void revert_halo_bug_fixes() {
 // Upgrades
 
 #include "upgrades/map.hpp"
+#include "upgrades/gamestate.hpp"
 void init_upgrades() {
     init_map_crc_upgrades(game_is_server_executable());
+    init_gamestate_upgrades();
 }
 
 void revert_upgrades() {
     revert_map_crc_upgrades();
+    revert_gamestate_upgrades();
 }
 
 // Memory
