@@ -13,26 +13,48 @@
 
 #include "gamestate.hpp"
 
+static void table_set_up(GenericTable* table, char* name, uint32_t element_size, uint32_t element_max) {
+    memset(new_table, 0, sizeof(GenericTable));
+    strncpy(new_table->name, name, sizeof(new_table->name));
+    table->max_elements = element_max;
+    table->element_size = element_size;
+    // Just hex for the NOT terminated string 'd@t@'
+    table->sig = 0x64407440; //'d@t@'
+    // Mark as invalid as that is what vanilla does.
+    table->is_valid = false;
+}
+
 // Vanilla
 
 static uint32_t* game_state_globals;
 static uint32_t* game_state_globals_cpu_allocation_size;
 uint32_t gamestate_new_return_address;
 
+// We're replacing the stock table allocation function for no reason other
+// than that I have been in stack debug hell for three hours now.
+// And I got shit to do.
+// So, this here does almost exactly what stock does.
+// Except for things I stripped for speed (tm)
 static GenericTable* gamestate_table_new_vanilla_memory(
         char* name, uint32_t element_size, uint32_t element_max) {
+    // Get the next available spot in vanilla gamestate.
     auto new_table = reinterpret_cast<GenericTable*>(
             *game_state_globals + *game_state_globals_cpu_allocation_size);
-    auto new_alloc_size = *game_state_globals_cpu_allocation_size + sizeof(GenericTable) + element_size * element_max;
+
+    // Do generic table setup.
+    table_set_up(new_table, name, element_size, element_max);
+
+    // Calculate total used vanilla gamestate.
+    auto new_alloc_size = *game_state_globals_cpu_allocation_size
+                          + sizeof(GenericTable)
+                          + element_size * element_max;
+    // Store the total.
     *game_state_globals_cpu_allocation_size = new_alloc_size;
-    memset(new_table, 0, sizeof(GenericTable));
-    strncpy(new_table->name, name, sizeof(new_table->name));
-    new_table->max_elements = element_max;
-    new_table->element_size = element_size;
-    new_table->sig = 0x64407440; //'d@t@'
-    new_table->first = reinterpret_cast<void*>(
+
+    // The first entry in the table in vanilla gamestate is right after the
+    // header.
+    table->first = reinterpret_cast<void*>(
             reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable));
-    new_table->is_valid = false;
 
     return new_table;
 }
