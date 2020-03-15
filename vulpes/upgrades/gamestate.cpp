@@ -67,6 +67,7 @@ static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
 static GenericTable tables[32];
+static GenericTable tables_checkpoint[32];
 
 static GenericTable* gamestate_table_new_upgrade_memory(
         const char* name, uint32_t element_size, uint32_t element_max) {
@@ -164,9 +165,11 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 
 static void save_checkpoint_upgrade() {
     memcpy(gamestate_extension_checkpoint_buffer, gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY);
+    memcpy(tables_checkpoint, tables, sizeof(tables));
 }
 static void load_checkpoint_upgrade() {
     memcpy(gamestate_extension_buffer, gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY);
+    memcpy(tables, tables_checkpoint, sizeof(tables));
 }
 
 extern "C" void gamestate_table_new_wrapper();
