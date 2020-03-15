@@ -62,7 +62,7 @@ static GenericTable* gamestate_table_new_vanilla_memory(
 
 static size_t used_tables = 0;
 static size_t used_memory = 0;
-static const size_t ALLOCATED_UPGRADE_MEMORY = 10*1024*1024;
+static const size_t ALLOCATED_UPGRADE_MEMORY = 5*1024*1024;
 static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
