@@ -69,6 +69,10 @@ static Patch(
 
 static bool hook_save_load_initialized = false;
 
+static const size_t BEFORE_SAVE_FUNC_OVERWRITE_ID = 0; // The only before_save function pointer.
+static const size_t BEFORE_LOAD_FUNC_OVERWRITE_ID = 1; // The only before_load function pointer.
+static const size_t AFTER_LOAD_FUNC_OVERWRITE_ID = 14; // The last after_load function pointer.
+
 void init_save_load_hook() {
     if (!hook_save_load_initialized) {
         hook_save_load_initialized = true;
@@ -76,26 +80,31 @@ void init_save_load_hook() {
         auto function_pointers = reinterpret_cast<fp_type*>(*sig_hook_save_load());
         // All of these are stored in arrays that in both 1.10 client and
         // server (our only targets) are right next to each other.
-        before_save_proc_orig = function_pointers[0];  // The only before_save function pointer.
-        before_load_proc_orig = function_pointers[1];  // The only before_load function pointer.
-        after_load_proc_orig  = function_pointers[14]; // The last after_load function pointer.
+        before_save_proc_orig = function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID];
+        before_load_proc_orig = function_pointers[BEFORE_LOAD_FUNC_OVERWRITE_ID];
+        after_load_proc_orig  = function_pointers[AFTER_LOAD_FUNC_OVERWRITE_ID];
 
         // The area of our protection change should include all the function pointers.
         // Including the bytes of element 14.
-        auto area = reinterpret_cast<size_t>(&function_pointers[14+1]) - reinterpret_cast<size_t>(&function_pointers[0]);
+        auto protection_range =
+            reinterpret_cast<size_t>(&function_pointers[AFTER_LOAD_FUNC_OVERWRITE_ID+1])
+            - reinterpret_cast<size_t>(&function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID]);
 
         DWORD prota, protb;
-        VirtualProtect(&function_pointers[0], area, PAGE_EXECUTE_READWRITE, &prota);
+        VirtualProtect(&function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID],
+            protection_range, PAGE_EXECUTE_READWRITE, &prota);
 
-        function_pointers[0]  = &before_save_proc_hook;
-        function_pointers[1]  = &before_load_proc_hook;
-        function_pointers[14] = &after_load_proc_hook;
+        function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID] = &before_save_proc_hook;
+        function_pointers[BEFORE_LOAD_FUNC_OVERWRITE_ID] = &before_load_proc_hook;
+        function_pointers[AFTER_LOAD_FUNC_OVERWRITE_ID]  = &after_load_proc_hook;
 
-        VirtualProtect(&function_pointers[0], area, prota, &protb);
+        VirtualProtect(&function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID],
+            protection_range, prota, &protb);
 
         auto core_load_fix_hack_addr = sig_hook_core_load();
         if (core_load_fix_hack_addr) {
-            core_load_orig = reinterpret_cast<core_load_type>(get_call_address(core_load_fix_hack_addr));
+            core_load_orig = reinterpret_cast<core_load_type>(
+                get_call_address(core_load_fix_hack_addr));
             core_load_hook_patch.build(core_load_fix_hack_addr);
             core_load_hook_patch.apply();
         }
@@ -107,16 +116,20 @@ void revert_save_load_hook() {
         hook_save_load_initialized = false;
         auto function_pointers = reinterpret_cast<fp_type*>(*sig_hook_save_load());
 
-        auto area = reinterpret_cast<size_t>(&function_pointers[14+1]) - reinterpret_cast<size_t>(&function_pointers[0]);
+        auto protection_range =
+            reinterpret_cast<size_t>(&function_pointers[AFTER_LOAD_FUNC_OVERWRITE_ID+1])
+            - reinterpret_cast<size_t>(&function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID]);
 
         DWORD prota, protb;
-        VirtualProtect(&function_pointers[0], area, PAGE_EXECUTE_READWRITE, &prota);
+        VirtualProtect(&function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID],
+            protection_range, PAGE_EXECUTE_READWRITE, &prota);
 
-        function_pointers[0]  = before_save_proc_orig;
-        function_pointers[1]  = before_load_proc_orig;
-        function_pointers[14] = after_load_proc_orig;
+        function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID] = before_save_proc_orig;
+        function_pointers[BEFORE_LOAD_FUNC_OVERWRITE_ID] = before_load_proc_orig;
+        function_pointers[AFTER_LOAD_FUNC_OVERWRITE_ID]  = after_load_proc_orig;
 
-        VirtualProtect(&function_pointers[0], area, prota, &protb);
+        VirtualProtect(&function_pointers[BEFORE_SAVE_FUNC_OVERWRITE_ID],
+            protection_range, prota, &protb);
 
         core_load_hook_patch.revert();
     }
