@@ -67,6 +67,7 @@ add_library(Vulpes SHARED
     vulpes/hooks/object.S
     vulpes/hooks/tick.cpp
     vulpes/hooks/tick.S
+    vulpes/hooks/save_load.cpp
 
     vulpes/memory/gamestate/object/object.cpp
     vulpes/memory/gamestate/object/object_device.cpp
