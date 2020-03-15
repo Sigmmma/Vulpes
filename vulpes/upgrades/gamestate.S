@@ -6,7 +6,7 @@
 
 .intel_syntax noprefix
 
-.globl _game_state_table_new_wrapper
-_game_state_table_new_wrapper:
+.globl _gamestate_table_new_wrapper
+_gamestate_table_new_wrapper:
         movsx eax, bx
-        jmp _game_state_table_new_replacement
+        jmp _gamestate_table_new_replacement

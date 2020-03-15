@@ -8,14 +8,15 @@
 #include <windows.h>
 
 #include <hooker/hooker.hpp>
+#include <vulpes/hooks/save_load.hpp>
 #include <vulpes/memory/signatures.hpp>
 #include <vulpes/memory/gamestate/table.hpp>
 
 #include "gamestate.hpp"
 
-static void table_set_up(GenericTable* table, char* name, uint32_t element_size, uint32_t element_max) {
-    memset(new_table, 0, sizeof(GenericTable));
-    strncpy(new_table->name, name, sizeof(new_table->name));
+static void table_set_up(GenericTable* table, const char* name, uint32_t element_size, uint32_t element_max) {
+    memset(table, 0, sizeof(GenericTable));
+    strncpy(table->name, name, sizeof(table->name) - 1);
     table->max_elements = element_max;
     table->element_size = element_size;
     // Just hex for the NOT terminated string 'd@t@'
@@ -36,7 +37,7 @@ uint32_t gamestate_new_return_address;
 // So, this here does almost exactly what stock does.
 // Except for things I stripped for speed (tm)
 static GenericTable* gamestate_table_new_vanilla_memory(
-        char* name, uint32_t element_size, uint32_t element_max) {
+        const char* name, uint32_t element_size, uint32_t element_max) {
     // Get the next available spot in vanilla gamestate.
     auto new_table = reinterpret_cast<GenericTable*>(
             *game_state_globals + *game_state_globals_cpu_allocation_size);
@@ -53,7 +54,7 @@ static GenericTable* gamestate_table_new_vanilla_memory(
 
     // The first entry in the table in vanilla gamestate is right after the
     // header.
-    table->first = reinterpret_cast<void*>(
+    new_table->first = reinterpret_cast<void*>(
             reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable));
 
     return new_table;
@@ -61,32 +62,149 @@ static GenericTable* gamestate_table_new_vanilla_memory(
 
 static size_t used_tables = 0;
 static size_t used_memory = 0;
-static const size_t ALLOCATED_MEMORY = 2*1024*1024;
+static const size_t ALLOCATED_UPGRADE_MEMORY = 10*1024*1024;
 static void* gamestate_extension_buffer;
+static void* gamestate_extension_checkpoint_buffer;
 
 static GenericTable tables[32];
 
-// Wonky argument order needed for the wrapper to stay simple.
-extern "C" __attribute__((regparm(1)))
-GenericTable* game_state_table_new_replacement(uint32_t element_size,
-        char* name, uint32_t element_max) {
-    auto new_table = gamestate_table_new_vanilla_memory(name, element_size, element_max);
+static GenericTable* gamestate_table_new_upgrade_memory(
+        const char* name, uint32_t element_size, uint32_t element_max) {
+    // Pick the next available table.
+    size_t i = used_tables;
+    used_tables++;
+
+    auto new_table = &tables[i];
+    // Do generic table setup.
+    table_set_up(new_table, name, element_size, element_max);
+
+    // Make the first element be the next available spot in memory.
+    new_table->first = reinterpret_cast<void*>(
+        reinterpret_cast<size_t>(gamestate_extension_buffer) + used_memory);
+
+    // Update the used memory.
+    used_memory += element_size * element_max;
+
+    printf("Used upgrade memory: %d/%d\n", used_memory, ALLOCATED_UPGRADE_MEMORY);
+
     return new_table;
 }
 
-extern "C" void game_state_table_new_wrapper();
+struct TableUpgradeData {
+    const char* name; // Name to apply this upgrade to.
+    uint16_t new_max; // New max to use.
+    bool in_upgrade_memory; // Whether or not to store this upgrade in upgrade
+    // memory. This is important because some tables might contain pointers.
+    // Our memory does not have a set location.
+};
+
+const uint16_t UPGRADED_OBJECT_LIMIT = 4096;
+
+const TableUpgradeData TABLE_UPGRADES[] = {
+    {"object", UPGRADED_OBJECT_LIMIT, false},
+    {"flag", 16, true},
+    {"antenna", 24, true},
+    {"glow", 16, true},
+    {"glow particles", 1024, true},
+    {"light volumes", 1024, true},
+    {"lights", 2048, true},
+    {"cluster collideable object reference", UPGRADED_OBJECT_LIMIT, false},
+    {"collideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
+    {"cluster noncollideable object reference", UPGRADED_OBJECT_LIMIT, false},
+    {"noncollideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
+    {"players", 32, true},
+    {"teams", 32, true},
+    {"contrail", 1024, true},
+    {"contrail point", 4096, true},
+    //{"particle", 2048, true}, // We have to wait until we can fix the game's particle code for this.
+    {"effect", 4096, true},
+    {"effect location", 8192, true},
+    {"particle systems", 1024, true},
+    {"particle system particles", 4096, true},
+    {"actors", 1024, true},
+    {"swarm", 128, true},
+    {"swarm component", 1024, true},
+    {"prop", 768*4, true},
+    {"encounter", 1024, true},
+    {"ai persuit", 1024, true},
+    {"", 0, false}, // Terminate
+};
+
+// Wonky argument order needed for the assembly wrapper to stay simple.
+extern "C" __attribute__((regparm(1)))
+GenericTable* gamestate_table_new_replacement(uint32_t element_size,
+        const char* name, uint16_t element_max) {
+    GenericTable* new_table;
+    printf(
+        "Table creation request:\n"
+        "name:%-48s element_size:%8d element_max:%8d\n", name, element_size, element_max);
+
+    bool found = false;
+    bool use_upgrade_memory = false;
+    size_t i = 0;
+    while (!found && TABLE_UPGRADES[i].new_max != 0) {
+        if (strncmp(name, TABLE_UPGRADES[i].name, 31) == 0) {
+            element_max = TABLE_UPGRADES[i].new_max;
+            use_upgrade_memory = TABLE_UPGRADES[i].in_upgrade_memory;
+            printf("Upgrading element_max to %d\n", element_max);
+            found = true;
+            break;
+        }
+        i++;
+    }
+
+    if (use_upgrade_memory) {
+        new_table = gamestate_table_new_upgrade_memory(name, element_size, element_max);
+    } else {
+        new_table = gamestate_table_new_vanilla_memory(name, element_size, element_max);
+    }
+
+    return new_table;
+}
+
+static void save_checkpoint_upgrade() {
+    memcpy(gamestate_extension_checkpoint_buffer, gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY);
+}
+static void load_checkpoint_upgrade() {
+    memcpy(gamestate_extension_buffer, gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY);
+}
+
+extern "C" void gamestate_table_new_wrapper();
 
 static Patch(patch_gamestate_new_replacement, NULL, 6,
-    JMP_PATCH, &game_state_table_new_wrapper);
+    JMP_PATCH, &gamestate_table_new_wrapper);
+
+static bool initialized = false;
 
 void init_gamestate_upgrades() {
+    if (initialized) return;
+
     auto patch_addr = sig_game_state_data_new();
     game_state_globals = *reinterpret_cast<uint32_t**>(patch_addr+2);
     game_state_globals_cpu_allocation_size = *reinterpret_cast<uint32_t**>(patch_addr+0x37);
     patch_gamestate_new_replacement.build(patch_addr);
     gamestate_new_return_address = patch_gamestate_new_replacement.return_address();
     patch_gamestate_new_replacement.apply();
+
+    // Allocate and null the memory for our upgrades.
+    gamestate_extension_buffer = VirtualAlloc(NULL, ALLOCATED_UPGRADE_MEMORY,
+        MEM_COMMIT, PAGE_READWRITE);
+    gamestate_extension_checkpoint_buffer = VirtualAlloc(NULL, ALLOCATED_UPGRADE_MEMORY,
+        MEM_COMMIT, PAGE_READWRITE);
+
+    ADD_CALLBACK_P(EVENT_BEFORE_SAVE, save_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
+    ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
+
+
 }
 void revert_gamestate_upgrades() {
+    if (!initialized) return;
+
     patch_gamestate_new_replacement.revert();
+
+    VirtualFree(gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
+    VirtualFree(gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
+
+    DEL_CALLBACK(EVENT_BEFORE_SAVE, save_checkpoint_upgrade);
+    DEL_CALLBACK(EVENT_BEFORE_LOAD, load_checkpoint_upgrade);
 }
