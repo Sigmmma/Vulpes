@@ -99,35 +99,38 @@ struct TableUpgradeData {
     // Our memory does not have a set location.
 };
 
-const uint16_t UPGRADED_OBJECT_LIMIT = 4096;
+const uint16_t UPGRADED_OBJECT_LIMIT = 4096; // original 2048
 
 const TableUpgradeData TABLE_UPGRADES[] = {
+    // Object refs have pointers wheras other table users only refer to
+    // things with MemRef
     {"object", UPGRADED_OBJECT_LIMIT, false},
-    {"flag", 16, true},
-    {"antenna", 24, true},
-    {"glow", 16, true},
-    {"glow particles", 1024, true},
-    {"light volumes", 1024, true},
-    {"lights", 2048, true},
     {"cluster collideable object reference", UPGRADED_OBJECT_LIMIT, false},
     {"collideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
     {"cluster noncollideable object reference", UPGRADED_OBJECT_LIMIT, false},
     {"noncollideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
-    {"players", 32, true},
-    {"teams", 32, true},
-    {"contrail", 1024, true},
-    {"contrail point", 4096, true},
+
+    {"flag", 16, true}, // original 2
+    {"antenna", 24, true}, // original 12
+    {"glow", 16, true}, // original 8
+    {"glow particles", 1024, true}, // original 512
+    {"light volumes", 1024, true}, // original 256
+    {"lights", 2048, true}, // original 896
+    {"players", 32, true}, // original 16
+    {"teams", 32, true}, // original 16
+    {"contrail", 1024, true}, // original 256
+    {"contrail point", 4096, true}, // original 1024
     //{"particle", 2048, true}, // We have to wait until we can fix the game's particle code for this.
-    {"effect", 4096, true},
-    {"effect location", 8192, true},
-    {"particle systems", 1024, true},
-    {"particle system particles", 4096, true},
-    {"actors", 1024, true},
-    {"swarm", 128, true},
-    {"swarm component", 1024, true},
-    {"prop", 768*4, true},
-    {"encounter", 1024, true},
-    {"ai persuit", 1024, true},
+    {"effect", 4096, true}, // original 256
+    {"effect location", 8192, true}, // original 512
+    {"particle systems", 1024, true}, // original 64
+    {"particle system particles", 4096, true}, // original 512
+    {"actors", 1024, true}, // original 256
+    {"swarm", 128, true}, // original 32
+    {"swarm component", 1024, true}, // original 256
+    {"prop", 768*4, true}, // original 768
+    {"encounter", 1024, true}, // original 128
+    {"ai persuit", 1024, true}, // original 256
     {"", 0, false}, // Terminate
 };
 
