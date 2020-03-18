@@ -24,6 +24,8 @@ void cprint_budget() {
     auto c = contrail_table();
     auto synced_objs = synced_objects();
 
+    // Print two collumns separated by \t
+
     cprintf(BUDGET_TEMPLATE "|t" BUDGET_TEMPLATE,
         objects->name, objects->count(), objects->max_elements,
         wp->name, wp->count(), wp->max_elements);
