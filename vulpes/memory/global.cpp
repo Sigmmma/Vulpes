@@ -13,6 +13,14 @@ const char* profile_path() {
     return *sig_path();
 }
 
+const char* savegames_path() {
+    return *sig_savegames_path();
+}
+
+const wchar_t* active_profile_name() {
+    return *sig_active_profile_name();
+}
+
 static const char ui_name[] = "ui";
 
 const char* map_name() {
