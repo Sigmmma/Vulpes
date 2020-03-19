@@ -22,7 +22,7 @@ Not even for performance reasons should we consider doing this. If we are
 constantly rewriting portions of code multiple times a second we're doing
 something wrong.
 
-## Why do we use three levels of abstractions for some pointers? (\*\*\*)
+## Why do we use three layers of pointers sometimes? (\*\*\*)
 
 This is because our signatures point to code. So, we have a value that is
 a reference to a piece of code (1). That piece of code references a pointer (2).
