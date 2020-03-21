@@ -120,10 +120,10 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"antenna", 24, true}, // original 12
     {"glow", 16, true}, // original 8
     {"glow particles", 1024, true}, // original 512
-    {"light volumes", 1024, true}, // original 256
+    {"light volumes", 1024, false}, // original 256
     {"lights", 2048, true}, // original 896
-    {"players", 32, true}, // original 16
-    {"teams", 32, true}, // original 16
+    //{"players", 32, true}, // original 16
+    //{"teams", 32, true}, // original 16
     {"contrail", 1024, true}, // original 256
     {"contrail point", 4096, true}, // original 1024
     //{"particle", 2048, true}, // We have to wait until we can fix the game's particle code for this.
@@ -131,11 +131,11 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"effect location", 8192, true}, // original 512
     {"particle systems", 1024, true}, // original 64
     {"particle system particles", 4096, true}, // original 512
-    {"actors", 1024, true}, // original 256
-    {"swarm", 128, true}, // original 32
-    {"swarm component", 1024, true}, // original 256
-    {"prop", 768*4, true}, // original 768
-    {"encounter", 1024, true}, // original 128
+    //{"actors", 1024, false}, // original 256
+    //{"swarm", 128, true}, // original 32
+    //{"swarm component", 1024, true}, // original 256
+    //{"prop", 768*4, true}, // original 768
+    //{"encounter", 1024, true}, // original 128
     {"ai persuit", 1024, true}, // original 256
     {"", 0, false}, // Terminate
 };
@@ -210,13 +210,41 @@ static void save_checkpoint_upgrade() {
     // Write all the relevant data to the file.
     fwrite(&header, 1, sizeof(header), save_file);
     fwrite(&tables_checkpoint, 1, sizeof(tables_checkpoint), save_file);
-    fwrite(gamestate_extension_buffer, 1, used_memory, save_file);
+    fwrite(gamestate_extension_checkpoint_buffer, 1, used_memory, save_file);
 
     fflush(save_file);
     fclose(save_file);
 }
 
 static void load_checkpoint_upgrade() {
+    auto save_file_path = std::string(profile_path()) + "\\savegame.vulpes";
+    FILE* save_file = fopen(save_file_path.c_str(), "rb");
+
+    // Retrieve header
+    CheckpointFileHeader header;
+    fread(&header, 1, sizeof(header), save_file);
+
+    // These need to be the same.
+    assert(header.tables_count == used_tables);
+    assert(header.arrays_size == used_memory);
+
+    // Read table headers into checkpoint tables.
+    fseek(save_file, header.tables_offset, SEEK_SET);
+    fread(&tables_checkpoint, 1, sizeof(GenericTable) * used_tables, save_file);
+
+    // Make sure they're all the same types of tables.
+    for (int i=0; i < used_tables; i++) {
+        assert(strncmp(&tables[i].name[0], &tables_checkpoint[i].name[0], 31) == 0);
+    }
+
+    // Last thing we read from the file is the saved checkpoint memory.
+    fseek(save_file, header.arrays_offset, SEEK_SET);
+    fread(&gamestate_extension_checkpoint_buffer, 1, used_memory, save_file);
+
+    // Close the file.
+    fclose(save_file);
+
+
     uintptr_t upgrade_start_address_int = reinterpret_cast<uintptr_t>(gamestate_extension_buffer);
     for (int i=0; i < UPGRADE_TABLES; i++) {
         // Get the offset so that change in memory address does not break saves.
