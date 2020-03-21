@@ -23,7 +23,6 @@ constantly rewriting portions of code multiple times a second we're doing
 something wrong.
 
 ## Why do we use three layers of pointers sometimes? (\*\*\*)
-
 This is because our signatures point to code. So, we have a value that is
 a reference to a piece of code (1). That piece of code references a pointer (2).
 That last pointer is of course also a reference (3).
@@ -37,3 +36,17 @@ compiled with similar enough settings. And it helps with situations
 where another mod edits the code we need so we don't have an unreported error.
 And we instead just fail and log that the signature wasn't found, because the
 code was in a way unsafe.
+
+
+## Why pragma pack(push, 1)
+The rationale is that compiler repacking can't screw our structs. It has
+happened before. Most compilers tend to pack by the size of the biggest value
+in the table. Like if I add a double then everything that was supposed to be
+4 aligned is now screwed up, our size assertions fail. (They're there for that
+reason.)
+
+This also makes the structures easier to align with the actual memory.
+Because packing really is just weird if not 1:1 like this.
+
+We don't ever do this for our own structs though. Only for structs that we
+read from the game.
