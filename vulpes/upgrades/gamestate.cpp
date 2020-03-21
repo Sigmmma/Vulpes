@@ -145,7 +145,8 @@ struct CheckpointFileHeader {
     uint32_t tables_offset;
     uint32_t tables_count;
     uint32_t arrays_offset;
-    uint32_t reserved[6];
+    uint32_t arrays_size;
+    uint32_t reserved[5];
 };
 
 // Wonky argument order needed for the assembly wrapper to stay simple.
@@ -204,7 +205,9 @@ static void save_checkpoint_upgrade() {
     header.tables_count = used_tables;
     header.tables_offset = sizeof(header);
     header.arrays_offset = header.tables_offset + sizeof(tables);
+    header.arrays_size = used_memory;
 
+    // Write all the relevant data to the file.
     fwrite(&header, 1, sizeof(header), save_file);
     fwrite(&tables_checkpoint, 1, sizeof(tables_checkpoint), save_file);
     fwrite(gamestate_extension_buffer, 1, used_memory, save_file);
