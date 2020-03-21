@@ -4,10 +4,12 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <cassert>
 #include <cstdio>
 #include <windows.h>
 
 #include <hooker/hooker.hpp>
+#include <util/file_helpers.hpp>
 #include <vulpes/hooks/save_load.hpp>
 #include <vulpes/memory/signatures.hpp>
 #include <vulpes/memory/gamestate/table.hpp>
@@ -54,8 +56,7 @@ static GenericTable* gamestate_table_new_vanilla_memory(
 
     // The first entry in the table in vanilla gamestate is right after the
     // header.
-    new_table->first = reinterpret_cast<void*>(
-            reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable));
+    new_table->first_int = reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable);
 
     return new_table;
 }
@@ -66,8 +67,9 @@ static const size_t ALLOCATED_UPGRADE_MEMORY = 5*1024*1024;
 static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
-static GenericTable tables[32];
-static GenericTable tables_checkpoint[32];
+static const size_t UPGRADE_TABLES = 32;
+static GenericTable tables[UPGRADE_TABLES];
+static GenericTable tables_checkpoint[UPGRADE_TABLES];
 
 static GenericTable* gamestate_table_new_upgrade_memory(
         const char* name, uint32_t element_size, uint32_t element_max) {
@@ -75,13 +77,15 @@ static GenericTable* gamestate_table_new_upgrade_memory(
     size_t i = used_tables;
     used_tables++;
 
+    // Never should we have more tables than the amount we allocated. Duh.
+    assert(i < UPGRADE_TABLES);
+
     auto new_table = &tables[i];
     // Do generic table setup.
     table_set_up(new_table, name, element_size, element_max);
 
     // Make the first element be the next available spot in memory.
-    new_table->first = reinterpret_cast<void*>(
-        reinterpret_cast<size_t>(gamestate_extension_buffer) + used_memory);
+    new_table->first_int = reinterpret_cast<size_t>(gamestate_extension_buffer) + used_memory;
 
     // Update the used memory.
     used_memory += element_size * element_max;
@@ -169,8 +173,27 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 static void save_checkpoint_upgrade() {
     memcpy(gamestate_extension_checkpoint_buffer, gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY);
     memcpy(tables_checkpoint, tables, sizeof(tables));
+
+    uintptr_t upgrade_start_address_int = reinterpret_cast<uintptr_t>(gamestate_extension_buffer);
+    for (int i=0; i < UPGRADE_TABLES; i++) {
+        // Get the offset so that change in memory address does not break saves.
+        uintptr_t array_start_address_int = tables_checkpoint[i].first_int;
+        uintptr_t offset = array_start_address_int - upgrade_start_address_int;
+
+        tables_checkpoint[i].first_int = offset;
+    }
 }
+
 static void load_checkpoint_upgrade() {
+    uintptr_t upgrade_start_address_int = reinterpret_cast<uintptr_t>(gamestate_extension_buffer);
+    for (int i=0; i < UPGRADE_TABLES; i++) {
+        // Get the offset so that change in memory address does not break saves.
+        uintptr_t array_start_offset_int = tables_checkpoint[i].first_int;
+        uintptr_t address = upgrade_start_address_int + array_start_offset_int;
+
+        tables_checkpoint[i].first_int = address;
+    }
+
     memcpy(gamestate_extension_buffer, gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY);
     memcpy(tables, tables_checkpoint, sizeof(tables));
 }
@@ -186,8 +209,10 @@ void init_gamestate_upgrades() {
     if (initialized) return;
 
     auto patch_addr = sig_game_state_data_new();
+
     game_state_globals = *reinterpret_cast<uint32_t**>(patch_addr+2);
     game_state_globals_cpu_allocation_size = *reinterpret_cast<uint32_t**>(patch_addr+0x37);
+
     patch_gamestate_new_replacement.build(patch_addr);
     gamestate_new_return_address = patch_gamestate_new_replacement.return_address();
     patch_gamestate_new_replacement.apply();
@@ -200,9 +225,8 @@ void init_gamestate_upgrades() {
 
     ADD_CALLBACK_P(EVENT_BEFORE_SAVE, save_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
     ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
-
-
 }
+
 void revert_gamestate_upgrades() {
     if (!initialized) return;
 

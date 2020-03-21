@@ -41,7 +41,11 @@ public:
 
 class GenericTable : public Table {
 public:
-    void* first;
+    union {
+        // This union allows us to remove a bunch of reinterpret_casts.
+        void* first;
+        uintptr_t first_int;
+    };
 };
 
 #pragma pack(pop)
