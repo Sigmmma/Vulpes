@@ -70,8 +70,9 @@ static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
 static const size_t UPGRADE_TABLES = 32;
-static GenericTable tables[UPGRADE_TABLES];
+static GenericTable* tables[UPGRADE_TABLES];
 static GenericTable tables_checkpoint[UPGRADE_TABLES];
+static uintptr_t table_offsets[UPGRADE_TABLES];
 
 static GenericTable* gamestate_table_new_upgrade_memory(
         const char* name, uint32_t element_size, uint32_t element_max) {
@@ -82,12 +83,17 @@ static GenericTable* gamestate_table_new_upgrade_memory(
     // Never should we have more tables than the amount we allocated. Duh.
     assert(i < UPGRADE_TABLES);
 
-    auto new_table = &tables[i];
+    auto new_table = reinterpret_cast<GenericTable*>(
+            *game_state_globals + *game_state_globals_cpu_allocation_size);
+    tables[i] = new_table;
+    *game_state_globals_cpu_allocation_size = *game_state_globals_cpu_allocation_size + sizeof(GenericTable);
     // Do generic table setup.
     table_set_up(new_table, name, element_size, element_max);
 
     // Make the first element be the next available spot in memory.
     new_table->first_int = reinterpret_cast<size_t>(gamestate_extension_buffer) + used_memory;
+
+    table_offsets[i] = used_memory;
 
     // Update the used memory.
     used_memory += element_size * element_max;
@@ -121,21 +127,24 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"glow", 16, true}, // original 8
     {"glow particles", 1024, true}, // original 512
     {"light volumes", 1024, false}, // original 256
-    {"lights", 2048, true}, // original 896
+    //{"lights", 2048, false}, // original 896
     //{"players", 32, true}, // original 16
     //{"teams", 32, true}, // original 16
-    {"contrail", 1024, true}, // original 256
-    {"contrail point", 4096, true}, // original 1024
+    //{"contrail", 1024, true}, // original 256
+    //{"contrail point", 4096, true}, // original 1024
     //{"particle", 2048, true}, // We have to wait until we can fix the game's particle code for this.
     {"effect", 4096, true}, // original 256
     {"effect location", 8192, true}, // original 512
     {"particle systems", 1024, true}, // original 64
     {"particle system particles", 4096, true}, // original 512
-    //{"actors", 1024, false}, // original 256
+    {"actors", 1024, true}, // original 256
     //{"swarm", 128, true}, // original 32
     //{"swarm component", 1024, true}, // original 256
-    //{"prop", 768*4, true}, // original 768
-    //{"encounter", 1024, true}, // original 128
+    // Puts some AI code in an infinite loop if loaded using our system.
+    // Too big to upgrade in vanilla memory.
+    //{"prop", 768*4, false}, // original 768
+    // Cannot be reloaded without encounters breaking completely if outside vanilla memory.
+    {"encounter", 256, false}, // original 128
     {"ai persuit", 1024, true}, // original 256
     {"", 0, false}, // Terminate
 };
@@ -183,15 +192,11 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 
 static void save_checkpoint_upgrade() {
     memcpy(gamestate_extension_checkpoint_buffer, gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY);
-    memcpy(tables_checkpoint, tables, sizeof(tables));
 
-    uintptr_t upgrade_start_address_int = reinterpret_cast<uintptr_t>(gamestate_extension_buffer);
-    for (int i=0; i < UPGRADE_TABLES; i++) {
-        // Get the offset so that change in memory address does not break saves.
-        uintptr_t array_start_address_int = tables_checkpoint[i].first_int;
-        uintptr_t offset = array_start_address_int - upgrade_start_address_int;
-
-        tables_checkpoint[i].first_int = offset;
+    GenericTable tables_checkpoint[used_tables];
+    for (int i=0; i<used_tables; i++) {
+        memcpy(&tables_checkpoint[i], tables[i], sizeof(GenericTable));
+        tables_checkpoint[i].first_int = table_offsets[i];
     }
 
     auto save_file_path = std::string(profile_path()) + "\\savegame.vulpes";
@@ -234,7 +239,7 @@ static void load_checkpoint_upgrade() {
 
     // Make sure they're all the same types of tables.
     for (int i=0; i < used_tables; i++) {
-        assert(strncmp(&tables[i].name[0], &tables_checkpoint[i].name[0], 31) == 0);
+        assert(strncmp(&tables[i]->name[0], &tables_checkpoint[i].name[0], 31) == 0);
     }
 
     // Last thing we read from the file is the saved checkpoint memory.
@@ -244,18 +249,13 @@ static void load_checkpoint_upgrade() {
     // Close the file.
     fclose(save_file);
 
-
     uintptr_t upgrade_start_address_int = reinterpret_cast<uintptr_t>(gamestate_extension_buffer);
-    for (int i=0; i < UPGRADE_TABLES; i++) {
+    for (int i=0; i < used_tables; i++) {
         // Get the offset so that change in memory address does not break saves.
-        uintptr_t array_start_offset_int = tables_checkpoint[i].first_int;
-        uintptr_t address = upgrade_start_address_int + array_start_offset_int;
-
-        tables_checkpoint[i].first_int = address;
+        tables[i]->first_int = upgrade_start_address_int + table_offsets[i];
     }
 
     memcpy(gamestate_extension_buffer, gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY);
-    memcpy(tables, tables_checkpoint, sizeof(tables));
 }
 
 extern "C" void gamestate_table_new_wrapper();
