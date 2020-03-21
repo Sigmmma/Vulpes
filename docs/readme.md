@@ -37,7 +37,6 @@ where another mod edits the code we need so we don't have an unreported error.
 And we instead just fail and log that the signature wasn't found, because the
 code was in a way unsafe.
 
-
 ## Why pragma pack(push, 1)
 The rationale is that compiler repacking can't screw our structs. It has
 happened before. Most compilers tend to pack by the size of the biggest value
@@ -50,3 +49,12 @@ Because packing really is just weird if not 1:1 like this.
 
 We don't ever do this for our own structs though. Only for structs that we
 read from the game.
+
+## Why static_assert(sizeof(Type) == value)
+This is a way to sanitize our structures. A lot of structures in Halo we can
+infer the size of before we know the structure. This also helps us when we have
+a full struct and there is something wrong about how certain elements are
+offset.
+
+It's a safety precaution to avoid getting our structures wrong and getting
+crashes.
