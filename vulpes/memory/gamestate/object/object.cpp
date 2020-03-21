@@ -10,5 +10,5 @@
 
 ObjectTable* object_table() {
     return **reinterpret_cast<ObjectTable***>(
-        sig_object_table_ref());;
+        sig_object_table_ref());
 }
