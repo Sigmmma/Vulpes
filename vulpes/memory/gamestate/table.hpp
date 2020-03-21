@@ -13,13 +13,18 @@
 class Table {
 public:
 
-    // Checks if there is an empty entry and sets one up if there is,
-    // returns a MemRef to the allocated id.
+    /*
+    Checks if there is an empty entry and sets one up if there is,
+    returns a MemRef to the allocated id.
+    */
     MemRef allocate();
-    // Deletes the entry at the given MemRef.
-    // Returns true if succesful, false if it couldn't find it.
+    /*
+    Deletes the entry at the given MemRef.
+    Returns true if succesful, false if it couldn't find it.
+    */
     bool remove(MemRef id);
 
+    /* Count the number of valid elements in this table.*/
     size_t count();
 
     char name[0x20];

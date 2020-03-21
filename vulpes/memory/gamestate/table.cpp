@@ -25,16 +25,21 @@ bool Table::remove(MemRef id) {
 }
 
 size_t Table::count() {
-    // Universal table element counting function.
-    // Made to work with any table.
+    // The reason we wrote it like this is to make it universal.
+    // So it does not need to be overwritten for every table type.
     size_t count = 0;
+
     auto table = reinterpret_cast<GenericTable*>(this);
     // Table array starts here.
-    uint32_t base = reinterpret_cast<uint32_t>(table->first);
+    uint32_t array_start_address = reinterpret_cast<uint32_t>(table->first);
+
+    // Count all the valid entries.
     for (int i = 0; i < table->max_elements; i++) {
         uint32_t offset = table->element_size * i;
+
         // The first two bytes of a table entry is always the salt.
-        uint16_t salt = *reinterpret_cast<uint16_t*>(base + offset);
+        uint16_t salt = *reinterpret_cast<uint16_t*>(array_start_address + offset);
+
         // If the salt is non-zero that means the entry is occupied.
         if (salt) count++;
     }
