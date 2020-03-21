@@ -9,6 +9,6 @@
 #include "object.hpp"
 
 ObjectTable* object_table() {
-    return *reinterpret_cast<ObjectTable**>(
-        sig_object_table_ref());;
+    return **reinterpret_cast<ObjectTable***>(
+        sig_object_table_ref());
 }

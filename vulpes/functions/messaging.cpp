@@ -35,7 +35,7 @@ void console_clear() {
     // This is not the best way to do it. But it serves the purpose.
     // We're nulling out all the first chars so Halo doesn't actually see text!
     ConsoleOutputTable* output = console_output_table();
-    for (size_t i = 0; i < output->max_count; i++) {
+    for (size_t i = 0; i < output->max_elements; i++) {
         output->entries[i].text[0] = 0;
     }
 }
