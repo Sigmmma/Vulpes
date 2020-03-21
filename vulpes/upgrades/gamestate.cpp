@@ -7,10 +7,12 @@
 #include <cassert>
 #include <cstdio>
 #include <windows.h>
+#include <string>
 
 #include <hooker/hooker.hpp>
 #include <util/file_helpers.hpp>
 #include <vulpes/hooks/save_load.hpp>
+#include <vulpes/memory/global.hpp>
 #include <vulpes/memory/signatures.hpp>
 #include <vulpes/memory/gamestate/table.hpp>
 
@@ -138,6 +140,14 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"", 0, false}, // Terminate
 };
 
+struct CheckpointFileHeader {
+    uint32_t memory_layout_crc;
+    uint32_t tables_offset;
+    uint32_t tables_count;
+    uint32_t arrays_offset;
+    uint32_t reserved[6];
+};
+
 // Wonky argument order needed for the assembly wrapper to stay simple.
 extern "C" __attribute__((regparm(1)))
 GenericTable* gamestate_table_new_replacement(uint32_t element_size,
@@ -182,6 +192,25 @@ static void save_checkpoint_upgrade() {
 
         tables_checkpoint[i].first_int = offset;
     }
+
+    auto save_file_path = std::string(profile_path()) + "\\savegame.vulpes";
+
+    FILE* save_file = fopen(save_file_path.c_str(), "wb");
+
+    // Prepare save_file header.
+    CheckpointFileHeader header;
+    memset(&header, 0, sizeof(header));
+    header.memory_layout_crc = 0;
+    header.tables_count = used_tables;
+    header.tables_offset = sizeof(header);
+    header.arrays_offset = header.tables_offset + sizeof(tables);
+
+    fwrite(&header, 1, sizeof(header), save_file);
+    fwrite(&tables_checkpoint, 1, sizeof(tables_checkpoint), save_file);
+    fwrite(gamestate_extension_buffer, 1, used_memory, save_file);
+
+    fflush(save_file);
+    fclose(save_file);
 }
 
 static void load_checkpoint_upgrade() {
