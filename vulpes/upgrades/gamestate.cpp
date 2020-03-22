@@ -60,6 +60,8 @@ static GenericTable* gamestate_table_new_vanilla_memory(
     // header.
     new_table->first_int = reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable);
 
+    printf("Vanilla gamestate allocation size %d/%d\n", new_alloc_size, 0x440000);
+
     return new_table;
 }
 
@@ -97,6 +99,7 @@ static GenericTable* gamestate_table_new_upgrade_memory(
 
     // Update the used memory.
     used_memory += element_size * element_max;
+    assert(used_memory <= ALLOCATED_UPGRADE_MEMORY);
 
     printf("Used upgrade memory: %d/%d\n", used_memory, ALLOCATED_UPGRADE_MEMORY);
 
@@ -121,18 +124,25 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"collideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
     {"cluster noncollideable object reference", UPGRADED_OBJECT_LIMIT, false},
     {"noncollideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
+    {"lights", 2048, false}, // original 896
+    {"contrail", 512, false}, // original 256
+    {"contrail point", 2048, false}, // original 1024
+    {"encounter", 256, false}, // original 128
+    {"light volumes", 1024, false}, // original 256
 
+
+    {"decals", 2048, true}, // original 2048
+    {"cached object render states", 256, true}, // original 256
     {"flag", 16, true}, // original 2
     {"antenna", 24, true}, // original 12
     {"glow", 16, true}, // original 8
     {"glow particles", 1024, true}, // original 512
-    {"light volumes", 1024, false}, // original 256
-    //{"lights", 2048, false}, // original 896
-    //{"players", 32, true}, // original 16
+
+
+    //{"players", 32, false}, // original 16
     //{"teams", 32, true}, // original 16
-    //{"contrail", 1024, true}, // original 256
-    //{"contrail point", 4096, true}, // original 1024
-    //{"particle", 2048, true}, // We have to wait until we can fix the game's particle code for this.
+
+    {"particle", 1024, true}, // We have to wait until we can fix the game's particle code for this.
     {"effect", 4096, true}, // original 256
     {"effect location", 8192, true}, // original 512
     {"particle systems", 1024, true}, // original 64
@@ -144,7 +154,7 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     // Too big to upgrade in vanilla memory.
     //{"prop", 768*4, false}, // original 768
     // Cannot be reloaded without encounters breaking completely if outside vanilla memory.
-    {"encounter", 256, false}, // original 128
+
     {"ai persuit", 1024, true}, // original 256
     {"", 0, false}, // Terminate
 };
@@ -191,12 +201,12 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 }
 
 static void save_checkpoint_upgrade() {
+    printf("Saving upgraded gamestate...");
     memcpy(gamestate_extension_checkpoint_buffer, gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY);
 
     GenericTable tables_checkpoint[used_tables];
     for (int i=0; i<used_tables; i++) {
         memcpy(&tables_checkpoint[i], tables[i], sizeof(GenericTable));
-        tables_checkpoint[i].first_int = table_offsets[i];
     }
 
     auto save_file_path = std::string(profile_path()) + "\\savegame.vulpes";
@@ -219,9 +229,11 @@ static void save_checkpoint_upgrade() {
 
     fflush(save_file);
     fclose(save_file);
+    printf("done.\n");
 }
 
 static void load_checkpoint_upgrade() {
+    printf("Loading upgraded gamestate...");
     auto save_file_path = std::string(profile_path()) + "\\savegame.vulpes";
     FILE* save_file = fopen(save_file_path.c_str(), "rb");
 
@@ -249,13 +261,8 @@ static void load_checkpoint_upgrade() {
     // Close the file.
     fclose(save_file);
 
-    uintptr_t upgrade_start_address_int = reinterpret_cast<uintptr_t>(gamestate_extension_buffer);
-    for (int i=0; i < used_tables; i++) {
-        // Get the offset so that change in memory address does not break saves.
-        tables[i]->first_int = upgrade_start_address_int + table_offsets[i];
-    }
-
     memcpy(gamestate_extension_buffer, gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY);
+    printf("done.\n");
 }
 
 extern "C" void gamestate_table_new_wrapper();
@@ -268,6 +275,7 @@ static bool initialized = false;
 void init_gamestate_upgrades() {
     if (initialized) return;
 
+
     auto patch_addr = sig_game_state_data_new();
 
     game_state_globals = *reinterpret_cast<uint32_t**>(patch_addr+2);
@@ -278,10 +286,16 @@ void init_gamestate_upgrades() {
     patch_gamestate_new_replacement.apply();
 
     // Allocate and null the memory for our upgrades.
-    gamestate_extension_buffer = VirtualAlloc(NULL, ALLOCATED_UPGRADE_MEMORY,
-        MEM_COMMIT, PAGE_READWRITE);
+    gamestate_extension_buffer = VirtualAlloc(reinterpret_cast<void*>(0x40000000+0x4000000), ALLOCATED_UPGRADE_MEMORY,
+        MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     gamestate_extension_checkpoint_buffer = VirtualAlloc(NULL, ALLOCATED_UPGRADE_MEMORY,
-        MEM_COMMIT, PAGE_READWRITE);
+        MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    assert(gamestate_extension_buffer);
+    assert(gamestate_extension_checkpoint_buffer);
+
+    memset(gamestate_extension_buffer, 0, ALLOCATED_UPGRADE_MEMORY);
+
 
     ADD_CALLBACK_P(EVENT_BEFORE_SAVE, save_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
     ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
