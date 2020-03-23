@@ -22,6 +22,9 @@
 
 static uintptr_t* game_state_globals;
 static uintptr_t* game_state_globals_cpu_allocation_size;
+static void** game_state_globals_autosave_thread;
+static uintptr_t* game_state_globals_buffer_size;
+static HANDLE*    game_state_globals_file_handle;
 
 // Upgrades
 
@@ -182,16 +185,56 @@ static void load_checkpoint_upgrade() {
     printf("done.\n");
 }
 
+static HANDLE vulpes_save_file;
+
+extern "C" void gamestate_write_to_file_hook() {
+    printf("Attempting to save, let's not die :|\n");
+    auto save_file_path = std::string(profile_path()) + "\\savegame.vulpes";
+
+    long unsigned written = 0;
+
+    //WriteFile(*game_state_globals_file_handle, gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, &written, NULL);
+
+    FILE* save_file = fopen(save_file_path.c_str(), "wb");
+
+    fwrite(gamestate_extension_checkpoint_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
+
+    fflush(save_file);
+    fclose(save_file);
+    printf("Didn't die?\n");
+}
+
+typedef void (*cunt)();
+static cunt set_event;
+
+void gamestate_copy_to_backup_buffer_hook() {
+    printf("Copying vanilla gamestate to checkpoint memory...");
+    printf("%X %X %X", reinterpret_cast<void*>(*game_state_globals_autosave_thread), reinterpret_cast<void*>(*game_state_globals_buffer_size - *game_state_globals), *game_state_globals_buffer_size);
+    memcpy(reinterpret_cast<void*>(*game_state_globals_autosave_thread), reinterpret_cast<void*>(*game_state_globals), *game_state_globals_buffer_size);
+    printf("done\n");
+    printf("Copying gamestate to checkpoint memory...");
+    memcpy(gamestate_extension_checkpoint_buffer, gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY);
+    printf("done\n");
+}
+
 extern "C" void gamestate_table_new_wrapper();
+extern "C" void gamestate_write_to_file_hook_wrapper();
 
 static Patch(patch_gamestate_new_replacement, NULL, 6,
     JMP_PATCH, &gamestate_table_new_wrapper);
+
+static Patch(patch_gamestate_write_to_file_hook, NULL, 5,
+    CALL_PATCH, &gamestate_write_to_file_hook_wrapper);
+static Patch(patch_gamestate_write_to_file_hook_nops, NULL, 15,
+    NOP_PATCH, NULL);
+
+static Patch(patch_copy_to_checkpoint_stat_hook, NULL, 9,
+    CALL_PATCH, &gamestate_copy_to_backup_buffer_hook);
 
 static bool initialized = false;
 
 void init_gamestate_upgrades() {
     if (initialized) return;
-
 
     auto patch_addr = sig_game_state_data_new();
 
@@ -199,7 +242,7 @@ void init_gamestate_upgrades() {
     game_state_globals_cpu_allocation_size = *reinterpret_cast<uintptr_t**>(patch_addr+0x37);
 
     patch_gamestate_new_replacement.build(patch_addr);
-    patch_gamestate_new_replacement.apply();
+    //patch_gamestate_new_replacement.apply();
 
     // Allocate and null the memory for our upgrades.
     gamestate_extension_buffer = VirtualAlloc(reinterpret_cast<void*>(0x40000000+0x4000000), ALLOCATED_UPGRADE_MEMORY,
@@ -212,8 +255,25 @@ void init_gamestate_upgrades() {
 
     memset(gamestate_extension_buffer, 0, ALLOCATED_UPGRADE_MEMORY);
 
-    ADD_CALLBACK_P(EVENT_BEFORE_SAVE, save_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
-    ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
+    uintptr_t write_to_file_patch_address = 0x53BD33;
+    game_state_globals_autosave_thread = *reinterpret_cast<void***>(write_to_file_patch_address+21);
+    game_state_globals_buffer_size = *reinterpret_cast<uintptr_t**>(write_to_file_patch_address+15);
+    game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_address+2);
+
+    //patch_gamestate_write_to_file_hook_nops.build(write_to_file_patch_address - 15);
+    //patch_gamestate_write_to_file_hook_nops.apply();
+    patch_gamestate_write_to_file_hook.build(write_to_file_patch_address + 51);
+    patch_gamestate_write_to_file_hook.apply();
+
+    uintptr_t copy_to_checkpoint_state_patch_address = 0x53BA94;
+    set_event = reinterpret_cast<cunt>(0x53BCD0);
+
+    patch_copy_to_checkpoint_stat_hook.build(copy_to_checkpoint_state_patch_address);
+    patch_copy_to_checkpoint_stat_hook.apply();
+
+
+    //ADD_CALLBACK_P(EVENT_BEFORE_SAVE, save_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
+    //ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
 }
 
 void revert_gamestate_upgrades() {
@@ -224,6 +284,6 @@ void revert_gamestate_upgrades() {
     VirtualFree(gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
     VirtualFree(gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
 
-    DEL_CALLBACK(EVENT_BEFORE_SAVE, save_checkpoint_upgrade);
-    DEL_CALLBACK(EVENT_BEFORE_LOAD, load_checkpoint_upgrade);
+    //DEL_CALLBACK(EVENT_BEFORE_SAVE, save_checkpoint_upgrade);
+    //DEL_CALLBACK(EVENT_BEFORE_LOAD, load_checkpoint_upgrade);
 }
