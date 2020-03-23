@@ -20,10 +20,15 @@
 
 // Vanilla
 
+// base address for gamestate.
 static uintptr_t* game_state_globals;
+// Actually the end address for gamestate.
 static uintptr_t* game_state_globals_cpu_allocation_size;
+// The buffer in which a checkpoint to be saved resides.
 static void** game_state_globals_autosave_thread;
+// The amount of allocated memory in gamestate.
 static uintptr_t* game_state_globals_buffer_size;
+// The filehandle to the savefile.
 //static HANDLE*    game_state_globals_file_handle;
 
 // Upgrades
@@ -84,15 +89,6 @@ const TableUpgradeData TABLE_UPGRADES[] = {
 
     {"ai persuit", 1024, true}, // original 256
     {"", 0, false}, // Terminate
-};
-
-struct CheckpointFileHeader {
-    uint32_t memory_layout_crc;
-    uint32_t tables_offset;
-    uint32_t tables_count;
-    uint32_t arrays_offset;
-    uint32_t arrays_size;
-    uint32_t reserved[5];
 };
 
 // Wonky argument order needed for the assembly wrapper to stay simple.
@@ -198,8 +194,6 @@ static Patch(patch_gamestate_new_replacement, NULL, 6,
 
 static Patch(patch_gamestate_write_to_file_hook, NULL, 5,
     CALL_PATCH, &gamestate_write_to_file_hook_wrapper);
-static Patch(patch_gamestate_write_to_file_hook_nops, NULL, 15,
-    NOP_PATCH, NULL);
 
 static Patch(patch_copy_to_checkpoint_stat_hook, NULL, 9,
     CALL_PATCH, &gamestate_copy_to_backup_buffer_hook);
