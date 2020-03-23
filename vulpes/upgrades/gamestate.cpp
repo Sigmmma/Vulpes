@@ -29,6 +29,11 @@ static void** game_state_globals_autosave_thread;
 // The amount of allocated memory in gamestate.
 static uintptr_t* game_state_globals_buffer_size;
 // The filehandle to the savefile.
+/* The reason we don't use this is that Halo resizes the checkpoint file to
+   a specific size every time Halo starts.
+   We could fix this, but I'd rather avoid the potential compatibility conflict
+   we could have with other mods over this.
+*/
 //static HANDLE*    game_state_globals_file_handle;
 
 // Upgrades
@@ -173,6 +178,9 @@ extern "C" void gamestate_write_to_file_hook() {
 
 void gamestate_copy_to_backup_buffer_hook() {
     // Copy the vanilla gamestate into the checkpoint buffer.
+    // We're replacing the vanilla mechanism for this because there isn't
+    // really a great place to hook this function. So, we replaced the code
+    // that normally handles this.
     memcpy(
         reinterpret_cast<void*>(*game_state_globals_autosave_thread),
         reinterpret_cast<void*>(*game_state_globals),
@@ -195,7 +203,7 @@ static Patch(patch_gamestate_new_replacement, NULL, 6,
 static Patch(patch_gamestate_write_to_file_hook, NULL, 5,
     CALL_PATCH, &gamestate_write_to_file_hook_wrapper);
 
-static Patch(patch_copy_to_checkpoint_stat_hook, NULL, 9,
+static Patch(patch_copy_to_checkpoint_state_hook, NULL, 9,
     CALL_PATCH, &gamestate_copy_to_backup_buffer_hook);
 
 static bool initialized = false;
@@ -225,8 +233,8 @@ void init_gamestate_upgrades() {
 
     // Replace parts of the code that handles the memory copy to the checkpoint
     // buffer with our own code.
-    patch_copy_to_checkpoint_stat_hook.build(copy_to_checkpoint_state_patch_address);
-    patch_copy_to_checkpoint_stat_hook.apply();
+    patch_copy_to_checkpoint_state_hook.build(copy_to_checkpoint_state_patch_address);
+    patch_copy_to_checkpoint_state_hook.apply();
 
     // I couldn't find a good place to hook this in. But the BEFORE_LOAD event
     // works just fine. So, even though it is weird to do it in two different
@@ -234,7 +242,7 @@ void init_gamestate_upgrades() {
     ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
 
     // Allocate and null the memory for our upgrades.
-    gamestate_extension_buffer = VirtualAlloc(reinterpret_cast<void*>(0x40000000+0x4000000), ALLOCATED_UPGRADE_MEMORY,
+    gamestate_extension_buffer = VirtualAlloc(reinterpret_cast<void*>(0x40000000-ALLOCATED_UPGRADE_MEMORY), ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     gamestate_extension_checkpoint_buffer = VirtualAlloc(NULL, ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -250,7 +258,7 @@ void revert_gamestate_upgrades() {
 
     patch_gamestate_new_replacement.revert();
     patch_gamestate_write_to_file_hook.revert();
-    patch_copy_to_checkpoint_stat_hook.revert();
+    patch_copy_to_checkpoint_state_hook.revert();
 
     VirtualFree(gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
     VirtualFree(gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
