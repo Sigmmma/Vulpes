@@ -170,18 +170,17 @@ static void save_checkpoint_upgrade() {
     printf("done.\n");
 }
 
-static void load_checkpoint_upgrade() {
+extern "C" void load_checkpoint_upgrade() {
     printf("Loading upgraded gamestate...");
     auto save_file_path = std::string(profile_path()) + "\\savegame.vulpes";
 
     FILE* save_file = fopen(save_file_path.c_str(), "rb");
 
-    fread(&gamestate_extension_checkpoint_buffer, 1, used_extension_memory, save_file);
+    fread(gamestate_extension_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
 
     // Close the file.
     fclose(save_file);
 
-    memcpy(gamestate_extension_buffer, gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY);
     printf("done.\n");
 }
 
@@ -242,7 +241,7 @@ void init_gamestate_upgrades() {
     game_state_globals_cpu_allocation_size = *reinterpret_cast<uintptr_t**>(patch_addr+0x37);
 
     patch_gamestate_new_replacement.build(patch_addr);
-    //patch_gamestate_new_replacement.apply();
+    patch_gamestate_new_replacement.apply();
 
     // Allocate and null the memory for our upgrades.
     gamestate_extension_buffer = VirtualAlloc(reinterpret_cast<void*>(0x40000000+0x4000000), ALLOCATED_UPGRADE_MEMORY,
@@ -271,9 +270,8 @@ void init_gamestate_upgrades() {
     patch_copy_to_checkpoint_stat_hook.build(copy_to_checkpoint_state_patch_address);
     patch_copy_to_checkpoint_stat_hook.apply();
 
-
     //ADD_CALLBACK_P(EVENT_BEFORE_SAVE, save_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
-    //ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
+    ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
 }
 
 void revert_gamestate_upgrades() {
@@ -285,5 +283,5 @@ void revert_gamestate_upgrades() {
     VirtualFree(gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
 
     //DEL_CALLBACK(EVENT_BEFORE_SAVE, save_checkpoint_upgrade);
-    //DEL_CALLBACK(EVENT_BEFORE_LOAD, load_checkpoint_upgrade);
+    DEL_CALLBACK(EVENT_BEFORE_LOAD, load_checkpoint_upgrade);
 }
