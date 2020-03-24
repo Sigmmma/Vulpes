@@ -47,52 +47,53 @@ struct TableUpgradeData {
     const char* name; // Name to apply this upgrade to.
     uint16_t new_max; // New max to use.
     bool in_upgrade_memory; // Whether or not to store this upgrade in upgrade
-    // memory. This is important because some tables might contain pointers.
-    // Our memory does not have a set location.
+    // memory.
+    // Only really used for objects, so we don't break compat with the old
+    // Chimera.
 };
 
 const uint16_t UPGRADED_OBJECT_LIMIT = 4096; // original 2048
 
 const TableUpgradeData TABLE_UPGRADES[] = {
-    // Object refs have pointers wheras other table users only refer to
-    // things with MemRef
-    {"object", UPGRADED_OBJECT_LIMIT, false},
-    {"cluster collideable object reference", UPGRADED_OBJECT_LIMIT, false},
-    {"collideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
-    {"cluster noncollideable object reference", UPGRADED_OBJECT_LIMIT, false},
-    {"noncollideable object cluster reference", UPGRADED_OBJECT_LIMIT, false},
-    {"lights", 2048, false}, // original 896
-    {"contrail", 512, false}, // original 256
-    {"contrail point", 2048, false}, // original 1024
-    {"encounter", 256, false}, // original 128
-    {"light volumes", 1024, false}, // original 256
-
-
-    {"decals", 2048, true}, // original 2048
-    {"cached object render states", 256, true}, // original 256
-    {"flag", 16, true}, // original 2
-    {"antenna", 24, true}, // original 12
-    {"glow", 16, true}, // original 8
-    {"glow particles", 1024, true}, // original 512
-
-
-    //{"players", 32, false}, // original 16
-    //{"teams", 32, true}, // original 16
-
-    {"particle", 1024, true}, // We have to wait until we can fix the game's particle code for this.
-    {"effect", 4096, true}, // original 256
-    {"effect location", 8192, true}, // original 512
-    {"particle systems", 1024, true}, // original 64
-    {"particle system particles", 4096, true}, // original 512
-    {"actors", 1024, true}, // original 256
-    //{"swarm", 128, true}, // original 32
-    //{"swarm component", 1024, true}, // original 256
-    // Puts some AI code in an infinite loop if loaded using our system.
-    // Too big to upgrade in vanilla memory.
-    //{"prop", 768*4, false}, // original 768
-    // Cannot be reloaded without encounters breaking completely if outside vanilla memory.
-
-    {"ai persuit", 1024, true}, // original 256
+    {"object", TABLE_OBJECT_UPGR_MAX, false},
+    {"cached object render states", TABLE_CACHED_OBJECT_RENDER_STATES_UPGR_MAX, true},
+    {"widget", TABLE_WIDGET_UPGR_MAX, true},
+    {"flag", TABLE_FLAG_UPGR_MAX, true},
+    {"antenna", TABLE_ANTENNA_UPGR_MAX, true},
+    {"glow", TABLE_GLOW_UPGR_MAX, true},
+    {"glow particles", TABLE_GLOW_PARTICLES_UPGR_MAX, true},
+    {"light volumes", TABLE_LIGHT_VOLUMES_UPGR_MAXX, true},
+    {"lightnings", TABLE_LIGHTNINGS_UPGR_MAX, true},
+    {"device groups", TABLE_DEVICE_GROUPS_UPGR_MAX, true},
+    {"lights", TABLE_LIGHTS_UPGR_MAX, true},
+    {"cluster light reference", TABLE_CLUSTER_LIGHT_REFERENCE_UPGR_MAX, true},
+    {"light cluster reference", TABLE_LIGHT_CLUSTER_REFERENCE_UPGR_MAX, true},
+    {"cluster collideable object reference", TABLE_CLUSTER_COLLIDABLE_OBJECT_REFERENCE_UPGR_MAX, true},
+    {"cluster noncollideable object reference", TABLE_CLUSTER_NONCOLLIDABLE_OBJECT_REFERENCE_UPGR_MAX, true},
+    {"collideable object cluster reference", TABLE_COLLIDABLE_OBJECT_CLUSTER_REFERENCE_UPGR_MAX, true},
+    {"noncollideable object cluster reference", TABLE_NONCOLLIDABLE_OBJECT_CLUSTER_REFERENCE_UPGR_MAX, true},
+    {"decals", TABLE_DECALS_UPGR_MAX, true},
+    {"players", TABLE_PLAYERS_UPGR_MAX, true},
+    {"teams", TABLE_TEAMS_UPGR_MAX, true},
+    {"contrail", TABLE_CONTRAIL_UPGR_MAX, true},
+    {"contrail point", TABLE_CONTRAIL_POINT_UPGR_MAX, true},
+    {"particle", TABLE_PARTICLE_UPGR_MAX, true},
+    {"effect", TABLE_EFFECT_UPGR_MAX, true},
+    {"effect location", TABLE_EFFECT_LOCATION_UPGR_MAX, true},
+    {"particle systems", TABLE_PARTICLE_SYSTEMS_UPGR_MAX, true},
+    {"particle system particles", TABLE_PARTICLE_SYSTEM_PARTICLES_UPGR_MAX, true},
+    {"object looping sounds", TABLE_OBJECT_LOOPING_SOUNDS_UPGR_MAX, true},
+    {"actor", TABLE_ACTOR_UPGR_MAX, true},
+    {"swarm", TABLE_SWARM_UPGR_MAX, true},
+    {"swarm component", TABLE_SWARM_COMPONENT_UPGR_MAX, true},
+    {"prop", TABLE_PROP_UPGR_MAX, true},
+    {"encounter", TABLE_ENCOUNTER_UPGR_MAX, true},
+    {"ai pursuit", TABLE_AI_PERSUIT_UPGR_MAX, true},
+    {"object list header", TABLE_OBJECT_LIST_HEADER_UPGR_MAX, false},
+    {"list object reference", TABLE_LIST_OBJECT_REFERENCE_UPGR_MAX, false},
+    {"hs thread", TABLE_HS_THREAD_UPGR_MAX, true},
+    {"hs globals", TABLE_HS_GLOBALS_UPGR_MAX, true},
+    {"recorded animations", TABLE_RECORDED_ANIMATIONS_UPGR_MAX, true},
     {"", 0, false}, // Terminate
 };
 
