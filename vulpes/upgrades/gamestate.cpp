@@ -27,7 +27,7 @@ static uintptr_t* game_state_globals_cpu_allocation_size;
 // The buffer in which a checkpoint to be saved resides.
 static void** game_state_globals_autosave_thread;
 // The amount of allocated memory in gamestate.
-static uintptr_t* game_state_globals_buffer_size;
+static const uintptr_t* game_state_globals_buffer_size;
 // The filehandle to the savefile.
 /* The reason we don't use this is that Halo resizes the checkpoint file to
    a specific size every time Halo starts.
@@ -39,7 +39,7 @@ static uintptr_t* game_state_globals_buffer_size;
 // Upgrades
 
 static uintptr_t used_extension_memory = 0;
-static const size_t ALLOCATED_UPGRADE_MEMORY = 8*1024*1024;
+static const size_t ALLOCATED_UPGRADE_MEMORY = 10*1024*1024;
 static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
@@ -101,8 +101,7 @@ extern "C" __attribute__((regparm(1)))
 GenericTable* gamestate_table_new_replacement(uint32_t element_size,
         const char* name, uint16_t element_max) {
     printf(
-        "Table alloc:"
-        "%-32s e_size:%-4d e_max:%-4d\n",
+        "Table alloc:%-32s e_size:%-4d e_max:%-4d\n",
         name, element_size, element_max
     );
 
@@ -127,19 +126,28 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 
     uintptr_t* mem_start;
     uintptr_t* mem_used;
+    const uintptr_t* mem_max;
 
     if (use_upgrade_memory) {
         mem_start = reinterpret_cast<uintptr_t*>(&gamestate_extension_buffer);
         mem_used  = &used_extension_memory;
+        mem_max   = &ALLOCATED_UPGRADE_MEMORY;
     } else {
         mem_start = game_state_globals;
         mem_used  = game_state_globals_cpu_allocation_size;
+        mem_max   = game_state_globals_buffer_size;
     }
 
     // Get the next available spot in vanilla gamestate.
     auto new_table = reinterpret_cast<GenericTable*>(*mem_start + *mem_used);
 
-    // Do the same setup that Halo does.
+    // Calculate and store the total used.
+    *mem_used = *mem_used + sizeof(GenericTable) + element_size * element_max;
+
+    // Make sure the limits are correctly enforced.
+    assert(*mem_used <= *mem_max);
+
+    // Do the same setup for the table header that Halo does.
     memset(new_table, 0, sizeof(GenericTable));
     strncpy(new_table->name, name, sizeof(new_table->name) - 1);
     new_table->max_elements = element_max;
@@ -152,19 +160,15 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     // The first entry in the table in vanilla gamestate is right after the
     // header.
     new_table->first_int = reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable);
+
     // Null the whole array.
     memset(new_table->first, 0, element_size * element_max);
-
-    // Calculate and store the total used.
-    *mem_used = *mem_used + sizeof(GenericTable) + element_size * element_max;
-
-    assert(*mem_used <= use_upgrade_memory ? ALLOCATED_UPGRADE_MEMORY : 0x440000);
 
     printf(
         "%s used budget %d/%d\n",
         use_upgrade_memory ? "Upgrade" : "Vanilla",
         *mem_used,
-        use_upgrade_memory ? ALLOCATED_UPGRADE_MEMORY : 0x440000
+        *mem_max
     );
 
     return new_table;
@@ -227,28 +231,28 @@ static bool initialized = false;
 void init_gamestate_upgrades() {
     if (initialized) return;
 
-    auto patch_addr = sig_game_state_data_new();
-    uintptr_t write_to_file_patch_address = 0x53BD33;
-    uintptr_t copy_to_checkpoint_state_patch_address = 0x53BA94;
+    uintptr_t game_state_table_alloc_patch_addr = sig_game_state_data_new();
+    uintptr_t write_to_file_patch_addr = sig_game_state_write_to_file();
+    uintptr_t copy_to_checkpoint_state_patch_addr = sig_game_state_copy_to_checkpoint_buffer();
 
-    game_state_globals = *reinterpret_cast<uintptr_t**>(patch_addr+2);
-    game_state_globals_cpu_allocation_size = *reinterpret_cast<uintptr_t**>(patch_addr+0x37);
-    game_state_globals_autosave_thread = *reinterpret_cast<void***>(write_to_file_patch_address+21);
-    game_state_globals_buffer_size = *reinterpret_cast<uintptr_t**>(write_to_file_patch_address+15);
-    //game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_address+2);
+    game_state_globals = *reinterpret_cast<uintptr_t**>(game_state_table_alloc_patch_addr+2);
+    game_state_globals_cpu_allocation_size = *reinterpret_cast<uintptr_t**>(game_state_table_alloc_patch_addr+0x37);
+    game_state_globals_autosave_thread = *reinterpret_cast<void***>(write_to_file_patch_addr+21);
+    game_state_globals_buffer_size = *reinterpret_cast<const uintptr_t**>(write_to_file_patch_addr+15);
+    //game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_addr+2);
 
     // Patch the original table allocation function to replace it with ours.
-    patch_gamestate_new_replacement.build(patch_addr);
+    patch_gamestate_new_replacement.build(game_state_table_alloc_patch_addr);
     patch_gamestate_new_replacement.apply();
 
     // Hook into a small piece of code in the checkpoint file writing code
     // so we can execute our file writing code.
-    patch_gamestate_write_to_file_hook.build(write_to_file_patch_address + 51);
+    patch_gamestate_write_to_file_hook.build(write_to_file_patch_addr + 51);
     patch_gamestate_write_to_file_hook.apply();
 
     // Replace parts of the code that handles the memory copy to the checkpoint
     // buffer with our own code.
-    patch_copy_to_checkpoint_state_hook.build(copy_to_checkpoint_state_patch_address);
+    patch_copy_to_checkpoint_state_hook.build(copy_to_checkpoint_state_patch_addr);
     patch_copy_to_checkpoint_state_hook.apply();
 
     // I couldn't find a good place to hook this in. But the BEFORE_LOAD event
@@ -256,11 +260,15 @@ void init_gamestate_upgrades() {
     // ways. It's what we're doing for now.
     ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
 
+    // This is the location the game stores its gamestate in.
+    uintptr_t mem_map_loc = *sig_physical_memory_map_location();
+
     // Allocate and null the memory for our upgrades.
     gamestate_extension_buffer = VirtualAlloc(
         // Allocating on a static address relieves us from the duty of needing
         // to patch loaded stuff to fit in the current memory model.
-        reinterpret_cast<void*>(0x40000000-ALLOCATED_UPGRADE_MEMORY),
+        // We basically allocate our chunk of gamestate before vanilla gamestate.
+        reinterpret_cast<void*>(mem_map_loc-ALLOCATED_UPGRADE_MEMORY),
         ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     gamestate_extension_checkpoint_buffer = VirtualAlloc(
@@ -269,7 +277,9 @@ void init_gamestate_upgrades() {
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     assert(gamestate_extension_buffer);
+    printf("Allocated gamestate upgrade buffer at 0x%X\n", gamestate_extension_buffer);
     assert(gamestate_extension_checkpoint_buffer);
+    printf("Allocated gamestate checkpoint upgrade buffer at 0x%X\n", gamestate_extension_checkpoint_buffer);
 
     memset(gamestate_extension_buffer, 0, ALLOCATED_UPGRADE_MEMORY);
 }

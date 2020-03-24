@@ -438,6 +438,20 @@ signatures:
     bytes: 8B 15 ?? ?? ?? ?? 55 66 8B 6C 24 0C
     crucial: true
 
+  - name: game_state_write_to_file
+    bytes: 8B 0D ?? ?? ?? ?? 6A 00 8D 54 24 14 52 8B 15 ?? ?? ?? ?? 50
+    crucial: true
+
+  - name: game_state_copy_to_checkpoint_buffer
+    bytes: F3 A5 8B C8 83 E1 03 F3 A4 8B 15 ?? ?? ?? ?? 8A 4C 24 0C
+    crucial: true
+
+  - name: physical_memory_map_location
+    bytes: A3 ?? ?? ?? ?? 68 ?? ?? ?? ?? A3 ?? ?? ?? ?? FF
+    crucial: true
+    offset: 6
+    type: uintptr_t*
+
 # I think this can be used for adding maps to the table
 # - name: func_add_map_to_list
 # - bytes: 8B 0D ?? ?? ?? ?? 81 EC 00 08 00 00
