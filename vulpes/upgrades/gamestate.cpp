@@ -112,9 +112,13 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     while (!found && TABLE_UPGRADES[i].new_max != 0) {
         if (strncmp(name, TABLE_UPGRADES[i].name, 31) == 0) {
             // Set max to new max.
-            element_max = TABLE_UPGRADES[i].new_max;
+            if (TABLE_UPGRADES[i].new_max > element_max) {
+                // Safety measure to accomodate other mods that may increase
+                // more than we do.
+                element_max = TABLE_UPGRADES[i].new_max;
+                printf("Set e_max to %d\n", element_max);
+            }
             use_upgrade_memory = TABLE_UPGRADES[i].in_upgrade_memory;
-            printf("Set e_max to %d\n", element_max);
             found = true;
             break;
         }
