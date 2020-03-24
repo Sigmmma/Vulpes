@@ -156,9 +156,10 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     return new_table;
 }
 
-const auto SAVE_FILE_PATH = std::string(profile_path()) + "\\savegame.vulpes";
+static const char* SAVE_PATH = "\\savegame.vulpes";
 
 extern "C" void load_checkpoint_upgrade() {
+    auto SAVE_FILE_PATH = std::string(profile_path()) + SAVE_PATH;
     FILE* save_file = fopen(SAVE_FILE_PATH.c_str(), "rb");
     // Read the upgrade memory from file.
     fread(gamestate_extension_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
@@ -168,6 +169,7 @@ extern "C" void load_checkpoint_upgrade() {
 }
 
 extern "C" void gamestate_write_to_file_hook() {
+    auto SAVE_FILE_PATH = std::string(profile_path()) + SAVE_PATH;
     FILE* save_file = fopen(SAVE_FILE_PATH.c_str(), "wb");
     // Just dump the entire upgrade memory into one file.
     fwrite(gamestate_extension_checkpoint_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
