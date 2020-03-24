@@ -154,6 +154,8 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     // Calculate and store the total used.
     *mem_used = *mem_used + sizeof(GenericTable) + element_size * element_max;
 
+    assert(*mem_used <= use_upgrade_memory ? ALLOCATED_UPGRADE_MEMORY : 0x440000);
+
     printf(
         "%s used budget %d/%d\n",
         use_upgrade_memory ? "Upgrade" : "Vanilla",
