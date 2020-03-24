@@ -101,9 +101,10 @@ extern "C" __attribute__((regparm(1)))
 GenericTable* gamestate_table_new_replacement(uint32_t element_size,
         const char* name, uint16_t element_max) {
     printf(
-        "Table creation request:\n"
-        "name:%-32s element_size:%6d element_max:%6d\n", name, element_size, element_max);
-    fflush(stdout);
+        "Table alloc:"
+        "%-32s e_size:%-4d e_max:%-4d\n",
+        name, element_size, element_max
+    );
 
     bool found = false;
     bool use_upgrade_memory = false;
@@ -113,7 +114,7 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
             // Set max to new max.
             element_max = TABLE_UPGRADES[i].new_max;
             use_upgrade_memory = TABLE_UPGRADES[i].in_upgrade_memory;
-            printf("Upgrading element_max to %d\n", element_max);
+            printf("Set e_max to %d\n", element_max);
             found = true;
             break;
         }
@@ -135,7 +136,7 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     auto new_table = reinterpret_cast<GenericTable*>(*mem_start + *mem_used);
 
     // Do the same setup that Halo does.
-    memset(new_table, 0, sizeof(GenericTable) + element_size * element_max);
+    memset(new_table, 0, sizeof(GenericTable));
     strncpy(new_table->name, name, sizeof(new_table->name) - 1);
     new_table->max_elements = element_max;
     new_table->element_size = element_size;
@@ -147,11 +148,18 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     // The first entry in the table in vanilla gamestate is right after the
     // header.
     new_table->first_int = reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable);
+    // Null the whole array.
+    memset(new_table->first, 0, element_size * element_max);
 
     // Calculate and store the total used.
     *mem_used = *mem_used + sizeof(GenericTable) + element_size * element_max;
 
-    printf("Gamestate allocation size %d/%d\n", *mem_used, 0x440000);
+    printf(
+        "%s used budget %d/%d\n",
+        use_upgrade_memory ? "Upgrade" : "Vanilla",
+        *mem_used,
+        use_upgrade_memory ? ALLOCATED_UPGRADE_MEMORY : 0x440000
+    );
 
     return new_table;
 }
@@ -223,7 +231,6 @@ void init_gamestate_upgrades() {
     game_state_globals_buffer_size = *reinterpret_cast<uintptr_t**>(write_to_file_patch_address+15);
     //game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_address+2);
 
-
     // Patch the original table allocation function to replace it with ours.
     patch_gamestate_new_replacement.build(patch_addr);
     patch_gamestate_new_replacement.apply();
@@ -244,9 +251,15 @@ void init_gamestate_upgrades() {
     ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
 
     // Allocate and null the memory for our upgrades.
-    gamestate_extension_buffer = VirtualAlloc(reinterpret_cast<void*>(0x40000000-ALLOCATED_UPGRADE_MEMORY), ALLOCATED_UPGRADE_MEMORY,
+    gamestate_extension_buffer = VirtualAlloc(
+        // Allocating on a static address relieves us from the duty of needing
+        // to patch loaded stuff to fit in the current memory model.
+        reinterpret_cast<void*>(0x40000000-ALLOCATED_UPGRADE_MEMORY),
+        ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    gamestate_extension_checkpoint_buffer = VirtualAlloc(NULL, ALLOCATED_UPGRADE_MEMORY,
+    gamestate_extension_checkpoint_buffer = VirtualAlloc(
+        NULL,
+        ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     assert(gamestate_extension_buffer);
