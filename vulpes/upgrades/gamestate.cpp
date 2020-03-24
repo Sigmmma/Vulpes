@@ -39,20 +39,19 @@ static uintptr_t* game_state_globals_buffer_size;
 // Upgrades
 
 static uintptr_t used_extension_memory = 0;
-static const size_t ALLOCATED_UPGRADE_MEMORY = 5*1024*1024;
+static const size_t ALLOCATED_UPGRADE_MEMORY = 8*1024*1024;
 static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
 struct TableUpgradeData {
     const char* name; // Name to apply this upgrade to.
     uint16_t new_max; // New max to use.
-    bool in_upgrade_memory; // Whether or not to store this upgrade in upgrade
-    // memory.
+    bool in_upgrade_memory;
+    // Whether or not to store this upgrade in upgrade memory.
     // Only really used for objects, so we don't break compat with the old
-    // Chimera.
+    // Chimera. As the sandboxed LUA in that version has a specific memory
+    // range that it allows edits in.
 };
-
-const uint16_t UPGRADED_OBJECT_LIMIT = 4096; // original 2048
 
 const TableUpgradeData TABLE_UPGRADES[] = {
     {"object", TABLE_OBJECT_UPGR_MAX, false},
@@ -62,7 +61,7 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"antenna", TABLE_ANTENNA_UPGR_MAX, true},
     {"glow", TABLE_GLOW_UPGR_MAX, true},
     {"glow particles", TABLE_GLOW_PARTICLES_UPGR_MAX, true},
-    {"light volumes", TABLE_LIGHT_VOLUMES_UPGR_MAXX, true},
+    {"light volumes", TABLE_LIGHT_VOLUMES_UPGR_MAX, true},
     {"lightnings", TABLE_LIGHTNINGS_UPGR_MAX, true},
     {"device groups", TABLE_DEVICE_GROUPS_UPGR_MAX, true},
     {"lights", TABLE_LIGHTS_UPGR_MAX, true},
@@ -193,7 +192,7 @@ extern "C" void gamestate_write_to_file_hook() {
     fclose(save_file);
 }
 
-void gamestate_copy_to_backup_buffer_hook() {
+static void gamestate_copy_to_backup_buffer_hook() {
     // Copy the vanilla gamestate into the checkpoint buffer.
     // We're replacing the vanilla mechanism for this because there isn't
     // really a great place to hook this function. So, we replaced the code
