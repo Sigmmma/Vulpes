@@ -11,6 +11,24 @@ _gamestate_table_new_wrapper:
         movsx eax, bx
         jmp _gamestate_table_new_replacement
 
+.globl _gamestate_read_from_main_file_hook_wrapper
+_gamestate_read_from_main_file_hook_wrapper:
+        pushad
+        call _gamestate_read_from_main_file_hook
+        popad
+        mov al, 1
+        pop ebx
+        pop ecx
+        ret
+
+.globl _gamestate_read_from_profile_file_hook_wrapper
+_gamestate_read_from_profile_file_hook_wrapper:
+        add esp, 0x104
+        pushad
+        call _gamestate_read_from_profile_file_hook
+        popad
+        ret
+
 .globl _gamestate_write_to_file_hook_wrapper
 _gamestate_write_to_file_hook_wrapper:
         test esi, esi
@@ -35,3 +53,8 @@ _gamestate_copy_checkpoint_file:
         mov esi, edx
         sub esp, 0x240
         jmp [_gamestate_copy_checkpoint_file_continue_ptr]
+
+.globl _saved_game_file_get_path_to_enclosing_directory
+_saved_game_file_get_path_to_enclosing_directory:
+        mov esi, edx
+        jmp [_saved_game_file_get_path_to_enclosing_directory_ptr]

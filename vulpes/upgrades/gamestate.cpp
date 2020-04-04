@@ -37,7 +37,13 @@ static const uintptr_t* game_state_globals_buffer_size;
 //static HANDLE*    game_state_globals_file_handle;
 extern "C" {
     uintptr_t gamestate_copy_checkpoint_file_continue_ptr;
+    uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr = 0x5403E0;
 }
+
+extern "C" __attribute__((regparm(2)))
+void saved_game_file_get_path_to_enclosing_directory(uint32_t profile_id, char* write_to);
+
+static uintptr_t* player_profile_id = reinterpret_cast<uintptr_t*>(0x6AFE1C);
 
 
 // Upgrades
@@ -180,9 +186,37 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 
 static const char* SAVE_PATH = "\\savegame.vulpes";
 
-extern "C" void load_checkpoint_upgrade() {
-    auto SAVE_FILE_PATH = std::string(profile_path()) + SAVE_PATH;
-    FILE* save_file = fopen(SAVE_FILE_PATH.c_str(), "rb");
+extern "C" void gamestate_read_from_main_file_hook() {
+    printf("gamestate_read_from_main_file_hook\n");
+    char path[1024];
+
+    // Find the path where the main savefile goes.
+
+    strcpy(path, profile_path());
+    strcat(path, SAVE_PATH);
+
+    // Read directly from the main savefile extension
+
+    FILE* save_file = fopen(path, "rb");
+    // Read the upgrade memory from file.
+    fread(gamestate_extension_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
+
+    // Close the file.
+    fclose(save_file);
+}
+
+extern "C" void gamestate_read_from_profile_file_hook() {
+    printf("gamestate_read_from_profile_file_hook\n");
+    char path[1024];
+
+    // Find the path where the main savefile goes.
+
+    saved_game_file_get_path_to_enclosing_directory(*player_profile_id, path);
+    strcat(path, SAVE_PATH);
+
+    // Read directly from the main savefile extension
+
+    FILE* save_file = fopen(path, "rb");
     // Read the upgrade memory from file.
     fread(gamestate_extension_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
 
@@ -191,8 +225,32 @@ extern "C" void load_checkpoint_upgrade() {
 }
 
 extern "C" void gamestate_write_to_file_hook() {
-    auto SAVE_FILE_PATH = std::string(profile_path()) + SAVE_PATH;
-    FILE* save_file = fopen(SAVE_FILE_PATH.c_str(), "wb");
+    int path_size = 1024;
+    char path[path_size];
+
+    // Find the path where the main savefile goes.
+
+    strcpy(path, profile_path());
+    strcat(path, SAVE_PATH);
+
+    // Dump to the main savefile extension
+
+    FILE* save_file = fopen(path, "wb");
+    // Just dump the entire upgrade memory into one file.
+    fwrite(gamestate_extension_checkpoint_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
+    // Flush and close.
+    fflush(save_file);
+    fclose(save_file);
+
+    // Find the path where profile specific savefiles go
+
+    memset(path, 0, path_size);
+    saved_game_file_get_path_to_enclosing_directory(*player_profile_id, path);
+    strcat(path, SAVE_PATH);
+
+    // Dump to the profile specific savefile extension
+
+    save_file = fopen(path, "wb");
     // Just dump the entire upgrade memory into one file.
     fwrite(gamestate_extension_checkpoint_buffer, 1, ALLOCATED_UPGRADE_MEMORY, save_file);
     // Flush and close.
@@ -224,7 +282,7 @@ char gamestate_copy_checkpoint_file_hook(char* a1, char* a2, char* a3) {
     printf("%s\n", full_path1);
     printf("%s\n", full_path2);
 
-    CopyFileA(full_path1, full_path2, 0);
+    CopyFile(full_path2, full_path1, 0);
 
     return 1;
 }
@@ -248,11 +306,19 @@ static void gamestate_copy_to_backup_buffer_hook() {
 }
 
 extern "C" void gamestate_table_new_wrapper();
+extern "C" void gamestate_read_from_main_file_hook_wrapper();
+extern "C" void gamestate_read_from_profile_file_hook_wrapper();
 extern "C" void gamestate_write_to_file_hook_wrapper();
 extern "C" char gamestate_copy_checkpoint_file_wrapper(char*, char*, char*);
 
 static Patch(patch_gamestate_new_replacement, NULL, 6,
     JMP_PATCH, &gamestate_table_new_wrapper);
+
+static Patch(patch_gamestate_read_from_file_hook, 0x53C6F6, 5,
+    JMP_PATCH, &gamestate_read_from_main_file_hook_wrapper);
+
+static Patch(patch_gamestate_read_from_profile_file_hook, 0x53CC26, 6,
+    JMP_PATCH, &gamestate_read_from_profile_file_hook_wrapper);
 
 static Patch(patch_gamestate_write_to_file_hook, NULL, 5,
     CALL_PATCH, &gamestate_write_to_file_hook_wrapper);
@@ -282,6 +348,12 @@ void init_gamestate_upgrades() {
     patch_gamestate_new_replacement.build(game_state_table_alloc_patch_addr);
     patch_gamestate_new_replacement.apply();
 
+    patch_gamestate_read_from_file_hook.build();
+    patch_gamestate_read_from_file_hook.apply();
+
+    patch_gamestate_read_from_profile_file_hook.build();
+    patch_gamestate_read_from_profile_file_hook.apply();
+
     // Hook into a small piece of code in the checkpoint file writing code
     // so we can execute our file writing code.
     patch_gamestate_write_to_file_hook.build(write_to_file_patch_addr + 51);
@@ -301,7 +373,7 @@ void init_gamestate_upgrades() {
     // I couldn't find a good place to hook this in. But the BEFORE_LOAD event
     // works just fine. So, even though it is weird to do it in two different
     // ways. It's what we're doing for now.
-    ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
+    //ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
 
     // This is the location the game stores its gamestate in.
     uintptr_t mem_map_loc = *sig_physical_memory_map_location();
@@ -337,5 +409,4 @@ void revert_gamestate_upgrades() {
     VirtualFree(gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
     VirtualFree(gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
 
-    DEL_CALLBACK(EVENT_BEFORE_LOAD, load_checkpoint_upgrade);
 }
