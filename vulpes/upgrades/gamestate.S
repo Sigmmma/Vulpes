@@ -19,3 +19,19 @@ _gamestate_write_to_file_hook_wrapper:
         call _gamestate_write_to_file_hook
         popad
         ret
+
+# This hooks into the function that creates backups of savefiles.
+# We basically make it execute twice
+.globl _gamestate_copy_checkpoint_file_wrapper
+_gamestate_copy_checkpoint_file_wrapper:
+        mov eax, edi
+        mov edx, esi
+        jmp _gamestate_copy_checkpoint_file_hook
+
+
+.globl _gamestate_copy_checkpoint_file
+_gamestate_copy_checkpoint_file:
+        mov edi, eax
+        mov esi, edx
+        sub esp, 0x240
+        jmp [_gamestate_copy_checkpoint_file_continue_ptr]

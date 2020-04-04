@@ -35,6 +35,10 @@ static const uintptr_t* game_state_globals_buffer_size;
    we could have with other mods over this.
 */
 //static HANDLE*    game_state_globals_file_handle;
+extern "C" {
+    uintptr_t gamestate_copy_checkpoint_file_continue_ptr;
+}
+
 
 // Upgrades
 
@@ -196,6 +200,35 @@ extern "C" void gamestate_write_to_file_hook() {
     fclose(save_file);
 }
 
+extern "C" __attribute__((regparm(2)))
+char gamestate_copy_checkpoint_file(char*, char*, char*);
+
+extern "C" __attribute__((regparm(2)))
+char gamestate_copy_checkpoint_file_hook(char* a1, char* a2, char* a3) {
+    printf("gamestate_copy_checkpoint_file_hook\n");
+    char return_value = gamestate_copy_checkpoint_file(a1, a2, a3);
+    // If the function returns 1 that means it succesfully copied the files
+    if (!return_value) {
+        return 0;
+    }
+
+    // We also need to copy ours.
+    // This is basically sort of a copy of what Halo does, but for our files.
+
+    char full_path1[4096];
+    char full_path2[4096];
+
+    sprintf(full_path1, "%s%s.vulpes", a2, a3);
+    sprintf(full_path2, "%s%s.vulpes", a2, a1);
+
+    printf("%s\n", full_path1);
+    printf("%s\n", full_path2);
+
+    CopyFileA(full_path1, full_path2, 0);
+
+    return 1;
+}
+
 static void gamestate_copy_to_backup_buffer_hook() {
     // Copy the vanilla gamestate into the checkpoint buffer.
     // We're replacing the vanilla mechanism for this because there isn't
@@ -216,6 +249,7 @@ static void gamestate_copy_to_backup_buffer_hook() {
 
 extern "C" void gamestate_table_new_wrapper();
 extern "C" void gamestate_write_to_file_hook_wrapper();
+extern "C" char gamestate_copy_checkpoint_file_wrapper(char*, char*, char*);
 
 static Patch(patch_gamestate_new_replacement, NULL, 6,
     JMP_PATCH, &gamestate_table_new_wrapper);
@@ -225,6 +259,9 @@ static Patch(patch_gamestate_write_to_file_hook, NULL, 5,
 
 static Patch(patch_copy_to_checkpoint_state_hook, NULL, 9,
     CALL_PATCH, &gamestate_copy_to_backup_buffer_hook);
+
+static Patch(patch_copy_checkpoint_file_hook, NULL, 6,
+    JMP_PATCH, &gamestate_copy_checkpoint_file_wrapper);
 
 static bool initialized = false;
 
@@ -254,6 +291,12 @@ void init_gamestate_upgrades() {
     // buffer with our own code.
     patch_copy_to_checkpoint_state_hook.build(copy_to_checkpoint_state_patch_addr);
     patch_copy_to_checkpoint_state_hook.apply();
+
+    // Extend the checkpoint file copying function to also copy our checkpoint
+    // file.
+    patch_copy_checkpoint_file_hook.build(0x53BB30);
+    patch_copy_checkpoint_file_hook.apply();
+    gamestate_copy_checkpoint_file_continue_ptr = patch_copy_checkpoint_file_hook.return_address();
 
     // I couldn't find a good place to hook this in. But the BEFORE_LOAD event
     // works just fine. So, even though it is weird to do it in two different
