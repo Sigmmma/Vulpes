@@ -64,6 +64,12 @@ static const size_t ALLOCATED_UPGRADE_MEMORY = 10*1024*1024;
 static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
+// Misc constants
+static const char* SAVE_PATH = "\\savegame.vulpes";
+// Number of characters to allocate when building paths.
+static const size_t PATH_CHARS = 4096;
+
+
 struct TableUpgradeData {
     const char* name; // Name to apply this upgrade to.
     uint16_t new_max; // New max to use.
@@ -172,8 +178,6 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     return new_table;
 }
 
-static const char* SAVE_PATH = "\\savegame.vulpes";
-
 static void game_state_upgrade_read_from_file(char* filepath) {
     FILE* save_file = fopen(filepath, "rb");
     // Read the upgrade memory from file.
@@ -194,7 +198,7 @@ static void game_state_upgrade_write_to_file(char* filepath) {
 
 extern "C"
 void gamestate_read_from_main_file_hook() {
-    char path[1024];
+    char path[PATH_CHARS];
 
     // Find the path where the main savefile goes.
 
@@ -208,7 +212,7 @@ void gamestate_read_from_main_file_hook() {
 
 extern "C"
 void gamestate_read_from_profile_file_hook() {
-    char path[1024];
+    char path[PATH_CHARS];
 
     // Find the path where the main savefile goes.
 
@@ -222,13 +226,12 @@ void gamestate_read_from_profile_file_hook() {
 
 extern "C"
 void gamestate_write_to_files_hook() {
-    int path_size = 1024;
-    char path[path_size];
+    char path[PATH_CHARS];
 
     // Find the path where the main savefile goes.
 
-    strcpy(path, profile_path());
-    strcat(path, SAVE_PATH);
+    strncpy(path, profile_path(), PATH_CHARS);
+    strncat(path, SAVE_PATH,      PATH_CHARS);
 
     // Dump to the main savefile extension
 
@@ -236,9 +239,9 @@ void gamestate_write_to_files_hook() {
 
     // Find the path where profile specific savefiles go
 
-    memset(path, 0, path_size);
+    memset(path, 0, PATH_CHARS);
     saved_game_file_get_path_to_enclosing_directory(active_profile_id(), path);
-    strcat(path, SAVE_PATH);
+    strncat(path, SAVE_PATH, PATH_CHARS);
 
     // Dump to the profile specific savefile extension
 
@@ -256,11 +259,11 @@ char gamestate_copy_checkpoint_file_hook(char* a1, char* a2, char* a3) {
     // We also need to copy ours.
     // This is basically sort of a copy of what Halo does, but for our files.
 
-    char full_path1[4096];
-    char full_path2[4096];
+    char full_path1[PATH_CHARS];
+    char full_path2[PATH_CHARS];
 
-    sprintf(full_path1, "%s%s.vulpes", a2, a3);
-    sprintf(full_path2, "%s%s.vulpes", a2, a1);
+    snprintf(full_path1, PATH_CHARS, "%s%s.vulpes", a2, a3);
+    snprintf(full_path2, PATH_CHARS, "%s%s.vulpes", a2, a1);
 
     CopyFile(full_path2, full_path1, 0);
 
