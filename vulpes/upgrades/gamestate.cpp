@@ -7,11 +7,8 @@
 #include <cassert>
 #include <cstdio>
 #include <windows.h>
-#include <string>
 
 #include <hooker/hooker.hpp>
-#include <util/file_helpers.hpp>
-#include <vulpes/hooks/save_load.hpp>
 #include <vulpes/memory/global.hpp>
 #include <vulpes/memory/signatures.hpp>
 #include <vulpes/memory/gamestate/table.hpp>
@@ -38,13 +35,15 @@ static const uintptr_t* game_state_globals_buffer_size;
 extern "C" {
     uintptr_t gamestate_copy_checkpoint_file_continue_ptr;
     uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr = 0x5403E0;
+
+    __attribute__((regparm(2)))
+    void saved_game_file_get_path_to_enclosing_directory(uint32_t profile_id, char* write_to);
+
+    __attribute__((regparm(2)))
+    char gamestate_copy_checkpoint_file(char*, char*, char*);
 }
 
-extern "C" __attribute__((regparm(2)))
-void saved_game_file_get_path_to_enclosing_directory(uint32_t profile_id, char* write_to);
-
 static uintptr_t* player_profile_id = reinterpret_cast<uintptr_t*>(0x6AFE1C);
-
 
 // Upgrades
 
@@ -224,7 +223,7 @@ extern "C" void gamestate_read_from_profile_file_hook() {
     fclose(save_file);
 }
 
-extern "C" void gamestate_write_to_file_hook() {
+extern "C" void gamestate_write_to_files_hook() {
     int path_size = 1024;
     char path[path_size];
 
@@ -259,9 +258,6 @@ extern "C" void gamestate_write_to_file_hook() {
 }
 
 extern "C" __attribute__((regparm(2)))
-char gamestate_copy_checkpoint_file(char*, char*, char*);
-
-extern "C" __attribute__((regparm(2)))
 char gamestate_copy_checkpoint_file_hook(char* a1, char* a2, char* a3) {
     printf("gamestate_copy_checkpoint_file_hook\n");
     char return_value = gamestate_copy_checkpoint_file(a1, a2, a3);
@@ -278,9 +274,6 @@ char gamestate_copy_checkpoint_file_hook(char* a1, char* a2, char* a3) {
 
     sprintf(full_path1, "%s%s.vulpes", a2, a3);
     sprintf(full_path2, "%s%s.vulpes", a2, a1);
-
-    printf("%s\n", full_path1);
-    printf("%s\n", full_path2);
 
     CopyFile(full_path2, full_path1, 0);
 
@@ -308,20 +301,20 @@ static void gamestate_copy_to_backup_buffer_hook() {
 extern "C" void gamestate_table_new_wrapper();
 extern "C" void gamestate_read_from_main_file_hook_wrapper();
 extern "C" void gamestate_read_from_profile_file_hook_wrapper();
-extern "C" void gamestate_write_to_file_hook_wrapper();
+extern "C" void gamestate_write_to_files_hook_wrapper();
 extern "C" char gamestate_copy_checkpoint_file_wrapper(char*, char*, char*);
 
 static Patch(patch_gamestate_new_replacement, NULL, 6,
     JMP_PATCH, &gamestate_table_new_wrapper);
 
-static Patch(patch_gamestate_read_from_file_hook, 0x53C6F6, 5,
+static Patch(patch_gamestate_read_from_main_file_hook, 0x53C6F6, 5,
     JMP_PATCH, &gamestate_read_from_main_file_hook_wrapper);
 
 static Patch(patch_gamestate_read_from_profile_file_hook, 0x53CC26, 6,
     JMP_PATCH, &gamestate_read_from_profile_file_hook_wrapper);
 
-static Patch(patch_gamestate_write_to_file_hook, NULL, 5,
-    CALL_PATCH, &gamestate_write_to_file_hook_wrapper);
+static Patch(patch_gamestate_write_to_files_hook, NULL, 5,
+    CALL_PATCH, &gamestate_write_to_files_hook_wrapper);
 
 static Patch(patch_copy_to_checkpoint_state_hook, NULL, 9,
     CALL_PATCH, &gamestate_copy_to_backup_buffer_hook);
@@ -348,16 +341,16 @@ void init_gamestate_upgrades() {
     patch_gamestate_new_replacement.build(game_state_table_alloc_patch_addr);
     patch_gamestate_new_replacement.apply();
 
-    patch_gamestate_read_from_file_hook.build();
-    patch_gamestate_read_from_file_hook.apply();
+    patch_gamestate_read_from_main_file_hook.build();
+    patch_gamestate_read_from_main_file_hook.apply();
 
     patch_gamestate_read_from_profile_file_hook.build();
     patch_gamestate_read_from_profile_file_hook.apply();
 
     // Hook into a small piece of code in the checkpoint file writing code
     // so we can execute our file writing code.
-    patch_gamestate_write_to_file_hook.build(write_to_file_patch_addr + 51);
-    patch_gamestate_write_to_file_hook.apply();
+    patch_gamestate_write_to_files_hook.build(write_to_file_patch_addr + 51);
+    patch_gamestate_write_to_files_hook.apply();
 
     // Replace parts of the code that handles the memory copy to the checkpoint
     // buffer with our own code.
@@ -403,7 +396,10 @@ void revert_gamestate_upgrades() {
     if (!initialized) return;
 
     patch_gamestate_new_replacement.revert();
-    patch_gamestate_write_to_file_hook.revert();
+    patch_gamestate_write_to_files_hook.revert();
+    patch_copy_to_checkpoint_state_hook.revert();
+    patch_gamestate_read_from_main_file_hook.revert();
+    patch_gamestate_read_from_profile_file_hook.revert();
     patch_copy_to_checkpoint_state_hook.revert();
 
     VirtualFree(gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);

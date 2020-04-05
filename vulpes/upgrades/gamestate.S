@@ -29,12 +29,12 @@ _gamestate_read_from_profile_file_hook_wrapper:
         popad
         ret
 
-.globl _gamestate_write_to_file_hook_wrapper
-_gamestate_write_to_file_hook_wrapper:
+.globl _gamestate_write_to_files_hook_wrapper
+_gamestate_write_to_files_hook_wrapper:
         test esi, esi
         setz al
         pushad
-        call _gamestate_write_to_file_hook
+        call _gamestate_write_to_files_hook
         popad
         ret
 
