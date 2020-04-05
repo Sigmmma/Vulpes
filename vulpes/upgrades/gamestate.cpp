@@ -6,7 +6,7 @@
 
 #include <cassert>
 #include <cstdio>
-#include <windows.h>
+#include <windows.h> /* VirtualAlloc, VirtualFree */
 
 #include <hooker/hooker.hpp>
 #include <vulpes/memory/global.hpp>
@@ -32,15 +32,29 @@ static const uintptr_t* game_state_globals_buffer_size;
    we could have with other mods over this.
 */
 //static HANDLE*    game_state_globals_file_handle;
-extern "C" {
+
+extern "C" { // These are shared with the assembly.
+
+    // the jmp location for saved_game_file_get_path_to_enclosing_directory
     uintptr_t gamestate_copy_checkpoint_file_continue_ptr;
+
     uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr = 0x5403E0;
 
     __attribute__((regparm(2)))
     void saved_game_file_get_path_to_enclosing_directory(uint32_t profile_id, char* write_to);
 
+    /* The original function that copies both the .sav and .bin files for a
+       checkpoint to another location */
     __attribute__((regparm(2)))
     char gamestate_copy_checkpoint_file(char*, char*, char*);
+
+    // These are assembly wrappers for functions in this file.
+
+    void gamestate_table_new_wrapper();
+    void gamestate_read_from_main_file_hook_wrapper();
+    void gamestate_read_from_profile_file_hook_wrapper();
+    void gamestate_write_to_files_hook_wrapper();
+    char gamestate_copy_checkpoint_file_wrapper(char*, char*, char*);
 }
 
 static uintptr_t* player_profile_id = reinterpret_cast<uintptr_t*>(0x6AFE1C);
@@ -109,10 +123,6 @@ const TableUpgradeData TABLE_UPGRADES[] = {
 extern "C" __attribute__((regparm(1)))
 GenericTable* gamestate_table_new_replacement(uint32_t element_size,
         const char* name, uint16_t element_max) {
-    printf(
-        "Table alloc:%-32s e_size:%-4d e_max:%-4d\n",
-        name, element_size, element_max
-    );
 
     bool found = false;
     bool use_upgrade_memory = false;
@@ -156,28 +166,9 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     // Make sure the limits are correctly enforced.
     assert(*mem_used <= *mem_max);
 
-    // Do the same setup for the table header that Halo does.
-    memset(new_table, 0, sizeof(GenericTable));
-    strncpy(new_table->name, name, sizeof(new_table->name) - 1);
-    new_table->max_elements = element_max;
-    new_table->element_size = element_size;
-    // Just hex for the NOT terminated string 'd@t@'
-    new_table->sig = 0x64407440; //'d@t@'
-    // Mark as invalid as that is what vanilla does.
-    new_table->is_valid = false;
-
-    // The first entry in the table in vanilla gamestate is right after the
-    // header.
-    new_table->first_int = reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable);
-
-    // Null the whole array.
-    memset(new_table->first, 0, element_size * element_max);
-
-    printf(
-        "%s used budget %d/%d\n",
-        use_upgrade_memory ? "Upgrade" : "Vanilla",
-        *mem_used,
-        *mem_max
+    new_table->init(
+        name, element_max, element_size,
+        reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable)
     );
 
     return new_table;
@@ -185,7 +176,8 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 
 static const char* SAVE_PATH = "\\savegame.vulpes";
 
-extern "C" void gamestate_read_from_main_file_hook() {
+extern "C"
+void gamestate_read_from_main_file_hook() {
     printf("gamestate_read_from_main_file_hook\n");
     char path[1024];
 
@@ -204,7 +196,8 @@ extern "C" void gamestate_read_from_main_file_hook() {
     fclose(save_file);
 }
 
-extern "C" void gamestate_read_from_profile_file_hook() {
+extern "C"
+void gamestate_read_from_profile_file_hook() {
     printf("gamestate_read_from_profile_file_hook\n");
     char path[1024];
 
@@ -223,7 +216,8 @@ extern "C" void gamestate_read_from_profile_file_hook() {
     fclose(save_file);
 }
 
-extern "C" void gamestate_write_to_files_hook() {
+extern "C"
+void gamestate_write_to_files_hook() {
     int path_size = 1024;
     char path[path_size];
 
@@ -297,12 +291,6 @@ static void gamestate_copy_to_backup_buffer_hook() {
         ALLOCATED_UPGRADE_MEMORY
     );
 }
-
-extern "C" void gamestate_table_new_wrapper();
-extern "C" void gamestate_read_from_main_file_hook_wrapper();
-extern "C" void gamestate_read_from_profile_file_hook_wrapper();
-extern "C" void gamestate_write_to_files_hook_wrapper();
-extern "C" char gamestate_copy_checkpoint_file_wrapper(char*, char*, char*);
 
 static Patch(patch_gamestate_new_replacement, NULL, 6,
     JMP_PATCH, &gamestate_table_new_wrapper);
