@@ -4,6 +4,34 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+/*
+    Halo allocates all of its gamestate important memory into a static buffer
+    that is always the same size, and always in the same place.
+
+    When we want to increase the amount of things we can store in gamestate
+    the naive approach would be to extend that buffer. Problem is with that
+    approach that there is other data after that buffer that is also always
+    there. Opensauce also just extends this buffer, and we don't want to step
+    on its toes.
+
+    Our solution to this problem is to instead allocate another buffer right
+    before this gamestate buffer. We try to fit as many things as possible into
+    this buffer. We're excluding certain things though. Objects are still in
+    the normal buffer because the old Chimera lua lets people directly access
+    memory, and in sandboxed mode will not allow writes outside of that region.
+    I don't want to deal with that incompatibility either.
+
+    The problem with allocating another buffer in a different location is that
+    Halo doesn't save this buffer's data to checkpoint files. Most of the hooks
+    in this file hook into Halo's checkpoint saving and loading code so that
+    our files are also saved, loaded, and copied at the right times.
+
+    We also completely replace the table allocation function that the game
+    normally uses because hooking into it more passively turned out to be a
+    major pain in my ass. So, we have a function that allocates tables in both
+    our and vanilla memory that does all the things Halo normally does.
+*/
+
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -183,6 +211,7 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     return new_table;
 }
 
+/* Reads upgraded gamestate from the given filepath */
 static void game_state_upgrade_read_from_file(char* filepath) {
     FILE* save_file = fopen(filepath, "rb");
     // Read the upgrade memory from file.
@@ -192,6 +221,7 @@ static void game_state_upgrade_read_from_file(char* filepath) {
     fclose(save_file);
 }
 
+/* saves the upgraded gamestate to the given filepath */
 static void game_state_upgrade_write_to_file(char* filepath) {
     FILE* save_file = fopen(filepath, "wb");
     // Just dump the entire upgrade memory into one file.
@@ -202,6 +232,7 @@ static void game_state_upgrade_write_to_file(char* filepath) {
 }
 
 extern "C"
+/* Loads the upgraded savegame from the main profile path */
 void gamestate_read_from_main_file_hook() {
     char path[PATH_CHARS];
 
@@ -216,6 +247,7 @@ void gamestate_read_from_main_file_hook() {
 }
 
 extern "C"
+/* Loads the upgraded savegame from the player profile folder */
 void gamestate_read_from_profile_file_hook() {
     char path[PATH_CHARS];
 
@@ -230,6 +262,8 @@ void gamestate_read_from_profile_file_hook() {
 }
 
 extern "C"
+/* Halo always saved to both the main save file and to the profile savefile
+   that is why we do both at once here */
 void gamestate_write_to_files_hook() {
     char path[PATH_CHARS];
 
