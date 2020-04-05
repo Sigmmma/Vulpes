@@ -18,16 +18,16 @@ static const uint16_t TABLE_CACHED_OBJECT_RENDER_STATES_ORIG_MAX = 256;
 static const uint16_t TABLE_CACHED_OBJECT_RENDER_STATES_UPGR_MAX = 1024;
 
 static const uint16_t TABLE_WIDGET_ORIG_MAX = 12;
-static const uint16_t TABLE_WIDGET_UPGR_MAX = 64;
+static const uint16_t TABLE_WIDGET_UPGR_MAX = 256;
 
 static const uint16_t TABLE_FLAG_ORIG_MAX = 2;
 static const uint16_t TABLE_FLAG_UPGR_MAX = 8;
 
 static const uint16_t TABLE_ANTENNA_ORIG_MAX = 12;
-static const uint16_t TABLE_ANTENNA_UPGR_MAX = 64;
+static const uint16_t TABLE_ANTENNA_UPGR_MAX = 256;
 
 static const uint16_t TABLE_GLOW_ORIG_MAX = 8;
-static const uint16_t TABLE_GLOW_UPGR_MAX = 32;
+static const uint16_t TABLE_GLOW_UPGR_MAX = 128;
 
 static const uint16_t TABLE_GLOW_PARTICLES_ORIG_MAX = 512;
 static const uint16_t TABLE_GLOW_PARTICLES_UPGR_MAX = 2048;
@@ -36,7 +36,7 @@ static const uint16_t TABLE_LIGHT_VOLUMES_ORIG_MAX = 256;
 static const uint16_t TABLE_LIGHT_VOLUMES_UPGR_MAX = 1024;
 
 static const uint16_t TABLE_LIGHTNINGS_ORIG_MAX = 256;
-static const uint16_t TABLE_LIGHTNINGS_UPGR_MAX = 256;
+static const uint16_t TABLE_LIGHTNINGS_UPGR_MAX = 1024;
 
 static const uint16_t TABLE_DEVICE_GROUPS_ORIG_MAX = 1024;
 static const uint16_t TABLE_DEVICE_GROUPS_UPGR_MAX = 2048;
