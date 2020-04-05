@@ -19,4 +19,4 @@ extern "C" __attribute__((regparm(2)))
 void saved_game_file_get_path_to_enclosing_directory(uint32_t profile_id, char* write_to);
 
 
-init_memory_global()
+void init_memory_global();
