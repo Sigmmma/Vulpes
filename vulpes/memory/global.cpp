@@ -43,3 +43,9 @@ const char* map_name() {
 bool at_main_menu() {
     return *sig_at_main_menu();
 }
+
+uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr;
+
+void init_memory_global() {
+    saved_game_file_get_path_to_enclosing_directory_ptr = sig_saved_game_file_get_path_to_enclosing_directory();
+}

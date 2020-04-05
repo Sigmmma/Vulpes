@@ -53,8 +53,3 @@ _gamestate_copy_checkpoint_file:
         mov esi, edx
         sub esp, 0x240
         jmp [_gamestate_copy_checkpoint_file_continue_ptr]
-
-.globl _saved_game_file_get_path_to_enclosing_directory
-_saved_game_file_get_path_to_enclosing_directory:
-        mov esi, edx
-        jmp [_saved_game_file_get_path_to_enclosing_directory_ptr]

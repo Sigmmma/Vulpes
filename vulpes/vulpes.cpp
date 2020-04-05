@@ -97,7 +97,9 @@ void revert_upgrades() {
 
 // Memory
 
+#include "memory/global.hpp"
 void init_memory() {
+    init_memory_global();
 }
 
 // Halo functions
@@ -173,6 +175,7 @@ void init_vulpes() {
 
     init_signatures_signatures();
 
+    init_memory();
     init_hooks();
     init_halo_bug_fixes();
     init_upgrades();

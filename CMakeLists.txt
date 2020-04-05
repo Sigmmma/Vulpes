@@ -84,6 +84,7 @@ add_library(Vulpes SHARED
     vulpes/memory/gamestate/table.cpp
     vulpes/memory/behavior_definition.cpp
     vulpes/memory/global.cpp
+    vulpes/memory/global.S
 
     vulpes/memory/types.cpp
 

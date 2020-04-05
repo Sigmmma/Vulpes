@@ -386,6 +386,10 @@ signatures:
     crucial: true
     type: bool*
 
+  - name: saved_game_file_get_path_to_enclosing_directory
+    bytes: 81 EC 08 02 00 00 53 33 DB 83 F8 FF
+    crucial: true
+
   - name: object_behavior_defs
     bytes: 8B 0C 95 ?? ?? ?? 00 39 71 10 74 02 33 C0
     crucial: true

@@ -39,11 +39,6 @@ extern "C" { // These are shared with the assembly.
     // the jmp location for gamestate_copy_checkpoint_file
     uintptr_t gamestate_copy_checkpoint_file_continue_ptr;
 
-    uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr = 0x5403E0;
-
-    __attribute__((regparm(2)))
-    void saved_game_file_get_path_to_enclosing_directory(uint32_t profile_id, char* write_to);
-
     /* The original function that copies both the .sav and .bin files for a
        checkpoint to another location */
     __attribute__((regparm(2)))
@@ -61,7 +56,7 @@ extern "C" { // These are shared with the assembly.
 // Upgrades
 
 static uintptr_t used_extension_memory = 0;
-static const size_t ALLOCATED_UPGRADE_MEMORY = 10*1024*1024;
+static const size_t ALLOCATED_UPGRADE_MEMORY = 10*1024*1024; // 10 MB
 static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
@@ -326,9 +321,11 @@ void init_gamestate_upgrades() {
     patch_gamestate_new_replacement.build(game_state_table_alloc_patch_addr);
     patch_gamestate_new_replacement.apply();
 
+    // Make sure to also load our file when the game loads from the main checkpoint file.
     patch_gamestate_read_from_main_file_hook.build(sig_game_state_read_from_main_file_hook());
     patch_gamestate_read_from_main_file_hook.apply();
 
+    // Also load our file from the player specific checkpoint folder when the game does so.
     patch_gamestate_read_from_profile_file_hook.build(sig_game_state_read_from_profile_file_hook());
     patch_gamestate_read_from_profile_file_hook.apply();
 
@@ -347,7 +344,6 @@ void init_gamestate_upgrades() {
     patch_copy_checkpoint_file_hook.build(sig_copy_checkpoint_file_hook());
     patch_copy_checkpoint_file_hook.apply();
     gamestate_copy_checkpoint_file_continue_ptr = patch_copy_checkpoint_file_hook.return_address();
-
 
     // This is the location the game stores its gamestate in.
     uintptr_t mem_map_loc = *sig_physical_memory_map_location();

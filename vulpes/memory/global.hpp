@@ -13,3 +13,10 @@ const wchar_t* active_profile_name();
 int32_t active_profile_id();
 const char* map_name();
 bool at_main_menu();
+
+extern "C" __attribute__((regparm(2)))
+/* Writes the path to the requested profile's save folder to the given pointer */
+void saved_game_file_get_path_to_enclosing_directory(uint32_t profile_id, char* write_to);
+
+
+init_memory_global()
