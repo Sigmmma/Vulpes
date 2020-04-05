@@ -10,6 +10,7 @@
 #include <windows.h> /* VirtualAlloc, VirtualFree */
 
 #include <hooker/hooker.hpp>
+#include <util/crc32.hpp>
 #include <vulpes/memory/global.hpp>
 #include <vulpes/memory/signatures.hpp>
 #include <vulpes/memory/gamestate/table.hpp>
@@ -26,6 +27,8 @@ static uintptr_t* game_state_globals_cpu_allocation_size;
 static void** game_state_globals_autosave_thread;
 // The amount of allocated memory in gamestate.
 static const uintptr_t* game_state_globals_buffer_size;
+// A sentinel value that Halo uses to avoid loading invalid saves.
+static uintptr_t* game_state_globals_crc;
 // The filehandle to the savefile.
 /* The reason we don't use this is that Halo resizes the checkpoint file to
    a specific size every time Halo starts.
@@ -171,6 +174,12 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
         reinterpret_cast<uintptr_t>(new_table) + sizeof(GenericTable)
     );
 
+    // Halo does this as a security measure to avoid loading gamestates with
+    // mismatched layouts.
+
+    const int crc_buffer = element_max;
+    *game_state_globals_crc = crc32(*game_state_globals_crc, &crc_buffer, sizeof(int));
+
     return new_table;
 }
 
@@ -315,6 +324,7 @@ void init_gamestate_upgrades() {
     game_state_globals_cpu_allocation_size = *reinterpret_cast<uintptr_t**>(game_state_table_alloc_patch_addr+0x37);
     game_state_globals_autosave_thread = *reinterpret_cast<void***>(write_to_file_patch_addr+21);
     game_state_globals_buffer_size = *reinterpret_cast<const uintptr_t**>(write_to_file_patch_addr+15);
+    game_state_globals_crc = *reinterpret_cast<uintptr_t**>(game_state_table_alloc_patch_addr+0x31);
     //game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_addr+2);
 
     // Patch the original table allocation function to replace it with ours.
