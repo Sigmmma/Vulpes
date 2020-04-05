@@ -57,8 +57,6 @@ extern "C" { // These are shared with the assembly.
     char gamestate_copy_checkpoint_file_wrapper(char*, char*, char*);
 }
 
-static uintptr_t* player_profile_id = reinterpret_cast<uintptr_t*>(0x6AFE1C);
-
 // Upgrades
 
 static uintptr_t used_extension_memory = 0;
@@ -214,7 +212,7 @@ void gamestate_read_from_profile_file_hook() {
 
     // Find the path where the main savefile goes.
 
-    saved_game_file_get_path_to_enclosing_directory(*player_profile_id, path);
+    saved_game_file_get_path_to_enclosing_directory(active_profile_id(), path);
     strcat(path, SAVE_PATH);
 
     // Read directly from the main savefile extension
@@ -239,7 +237,7 @@ void gamestate_write_to_files_hook() {
     // Find the path where profile specific savefiles go
 
     memset(path, 0, path_size);
-    saved_game_file_get_path_to_enclosing_directory(*player_profile_id, path);
+    saved_game_file_get_path_to_enclosing_directory(active_profile_id(), path);
     strcat(path, SAVE_PATH);
 
     // Dump to the profile specific savefile extension

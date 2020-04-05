@@ -9,5 +9,7 @@
 const char* profile_path();
 const char* savegames_path();
 const wchar_t* active_profile_name();
+/* Returns -1 if not found */
+int32_t active_profile_id();
 const char* map_name();
 bool at_main_menu();
