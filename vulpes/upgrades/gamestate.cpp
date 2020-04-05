@@ -254,8 +254,8 @@ void gamestate_write_to_files_hook() {
 }
 
 extern "C" __attribute__((regparm(2)))
-char gamestate_copy_checkpoint_file_hook(char* a1, char* a2, char* a3) {
-    char return_value = gamestate_copy_checkpoint_file(a1, a2, a3);
+char gamestate_copy_checkpoint_file_hook(char* to, char* base_path, char* from) {
+    char return_value = gamestate_copy_checkpoint_file(to, base_path, from);
     // If the function returns 1 that means it succesfully copied the files
     if (!return_value) {
         return 0;
@@ -267,8 +267,8 @@ char gamestate_copy_checkpoint_file_hook(char* a1, char* a2, char* a3) {
     char full_path1[PATH_CHARS];
     char full_path2[PATH_CHARS];
 
-    snprintf(full_path1, PATH_CHARS, "%s%s.vulpes", a2, a3);
-    snprintf(full_path2, PATH_CHARS, "%s%s.vulpes", a2, a1);
+    snprintf(full_path1, PATH_CHARS, "%s%s.vulpes", base_path, from);
+    snprintf(full_path2, PATH_CHARS, "%s%s.vulpes", base_path, to);
 
     CopyFile(full_path2, full_path1, 0);
 
