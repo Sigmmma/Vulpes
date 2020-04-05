@@ -354,9 +354,8 @@ signatures:
     type: const char**
 
   - name: savegames_path
-    bytes: 57 68 FF 00 00 00 33 C0 68 ?? ?? ?? ?? B9 C7 02 00 00 BF ?? ?? ?? ?? 68
-    crucial: true
-    offset: 0x5B
+    base: path
+    offset: 82
     type: const char**
 
     # Doesn't exist on server
