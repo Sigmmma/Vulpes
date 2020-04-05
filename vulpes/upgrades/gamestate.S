@@ -11,6 +11,7 @@ _gamestate_table_new_wrapper:
         movsx eax, bx
         jmp _gamestate_table_new_replacement
 
+
 .globl _gamestate_read_from_main_file_hook_wrapper
 _gamestate_read_from_main_file_hook_wrapper:
         pushad
@@ -21,6 +22,7 @@ _gamestate_read_from_main_file_hook_wrapper:
         pop ecx
         ret
 
+
 .globl _gamestate_read_from_profile_file_hook_wrapper
 _gamestate_read_from_profile_file_hook_wrapper:
         add esp, 0x104
@@ -28,6 +30,7 @@ _gamestate_read_from_profile_file_hook_wrapper:
         call _gamestate_read_from_profile_file_hook
         popad
         ret
+
 
 .globl _gamestate_write_to_files_hook_wrapper
 _gamestate_write_to_files_hook_wrapper:
@@ -38,8 +41,7 @@ _gamestate_write_to_files_hook_wrapper:
         popad
         ret
 
-# This hooks into the function that creates backups of savefiles.
-# We basically make it execute twice
+
 .globl _gamestate_copy_checkpoint_file_wrapper
 _gamestate_copy_checkpoint_file_wrapper:
         mov eax, edi
