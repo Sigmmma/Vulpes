@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 #include <windows.h> /* VirtualAlloc, VirtualFree */
 
 #include <hooker/hooker.hpp>
@@ -35,7 +36,7 @@ static const uintptr_t* game_state_globals_buffer_size;
 
 extern "C" { // These are shared with the assembly.
 
-    // the jmp location for saved_game_file_get_path_to_enclosing_directory
+    // the jmp location for gamestate_copy_checkpoint_file
     uintptr_t gamestate_copy_checkpoint_file_continue_ptr;
 
     uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr = 0x5403E0;
