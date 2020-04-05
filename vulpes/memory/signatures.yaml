@@ -458,6 +458,19 @@ signatures:
     offset: 6
     type: uintptr_t*
 
+  - name: game_state_read_from_main_file_hook
+    bytes: B0 01 5B 59 C3 6A 01 68 8C 00 00 00 ?? 8B 00 00 00
+    crucial: true
+
+  - name: game_state_read_from_profile_file_hook
+    bytes: FF 15 ?? ?? ?? ?? 5F 5E 81 C4 04 01 00 00 C3
+    offset: 8
+    crucial: true
+
+  - name: copy_checkpoint_file_hook
+    bytes: 81 EC 40 02 00 00 53 55 8B AC 24 4C 02 00 00 57 56 8D 44 24 10
+    crucial: true
+
 # I think this can be used for adding maps to the table
 # - name: func_add_map_to_list
 # - bytes: 8B 0D ?? ?? ?? ?? 81 EC 00 08 00 00

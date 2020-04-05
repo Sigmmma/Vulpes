@@ -322,10 +322,10 @@ void init_gamestate_upgrades() {
     patch_gamestate_new_replacement.build(game_state_table_alloc_patch_addr);
     patch_gamestate_new_replacement.apply();
 
-    patch_gamestate_read_from_main_file_hook.build(0x53C6F6);
+    patch_gamestate_read_from_main_file_hook.build(sig_game_state_read_from_main_file_hook());
     patch_gamestate_read_from_main_file_hook.apply();
 
-    patch_gamestate_read_from_profile_file_hook.build(0x53CC26);
+    patch_gamestate_read_from_profile_file_hook.build(sig_game_state_read_from_profile_file_hook());
     patch_gamestate_read_from_profile_file_hook.apply();
 
     // Hook into a small piece of code in the checkpoint file writing code
@@ -340,14 +340,10 @@ void init_gamestate_upgrades() {
 
     // Extend the checkpoint file copying function to also copy our checkpoint
     // file.
-    patch_copy_checkpoint_file_hook.build(0x53BB30);
+    patch_copy_checkpoint_file_hook.build(sig_copy_checkpoint_file_hook());
     patch_copy_checkpoint_file_hook.apply();
     gamestate_copy_checkpoint_file_continue_ptr = patch_copy_checkpoint_file_hook.return_address();
 
-    // I couldn't find a good place to hook this in. But the BEFORE_LOAD event
-    // works just fine. So, even though it is weird to do it in two different
-    // ways. It's what we're doing for now.
-    //ADD_CALLBACK_P(EVENT_BEFORE_LOAD, load_checkpoint_upgrade, EVENT_PRIORITY_FINAL);
 
     // This is the location the game stores its gamestate in.
     uintptr_t mem_map_loc = *sig_physical_memory_map_location();
@@ -366,9 +362,7 @@ void init_gamestate_upgrades() {
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     assert(gamestate_extension_buffer);
-    printf("Allocated gamestate upgrade buffer at 0x%X\n", gamestate_extension_buffer);
     assert(gamestate_extension_checkpoint_buffer);
-    printf("Allocated gamestate checkpoint upgrade buffer at 0x%X\n", gamestate_extension_checkpoint_buffer);
 
     memset(gamestate_extension_buffer, 0, ALLOCATED_UPGRADE_MEMORY);
 }
