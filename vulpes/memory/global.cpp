@@ -22,8 +22,7 @@ const wchar_t* active_profile_name() {
 }
 
 int32_t active_profile_id() {
-    auto ptr = sig_active_profile_id();
-    return ptr ? **sig_active_profile_id() : -1;
+    return **sig_active_profile_id();
 }
 
 static const char ui_name[] = "ui";
