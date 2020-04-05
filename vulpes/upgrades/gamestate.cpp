@@ -350,19 +350,15 @@ static bool initialized = false;
 void init_gamestate_upgrades() {
     if (initialized) return;
 
-    uintptr_t game_state_table_alloc_patch_addr = sig_game_state_data_new();
-    uintptr_t write_to_file_patch_addr = sig_game_state_write_to_file();
-    uintptr_t copy_to_checkpoint_state_patch_addr = sig_game_state_copy_to_checkpoint_buffer();
-
-    game_state_globals = *reinterpret_cast<uintptr_t**>(game_state_table_alloc_patch_addr+2);
-    game_state_globals_cpu_allocation_size = *reinterpret_cast<uintptr_t**>(game_state_table_alloc_patch_addr+0x37);
-    game_state_globals_autosave_thread = *reinterpret_cast<void***>(write_to_file_patch_addr+21);
-    game_state_globals_buffer_size = *reinterpret_cast<const uintptr_t**>(write_to_file_patch_addr+15);
-    game_state_globals_crc = *reinterpret_cast<uintptr_t**>(game_state_table_alloc_patch_addr+0x31);
+    game_state_globals = *sig_game_state_globals();
+    game_state_globals_cpu_allocation_size = *sig_game_state_globals_cpu_allocation_size();
+    game_state_globals_autosave_thread = *sig_game_state_globals_autosave_thread();
+    game_state_globals_buffer_size = *sig_game_state_globals_buffer_size();
+    game_state_globals_crc = *sig_game_state_globals_crc();
     //game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_addr+2);
 
     // Patch the original table allocation function to replace it with ours.
-    patch_gamestate_new_replacement.build(game_state_table_alloc_patch_addr);
+    patch_gamestate_new_replacement.build(sig_game_state_data_new());
     patch_gamestate_new_replacement.apply();
 
     // Make sure to also load our file when the game loads from the main checkpoint file.
@@ -375,12 +371,12 @@ void init_gamestate_upgrades() {
 
     // Hook into a small piece of code in the checkpoint file writing code
     // so we can execute our file writing code.
-    patch_gamestate_write_to_files_hook.build(write_to_file_patch_addr + 51);
+    patch_gamestate_write_to_files_hook.build(sig_game_state_write_to_file_patch());
     patch_gamestate_write_to_files_hook.apply();
 
     // Replace parts of the code that handles the memory copy to the checkpoint
     // buffer with our own code.
-    patch_copy_to_checkpoint_state_hook.build(copy_to_checkpoint_state_patch_addr);
+    patch_copy_to_checkpoint_state_hook.build(sig_game_state_copy_to_checkpoint_buffer());
     patch_copy_to_checkpoint_state_hook.apply();
 
     // Extend the checkpoint file copying function to also copy our checkpoint

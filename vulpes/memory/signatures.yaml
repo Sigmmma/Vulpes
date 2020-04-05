@@ -448,13 +448,42 @@ signatures:
     bytes: 8B 15 ?? ?? ?? ?? 55 66 8B 6C 24 0C
     crucial: true
 
+  - name: game_state_globals
+    base: game_state_data_new
+    offset: 2
+    type: uintptr_t**
+
+  - name: game_state_globals_cpu_allocation_size
+    base: game_state_data_new
+    offset: 0x37
+    type: uintptr_t**
+
   - name: game_state_write_to_file
     bytes: 8B 0D ?? ?? ?? ?? 6A 00 8D 54 24 14 52 8B 15 ?? ?? ?? ?? 50
     crucial: true
 
+  - name: game_state_write_to_file_patch
+    base: game_state_write_to_file
+    offset: 51
+
+  - name: game_state_globals_autosave_thread
+    base: game_state_write_to_file
+    offset: 21
+    type: void***
+
+  - name: game_state_globals_buffer_size
+    base: game_state_write_to_file
+    offset: 15
+    type: const uintptr_t**
+
   - name: game_state_copy_to_checkpoint_buffer
     bytes: F3 A5 8B C8 83 E1 03 F3 A4 8B 15 ?? ?? ?? ?? 8A 4C 24 0C
     crucial: true
+
+  - name: game_state_globals_crc
+    base: game_state_copy_to_checkpoint_buffer
+    offset: 0x31
+    type: uintptr_t**
 
   - name: physical_memory_map_location
     bytes: A3 ?? ?? ?? ?? 68 ?? ?? ?? ?? A3 ?? ?? ?? ?? FF
