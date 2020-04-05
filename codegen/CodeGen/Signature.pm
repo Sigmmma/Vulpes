@@ -13,10 +13,17 @@ sub preprocess_signature {
     $_->{type}    //= "uintptr_t";
     $_->{multi}   //= 0;
     $_->{crucial} //= 0;
+
+    $_->{ref} = $_->{base} ? 1 : 0;
+
     return $_;
 }
 
 sub yaml_sig_to_cpp_sig {
+    if ($_->{ref}) {
+        # References don't contain signatures.
+        return "";
+    }
     # Validate the string
     unless ($_->{bytes} =~ /^\s*(?:(?:\?\?|[a-fA-F0-9]{2})\s??\s*)+$/) {
         die "Signature $_->{name} has an invalid byte pattern."
@@ -32,6 +39,10 @@ sub yaml_sig_to_cpp_sig {
 }
 
 sub yaml_sig_to_cpp_initializer {
+    if ($_->{ref}) {
+        # References are initialized when the thing they reference is initialized.
+        return "";
+    }
     if ($_->{multi}) {
         return "    PTRS_$_->{uc_name} = signature_$_->{name}.search_multiple();\n";
     }
@@ -39,6 +50,10 @@ sub yaml_sig_to_cpp_initializer {
 }
 
 sub yaml_sig_to_cpp_validator {
+    if ($_->{ref}) {
+        # References don't need validators.
+        return "";
+    }
     my $validator = "";
     if ($_->{multi}) {
         $validator .= "    if (PTRS_$_->{uc_name}.empty())\n";
@@ -55,6 +70,10 @@ sub yaml_sig_to_cpp_validator {
 }
 
 sub yaml_sig_to_cpp_address_var {
+    if ($_->{ref}) {
+        # References use the address of whatever they reference
+        return "";
+    }
     if ($_->{multi}) {
         return "static std::vector<uintptr_t> PTRS_$_->{uc_name};\n";
     }
@@ -62,6 +81,14 @@ sub yaml_sig_to_cpp_address_var {
 }
 
 sub yaml_sig_to_cpp_getter {
+    if ($_->{ref}) {
+        return "$_->{type} sig_$_->{name}() {\n".
+               "    return reinterpret_cast<$_->{type}>(\n".
+               "        sig_$_->{base}\() ?\n".
+               "            (reinterpret_cast<uintptr_t>(sig_$_->{base}\()) + $_->{offset}) : NULL);\n".
+               "}\n";
+    }
+
     if ($_->{multi}) {
         return "std::vector<uintptr_t> sig_$_->{name}() {\n".
                "    return PTRS_$_->{uc_name};\n".
