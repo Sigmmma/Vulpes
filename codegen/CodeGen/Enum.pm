@@ -30,20 +30,26 @@ sub preprocess_enum {
 }
 
 sub yaml_enum_to_cpp_definition {
+    # Start definition.
     my $string = "enum class $_->{name}";
 
+    # Optionally specify a base type
     if (exists $_->{type}) {
         $string .= " : $_->{type}";
     }
 
+    # Start main part.
     $string .= " {\n";
 
+    # Get the length for allignment.
     my $max_opt_len = max (map { length ($_->{uc_name}) } @{$_->{options}});
 
+    # Turn each option into a line with allignment.
     my @options = map {
         sprintf "    %- ".$max_opt_len."s = %d,", $_->{uc_name}, $_->{value}
     } @{$_->{options}};
 
+    # Close enum.
     $string .= join "\n", @options, "};\n";
 
     return $string;
