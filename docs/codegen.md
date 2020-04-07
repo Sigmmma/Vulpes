@@ -45,8 +45,7 @@ vs the structure that we have in code:
 CodeGen signatures handle all of this even with the user writing only a minimum
 of two lines.
 
-## Definition
-
+## Signature Definition
 
 | key     | values          | effect                                          |
 |---------|-----------------|-------------------------------------------------|
@@ -56,3 +55,49 @@ of two lines.
 | offset  | \<int\>         | This number will be added to the output if an address was found. (Negative offsets are valid) Default: `0`.|
 | type    | \<type name\>   | The type that the signature getter will output. It converts the value to this type with a reinterpret_cast. Default: `uintptr_t`.|
 | crucial | \<boolean\>     | Whether or not this signature is absolutely required. If true execution will halt after validation finds out that it was not found. Default `false`.|
+
+# Enum
+
+If type is `enum`
+
+## Definition
+
+```yaml
+enums:
+    - name: EnumTypeName
+      options:
+          - name: option 1
+          - name: option 2
+          - name: option 3
+          - name: another option
+            value: 5
+          - name: yet another option
+```
+## C++ output
+```cpp
+enum class EnumTypeName {
+    OPTION_1           = 0,
+    OPTION_2           = 1,
+    OPTION_3           = 2,
+    ANOTHER_OPTION     = 5,
+    YET_ANOTHER_OPTION = 6,
+};
+```
+## Lua interface
+```lua
+thing.our_enum    = "OPTION_1"
+thing['our_enum'] = "OPTION_1"
+```
+
+
+```yaml
+struct:
+    - name: StructTypeName
+      options:
+          - name: option 1
+          - name: option 2
+          - name: option 3
+          - name: another option
+            value: 5
+          - name: yet another option
+```
