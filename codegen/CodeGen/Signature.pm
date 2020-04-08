@@ -24,8 +24,8 @@ sub yaml_sig_to_cpp_sig {
         # References don't contain signatures.
         return "";
     }
-    # Validate the string
-    unless ($_->{bytes} =~ /^\s*(?:(?:\?\?|[a-fA-F0-9]{2})\s??\s*)+$/) {
+    # Validate the string # https://regex101.com/r/3Rrvy9/1
+    unless ($_->{bytes} =~ /^\s*(?:(?:\?\?|[[:xdigit:]]{2})\s??\s*)+$/) {
         die "Signature $_->{name} has an invalid byte pattern."
     }
     # Convert string to individual parts and then convert them into C++ format.
