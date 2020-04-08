@@ -11,7 +11,7 @@ use List::Util qw{ max };
 sub preprocess_enum_option {
     $_->{uc_name} = uc $_->{name};
     # Replace all series of spaces with single underscores
-    $_->{uc_name} =~ s/ +/_/;
+    $_->{uc_name} =~ s/ +/_/g;
 
     return $_;
 }
