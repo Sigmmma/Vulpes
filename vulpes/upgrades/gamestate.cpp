@@ -421,12 +421,12 @@ void init_gamestate_upgrades() {
 void revert_gamestate_upgrades() {
     if (!initialized) return;
 
-    patch_gamestate_new_replacement.revert();
+    patch_copy_checkpoint_file_hook.revert();
+    patch_copy_to_checkpoint_state_hook.revert();
     patch_gamestate_write_to_files_hook.revert();
-    patch_copy_to_checkpoint_state_hook.revert();
-    patch_gamestate_read_from_main_file_hook.revert();
     patch_gamestate_read_from_profile_file_hook.revert();
-    patch_copy_to_checkpoint_state_hook.revert();
+    patch_gamestate_read_from_main_file_hook.revert();
+    patch_gamestate_new_replacement.revert();
 
     VirtualFree(gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
     VirtualFree(gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
