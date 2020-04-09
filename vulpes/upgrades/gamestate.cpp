@@ -358,7 +358,6 @@ void init_gamestate_upgrades() {
     game_state_globals_autosave_thread = *sig_game_state_globals_autosave_thread();
     game_state_globals_buffer_size = *sig_game_state_globals_buffer_size();
     game_state_globals_crc = *sig_game_state_globals_crc();
-    //game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_addr+2);
 
     // Patch the original table allocation function to replace it with ours.
     patch_gamestate_new_replacement.build(sig_game_state_data_new());
@@ -399,10 +398,19 @@ void init_gamestate_upgrades() {
         reinterpret_cast<void*>(mem_map_loc-ALLOCATED_UPGRADE_MEMORY),
         ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    if (!gamestate_extension_buffer)
+        printf("Failed to allocate upgraded gamestate. "
+               "VirtualAlloc Error Code: %d\n", GetLastError());
+
     gamestate_extension_checkpoint_buffer = VirtualAlloc(
         NULL,
         ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    if (!gamestate_extension_checkpoint_buffer)
+        printf("Failed to allocate upgraded gamestate checkpoint buffer. "
+               "VirtualAlloc Error Code: %d\n", GetLastError());
 
     assert(gamestate_extension_buffer);
     assert(gamestate_extension_checkpoint_buffer);
