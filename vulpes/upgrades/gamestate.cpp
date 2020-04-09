@@ -107,6 +107,8 @@ struct TableUpgradeData {
     // range that it allows edits in.
 };
 
+const uint16_t TABLE_END_SENTINEL = 0;
+
 const TableUpgradeData TABLE_UPGRADES[] = {
     {"object", TABLE_OBJECT_UPGR_MAX, false},
     {"cached object render states", TABLE_CACHED_OBJECT_RENDER_STATES_UPGR_MAX, true},
@@ -147,7 +149,7 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"hs thread", TABLE_HS_THREAD_UPGR_MAX, true},
     {"hs globals", TABLE_HS_GLOBALS_UPGR_MAX, true},
     {"recorded animations", TABLE_RECORDED_ANIMATIONS_UPGR_MAX, true},
-    {"", 0, false}, // Terminate
+    {"", TABLE_END_SENTINEL, false}, // Terminate
 };
 
 // Wonky argument order needed for the assembly wrapper to stay simple.
@@ -157,21 +159,22 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 
     bool found = false;
     bool use_upgrade_memory = false;
-    size_t i = 0;
-    while (!found && TABLE_UPGRADES[i].new_max != 0) {
+    size_t i;
+    for (i=0; !found && TABLE_UPGRADES[i].new_max != TABLE_END_SENTINEL; i++) {
         if (strncmp(name, TABLE_UPGRADES[i].name, 31) == 0) {
-            // Set max to new max.
-            if (TABLE_UPGRADES[i].new_max > element_max) {
-                // Only use our limit if it is higher. Other mods may increase
-                // limits more than us and we have extra memory allocated for
-                // the occasion.
-                element_max = TABLE_UPGRADES[i].new_max;
-            }
-            use_upgrade_memory = TABLE_UPGRADES[i].in_upgrade_memory;
             found = true;
             break;
         }
-        i++;
+    }
+
+    if (found) {
+        /* Use our limit if it is higher. Otherwise use the limit passed into
+         * this function. Some other mod may have increased it.
+         * And probably expects it to actually have that size.
+         * We have extra memory allocated for this edge case. */
+        element_max = (TABLE_UPGRADES[i].new_max > element_max) ?
+                         TABLE_UPGRADES[i].new_max : element_max;
+        use_upgrade_memory = TABLE_UPGRADES[i].in_upgrade_memory;
     }
 
     uintptr_t* mem_start;

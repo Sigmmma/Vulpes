@@ -9,7 +9,9 @@
 void init_gamestate_upgrades();
 void revert_gamestate_upgrades();
 
-// Don't use these for loops and size checks. Use table->max_elements instead.
+/* Another mod might have caused these to be different.
+ * So, don't use these for loops and size checks.
+ * Use table_instance->max_elements instead. */
 
 static const uint16_t TABLE_OBJECT_ORIG_MAX = 2048;
 static const uint16_t TABLE_OBJECT_UPGR_MAX = 4096;
