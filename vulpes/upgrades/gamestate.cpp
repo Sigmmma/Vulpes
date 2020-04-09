@@ -198,6 +198,9 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     *mem_used = *mem_used + sizeof(GenericTable) + element_size * element_max;
 
     // Make sure the limits are correctly enforced.
+    if (*mem_used > *mem_max)
+        printf("Table memory usage went over the amount of allocated memory.\n"
+               "%d vs %d for table %s\n", *mem_used, *mem_max, name);
     assert(*mem_used <= *mem_max);
 
     new_table->init(
@@ -400,7 +403,7 @@ void init_gamestate_upgrades() {
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     if (!gamestate_extension_buffer)
-        printf("Failed to allocate upgraded gamestate. "
+        printf("Failed to allocate upgraded gamestate.\n"
                "VirtualAlloc Error Code: %d\n", GetLastError());
 
     gamestate_extension_checkpoint_buffer = VirtualAlloc(
@@ -409,7 +412,7 @@ void init_gamestate_upgrades() {
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     if (!gamestate_extension_checkpoint_buffer)
-        printf("Failed to allocate upgraded gamestate checkpoint buffer. "
+        printf("Failed to allocate upgraded gamestate checkpoint buffer.\n"
                "VirtualAlloc Error Code: %d\n", GetLastError());
 
     assert(gamestate_extension_buffer);
