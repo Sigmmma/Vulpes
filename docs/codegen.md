@@ -89,15 +89,29 @@ thing.our_enum    = "OPTION_1"
 thing['our_enum'] = "OPTION_1"
 ```
 
+# Struct
+
+If type is `struct`
+
+## Definition
 
 ```yaml
-struct:
+structs:
     - name: StructTypeName
-      options:
-          - name: option 1
-          - name: option 2
-          - name: option 3
-          - name: another option
-            value: 5
-          - name: yet another option
+      size: 7
+      fields:
+          - name: field 1
+            type: uint32_t
+          - name: field 2
+            type: uint16_t
+          - name: field 3
+            type: int8_t
+```
+## C++ output
+```cpp
+struct StructTypeName {
+    uint32_t field_1;
+    uint16_t field_2;
+    uint8_t  field_3;
+}; static_assert(sizeof(StructTypeName) == 7);
 ```
