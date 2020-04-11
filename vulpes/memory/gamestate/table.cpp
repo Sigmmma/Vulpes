@@ -4,6 +4,8 @@
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
 
+#include <cstring>
+
 #include <vulpes/functions/table.hpp>
 
 #include "table.hpp"
@@ -45,4 +47,29 @@ size_t Table::count() {
     }
 
     return count;
+}
+
+void GenericTable::init(const char* name, uint16_t e_max, uint16_t e_size, void* array) {
+    // Do the same setup for the table header that Halo does.
+    memset(this, 0, sizeof(this));
+    strncpy(this->name, name, sizeof(this->name) - 1);
+
+    this->max_elements = e_max;
+    this->element_size = e_size;
+
+    // Just hex for the NOT terminated string 'd@t@'
+    // (Vanilla Halo has this here, I don't think it actually serves a purpose.)
+    this->sig = 0x64407440; //'d@t@'
+
+    // Mark as invalid because vanilla Halo does that for some reason.
+    this->is_valid = false;
+
+    this->first = array;
+
+    // Null the whole array.
+    memset(this->first, 0, this->max_elements * this->element_size);
+}
+
+void GenericTable::init(const char* name, uint16_t e_max, uint16_t e_size, uintptr_t array) {
+    this->init(name, e_max, e_size, reinterpret_cast<void*>(array));
 }

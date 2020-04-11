@@ -41,7 +41,17 @@ public:
 
 class GenericTable : public Table {
 public:
-    void* first;
+    union {
+        // This union allows us to remove a bunch of reinterpret_casts.
+        void* first;
+        uintptr_t first_int;
+    };
+
+    /* Initializes the table the way Halo normally does it
+       Never execute after the game has loaded.
+    */
+    void init(const char* name, uint16_t e_max, uint16_t e_size, void* array);
+    void init(const char* name, uint16_t e_max, uint16_t e_size, uintptr_t array);
 };
 
 #pragma pack(pop)

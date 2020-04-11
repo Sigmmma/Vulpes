@@ -1,5 +1,5 @@
 /*
- * Vulpes (c) 2019 gbMichelle
+ * Vulpes (c) 2020 gbMichelle
  *
  * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
  */
@@ -11,6 +11,18 @@
 
 const char* profile_path() {
     return *sig_path();
+}
+
+const char* savegames_path() {
+    return *sig_savegames_path();
+}
+
+const wchar_t* active_profile_name() {
+    return *sig_active_profile_name();
+}
+
+int32_t active_profile_id() {
+    return **sig_active_profile_id();
 }
 
 static const char ui_name[] = "ui";
@@ -30,4 +42,10 @@ const char* map_name() {
 
 bool at_main_menu() {
     return *sig_at_main_menu();
+}
+
+uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr;
+
+void init_memory_global() {
+    saved_game_file_get_path_to_enclosing_directory_ptr = sig_saved_game_file_get_path_to_enclosing_directory();
 }

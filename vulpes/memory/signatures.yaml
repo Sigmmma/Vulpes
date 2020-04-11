@@ -1,5 +1,5 @@
 #
-# Vulpes (c) 2019 gbMichelle
+# Vulpes (c) 2020 gbMichelle
 #
 # This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
 #
@@ -348,10 +348,27 @@ signatures:
     offset: 6
 
   - name: path
-    bytes: 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 04 88 1D ?? ?? ?? ?? C6 05 ?? ?? ?? ?? 01 C6 05
+    bytes: 57 68 FF 00 00 00 33 C0 68 ?? ?? ?? ?? B9 C7 02 00 00 BF ?? ?? ?? ?? 68
+    crucial: true
+    offset: 9
+    type: const char**
+
+  - name: savegames_path
+    base: path
+    offset: 82
+    type: const char**
+
+    # Doesn't exist on server
+  - name: active_profile_name
+    bytes: ?? ?? ?? ?? B9 FF 07 00 00 8D 7C 24 10 F3 A5
+    crucial: false
+    type: const wchar_t**
+
+  - name: active_profile_id
+    bytes: A1 ?? ?? ?? ?? 83 C4 ?? 8D 74 24 0C E8 ?? ?? ?? ?? 84 C0 74 09
     crucial: true
     offset: 1
-    type: const char**
+    type: int32_t**
 
   - name: map_name
     bytes: ?? ?? ?? ?? E8 ?? ?? ?? ?? 32 C9 83 F8 13 7D
@@ -367,6 +384,10 @@ signatures:
     bytes: ?? ?? ?? ?? 84 C0 75 ?? 66 FF 0D
     crucial: true
     type: bool*
+
+  - name: saved_game_file_get_path_to_enclosing_directory
+    bytes: 81 EC 08 02 00 00 53 33 DB 83 F8 FF
+    crucial: true
 
   - name: object_behavior_defs
     bytes: 8B 0C 95 ?? ?? ?? 00 39 71 10 74 02 33 C0
@@ -419,6 +440,68 @@ signatures:
     bytes: A1 ?? ?? ?? ?? C1 E1 04 8B 44 01 0C C3 CC
     crucial: false
     offset: 5
+
+  # upgrades/gamestate
+
+  - name: game_state_data_new
+    bytes: 8B 15 ?? ?? ?? ?? 55 66 8B 6C 24 0C
+    crucial: true
+
+  - name: game_state_globals
+    base: game_state_data_new
+    offset: 2
+    type: uintptr_t**
+
+  - name: game_state_globals_cpu_allocation_size
+    base: game_state_data_new
+    offset: 0x37
+    type: uintptr_t**
+
+  - name: game_state_write_to_file
+    bytes: 8B 0D ?? ?? ?? ?? 6A 00 8D 54 24 14 52 8B 15 ?? ?? ?? ?? 50
+    crucial: true
+
+  - name: game_state_write_to_file_patch
+    base: game_state_write_to_file
+    offset: 51
+
+  - name: game_state_globals_autosave_thread
+    base: game_state_write_to_file
+    offset: 21
+    type: void***
+
+  - name: game_state_globals_buffer_size
+    base: game_state_write_to_file
+    offset: 15
+    type: const uintptr_t**
+
+  - name: game_state_copy_to_checkpoint_buffer
+    bytes: F3 A5 8B C8 83 E1 03 F3 A4 8B 15 ?? ?? ?? ?? 8A 4C 24 0C
+    crucial: true
+
+  - name: game_state_globals_crc
+    base: game_state_copy_to_checkpoint_buffer
+    offset: 0x31
+    type: uintptr_t**
+
+  - name: physical_memory_map_location
+    bytes: A3 ?? ?? ?? ?? 68 ?? ?? ?? ?? A3 ?? ?? ?? ?? FF
+    crucial: true
+    offset: 6
+    type: uintptr_t*
+
+  - name: game_state_read_from_main_file_hook
+    bytes: B0 01 5B 59 C3 6A 01 68 8C 00 00 00 ?? 8B 00 00 00
+    crucial: true
+
+  - name: game_state_read_from_profile_file_hook
+    bytes: FF 15 ?? ?? ?? ?? 5F 5E 81 C4 04 01 00 00 C3
+    offset: 8
+    crucial: true
+
+  - name: copy_checkpoint_file_hook
+    bytes: 81 EC 40 02 00 00 53 55 8B AC 24 4C 02 00 00 57 56 8D 44 24 10
+    crucial: true
 
 # I think this can be used for adding maps to the table
 # - name: func_add_map_to_list

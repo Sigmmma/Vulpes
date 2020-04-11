@@ -84,17 +84,22 @@ void revert_halo_bug_fixes() {
 // Upgrades
 
 #include "upgrades/map.hpp"
+#include "upgrades/gamestate.hpp"
 void init_upgrades() {
     init_map_crc_upgrades(game_is_server_executable());
+    init_gamestate_upgrades();
 }
 
 void revert_upgrades() {
     revert_map_crc_upgrades();
+    revert_gamestate_upgrades();
 }
 
 // Memory
 
+#include "memory/global.hpp"
 void init_memory() {
+    init_memory_global();
 }
 
 // Halo functions
@@ -170,6 +175,7 @@ void init_vulpes() {
 
     init_signatures_signatures();
 
+    init_memory();
     init_hooks();
     init_halo_bug_fixes();
     init_upgrades();

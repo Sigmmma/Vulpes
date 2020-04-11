@@ -5,6 +5,18 @@ are designed the way they are.
 There is a lot of nuance that goes into these decisions at times. And that
 should not be lost.
 
+## Signatures
+Signatures are patterns of bytes that we can use to identify pieces of code in
+the binary that we're hooking. We use signatures because they are
+(if done right) mostly binary agnostic given that the targets were
+compiled with similar enough settings. And it helps with situations
+where another mod edits the code we need so we don't have an unreported error.
+And we instead just fail and log that the signature wasn't found, because the
+code was in a way unsafe.
+
+We can write one pattern and if it is done properly it will work for both
+client and server. Potentially even older versions of both of these.
+
 ## VirtualProtect
 Virtual protect is needed because under certain circumstances it can be
 important to make sure that when we're writing things to memory that that
@@ -30,12 +42,7 @@ That last pointer is of course also a reference (3).
 That is why we need three asterisks sometimes. It gets me confused a lot too.
 
 The reason that we use signatures that point to code is because you can't have
-reliable signatures for data outside of code. And we use signatures because
-they are (if done right) mostly binary agnostic given that the targets were
-compiled with similar enough settings. And it helps with situations
-where another mod edits the code we need so we don't have an unreported error.
-And we instead just fail and log that the signature wasn't found, because the
-code was in a way unsafe.
+reliable signatures for data outside of code.
 
 ## Why pragma pack(push, 1)
 The rationale is that compiler repacking can't screw our structs. It has
