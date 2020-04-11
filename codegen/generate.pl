@@ -18,6 +18,7 @@ use File::Slurper qw( read_text );
 use File::Spec::Functions qw( catfile );
 use File::Path qw( make_path );
 use YAML::XS qw( LoadFile Load Dump );
+use List::AllUtils qw( uniq );
 
 use lib dirname(__FILE__); # Include own directory
 use CodeGen::Signature qw( yaml_signatures_to_cpp_definitions );
@@ -147,13 +148,13 @@ foreach my $filepath (@ARGV) {
         $hdr_inits .= $output->{header}->{initializer};
     }
 
-    print OUTPUT_SRC join "\n", @src_std_includes, "\n";
-    print OUTPUT_SRC join "\n", @src_includes, "\n";
+    print OUTPUT_SRC join "\n", (uniq @src_std_includes), "\n";
+    print OUTPUT_SRC join "\n", (uniq @src_includes), "\n";
     print OUTPUT_SRC $src_defs;
     print OUTPUT_SRC $src_inits;
 
-    print OUTPUT_HEAD join "\n", @hdr_std_includes, "\n";
-    print OUTPUT_HEAD join "\n", @hdr_includes, "\n";
+    print OUTPUT_HEAD join "\n", (uniq @hdr_std_includes), "\n";
+    print OUTPUT_HEAD join "\n", (uniq @hdr_includes), "\n";
     print OUTPUT_HEAD $hdr_defs;
     print OUTPUT_HEAD $hdr_inits;
 
