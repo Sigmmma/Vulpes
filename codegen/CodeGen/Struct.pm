@@ -34,7 +34,8 @@ sub yaml_struct_to_cpp_definition {
 
     # Get the length for allignment.
     my $max_type_len  = max (map { length ($_->{type}) } @{$_->{fields}});
-    my $max_field_len = max (map { length ($_->{name}) } @{$_->{fields}});
+    # + 1 because we're accounting for the semicolon.
+    my $max_field_len = max (map { length ($_->{name}) } @{$_->{fields}}) + 1;
 
     # Turn each option into a line with allignment.
     my @fields = map {
