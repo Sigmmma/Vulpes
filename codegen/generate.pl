@@ -120,8 +120,17 @@ foreach my $filepath (@ARGV) {
     my $hdr_defs = '';
     my $hdr_inits = '';
 
+    my @outputs;
+
+    if (exists $file->{enums}) {
+        push @outputs, yaml_enums_to_cpp_definitions $name, $file->{enums};
+    }
+
     if (exists $file->{signatures}) {
-        my $output = yaml_signatures_to_cpp_definitions $name, $file->{signatures};
+        push @outputs, yaml_signatures_to_cpp_definitions $name, $file->{signatures};
+    }
+
+    foreach my $output (@outputs){
         push @src_std_includes, @{$output->{source}->{std_includes}};
         push @src_includes, @{$output->{source}->{includes}};
         $src_defs .= $output->{source}->{defs};
@@ -146,9 +155,6 @@ foreach my $filepath (@ARGV) {
     close(OUTPUT_SRC);
     close(OUTPUT_HEAD);
 
-    if (exists $file->{enums}) {
-        yaml_enums_to_cpp_definitions $name, $file->{enums};
-    }
     print "done.\n";
 };
 

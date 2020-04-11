@@ -57,9 +57,30 @@ sub yaml_enum_to_cpp_definition {
 
 sub yaml_enums_to_cpp_definitions {
     my ($name, $enums) = @_;
+
+    my $std_header_includes = [
+        "#include <cstdint>",
+        "#include <vector>",
+        ];
+
     my @enums = map { preprocess_enum } @{$enums};
 
-    print map {yaml_enum_to_cpp_definition} @enums;
+    my $defs = join "\n", map {yaml_enum_to_cpp_definition} @enums;
+
+    return {
+        source => {
+            std_includes    => [],
+            includes        => [],
+            defs            => "",
+            initializer     => "",
+        },
+        header => {
+            std_includes    => $std_header_includes,
+            includes        => [],
+            defs            => $defs,
+            initializer     => "",
+        },
+    };
 }
 
 1;
