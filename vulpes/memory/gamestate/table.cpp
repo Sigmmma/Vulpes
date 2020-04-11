@@ -58,9 +58,10 @@ void GenericTable::init(const char* name, uint16_t e_max, uint16_t e_size, void*
     this->element_size = e_size;
 
     // Just hex for the NOT terminated string 'd@t@'
+    // (Vanilla Halo has this here, I don't think it actually serves a purpose.)
     this->sig = 0x64407440; //'d@t@'
 
-    // Mark as invalid as that is what vanilla does.
+    // Mark as invalid because vanilla Halo does that for some reason.
     this->is_valid = false;
 
     this->first = array;

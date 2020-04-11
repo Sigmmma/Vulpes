@@ -107,6 +107,8 @@ struct TableUpgradeData {
     // range that it allows edits in.
 };
 
+const uint16_t TABLE_END_SENTINEL = 0;
+
 const TableUpgradeData TABLE_UPGRADES[] = {
     {"object", TABLE_OBJECT_UPGR_MAX, false},
     {"cached object render states", TABLE_CACHED_OBJECT_RENDER_STATES_UPGR_MAX, true},
@@ -147,7 +149,7 @@ const TableUpgradeData TABLE_UPGRADES[] = {
     {"hs thread", TABLE_HS_THREAD_UPGR_MAX, true},
     {"hs globals", TABLE_HS_GLOBALS_UPGR_MAX, true},
     {"recorded animations", TABLE_RECORDED_ANIMATIONS_UPGR_MAX, true},
-    {"", 0, false}, // Terminate
+    {"", TABLE_END_SENTINEL, false}, // Terminate
 };
 
 // Wonky argument order needed for the assembly wrapper to stay simple.
@@ -157,21 +159,22 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
 
     bool found = false;
     bool use_upgrade_memory = false;
-    size_t i = 0;
-    while (!found && TABLE_UPGRADES[i].new_max != 0) {
+    size_t i;
+    for (i=0; !found && TABLE_UPGRADES[i].new_max != TABLE_END_SENTINEL; i++) {
         if (strncmp(name, TABLE_UPGRADES[i].name, 31) == 0) {
-            // Set max to new max.
-            if (TABLE_UPGRADES[i].new_max > element_max) {
-                // Only use our limit if it is higher. Other mods may increase
-                // limits more than us and we have extra memory allocated for
-                // the occasion.
-                element_max = TABLE_UPGRADES[i].new_max;
-            }
-            use_upgrade_memory = TABLE_UPGRADES[i].in_upgrade_memory;
             found = true;
             break;
         }
-        i++;
+    }
+
+    if (found) {
+        /* Use our limit if it is higher. Otherwise use the limit passed into
+         * this function. Some other mod may have increased it.
+         * And probably expects it to actually have that size.
+         * We have extra memory allocated for this edge case. */
+        element_max = (TABLE_UPGRADES[i].new_max > element_max) ?
+                         TABLE_UPGRADES[i].new_max : element_max;
+        use_upgrade_memory = TABLE_UPGRADES[i].in_upgrade_memory;
     }
 
     uintptr_t* mem_start;
@@ -195,6 +198,9 @@ GenericTable* gamestate_table_new_replacement(uint32_t element_size,
     *mem_used = *mem_used + sizeof(GenericTable) + element_size * element_max;
 
     // Make sure the limits are correctly enforced.
+    if (*mem_used > *mem_max)
+        printf("Table memory usage went over the amount of allocated memory.\n"
+               "%d vs %d for table %s\n", *mem_used, *mem_max, name);
     assert(*mem_used <= *mem_max);
 
     new_table->init(
@@ -355,7 +361,6 @@ void init_gamestate_upgrades() {
     game_state_globals_autosave_thread = *sig_game_state_globals_autosave_thread();
     game_state_globals_buffer_size = *sig_game_state_globals_buffer_size();
     game_state_globals_crc = *sig_game_state_globals_crc();
-    //game_state_globals_file_handle = *reinterpret_cast<HANDLE**>(write_to_file_patch_addr+2);
 
     // Patch the original table allocation function to replace it with ours.
     patch_gamestate_new_replacement.build(sig_game_state_data_new());
@@ -396,10 +401,19 @@ void init_gamestate_upgrades() {
         reinterpret_cast<void*>(mem_map_loc-ALLOCATED_UPGRADE_MEMORY),
         ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    if (!gamestate_extension_buffer)
+        printf("Failed to allocate upgraded gamestate.\n"
+               "VirtualAlloc Error Code: %d\n", GetLastError());
+
     gamestate_extension_checkpoint_buffer = VirtualAlloc(
         NULL,
         ALLOCATED_UPGRADE_MEMORY,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    if (!gamestate_extension_checkpoint_buffer)
+        printf("Failed to allocate upgraded gamestate checkpoint buffer.\n"
+               "VirtualAlloc Error Code: %d\n", GetLastError());
 
     assert(gamestate_extension_buffer);
     assert(gamestate_extension_checkpoint_buffer);
@@ -410,12 +424,12 @@ void init_gamestate_upgrades() {
 void revert_gamestate_upgrades() {
     if (!initialized) return;
 
-    patch_gamestate_new_replacement.revert();
+    patch_copy_checkpoint_file_hook.revert();
+    patch_copy_to_checkpoint_state_hook.revert();
     patch_gamestate_write_to_files_hook.revert();
-    patch_copy_to_checkpoint_state_hook.revert();
-    patch_gamestate_read_from_main_file_hook.revert();
     patch_gamestate_read_from_profile_file_hook.revert();
-    patch_copy_to_checkpoint_state_hook.revert();
+    patch_gamestate_read_from_main_file_hook.revert();
+    patch_gamestate_new_replacement.revert();
 
     VirtualFree(gamestate_extension_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
     VirtualFree(gamestate_extension_checkpoint_buffer, ALLOCATED_UPGRADE_MEMORY, MEM_RELEASE);
