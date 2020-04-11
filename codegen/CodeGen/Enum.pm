@@ -60,7 +60,6 @@ sub yaml_enums_to_cpp_definitions {
 
     my $std_header_includes = [
         "#include <cstdint>",
-        "#include <vector>",
         ];
 
     my @enums = map { preprocess_enum } @{$enums};
