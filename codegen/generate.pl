@@ -110,20 +110,38 @@ foreach my $filepath (@ARGV) {
     print OUTPUT_SRC $license_header, "#include <$output_stem.hpp>\n";
     print OUTPUT_HEAD $license_header, "#pragma once\n";
 
-    # Writes all cpp data to the opened files.
-    # TODO: Update this when more types of things get written to these.
+    my @src_std_includes;
+    my @src_includes;
+    my $src_defs = '';
+    my $src_inits = '';
+
+    my @hdr_std_includes;
+    my @hdr_includes;
+    my $hdr_defs = '';
+    my $hdr_inits = '';
+
     if (exists $file->{signatures}) {
         my $output = yaml_signatures_to_cpp_definitions $name, $file->{signatures};
-        print OUTPUT_SRC join "\n", @{$output->{source}->{std_includes}}, "\n";
-        print OUTPUT_SRC join "\n", @{$output->{source}->{includes}}, "\n";
-        print OUTPUT_SRC $output->{source}->{defs};
-        print OUTPUT_SRC $output->{source}->{initializer};
+        push @src_std_includes, @{$output->{source}->{std_includes}};
+        push @src_includes, @{$output->{source}->{includes}};
+        $src_defs .= $output->{source}->{defs};
+        $src_inits .= $output->{source}->{initializer};
 
-        print OUTPUT_HEAD join "\n", @{$output->{header}->{std_includes}}, "\n";
-        print OUTPUT_HEAD join "\n", @{$output->{header}->{includes}}, "\n";
-        print OUTPUT_HEAD $output->{header}->{defs};
-        print OUTPUT_HEAD $output->{header}->{initializer};
+        push @hdr_std_includes, @{$output->{header}->{std_includes}};
+        push @hdr_includes, @{$output->{header}->{includes}};
+        $hdr_defs .= $output->{header}->{defs};
+        $hdr_inits .= $output->{header}->{initializer};
     }
+
+    print OUTPUT_SRC join "\n", @src_std_includes, "\n";
+    print OUTPUT_SRC join "\n", @src_includes, "\n";
+    print OUTPUT_SRC $src_defs;
+    print OUTPUT_SRC $src_inits;
+
+    print OUTPUT_HEAD join "\n", @hdr_std_includes, "\n";
+    print OUTPUT_HEAD join "\n", @hdr_includes, "\n";
+    print OUTPUT_HEAD $hdr_defs;
+    print OUTPUT_HEAD $hdr_inits;
 
     close(OUTPUT_SRC);
     close(OUTPUT_HEAD);
