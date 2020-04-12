@@ -97,10 +97,6 @@ sub yaml_bitfield_to_cpp_definition {
     }
     $string .= ";";
 
-    if (exists $_->{size}) {
-        $string .= " static_assert(sizeof($_->{name}) == $_->{size});";
-    }
-
     $string .= "\n";
 
     return $string;
