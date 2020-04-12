@@ -9,7 +9,14 @@ use warnings;
 use List::Util qw{ max };
 
 sub preprocess_struct_member {
-    $_->{name} =~ s/ +/_/g;
+    # Names can be left out for padding.
+    if (exists $_->{name}) {
+        $_->{name} =~ s/ +/_/g;
+    }
+
+    die "struct members need a type" unless exists $_->{type};
+
+    if ($_->{type} eq "pad" and not exists $_->{size}) {die "pad type need a size"};
 
     return $_;
 }
@@ -18,6 +25,22 @@ sub preprocess_struct {
     $_->{fields} = [map { preprocess_struct_member } @{$_->{fields}}];
 
     return $_;
+}
+
+sub build_struct_line {
+    my $string = '';
+
+    if (exists $_->{comment}) {
+        $string .= sprintf "    /* %s */\n", $_->{comment};
+    }
+
+    if ($_->{type} eq "pad") {
+        $string .= "    PAD($_->{size});";
+    } else {
+        $string .= sprintf "    $_->{type} $_->{name};";
+    }
+
+    return $string;
 }
 
 sub yaml_struct_to_cpp_definition {
@@ -32,16 +55,11 @@ sub yaml_struct_to_cpp_definition {
     # Start main part.
     $string .= " {\n";
 
-    # Get the length for allignment.
-    my $max_type_len  = max (map { length ($_->{type}) } @{$_->{fields}});
-    # + 1 because we're accounting for the semicolon.
-    my $max_field_len = max (map { length ($_->{name}) } @{$_->{fields}}) + 1;
+    # TODO: Calculate offsets for more easy crossreference with ASM.
+    # The feature from this TODO is currently left out because of time constraints.
 
     # Turn each option into a line with allignment.
-    my @fields = map {
-        sprintf "    %- ".$max_type_len
-        ."s %- ".$max_field_len."s // 0x", $_->{type}, $_->{name}.";",
-    } @{$_->{fields}};
+    my @fields = map { build_struct_line } @{$_->{fields}};
 
     # Close enum.
     $string .= join "\n", @fields, "};";
@@ -60,6 +78,10 @@ sub yaml_structs_to_cpp_definitions {
 
     my $std_header_includes = [
         "#include <cstdint>",
+        ];
+
+    my $header_includes = [
+        "#include <vulpes/memory/types.hpp>",
         ];
 
     my @structs = map { preprocess_struct } @{$structs};
@@ -81,7 +103,7 @@ $defs
         },
         header => {
             std_includes    => $std_header_includes,
-            includes        => [],
+            includes        => $header_includes,
             defs            => $defs,
             initializer     => "",
         },
