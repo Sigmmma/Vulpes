@@ -15,6 +15,9 @@ sub preprocess_bitfield_member {
 }
 
 sub preprocess_bitfield {
+    die "bitfields need either a name for their type, or an instance name"
+    unless exists $_->{name} or exists $_->{instance_name};
+
     $_->{fields} = [map { preprocess_bitfield_member } @{$_->{fields}}];
 
     die "enum width is not multiple of 8" unless ($_->{width} % 8 == 0);
@@ -29,11 +32,7 @@ sub preprocess_bitfield {
         } elsif ($_->{width} == 16) {
             $opt->{type} = "uint16_t";
         } elsif ($_->{width} == 24) {
-            if ($opt->{bit} < 16) {
-                $opt->{type} = "uint16_t";
-            } else {
-                $opt->{type} = "uint8_t";
-            }
+            die "enum width has to be a valid integer size";
         } elsif ($_->{width} == 32) {
             $opt->{type} = "uint32_t";
         }
@@ -48,7 +47,11 @@ sub preprocess_bitfield {
 
 sub yaml_bitfield_to_cpp_definition {
     # Start definition.
-    my $string = "struct $_->{name}";
+    my $string = "struct";
+
+    if (exists $_->{name}) {
+        $string .= " $_->{name}";
+    }
 
     # Start main part.
     $string .= " {\n";
@@ -60,14 +63,35 @@ sub yaml_bitfield_to_cpp_definition {
     # + 1 because we're accounting for the semicolon.
     my $max_field_len = max (map { length ($_->{name}) } @{$_->{fields}}) + length $bit_thingy;
 
-    # Turn each option into a line with allignment.
-    my @fields = map {
-        sprintf "    %- ".$max_type_len
-        ."s %- ".$max_field_len."s // 0x%X", $_->{type}, $_->{name}.$bit_thingy, $_->{mask}
-    } @{$_->{fields}};
+    # Turn each option into a set of lines with allignment.
+    my @fields;
+    my $i = 0;
+    foreach my $field (@{$_->{fields}}) {
+        # Pad any bits that were skipped.
+        if ($i + 1 < $field->{bit}) {
+            my $dif = $field->{bit} - ($i + 1);
+            push @fields, "    BITPAD(uint8_t, $dif);";
+        }
 
-    # Close enum.
-    $string .= join "\n", @fields, "};";
+        if (exists $field->{comment}) {
+            $string .= sprintf "    /* %s */\n", $field->{comment};
+        }
+
+        push @fields, sprintf "    %- ".$max_type_len
+        ."s %- ".$max_field_len."s // 0x%X", $field->{type}, $field->{name}.$bit_thingy, $field->{mask};
+
+        $i = $field->{bit};
+    }
+
+    $string .= join "\n", @fields;
+
+    # Close struct.
+    $string .= "\n}";
+
+    if (exists $_->{instance_name}) {
+        $string .= " $_->{instance_name}";
+    }
+    $string .= ";";
 
     if (exists $_->{size}) {
         $string .= " static_assert(sizeof($_->{name}) == $_->{size});";
@@ -83,6 +107,10 @@ sub yaml_bitfields_to_cpp_definitions {
 
     my $std_header_includes = [
         "#include <cstdint>",
+        ];
+
+    my $header_includes = [
+        "#include <vulpes/memory/types.hpp>",
         ];
 
     my @structs = map { preprocess_bitfield } @{$structs};
@@ -105,7 +133,7 @@ $defs
         },
         header => {
             std_includes    => $std_header_includes,
-            includes        => [],
+            includes        => $header_includes,
             defs            => $defs,
             initializer     => "",
         },
