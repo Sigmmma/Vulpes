@@ -23,19 +23,23 @@ sub preprocess_bitfield {
     die "enum width is not multiple of 8" unless ($_->{width} % 8 == 0);
     $_->{size} = $_->{width} / 8;
 
+    my $type;
+
+    if ($_->{width} == 8) {
+        $type = "uint8_t";
+    } elsif ($_->{width} == 16) {
+        $type = "uint16_t";
+    } elsif ($_->{width} == 24) {
+        die "enum width has to be a valid integer size";
+    } elsif ($_->{width} == 32) {
+        $type = "uint32_t";
+    }
+
     my $i = 0;
     foreach my $opt (@{$_->{fields}}) {
         $opt->{bit} //= $i;
 
-        if ($_->{width} == 8) {
-            $opt->{type} = "uint8_t";
-        } elsif ($_->{width} == 16) {
-            $opt->{type} = "uint16_t";
-        } elsif ($_->{width} == 24) {
-            die "enum width has to be a valid integer size";
-        } elsif ($_->{width} == 32) {
-            $opt->{type} = "uint32_t";
-        }
+        $opt->{type} = $type;
 
         $opt->{mask} = 1 << $opt->{bit};
 
