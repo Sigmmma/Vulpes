@@ -24,6 +24,7 @@ use lib dirname(__FILE__); # Include own directory
 use CodeGen::Signature qw( yaml_signatures_to_cpp_definitions );
 use CodeGen::Enum qw( yaml_enums_to_cpp_definitions );
 use CodeGen::Struct qw( yaml_structs_to_cpp_definitions );
+use CodeGen::Bitfield qw( yaml_bitfields_to_cpp_definitions );
 
 sub gen_header {
     my $name = shift;
@@ -126,6 +127,10 @@ foreach my $filepath (@ARGV) {
 
     if (exists $file->{enums}) {
         push @outputs, yaml_enums_to_cpp_definitions $name, $file->{enums};
+    }
+
+    if (exists $file->{bitfields}) {
+        push @outputs, yaml_bitfields_to_cpp_definitions $name, $file->{bitfields};
     }
 
     if (exists $file->{structs}) {
