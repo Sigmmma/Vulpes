@@ -23,23 +23,11 @@ sub preprocess_bitfield {
     die "enum width is not multiple of 8" unless ($_->{width} % 8 == 0);
     $_->{size} = $_->{width} / 8;
 
-    my $type;
-
-    if ($_->{width} == 8) {
-        $type = "uint8_t";
-    } elsif ($_->{width} == 16) {
-        $type = "uint16_t";
-    } elsif ($_->{width} == 24) {
-        die "enum width has to be a valid integer size";
-    } elsif ($_->{width} == 32) {
-        $type = "uint32_t";
-    }
-
     my $i = 0;
     foreach my $opt (@{$_->{fields}}) {
         $opt->{bit} //= $i;
 
-        $opt->{type} = $type;
+        $opt->{type} = "uint$_->{width}_t";
 
         $opt->{mask} = 1 << $opt->{bit};
 
@@ -74,7 +62,7 @@ sub yaml_bitfield_to_cpp_definition {
         # Pad any bits that were skipped.
         if ($i + 1 < $field->{bit}) {
             my $dif = $field->{bit} - ($i + 1);
-            push @fields, "    BITPAD(uint8_t, $dif);";
+            push @fields, "    BITPAD(uint$_->{width}_t, $dif);";
         }
 
         if (exists $field->{comment}) {
