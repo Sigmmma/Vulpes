@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use List::Util qw{ max };
 
+use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
+
 sub preprocess_struct_member {
     # Names can be left out for padding.
     if (exists $_->{name}) {
@@ -36,6 +38,16 @@ sub build_struct_line {
 
     if ($_->{type} eq "pad") {
         $string .= "    PAD($_->{size});";
+    } elsif ($_->{type} eq "bitfield") {
+        $_->{instance_name} = $_->{name};
+        # Is there a way to actually undefine this?
+        $_->{name} = '';
+        my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $_);
+        # Add the indent.
+        $output =~ s/^/    /gm;
+        #$output =~ s/\n/\n    /g;
+
+        $string .= $output;
     } else {
         $string .= sprintf "    $_->{type} $_->{name};";
     }

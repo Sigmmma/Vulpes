@@ -122,7 +122,6 @@ sub yaml_bitfields_to_cpp_definitions {
 $defs
 #pragma pack(pop)
 };
-    print $defs;
 
     return {
         source => {
