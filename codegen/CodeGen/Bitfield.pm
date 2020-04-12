@@ -78,7 +78,7 @@ sub yaml_bitfield_to_cpp_definition {
         }
 
         if (exists $field->{comment}) {
-            $string .= sprintf "    /* %s */\n", $field->{comment};
+            push @fields, sprintf "    /* %s */", $field->{comment};
         }
 
         push @fields, sprintf "    %- ".$max_type_len
