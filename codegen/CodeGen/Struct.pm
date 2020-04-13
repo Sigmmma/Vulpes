@@ -20,6 +20,8 @@ sub preprocess_struct_member {
 
     if ($_->{type} eq "pad" and not exists $_->{size}) {die "pad type need a size"};
 
+    $_->{array_size} //= 1;
+
     return $_;
 }
 
@@ -45,11 +47,10 @@ sub build_struct_line {
         my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $_);
         # Add the indent.
         $output =~ s/^/    /gm;
-        #$output =~ s/\n/\n    /g;
 
         $string .= $output;
     } else {
-        $string .= sprintf "    $_->{type} $_->{name};";
+        $string .= "    $_->{type} $_->{name}". ($_->{array_size} > 1 ? "[$_->{array_size}];" : ";");
     }
 
     return $string;
