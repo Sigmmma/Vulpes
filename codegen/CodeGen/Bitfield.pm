@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use List::Util qw{ max };
 
+use CodeGen::Shared qw( wrap_text );
+
 sub preprocess_bitfield_member {
     $_->{name} =~ s/ +/_/g;
 
@@ -64,7 +66,11 @@ sub yaml_bitfield_to_cpp_definition {
         }
 
         if (exists $field->{comment}) {
-            push @fields, sprintf "    /* %s */", $field->{comment};
+            my $comment = wrap_text (text => "/* $field->{comment} */", line_len => 72);
+            # Indent by 4 spaces.
+            $comment =~ s/^/    /gm;
+
+            push @fields, $comment;
         }
 
         push @fields, sprintf "    %- ".$max_type_len

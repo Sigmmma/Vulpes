@@ -9,6 +9,7 @@ use warnings;
 use List::Util qw{ max };
 
 use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
+use CodeGen::Shared qw( wrap_text );
 
 sub preprocess_struct_member {
     # Names can be left out for padding.
@@ -35,7 +36,11 @@ sub build_struct_line {
     my $string = '';
 
     if (exists $_->{comment}) {
-        $string .= sprintf "    /* %s */\n", $_->{comment};
+        my $comment = wrap_text (text => "/* $_->{comment} */", line_len => 72);
+        # Indent by 4 spaces.
+        $comment =~ s/^/    /gm;
+
+        $string .= "$comment\n";
     }
 
     if ($_->{type} eq "pad") {
