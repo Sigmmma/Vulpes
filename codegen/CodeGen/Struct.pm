@@ -67,7 +67,7 @@ sub yaml_struct_to_cpp_definition {
 
     # Optionally specify a base type
     if (exists $_->{parent}) {
-        $string .= " : $_->{parent}";
+        $string .= " : public $_->{parent}";
     }
 
     # Start main part.
