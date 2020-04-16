@@ -13,9 +13,17 @@ sub wrap_text {
     my %args = @_;
     # The appended space here is a hack, it is to compensate for me
     # not knowing how to match both \s and the end of the string at the same time.
-    my @lines =  split /(.{1,$args{line_len}})\s+/, $args{text}.' ';
+    my @lines = split /(.{1,$args{line_len}})\s+/, $args{text}.' ';
 
     return join "\n", (grep {length $_} @lines);
+}
+
+sub ensure_number {
+    my $text = shift @_;
+    if ($text =~ /0x[[:xdigit:]]+/) {
+        return hex $text;
+    }
+    return $text;
 }
 
 1;

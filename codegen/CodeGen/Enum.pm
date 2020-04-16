@@ -7,6 +7,7 @@
 use strict;
 use warnings;
 use List::Util qw{ max };
+use CodeGen::Shared qw{ ensure_number };
 
 sub preprocess_enum_option {
     $_->{uc_name} = uc $_->{name};
@@ -23,6 +24,7 @@ sub preprocess_enum {
     my $i = 0;
     foreach my $opt (@{$_->{options}}) {
         $opt->{value} //= $i;
+        $opt->{value} = ensure_number $opt->{value};
         $i = $opt->{value} + 1;
     };
 

@@ -9,7 +9,7 @@ use warnings;
 use List::Util qw{ max };
 
 use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
-use CodeGen::Shared qw( wrap_text );
+use CodeGen::Shared qw( wrap_text ensure_number );
 
 sub preprocess_struct_member {
     # Names can be left out for padding.
@@ -28,6 +28,9 @@ sub preprocess_struct_member {
 
 sub preprocess_struct {
     $_->{fields} = [map { preprocess_struct_member } @{$_->{fields}}];
+    if (exists $_->{size}) {
+        $_->{size} = ensure_number $_->{size};
+    }
 
     return $_;
 }

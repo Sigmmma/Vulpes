@@ -10,6 +10,7 @@ use warnings;
 sub preprocess_signature {
     $_->{uc_name} //= uc $_->{name};
     $_->{offset}  //= 0;
+    $_->{offset} = ensure_number $_->{offset};
     $_->{type}    //= "uintptr_t";
     $_->{multi}   //= 0;
     $_->{crucial} //= 0;
