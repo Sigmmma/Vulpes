@@ -17,7 +17,9 @@ sub preprocess_struct_member {
         $_->{name} =~ s/ +/_/g;
     }
 
-    die "struct members need a type" unless exists $_->{type};
+    my $name = exists $_->{name} ? $_->{name} : "<no name>";
+
+    die "struct member $name doesn't have a type" unless exists $_->{type};
 
     if ($_->{type} eq "pad" and not exists $_->{size}) {die "pad type need a size"};
 
