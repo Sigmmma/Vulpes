@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 use List::Util qw{ max };
-use CodeGen::Shared qw{ ensure_number };
+use CodeGen::Shared qw{ ensure_number wrap_text };
 
 sub preprocess_enum_option {
     $_->{uc_name} = uc $_->{name};
@@ -47,9 +47,18 @@ sub yaml_enum_to_cpp_definition {
     my $max_opt_len = max (map { length ($_->{uc_name}) } @{$_->{options}});
 
     # Turn each option into a line with allignment.
-    my @options = map {
-        sprintf "    %- ".$max_opt_len."s = %d,", $_->{uc_name}, $_->{value}
-    } @{$_->{options}};
+    my @options;
+    foreach my $opt (@{$_->{options}}) {
+        if (exists $opt->{comment}) {
+            my $comment = wrap_text (text => "/* $opt->{comment} */", line_len => 72);
+            # Indent by 4 spaces.
+            $comment =~ s/^/    /gm;
+
+            push @options, $comment;
+        }
+
+        push @options, sprintf "    %- ".$max_opt_len."s = %d,", $opt->{uc_name}, $opt->{value};
+    }
 
     # Close enum.
     $string .= join "\n", @options, "};\n";
