@@ -10,6 +10,9 @@ use List::Util qw{ max };
 use CodeGen::Shared qw{ ensure_number wrap_text };
 
 sub preprocess_enum_option {
+    die "enum options need a name"
+    unless exists $_->{name};
+
     $_->{uc_name} = uc $_->{name};
     # Replace all series of spaces with single underscores
     $_->{uc_name} =~ s/ +/_/g;

@@ -11,6 +11,9 @@ use List::Util qw{ max };
 use CodeGen::Shared qw( wrap_text );
 
 sub preprocess_bitfield_member {
+    die "bitfield members need a name"
+    unless exists $_->{name};
+
     $_->{name} =~ s/ +/_/g;
 
     return $_;
@@ -20,10 +23,18 @@ sub preprocess_bitfield {
     die "bitfields need either a name for their type, or an instance name"
     unless exists $_->{name} or exists $_->{instance_name};
 
+    my $name = exists $_->{name} ? $_->{name} : $_->{instance_name};
+
     $_->{fields} = [map { preprocess_bitfield_member } @{$_->{fields}}];
 
-    die "enum width is not multiple of 8" unless ($_->{width} % 8 == 0);
+    die "enum $name width is not multiple of 8" unless ($_->{width} % 8 == 0);
     $_->{size} = $_->{width} / 8;
+
+    die "enum $name width is not valid width 8/16/32/64" unless (
+            $_->{width} == 8 or
+            $_->{width} == 16 or
+            $_->{width} == 32 or
+            $_->{width} == 64);
 
     my $i = 0;
     foreach my $opt (@{$_->{fields}}) {
