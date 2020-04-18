@@ -96,6 +96,6 @@ void init_debug_commands() {
     static VulpesCommand cmd_toggle_cprint_budget(
         "v_dev_show_budget",
         &toggle_cprint_budget, 0, 1,
-        VulpesArgDef("", true, A_LONG)
+        VulpesArgDef("", true, A_BOOL)
     );
 }
