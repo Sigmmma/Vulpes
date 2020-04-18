@@ -1,7 +1,18 @@
 /*
- * Vulpes (c) 2019 gbMichelle
+ * This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
+ * Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
  *
- * This program is free software under the GNU General Public License v3.0 or later. See LICENSE for more information.
+ * Vulpes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, version 3.
+ *
+ * Vulpes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
  */
 
 #include <vulpes/hooks/tick.hpp>
@@ -70,6 +81,26 @@ bool toggle_cprint_budget(std::vector<VulpesArg> input) {
     return true;
 }
 
+static bool print_about(std::vector<VulpesArg> input) {
+    cprintf("%s", "Vulpes is an extension of Halo Custom Edition's capabilities.");
+    cprintf("%s", "Copyright (C) 2019-2020 gbMichelle");
+    cprintf("%s", "");
+    cprintf("%s", "Vulpes is free software: you can redistribute it and/or modify");
+    cprintf("%s", "it under the terms of the GNU Affero General Public License as");
+    cprintf("%s", "published by the Free Software Foundation, version 3.");
+    cprintf("%s", "");
+    cprintf("%s", "Vulpes is distributed in the hope that it will be useful,");
+    cprintf("%s", "but WITHOUT ANY WARRANTY; without even the implied warranty of");
+    cprintf("%s", "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the");
+    cprintf("%s", "GNU Affero General Public License for more details.");
+    cprintf("%s", "");
+    cprintf("%s", "You should have received a copy of the GNU Affero General Public License");
+    cprintf("%s", "along with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>.");
+    cprintf("%s", "");
+    cprintf("%s", "Check out the source code at https://github.com/Sigmmma/Vulpes");
+    return true;
+}
+
 void init_debug_commands() {
     static VulpesCommand cmd_dev_shader_transparent_fix(
         "v_dev_shader_transparent_fix",
@@ -97,5 +128,10 @@ void init_debug_commands() {
         "v_dev_show_budget",
         &toggle_cprint_budget, 0, 1,
         VulpesArgDef("", true, A_LONG)
+    );
+
+    static VulpesCommand cmd_print_about(
+        "v_about",
+        &print_about, 0, 0
     );
 }
