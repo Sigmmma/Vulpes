@@ -19,14 +19,16 @@ use strict;
 use warnings;
 use List::Util qw{ max };
 use Data::Dumper qw{ Dumper };
+use Carp qw{ confess };
 
 use CodeGen::Shared qw( wrap_text );
 
 sub preprocess_bitfield_member {
     my ($opt) = @_;
 
-    die "bitfield members need a name"
-    unless exists $opt->{name};
+    unless (exists $opt->{name}) {
+        confess "bitfield members need a name" . Dumper $opt;
+    }
 
     $opt->{name} =~ s/ +/_/g;
 
@@ -36,21 +38,23 @@ sub preprocess_bitfield_member {
 sub preprocess_bitfield {
     my ($bitfield) = @_;
 
-    die ("bitfields need either a name for their type, or an instance name " . Dumper($bitfield))
-    unless exists $bitfield->{name} or exists $bitfield->{instance_name};
+    unless (exists $bitfield->{name} or exists $bitfield->{instance_name}) {
+        confess ("bitfields need either a name for their type, or an instance name " . Dumper($bitfield));
+    }
 
     my $name = exists $bitfield->{name} ? $bitfield->{name} : $bitfield->{instance_name};
 
     $bitfield->{fields} = [map { preprocess_bitfield_member $_ } @{$bitfield->{fields}}];
 
-    die "enum $name width is not multiple of 8" unless ($bitfield->{width} % 8 == 0);
+    unless ($bitfield->{width} % 8 == 0) {
+        confess "enum $name width is not multiple of 8";
+    }
     $bitfield->{size} = $bitfield->{width} / 8;
 
-    die "enum $name width is not valid width 8/16/32/64" unless (
-            $bitfield->{width} == 8 or
-            $bitfield->{width} == 16 or
-            $bitfield->{width} == 32 or
-            $bitfield->{width} == 64);
+    unless ($bitfield->{width} == 8  or $bitfield->{width} == 16 or
+            $bitfield->{width} == 32 or $bitfield->{width} == 64) {
+        confess "enum $name width is not valid width 8/16/32/64";
+    }
 
     # I is so we can increment each enum option
     my $i = 0;

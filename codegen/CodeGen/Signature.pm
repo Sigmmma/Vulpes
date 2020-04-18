@@ -18,14 +18,16 @@
 use strict;
 use warnings;
 use Data::Dumper qw{ Dumper };
+use Carp qw{ confess };
 
 use CodeGen::Shared qw{ ensure_number };
 
 sub preprocess_signature {
     my ($sig) = @_;
 
-    die "Signatures need a name " . Dumper $sig
-    unless exists $sig->{name};
+    unless (exists $sig->{name}) {
+        confess "Signatures need a name " . Dumper $sig;
+    }
 
     $sig->{uc_name}   = uc $sig->{name};
     $sig->{offset}  //= 0;
@@ -48,7 +50,7 @@ sub yaml_sig_to_cpp_sig {
     }
     # Validate the string # https://regex101.com/r/3Rrvy9/1
     unless ($sig->{bytes} =~ /^\s*(?:(?:\?\?|[[:xdigit:]]{2})\s??\s*)+$/) {
-        die "Signature $sig->{name} has an invalid byte pattern."
+        confess "Signature $sig->{name} has an invalid byte pattern."
     }
     # Convert string to individual parts and then convert them into C++ format.
     my @bytes = map {$_ eq "??" ? "-1" : "0x$_"} split /\s+/, $sig->{bytes};

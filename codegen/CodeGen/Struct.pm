@@ -19,6 +19,7 @@ use strict;
 use warnings;
 use List::Util qw{ max };
 use Data::Dumper qw{ Dumper };
+use Carp qw{ confess };
 
 use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
 use CodeGen::Shared qw( wrap_text ensure_number );
@@ -33,8 +34,9 @@ sub preprocess_struct_member {
 
     my $name = exists $mem->{name} ? $mem->{name} : "<no name>";
 
-    die "struct member $name doesn't have a type" . Dumper $mem
-    unless exists $mem->{type};
+    unless (exists $mem->{type}) {
+        die "struct member $name doesn't have a type" . Dumper $mem;
+    }
 
     if ($mem->{type} eq "pad" and not exists $mem->{size}) {die "pad type need a size"};
 

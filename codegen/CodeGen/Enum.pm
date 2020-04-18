@@ -18,14 +18,16 @@
 use strict;
 use warnings;
 use List::Util qw{ max };
+use Carp qw{ confess };
 
 use CodeGen::Shared qw{ ensure_number wrap_text };
 
 sub preprocess_enum_option {
     my ($opt) = @_;
 
-    die "enum options need a name"
-    unless exists $opt->{name};
+    unless (exists $opt->{name}) {
+        confess "enum options need a name";
+    }
 
     $opt->{uc_name} = uc $opt->{name};
     # Replace all series of spaces with single underscores
