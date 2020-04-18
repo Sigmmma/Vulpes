@@ -6,113 +6,133 @@
 
 use strict;
 use warnings;
+use Data::Dumper qw{ Dumper };
+
+use CodeGen::Shared qw{ ensure_number };
 
 sub preprocess_signature {
-    $_->{uc_name} //= uc $_->{name};
-    $_->{offset}  //= 0;
-    $_->{offset} = ensure_number $_->{offset};
-    $_->{type}    //= "uintptr_t";
-    $_->{multi}   //= 0;
-    $_->{crucial} //= 0;
+    my ($sig) = @_;
 
-    $_->{ref} = $_->{base} ? 1 : 0;
+    die "Signatures need a name " . Dumper $sig
+    unless exists $sig->{name};
 
-    return $_;
+    $sig->{uc_name}   = uc $sig->{name};
+    $sig->{offset}  //= 0;
+    $sig->{offset}    = ensure_number $sig->{offset};
+    $sig->{type}    //= "uintptr_t";
+    $sig->{multi}   //= 0;
+    $sig->{crucial} //= 0;
+
+    $sig->{ref} = $sig->{base} ? 1 : 0;
+
+    return $sig;
 }
 
 sub yaml_sig_to_cpp_sig {
-    if ($_->{ref}) {
+    my ($sig) = @_;
+
+    if ($sig->{ref}) {
         # References don't contain signatures.
         return "";
     }
     # Validate the string # https://regex101.com/r/3Rrvy9/1
-    unless ($_->{bytes} =~ /^\s*(?:(?:\?\?|[[:xdigit:]]{2})\s??\s*)+$/) {
-        die "Signature $_->{name} has an invalid byte pattern."
+    unless ($sig->{bytes} =~ /^\s*(?:(?:\?\?|[[:xdigit:]]{2})\s??\s*)+$/) {
+        die "Signature $sig->{name} has an invalid byte pattern."
     }
     # Convert string to individual parts and then convert them into C++ format.
-    my @bytes = map {$_ eq "??" ? "-1" : "0x$_"} split /\s+/, $_->{bytes};
+    my @bytes = map {$_ eq "??" ? "-1" : "0x$_"} split /\s+/, $sig->{bytes};
     # Combine the bytes into a single string.
     my $byte_str = join ", ", @bytes;
     # Get amount of bytes.
     my $len = scalar @bytes;
-    return "static LiteSignature signature_$_->{name} = ".
-           "{ \"$_->{name}\", $len, { $byte_str } };\n";
+    return "static LiteSignature signature_$sig->{name} = ".
+           "{ \"$sig->{name}\", $len, { $byte_str } };\n";
 }
 
 sub yaml_sig_to_cpp_initializer {
-    if ($_->{ref}) {
+    my ($sig) = @_;
+
+    if ($sig->{ref}) {
         # References are initialized when the thing they reference is initialized.
         return "";
     }
-    if ($_->{multi}) {
-        return "    PTRS_$_->{uc_name} = signature_$_->{name}.search_multiple();\n";
+    if ($sig->{multi}) {
+        return "    PTRS_$sig->{uc_name} = signature_$sig->{name}.search_multiple();\n";
     }
-    return "    PTR_$_->{uc_name} = signature_$_->{name}.search();\n";
+    return "    PTR_$sig->{uc_name} = signature_$sig->{name}.search();\n";
 }
 
 sub yaml_sig_to_cpp_validator {
-    if ($_->{ref}) {
+    my ($sig) = @_;
+
+    if ($sig->{ref}) {
         # References don't need validators.
         return "";
     }
     my $validator = "";
-    if ($_->{multi}) {
-        $validator .= "    if (PTRS_$_->{uc_name}.empty())\n";
+    if ($sig->{multi}) {
+        $validator .= "    if (PTRS_$sig->{uc_name}.empty())\n";
     } else {
-        $validator .= "    if (!PTR_$_->{uc_name})\n";
+        $validator .= "    if (!PTR_$sig->{uc_name})\n";
     }
 
-    if ($_->{crucial}) {
-        $validator .= "        crucial_missing.push_back(signature_$_->{name}.name);\n";
+    if ($sig->{crucial}) {
+        $validator .= "        crucial_missing.push_back(signature_$sig->{name}.name);\n";
     } else {
-        $validator .= "        non_crucial_missing.push_back(signature_$_->{name}.name);\n";
+        $validator .= "        non_crucial_missing.push_back(signature_$sig->{name}.name);\n";
     }
     return $validator;
 }
 
 sub yaml_sig_to_cpp_address_var {
-    if ($_->{ref}) {
+    my ($sig) = @_;
+
+    if ($sig->{ref}) {
         # References use the address of whatever they reference
         return "";
     }
-    if ($_->{multi}) {
-        return "static std::vector<uintptr_t> PTRS_$_->{uc_name};\n";
+    if ($sig->{multi}) {
+        return "static std::vector<uintptr_t> PTRS_$sig->{uc_name};\n";
     }
-    return "static uintptr_t PTR_$_->{uc_name};\n";
+    return "static uintptr_t PTR_$sig->{uc_name};\n";
 }
 
 sub yaml_sig_to_cpp_getter {
-    if ($_->{ref}) {
-        return "$_->{type} sig_$_->{name}() {\n".
-               "    return reinterpret_cast<$_->{type}>(\n".
-               "        sig_$_->{base}\() ?\n".
-               "            (reinterpret_cast<uintptr_t>(sig_$_->{base}\()) + $_->{offset}) : NULL);\n".
+    my ($sig) = @_;
+
+    if ($sig->{ref}) {
+        return "$sig->{type} sig_$sig->{name}() {\n".
+               "    return reinterpret_cast<$sig->{type}>(\n".
+               "        sig_$sig->{base}\() ?\n".
+               "            (reinterpret_cast<uintptr_t>(sig_$sig->{base}\()) + $sig->{offset}) : NULL);\n".
                "}\n";
     }
 
-    if ($_->{multi}) {
-        return "std::vector<uintptr_t> sig_$_->{name}() {\n".
-               "    return PTRS_$_->{uc_name};\n".
+    if ($sig->{multi}) {
+        return "std::vector<uintptr_t> sig_$sig->{name}() {\n".
+               "    return PTRS_$sig->{uc_name};\n".
                "}\n";
     }
-    return "$_->{type} sig_$_->{name}() {\n".
-           "    return reinterpret_cast<$_->{type}>(\n".
-           "        PTR_$_->{uc_name} ?\n".
-           "            (PTR_$_->{uc_name} + $_->{offset}) : NULL);\n".
+    return "$sig->{type} sig_$sig->{name}() {\n".
+           "    return reinterpret_cast<$sig->{type}>(\n".
+           "        PTR_$sig->{uc_name} ?\n".
+           "            (PTR_$sig->{uc_name} + $sig->{offset}) : NULL);\n".
            "}\n";
 
 }
 
 sub yaml_sig_to_cpp_getter_header {
-    if ($_->{multi}) {
-        return "std::vector<uintptr_t> sig_$_->{name}();\n";
+    my ($sig) = @_;
+
+    if ($sig->{multi}) {
+        return "std::vector<uintptr_t> sig_$sig->{name}();\n";
     }
-    return "$_->{type} sig_$_->{name}();\n";
+    return "$sig->{type} sig_$sig->{name}();\n";
 }
 
 sub yaml_signatures_to_cpp_definitions {
     my ($name, $sigs) = @_;
-    my @sigs = map { preprocess_signature } @{$sigs};
+    my @sigs = map { preprocess_signature $_ } @{$sigs};
 
     #### Source file stuff.
     my $std_includes = [
@@ -130,14 +150,14 @@ sub yaml_signatures_to_cpp_definitions {
     ];
     my $source_defs = join "",
         # Actual signature definitions
-        (map { yaml_sig_to_cpp_sig } @sigs), "\n",
+        (map { yaml_sig_to_cpp_sig $_ } @sigs), "\n",
         # The variables that hold the addresses.
-        (map { yaml_sig_to_cpp_address_var } @sigs), "\n",
+        (map { yaml_sig_to_cpp_address_var $_ } @sigs), "\n",
         # Getters for these addresses.
-        (map { yaml_sig_to_cpp_getter } @sigs), "\n";
+        (map { yaml_sig_to_cpp_getter $_ } @sigs), "\n";
 
-    my $initialization_code = join "", map { yaml_sig_to_cpp_initializer } @sigs;
-    my $validation_code = join "", map { yaml_sig_to_cpp_validator } @sigs;
+    my $initialization_code = join "", map { yaml_sig_to_cpp_initializer $_ } @sigs;
+    my $validation_code = join "", map { yaml_sig_to_cpp_validator $_ } @sigs;
 
     # Function called on initialization.
     my $init_function = qq{void init_$name\_signatures() {
@@ -176,7 +196,7 @@ $validation_code
 };
 
     #### Header stuff
-    my $header_getters = join "", (map { yaml_sig_to_cpp_getter_header } @sigs), "\n";
+    my $header_getters = join "", (map { yaml_sig_to_cpp_getter_header $_ } @sigs), "\n";
     my $header_initializer = "void init_$name\_signatures();\n";
 
     return {

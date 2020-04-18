@@ -7,71 +7,81 @@
 use strict;
 use warnings;
 use List::Util qw{ max };
+use Data::Dumper qw{ Dumper };
 
 use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
 use CodeGen::Shared qw( wrap_text ensure_number );
 
 sub preprocess_struct_member {
+    my ($mem) = @_;
+
     # Names can be left out for padding.
-    if (exists $_->{name}) {
-        $_->{name} =~ s/ +/_/g;
+    if (exists $mem->{name}) {
+        $mem->{name} =~ s/ +/_/g;
     }
 
-    my $name = exists $_->{name} ? $_->{name} : "<no name>";
+    my $name = exists $mem->{name} ? $mem->{name} : "<no name>";
 
-    die "struct member $name doesn't have a type" unless exists $_->{type};
+    die "struct member $name doesn't have a type" . Dumper $mem
+    unless exists $mem->{type};
 
-    if ($_->{type} eq "pad" and not exists $_->{size}) {die "pad type need a size"};
+    if ($mem->{type} eq "pad" and not exists $mem->{size}) {die "pad type need a size"};
 
-    $_->{array_size} //= 1;
+    $mem->{array_size} //= 1;
 
-    return $_;
+    return $mem;
 }
 
 sub preprocess_struct {
-    $_->{fields} = [map { preprocess_struct_member } @{$_->{fields}}];
-    if (exists $_->{size}) {
-        $_->{size} = ensure_number $_->{size};
+    my ($struct) = @_;
+
+    $struct->{fields} = [map { preprocess_struct_member $_ } @{$struct->{fields}}];
+    if (exists $struct->{size}) {
+        $struct->{size} = ensure_number $struct->{size};
     }
 
-    return $_;
+    return $struct;
 }
 
 sub build_struct_line {
+    my ($mem) = @_;
+
     my $string = '';
 
-    if (exists $_->{comment}) {
-        my $comment = wrap_text (text => "/* $_->{comment} */", line_len => 72);
+    if (exists $mem->{comment}) {
+        my $comment = wrap_text (text => "/* $mem->{comment} */", line_len => 72);
         # Indent by 4 spaces.
         $comment =~ s/^/    /gm;
 
         $string .= "$comment\n";
     }
 
-    if ($_->{type} eq "pad") {
-        $string .= "    PAD($_->{size});";
-    } elsif ($_->{type} eq "bitfield") {
-        $_->{instance_name} = $_->{name};
-        delete $_->{name};
-        my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $_);
+    if ($mem->{type} eq "pad") {
+        $string .= "    PAD($mem->{size});";
+    } elsif ($mem->{type} eq "bitfield") {
+        $mem->{instance_name} = $mem->{name};
+        delete $mem->{name};
+        my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $mem);
         # Add the indent.
         $output =~ s/^/    /gm;
 
         $string .= $output;
     } else {
-        $string .= "    $_->{type} $_->{name}". ($_->{array_size} > 1 ? "[$_->{array_size}];" : ";");
+        $string .= "    $mem->{type} $mem->{name}". ($mem->{array_size} > 1 ? "[$mem->{array_size}];" : ";");
     }
 
     return $string;
 }
 
 sub yaml_struct_to_cpp_definition {
+    my ($struct) = @_;
+
     # Start definition.
-    my $string = "struct $_->{name}";
+    my $string = "struct $struct->{name}";
 
     # Optionally specify a base type
-    if (exists $_->{parent}) {
-        $string .= " : public $_->{parent}";
+    if (exists $struct->{parent}) {
+        $string .= " : public $struct->{parent}";
     }
 
     # Start main part.
@@ -81,13 +91,13 @@ sub yaml_struct_to_cpp_definition {
     # The feature from this TODO is currently left out because of time constraints.
 
     # Turn each option into a line with allignment.
-    my @fields = map { build_struct_line } @{$_->{fields}};
+    my @fields = map { build_struct_line $_ } @{$struct->{fields}};
 
     # Close enum.
     $string .= join "\n", @fields, "};";
 
-    if (exists $_->{size}) {
-        $string .= " static_assert(sizeof($_->{name}) == $_->{size});";
+    if (exists $struct->{size}) {
+        $string .= " static_assert(sizeof($struct->{name}) == $struct->{size});";
     }
 
     $string .= "\n";
@@ -106,9 +116,9 @@ sub yaml_structs_to_cpp_definitions {
         "#include <vulpes/memory/types.hpp>",
         ];
 
-    my @structs = map { preprocess_struct } @{$structs};
+    my @structs = map { preprocess_struct $_ } @{$structs};
 
-    my $defs = join "\n", map {yaml_struct_to_cpp_definition} @structs;
+    my $defs = join "\n", map { yaml_struct_to_cpp_definition $_ } @structs;
 
     $defs = qq{#pragma pack(push, 1)
 

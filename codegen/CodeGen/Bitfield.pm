@@ -7,37 +7,43 @@
 use strict;
 use warnings;
 use List::Util qw{ max };
+use Data::Dumper qw{ Dumper };
 
 use CodeGen::Shared qw( wrap_text );
 
 sub preprocess_bitfield_member {
+    my ($opt) = @_;
+
     die "bitfield members need a name"
-    unless exists $_->{name};
+    unless exists $opt->{name};
 
-    $_->{name} =~ s/ +/_/g;
+    $opt->{name} =~ s/ +/_/g;
 
-    return $_;
+    return $opt;
 }
 
 sub preprocess_bitfield {
-    die "bitfields need either a name for their type, or an instance name"
-    unless exists $_->{name} or exists $_->{instance_name};
+    my ($bitfield) = @_;
 
-    my $name = exists $_->{name} ? $_->{name} : $_->{instance_name};
+    die ("bitfields need either a name for their type, or an instance name " . Dumper($bitfield))
+    unless exists $bitfield->{name} or exists $bitfield->{instance_name};
 
-    $_->{fields} = [map { preprocess_bitfield_member } @{$_->{fields}}];
+    my $name = exists $bitfield->{name} ? $bitfield->{name} : $bitfield->{instance_name};
 
-    die "enum $name width is not multiple of 8" unless ($_->{width} % 8 == 0);
-    $_->{size} = $_->{width} / 8;
+    $bitfield->{fields} = [map { preprocess_bitfield_member $_ } @{$bitfield->{fields}}];
+
+    die "enum $name width is not multiple of 8" unless ($bitfield->{width} % 8 == 0);
+    $_->{size} = $bitfield->{width} / 8;
 
     die "enum $name width is not valid width 8/16/32/64" unless (
-            $_->{width} == 8 or
-            $_->{width} == 16 or
-            $_->{width} == 32 or
-            $_->{width} == 64);
+            $bitfield->{width} == 8 or
+            $bitfield->{width} == 16 or
+            $bitfield->{width} == 32 or
+            $bitfield->{width} == 64);
 
+    # I is so we can increment each enum option
     my $i = 0;
-    foreach my $opt (@{$_->{fields}}) {
+    foreach my $opt (@{$bitfield->{fields}}) {
         $opt->{bit} //= $i;
 
         $opt->{type} = "uint$_->{width}_t";
@@ -47,33 +53,34 @@ sub preprocess_bitfield {
         $i = $opt->{bit} + 1;
     };
 
-    return $_;
+    return $bitfield;
 }
 
 sub yaml_bitfield_to_cpp_definition {
+    my ($bitfield) = @_;
     # Start definition.
     my $string = "struct";
 
-    if (exists $_->{name}) {
-        $string .= " $_->{name}";
+    if (exists $bitfield->{name}) {
+        $string .= " $bitfield->{name}";
     }
 
     # Start main part.
     $string .= " {\n";
 
     # Get the length for allignment.
-    my $max_type_len  = max (map { length ($_->{type}) } @{$_->{fields}});
+    my $max_type_len  = max (map { length ($_->{type}) } @{$bitfield->{fields}});
     # + 1 because we're accounting for the semicolon.
-    my $max_field_len = max (map { length ($_->{name}) } @{$_->{fields}});
+    my $max_field_len = max (map { length ($_->{name}) } @{$bitfield->{fields}});
 
     # Turn each option into a set of lines with allignment.
     my @fields;
     my $i = 0;
-    foreach my $field (@{$_->{fields}}) {
+    foreach my $field (@{$bitfield->{fields}}) {
         # Pad any bits that were skipped.
         if ($i + 1 < $field->{bit}) {
             my $dif = $field->{bit} - ($i + 1);
-            push @fields, "    BITPAD(uint$_->{width}_t, $dif);";
+            push @fields, "    BITPAD(uint$bitfield->{width}_t, $dif);";
         }
 
         if (exists $field->{comment}) {
@@ -95,8 +102,8 @@ sub yaml_bitfield_to_cpp_definition {
     # Close struct.
     $string .= "\n}";
 
-    if (exists $_->{instance_name}) {
-        $string .= " $_->{instance_name}";
+    if (exists $bitfield->{instance_name}) {
+        $string .= " $bitfield->{instance_name}";
     }
     $string .= ";";
 
@@ -116,9 +123,9 @@ sub yaml_bitfields_to_cpp_definitions {
         "#include <vulpes/memory/types.hpp>",
         ];
 
-    my @structs = map { preprocess_bitfield } @{$structs};
+    my @structs = map { preprocess_bitfield $_ } @{$structs};
 
-    my $defs = join "\n", map {yaml_bitfield_to_cpp_definition} @structs;
+    my $defs = join "\n", map { yaml_bitfield_to_cpp_definition $_ } @structs;
 
     $defs = qq{#pragma pack(push, 1)
 

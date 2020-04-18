@@ -8,8 +8,11 @@ use strict;
 use warnings;
 
 # Wraps text into lines with the given length. Tries to preserve word boundaries.
+# Example:
+# wrap_text ( text => $text, line_len => 80 )
+#     will output a version of the string where all lines are wrapped to be 80
+#     or less chars.
 sub wrap_text {
-    # TODO: How do we go about clearly defining an argument list here?
     my %args = @_;
     # The appended space here is a hack, it is to compensate for me
     # not knowing how to match both \s and the end of the string at the same time.
