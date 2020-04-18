@@ -30,13 +30,12 @@ sub preprocess_signature {
     }
 
     $sig->{uc_name}   = uc $sig->{name};
-    $sig->{offset}  //= 0;
-    $sig->{offset}    = ensure_number $sig->{offset};
+    $sig->{offset}    = ensure_number ($sig->{offset} // 0);
     $sig->{type}    //= "uintptr_t";
     $sig->{multi}   //= 0;
     $sig->{crucial} //= 0;
 
-    $sig->{ref} = $sig->{base} ? 1 : 0;
+    $sig->{ref} = !!$sig->{base};
 
     return $sig;
 }

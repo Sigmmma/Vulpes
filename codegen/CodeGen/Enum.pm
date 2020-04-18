@@ -41,7 +41,8 @@ sub preprocess_enum {
 
     $enum->{options} = [map { preprocess_enum_option $_ } @{$enum->{options}}];
 
-    # Make it so each value that isn't given is the previous one incremented.
+    # This makes it so each option where no value is given the value is 1 above
+    # the previous. 0 for the first if not given.
     my $i = 0;
     foreach my $opt (@{$enum->{options}}) {
         $opt->{value} //= $i;
@@ -69,6 +70,8 @@ sub yaml_enum_to_cpp_definition {
     # Get the length for allignment.
     my $max_opt_len = max (map { length ($_->{uc_name}) } @{$enum->{options}});
 
+    my $opt_format_str = "    %- ".$max_opt_len."s = %d,";
+
     # Turn each option into a line with allignment.
     my @options;
     foreach my $opt (@{$enum->{options}}) {
@@ -77,10 +80,10 @@ sub yaml_enum_to_cpp_definition {
             # Indent by 4 spaces.
             $comment =~ s/^/    /gm;
 
-            push @options, $comment;
+            push (@options, ($comment));
         }
 
-        push @options, sprintf "    %- ".$max_opt_len."s = %d,", $opt->{uc_name}, $opt->{value};
+        push @options, (sprintf ($opt_format_str, ($opt->{uc_name}, $opt->{value})));
     }
 
     # Close enum.

@@ -35,10 +35,10 @@ sub preprocess_struct_member {
     my $name = exists $mem->{name} ? $mem->{name} : "<no name>";
 
     unless (exists $mem->{type}) {
-        die "struct member $name doesn't have a type" . Dumper $mem;
+        confess "struct member $name doesn't have a type" . Dumper $mem;
     }
 
-    if ($mem->{type} eq "pad" and not exists $mem->{size}) {die "pad type need a size"};
+    if ($mem->{type} eq "pad" and not exists $mem->{size}) {confess "pad type need a size"};
 
     $mem->{array_size} //= 1;
 
@@ -80,6 +80,7 @@ sub build_struct_line {
 
         $string .= $output;
     } else {
+        # Treating type as a literal C++ type for now.
         $string .= "    $mem->{type} $mem->{name}". ($mem->{array_size} > 1 ? "[$mem->{array_size}];" : ";");
     }
 
@@ -107,7 +108,7 @@ sub yaml_struct_to_cpp_definition {
     my @fields = map { build_struct_line $_ } @{$struct->{fields}};
 
     # Close enum.
-    $string .= join "\n", @fields, "};";
+    $string .= join ("\n", (@fields, "};"));
 
     if (exists $struct->{size}) {
         $string .= " static_assert(sizeof($struct->{name}) == $struct->{size});";
