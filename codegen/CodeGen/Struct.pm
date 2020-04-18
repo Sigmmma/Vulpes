@@ -52,8 +52,7 @@ sub build_struct_line {
         $string .= "    PAD($_->{size});";
     } elsif ($_->{type} eq "bitfield") {
         $_->{instance_name} = $_->{name};
-        # Is there a way to actually undefine this?
-        $_->{name} = '';
+        delete $_->{name};
         my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $_);
         # Add the indent.
         $output =~ s/^/    /gm;
