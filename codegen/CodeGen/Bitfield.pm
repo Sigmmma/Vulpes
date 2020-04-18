@@ -33,7 +33,7 @@ sub preprocess_bitfield {
     $bitfield->{fields} = [map { preprocess_bitfield_member $_ } @{$bitfield->{fields}}];
 
     die "enum $name width is not multiple of 8" unless ($bitfield->{width} % 8 == 0);
-    $_->{size} = $bitfield->{width} / 8;
+    $bitfield->{size} = $bitfield->{width} / 8;
 
     die "enum $name width is not valid width 8/16/32/64" unless (
             $bitfield->{width} == 8 or
@@ -46,7 +46,7 @@ sub preprocess_bitfield {
     foreach my $opt (@{$bitfield->{fields}}) {
         $opt->{bit} //= $i;
 
-        $opt->{type} = "uint$_->{width}_t";
+        $opt->{type} = "uint$bitfield->{width}_t";
 
         $opt->{mask} = 1 << $opt->{bit};
 
