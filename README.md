@@ -52,7 +52,7 @@ For multiplayer a lot of commands are added to both mirror SAPP's featureset and
 ### User Commands:
     WIP
 ### Quality of life
-These are generally small changes with a noticable impact.
+These are generally small changes with a noticeable impact.
  - **Faster Startup:** The game now only gets a checksum for a map once when it needs one, this makes starting the game near instant.
  - **Scoreboard Fade Removal:** The multiplayer scoreboard now appears instantly as on lower framerates it could take quite a few seconds for the text to be properly readable or fade out again.
  - **Console Always enabled:** This is so you won't need to add something to a shortcut, or use a shortcut at all to put in Vulpes Commands.
