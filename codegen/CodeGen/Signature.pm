@@ -17,10 +17,10 @@
 
 use strict;
 use warnings;
-use Data::Dumper qw{ Dumper };
-use Carp qw{ confess };
+use Data::Dumper qw( Dumper );
+use Carp qw( confess );
 
-use CodeGen::Shared qw{ ensure_number };
+use CodeGen::Shared qw( ensure_number );
 
 sub preprocess_signature {
     my ($sig) = @_;

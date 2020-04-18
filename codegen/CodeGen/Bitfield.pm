@@ -17,9 +17,9 @@
 
 use strict;
 use warnings;
-use List::Util qw{ max };
-use Data::Dumper qw{ Dumper };
-use Carp qw{ confess };
+use List::Util qw( max );
+use Data::Dumper qw( Dumper );
+use Carp qw( confess );
 
 use CodeGen::Shared qw( wrap_text );
 

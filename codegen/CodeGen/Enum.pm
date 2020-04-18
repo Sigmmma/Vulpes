@@ -17,10 +17,10 @@
 
 use strict;
 use warnings;
-use List::Util qw{ max };
-use Carp qw{ confess };
+use List::Util qw( max );
+use Carp qw( confess );
 
-use CodeGen::Shared qw{ ensure_number wrap_text };
+use CodeGen::Shared qw( ensure_number wrap_text );
 
 sub preprocess_enum_option {
     my ($opt) = @_;

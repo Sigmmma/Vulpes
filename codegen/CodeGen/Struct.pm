@@ -17,9 +17,9 @@
 
 use strict;
 use warnings;
-use List::Util qw{ max };
-use Data::Dumper qw{ Dumper };
-use Carp qw{ confess };
+use List::Util qw( max );
+use Data::Dumper qw( Dumper );
+use Carp qw( confess );
 
 use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
 use CodeGen::Shared qw( wrap_text ensure_number );
