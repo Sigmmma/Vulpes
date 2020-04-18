@@ -121,9 +121,7 @@ sub yaml_bitfield_to_cpp_definition {
     if (exists $bitfield->{instance_name}) {
         $string .= " $bitfield->{instance_name}";
     }
-    $string .= ";";
-
-    $string .= "\n";
+    $string .= ";\n";
 
     return $string;
 }
