@@ -85,8 +85,10 @@ sub yaml_bitfield_to_cpp_definition {
 
     # Get the length for allignment.
     my $max_type_len  = max (map { length ($_->{type}) } @{$bitfield->{fields}});
-    # + 1 because we're accounting for the semicolon.
     my $max_field_len = max (map { length ($_->{name}) } @{$bitfield->{fields}});
+
+    # Unholy format string that alligns everything nicely.
+    my $field_format_str = "    %- ".$max_type_len."s %- ".$max_field_len."s : 1; // 0x%X";
 
     # Turn each option into a set of lines with allignment.
     my @fields;
@@ -106,8 +108,7 @@ sub yaml_bitfield_to_cpp_definition {
             push @fields, $comment;
         }
 
-        push @fields, sprintf "    %- ".$max_type_len
-        ."s %- ".$max_field_len."s : 1; // 0x%X", $field->{type}, $field->{name}, $field->{mask};
+        push @fields, sprintf $field_format_str, ($field->{type}, $field->{name}, $field->{mask});
 
         $i = $field->{bit};
     }
