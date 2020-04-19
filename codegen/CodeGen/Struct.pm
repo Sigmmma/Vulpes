@@ -134,11 +134,7 @@ sub yaml_structs_to_cpp_definitions {
 
     my $defs = join("\n", map { yaml_struct_to_cpp_definition $_ } @structs);
 
-    $defs = qq{#pragma pack(push, 1)
-
-$defs
-#pragma pack(pop)
-};
+    $defs = join("\n", "#pragma pack(push, 1)\n", $defs, "#pragma pack(pop)\n");
 
     return {
         source => {
