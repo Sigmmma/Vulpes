@@ -22,7 +22,7 @@ use Data::Dumper qw( Dumper );
 use Carp qw( confess );
 
 use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
-use CodeGen::Shared qw( wrap_text ensure_number );
+use CodeGen::Shared qw( wrap_text ensure_number indent );
 
 use constant STRUCT_CPP_STD_SOURCE_INCLUDES => [];
 
@@ -75,10 +75,8 @@ sub build_struct_line {
 
     if (exists $mem->{comment}) {
         my $comment = wrap_text (text => "/* $mem->{comment} */", line_len => 72);
-        # Indent by 4 spaces.
-        $comment =~ s/^/    /gm;
-
-        $string .= "$comment\n";
+        # Indent and append.
+        $string .=  indent(text => $comment, indents => 1)."\n";
     }
 
     if ($mem->{type} eq "pad") {
@@ -87,10 +85,8 @@ sub build_struct_line {
         $mem->{instance_name} = $mem->{name};
         delete $mem->{name};
         my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $mem);
-        # Add the indent.
-        $output =~ s/^/    /gm;
-
-        $string .= $output;
+        # Indent and append.
+        $string .= indent(text => $output, indents => 1);
     } else {
         # Treating type as a literal C++ type for now.
         $string .= "    $mem->{type} $mem->{name}". ($mem->{array_size} > 1 ? "[$mem->{array_size}];" : ";");
