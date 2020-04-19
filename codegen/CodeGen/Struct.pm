@@ -108,7 +108,7 @@ sub yaml_struct_to_cpp_definition {
     my @fields = map { build_struct_line $_ } @{$struct->{fields}};
 
     # Close enum.
-    $string .= join ("\n", (@fields, "};"));
+    $string .= join("\n", @fields, "};");
 
     if (exists $struct->{size}) {
         $string .= " static_assert(sizeof($struct->{name}) == $struct->{size});";
@@ -132,7 +132,7 @@ sub yaml_structs_to_cpp_definitions {
 
     my @structs = map { preprocess_struct $_ } @{$structs};
 
-    my $defs = join "\n", map { yaml_struct_to_cpp_definition $_ } @structs;
+    my $defs = join("\n", map { yaml_struct_to_cpp_definition $_ } @structs);
 
     $defs = qq{#pragma pack(push, 1)
 

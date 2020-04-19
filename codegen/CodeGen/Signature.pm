@@ -54,7 +54,7 @@ sub yaml_sig_to_cpp_sig {
     # Convert string to individual parts and then convert them into C++ format.
     my @bytes = map {$_ eq "??" ? "-1" : "0x$_"} split /\s+/, $sig->{bytes};
     # Combine the bytes into a single string.
-    my $byte_str = join ", ", @bytes;
+    my $byte_str = join(", ", @bytes);
     # Get amount of bytes.
     my $len = scalar @bytes;
     return "static LiteSignature signature_$sig->{name} = ".
@@ -160,16 +160,16 @@ sub yaml_signatures_to_cpp_definitions {
     my $includes = [
         "#include <hooker/hooker.hpp>",
     ];
-    my $source_defs = join "",
+    my $source_defs = join("",
         # Actual signature definitions
         (map { yaml_sig_to_cpp_sig $_ } @sigs), "\n",
         # The variables that hold the addresses.
         (map { yaml_sig_to_cpp_address_var $_ } @sigs), "\n",
         # Getters for these addresses.
-        (map { yaml_sig_to_cpp_getter $_ } @sigs), "\n";
+        (map { yaml_sig_to_cpp_getter $_ } @sigs), "\n");
 
-    my $initialization_code = join "", map { yaml_sig_to_cpp_initializer $_ } @sigs;
-    my $validation_code = join "", map { yaml_sig_to_cpp_validator $_ } @sigs;
+    my $initialization_code = join("", map { yaml_sig_to_cpp_initializer $_ } @sigs);
+    my $validation_code = join("", map { yaml_sig_to_cpp_validator $_ } @sigs);
 
     # Function called on initialization.
     my $init_function = qq{void init_$name\_signatures() {
@@ -208,7 +208,7 @@ $validation_code
 };
 
     #### Header stuff
-    my $header_getters = join "", (map { yaml_sig_to_cpp_getter_header $_ } @sigs), "\n";
+    my $header_getters = join("", (map { yaml_sig_to_cpp_getter_header $_ } @sigs), "\n");
     my $header_initializer = "void init_$name\_signatures();\n";
 
     return {

@@ -113,7 +113,7 @@ sub yaml_bitfield_to_cpp_definition {
         $i = $field->{bit};
     }
 
-    $string .= join "\n", @fields;
+    $string .= join("\n", @fields);
 
     # Close struct.
     $string .= "\n}";
@@ -139,7 +139,7 @@ sub yaml_bitfields_to_cpp_definitions {
 
     my @structs = map { preprocess_bitfield $_ } @{$structs};
 
-    my $defs = join "\n", map { yaml_bitfield_to_cpp_definition $_ } @structs;
+    my $defs = join("\n", map { yaml_bitfield_to_cpp_definition($_) } @structs);
 
     $defs = qq{#pragma pack(push, 1)
 

@@ -29,7 +29,7 @@ sub wrap_text {
     # not knowing how to match both \s and the end of the string at the same time.
     my @lines = split /(.{1,$args{line_len}})\s+/, $args{text}.' ';
 
-    return join "\n", (grep {length $_} @lines);
+    return join("\n", (grep {length $_} @lines));
 }
 
 sub ensure_number {

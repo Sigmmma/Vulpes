@@ -87,7 +87,7 @@ sub yaml_enum_to_cpp_definition {
     }
 
     # Close enum.
-    $string .= join "\n", @options, "};\n";
+    $string .= join("\n", @options, "};\n");
 
     return $string;
 }
@@ -101,7 +101,7 @@ sub yaml_enums_to_cpp_definitions {
 
     my @enums = map { preprocess_enum $_ } @{$enums};
 
-    my $defs = join "\n", map { yaml_enum_to_cpp_definition $_ } @enums;
+    my $defs = join("\n", map { yaml_enum_to_cpp_definition $_ } @enums);
 
     return {
         source => {
