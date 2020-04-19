@@ -62,6 +62,8 @@ If type is `enum`
 
 ## Definition
 
+If no value is given for a given enum option it will use the previous value incremented by 1. If the first option has no value it defaults to 0. This is in line with C implementation.
+
 ```yaml
 enums:
     - name: EnumTypeName
