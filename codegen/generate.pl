@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 #
 # This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
 # Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
