@@ -80,10 +80,10 @@ sub yaml_enum_to_cpp_definition {
             # Indent by 4 spaces.
             $comment =~ s/^/    /gm;
 
-            push (@options, ($comment));
+            push(@options, $comment);
         }
 
-        push @options, (sprintf ($opt_format_str, ($opt->{uc_name}, $opt->{value})));
+        push(@options, sprintf($opt_format_str, $opt->{uc_name}, $opt->{value}));
     }
 
     # Close enum.

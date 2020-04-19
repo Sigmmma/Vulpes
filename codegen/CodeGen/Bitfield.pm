@@ -97,7 +97,7 @@ sub yaml_bitfield_to_cpp_definition {
         # Pad any bits that were skipped.
         if ($i + 1 < $field->{bit}) {
             my $dif = $field->{bit} - ($i + 1);
-            push @fields, "    BITPAD(uint$bitfield->{width}_t, $dif);";
+            push(@fields, "    BITPAD(uint$bitfield->{width}_t, $dif);");
         }
 
         if (exists $field->{comment}) {
@@ -105,10 +105,10 @@ sub yaml_bitfield_to_cpp_definition {
             # Indent by 4 spaces.
             $comment =~ s/^/    /gm;
 
-            push @fields, $comment;
+            push(@fields, $comment);
         }
 
-        push @fields, sprintf $field_format_str, ($field->{type}, $field->{name}, $field->{mask});
+        push(@fields, sprintf($field_format_str, ($field->{type}, $field->{name}, $field->{mask})));
 
         $i = $field->{bit};
     }
