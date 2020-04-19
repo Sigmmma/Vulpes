@@ -1,9 +1,10 @@
 This readme is still work in progress, and so is the mod.
 
-<h1 align="center">Vulpes</h1>
-<p align="center">
-    An opensource Halo Client and Server Extension Mod
-</p>
+<a href="COPYING.md"><img align="right" src="agplv3.png"></a>
+
+# Vulpes
+An opensource Halo Client and Server Extension Mod
+
 
 # Introduction
 
@@ -51,16 +52,14 @@ For multiplayer a lot of commands are added to both mirror SAPP's featureset and
 ### User Commands:
     WIP
 ### Quality of life
-These are generally small changes with a noticable impact.
+These are generally small changes with a noticeable impact.
  - **Faster Startup:** The game now only gets a checksum for a map once when it needs one, this makes starting the game near instant.
  - **Scoreboard Fade Removal:** The multiplayer scoreboard now appears instantly as on lower framerates it could take quite a few seconds for the text to be properly readable or fade out again.
  - **Console Always enabled:** This is so you won't need to add something to a shortcut, or use a shortcut at all to put in Vulpes Commands.
  - **Loading screen background removed:** This removes the loading screen background so you are not stuck waiting for it to fade out. It does not remove the text though, so you will still be able to read what the name of the map you're playing is.
- ### Bugfixes
+### Bugfixes
 Halo has some bugs that either came when porting the game onto PC or were there from the start.
  - **CPU Usage:** The game/server will now use less CPU time when idling.
- - **Map Related Memory Leaks:** When the vanilla game loads a map that is over 128MB in size it will leak a filehandle for each multiple of 128MB. This is fixed now.
- - **Console Fade:** The console text fade used to be affect by framerate, now it fades at the correct sped.
+ - **Console Fade:** The console text fade used to be affect by framerate, now it fades at the correct speed.
  - **HSC Print crashbug:** The original game's print command allowed for the use of formatted strings but did not allow you to give more than one argument. This would result in printing garbage or reading invalid memory. Causing the game to crash.
  - **Less Z-Fighting on Shader Transparent Geometry:** This helps with the flickery behavior of certain transparent shaders in maps like Bloodgulch and Assault on the Control Room.
- 
