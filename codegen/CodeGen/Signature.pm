@@ -22,6 +22,24 @@ use Carp qw( confess );
 
 use CodeGen::Shared qw( ensure_number );
 
+use constant SIGNATURE_CPP_STD_SOURCE_INCLUDES => [
+    "#include <cstdio>",
+    "#include <cstdint>",
+    "#include <cstdlib>",
+    "#include <vector>",
+];
+
+use constant SIGNATURE_CPP_SOURCE_INCLUDES => [
+    "#include <hooker/hooker.hpp>",
+];
+
+use constant SIGNATURE_CPP_STD_HEADER_INCLUDES => [
+    "#include <cstdint>",
+    "#include <vector>",
+];
+
+use constant SIGNATURE_CPP_HEADER_INCLUDES => [];
+
 sub preprocess_signature {
     my ($sig) = @_;
 
@@ -146,20 +164,6 @@ sub yaml_signatures_to_cpp_definitions {
     my ($name, $sigs) = @_;
     my @sigs = map { preprocess_signature $_ } @{$sigs};
 
-    #### Source file stuff.
-    my $std_includes = [
-        "#include <cstdio>",
-        "#include <cstdint>",
-        "#include <cstdlib>",
-        "#include <vector>",
-        ];
-    my $std_header_includes = [
-        "#include <cstdint>",
-        "#include <vector>",
-        ];
-    my $includes = [
-        "#include <hooker/hooker.hpp>",
-    ];
     my $source_defs = join("",
         # Actual signature definitions
         (map { yaml_sig_to_cpp_sig $_ } @sigs), "\n",
@@ -213,14 +217,14 @@ $validation_code
 
     return {
         source => {
-            std_includes    => $std_includes,
-            includes        => $includes,
+            std_includes    => SIGNATURE_CPP_STD_SOURCE_INCLUDES,
+            includes        => SIGNATURE_CPP_SOURCE_INCLUDES,
             defs            => $source_defs,
             initializer     => $init_function,
         },
         header => {
-            std_includes    => $std_header_includes,
-            includes        => [],
+            std_includes    => SIGNATURE_CPP_STD_HEADER_INCLUDES,
+            includes        => SIGNATURE_CPP_HEADER_INCLUDES,
             defs            => $header_getters,
             initializer     => $header_initializer,
         },

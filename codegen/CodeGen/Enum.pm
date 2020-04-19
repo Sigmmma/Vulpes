@@ -22,6 +22,16 @@ use Carp qw( confess );
 
 use CodeGen::Shared qw( ensure_number wrap_text );
 
+use constant ENUM_CPP_STD_SOURCE_INCLUDES => [];
+
+use constant ENUM_CPP_SOURCE_INCLUDES => [];
+
+use constant ENUM_CPP_STD_HEADER_INCLUDES => [
+    "#include <cstdint>",
+];
+
+use constant ENUM_CPP_HEADER_INCLUDES => [];
+
 sub preprocess_enum_option {
     my ($opt) = @_;
 
@@ -105,14 +115,14 @@ sub yaml_enums_to_cpp_definitions {
 
     return {
         source => {
-            std_includes    => [],
-            includes        => [],
+            std_includes    => ENUM_CPP_STD_SOURCE_INCLUDES,
+            includes        => ENUM_CPP_SOURCE_INCLUDES,
             defs            => "",
             initializer     => "",
         },
         header => {
-            std_includes    => $std_header_includes,
-            includes        => [],
+            std_includes    => ENUM_CPP_STD_HEADER_INCLUDES,
+            includes        => ENUM_CPP_HEADER_INCLUDES,
             defs            => $defs,
             initializer     => "",
         },

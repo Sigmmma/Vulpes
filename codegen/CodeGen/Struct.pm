@@ -24,6 +24,18 @@ use Carp qw( confess );
 use CodeGen::Bitfield qw( preprocess_bitfield yaml_bitfield_to_cpp_definition );
 use CodeGen::Shared qw( wrap_text ensure_number );
 
+use constant STRUCT_CPP_STD_SOURCE_INCLUDES => [];
+
+use constant STRUCT_CPP_SOURCE_INCLUDES => [];
+
+use constant STRUCT_CPP_STD_HEADER_INCLUDES => [
+    "#include <cstdint>",
+];
+
+use constant STRUCT_CPP_HEADER_INCLUDES => [
+    "#include <vulpes/memory/types.hpp>",
+];
+
 sub preprocess_struct_member {
     my ($mem) = @_;
 
@@ -122,14 +134,6 @@ sub yaml_struct_to_cpp_definition {
 sub yaml_structs_to_cpp_definitions {
     my ($name, $structs) = @_;
 
-    my $std_header_includes = [
-        "#include <cstdint>",
-        ];
-
-    my $header_includes = [
-        "#include <vulpes/memory/types.hpp>",
-        ];
-
     my @structs = map { preprocess_struct $_ } @{$structs};
 
     my $defs = join("\n", map { yaml_struct_to_cpp_definition $_ } @structs);
@@ -138,14 +142,14 @@ sub yaml_structs_to_cpp_definitions {
 
     return {
         source => {
-            std_includes    => [],
-            includes        => [],
+            std_includes    => STRUCT_CPP_STD_SOURCE_INCLUDES,
+            includes        => STRUCT_CPP_SOURCE_INCLUDES,
             defs            => "",
             initializer     => "",
         },
         header => {
-            std_includes    => $std_header_includes,
-            includes        => $header_includes,
+            std_includes    => STRUCT_CPP_STD_HEADER_INCLUDES,
+            includes        => STRUCT_CPP_HEADER_INCLUDES,
             defs            => $defs,
             initializer     => "",
         },
