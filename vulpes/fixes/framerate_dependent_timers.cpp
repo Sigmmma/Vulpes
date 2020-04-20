@@ -139,7 +139,7 @@ void revert_console_fix() {
 
     When do this, we do supply the time that passes between two ticks as
     one of the arguments to the function in our assembly. The same value
-    that would be supplied at 30fps where the contrails function properly.
+    that would be supplied at 30fps, where the contrails function properly.
 */
 
 static Patch(patch_contrail_framerate_dep, NULL, 5, NOP_PATCH, 0);
