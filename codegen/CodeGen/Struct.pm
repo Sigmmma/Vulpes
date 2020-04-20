@@ -52,7 +52,7 @@ sub preprocess_struct_member {
 
     if ($mem->{type} eq "pad" and not exists $mem->{size}) {confess "pad type need a size"};
 
-    $mem->{array_size} //= 1;
+    $mem->{array_size} = exists $mem->{array_size} ? (ensure_number $mem->{array_size}) : (1);
 
     return $mem;
 }
@@ -60,10 +60,24 @@ sub preprocess_struct_member {
 sub preprocess_struct {
     my ($struct) = @_;
 
+    unless (exists $struct->{name} or exists $struct->{instance_name}) {
+        confess ("structs need either a name for their type, or an instance name " . Dumper($struct));
+    }
+
+    if ((not exists $struct->{name}) and (exists $struct->{parent})) {
+        confess ("Unamed structs can't have a parent type " . Dumper($struct));
+    }
+
+    if ((not exists $struct->{name}) and (exists $struct->{size})) {
+        confess ("Unamed structs can't have size asserts " . Dumper($struct));
+    }
+
     $struct->{fields} = [map { preprocess_struct_member $_ } @{$struct->{fields}}];
     if (exists $struct->{size}) {
         $struct->{size} = ensure_number $struct->{size};
     }
+
+    $struct->{array_size} = exists $struct->{array_size} ? (ensure_number $struct->{array_size}) : (1);
 
     return $struct;
 }
@@ -87,6 +101,12 @@ sub build_struct_line {
         my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $mem);
         # Indent and append.
         $string .= indent(text => $output, indents => 1);
+    } elsif ($mem->{type} eq "struct") {
+        $mem->{instance_name} = $mem->{name};
+        delete $mem->{name};
+        my $output = yaml_struct_to_cpp_definition (preprocess_struct $mem);
+        # Indent and append.
+        $string .= indent(text => $output, indents => 1);
     } else {
         # Treating type as a literal C++ type for now.
         $string .= "    $mem->{type} $mem->{name}". ($mem->{array_size} > 1 ? "[$mem->{array_size}];" : ";");
@@ -99,7 +119,10 @@ sub yaml_struct_to_cpp_definition {
     my ($struct) = @_;
 
     # Start definition.
-    my $string = "struct $struct->{name}";
+    my $string = "struct";
+    if (exists $struct->{name}) {
+        $string .= " $struct->{name}";
+    }
 
     # Optionally specify a base type
     if (exists $struct->{parent}) {
@@ -116,7 +139,16 @@ sub yaml_struct_to_cpp_definition {
     my @fields = map { build_struct_line $_ } @{$struct->{fields}};
 
     # Close enum.
-    $string .= join("\n", @fields, "};");
+    $string .= join("\n", @fields, "}");
+
+    if (exists $struct->{instance_name}) {
+        $string .= " $struct->{instance_name}";
+        if ($struct->{array_size} > 1) {
+            $string .= "[$struct->{array_size}]";
+        }
+    }
+
+    $string .= ";";
 
     if (exists $struct->{size}) {
         $string .= " static_assert(sizeof($struct->{name}) == $struct->{size});";
