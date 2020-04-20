@@ -152,12 +152,15 @@ void init_contrail_fix() {
     if (sig_server()) return;
 
     if (patch_contrail_framerate_dep.build(sig_fix_contrails_framerate_dep())) {
+        // Save the pointer to the contrails_update function if we don't have it yet.
         if (!contrails_update_func) {
             contrails_update_func = get_call_address(patch_contrail_framerate_dep.address());
         }
 
+        // NOP out the call to contrails_update in the game_frame update function.
         patch_contrail_framerate_dep.apply();
 
+        // Add our wrapped version as a tick event.
         ADD_CALLBACK(EVENT_TICK, update_contrails_wrapper);
     }
 }
