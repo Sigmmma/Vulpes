@@ -444,6 +444,7 @@ void init_gamestate_upgrades() {
 void revert_gamestate_upgrades() {
     if (!initialized) return;
 
+    patch_increase_object_memory_pool.revert();
     patch_copy_checkpoint_file_hook.revert();
     patch_copy_to_checkpoint_state_hook.revert();
     patch_gamestate_write_to_files_hook.revert();
