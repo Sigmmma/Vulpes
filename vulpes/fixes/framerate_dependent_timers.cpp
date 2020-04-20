@@ -125,19 +125,58 @@ void init_console_fix() {
     }
 }
 
+static Patch(patch_contrail_framerate_dep, NULL, 5, NOP_PATCH, 0);
+
 void revert_console_fix() {
     patch_console_framerate_dep.revert();
     DEL_CALLBACK(EVENT_TICK, fade_console);
+}
+
+/*
+    Contrails are updated each frame, they are updated based on how much time
+    has passed between this and the last frame. Sometimes it updates a little
+    finnicky though and the contrails have visible distortions.
+
+    Turns out that contrails look fine if you just only update them every tick.
+
+    When do this, we do supply the time that passes between two ticks as
+    one of the arguments to the function in our assembly. The same value
+    that would be supplied at 30fps where the contrails function properly.
+*/
+
+uintptr_t contrails_update_func = NULL;
+extern "C" void update_contrails_wrapper();
+
+void init_contrail_fix() {
+    // This is a render only bug, don't bother with server.
+    if (sig_server()) return;
+
+    if (patch_contrail_framerate_dep.build(sig_fix_contrails_framerate_dep())) {
+        if (!contrails_update_func) {
+            contrails_update_func = get_call_address(patch_contrail_framerate_dep.address());
+        }
+
+        patch_contrail_framerate_dep.apply();
+
+        ADD_CALLBACK(EVENT_TICK, update_contrails_wrapper);
+    }
+}
+
+void revert_contrail_fix() {
+    patch_contrail_framerate_dep.revert();
+    DEL_CALLBACK(EVENT_TICK, update_contrails_wrapper);
 }
 
 void init_framerate_dependent_timer_fixes() {
     init_checkpoint_revert_fix();
     init_scoreboard_fix();
     init_console_fix();
+    init_contrail_fix();
 }
 
 void revert_framerate_dependent_timer_fixes() {
-    revert_checkpoint_revert_fix();
-    revert_scoreboard_fix();
+    revert_contrail_fix();
     revert_console_fix();
+    revert_scoreboard_fix();
+    revert_checkpoint_revert_fix();
 }
