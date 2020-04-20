@@ -125,8 +125,6 @@ void init_console_fix() {
     }
 }
 
-static Patch(patch_contrail_framerate_dep, NULL, 5, NOP_PATCH, 0);
-
 void revert_console_fix() {
     patch_console_framerate_dep.revert();
     DEL_CALLBACK(EVENT_TICK, fade_console);
@@ -144,6 +142,7 @@ void revert_console_fix() {
     that would be supplied at 30fps where the contrails function properly.
 */
 
+static Patch(patch_contrail_framerate_dep, NULL, 5, NOP_PATCH, 0);
 uintptr_t contrails_update_func = NULL;
 extern "C" void update_contrails_wrapper();
 
