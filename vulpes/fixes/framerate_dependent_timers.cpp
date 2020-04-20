@@ -161,6 +161,8 @@ void init_contrail_fix() {
 
         // Add our wrapped version as a tick event.
         ADD_CALLBACK(EVENT_TICK, update_contrails_wrapper);
+
+        // TODO: Potentially rebind contrail_update_points to frames.
     }
 }
 
