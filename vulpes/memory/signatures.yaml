@@ -71,9 +71,13 @@ signatures:
 
     # The place contrails_update gets called in frame_update.
   - name: fix_contrails_framerate_dep
-    bytes: 57 8B 7C 24 14 57 E8 ?? ?? ?? ?? 57 E8 ?? ?? ?? ?? 83 C4 08 85 F6
+    bytes: 57 8B 7C 24 14 57 ?? ?? ?? ?? ?? 57 E8 ?? ?? ?? ?? 83 C4 08 85 F6
     crucial: false
     offset: 6
+
+  - name: contrails_update
+    bytes: 83 EC 10 53 55 8B 2D ?? ?? ?? ?? 57 83 CB FF 8B D3 8B FD
+    crucial: false
 
   # fixes/host_refusal
 

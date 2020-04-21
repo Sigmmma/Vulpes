@@ -150,11 +150,10 @@ void init_contrail_fix() {
     // This is a render only bug, don't bother with server.
     if (sig_server()) return;
 
-    if (patch_contrail_framerate_dep.build(sig_fix_contrails_framerate_dep())) {
-        // Save the pointer to the contrails_update function if we don't have it yet.
-        if (!contrails_update_func) {
-            contrails_update_func = get_call_address(patch_contrail_framerate_dep.address());
-        }
+    contrails_update_func = sig_contrails_update();
+
+    if (patch_contrail_framerate_dep.build(sig_fix_contrails_framerate_dep())
+        && contrails_update_func) {
 
         // NOP out the call to contrails_update in the game_frame update function.
         patch_contrail_framerate_dep.apply();
