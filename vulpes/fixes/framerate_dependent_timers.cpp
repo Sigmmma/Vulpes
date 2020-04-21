@@ -139,8 +139,7 @@ void revert_console_fix() {
     contrails having little hiccups when they should be smooth curves).
 
     This issue does not happen if the contrails are updated every tick instead
-    of every frame. We can fix this by instead executing the contrail code
-    every tick and feeding it the time between two ticks instead of the
+    of every frame, while feeding it the time between two ticks instead of the
     time between two frames.
 */
 
