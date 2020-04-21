@@ -52,7 +52,7 @@ sub preprocess_struct_member {
 
     if ($mem->{type} eq "pad" and not exists $mem->{size}) {confess "pad type need a size"};
 
-    $mem->{array_size} = exists $mem->{array_size} ? (ensure_number $mem->{array_size}) : (1);
+    $mem->{array_size} = ensure_number $mem->{array_size} // 1;
 
     return $mem;
 }
@@ -77,7 +77,7 @@ sub preprocess_struct {
         $struct->{size} = ensure_number $struct->{size};
     }
 
-    $struct->{array_size} = exists $struct->{array_size} ? (ensure_number $struct->{array_size}) : (1);
+    $struct->{array_size} = ensure_number $struct->{array_size} // 1;
 
     return $struct;
 }
@@ -96,8 +96,8 @@ sub build_struct_line {
     if ($mem->{type} eq "pad") {
         $string .= "    PAD($mem->{size});";
     } elsif ($mem->{type} eq "bitfield") {
-        $mem->{instance_name} = $mem->{name};
-        delete $mem->{name};
+        $mem->{instance_name} = delete $mem->{name};
+
         my $output = yaml_bitfield_to_cpp_definition (preprocess_bitfield $mem);
         # Indent and append.
         $string .= indent(text => $output, indents => 1);

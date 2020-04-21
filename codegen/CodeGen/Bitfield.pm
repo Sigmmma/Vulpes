@@ -54,7 +54,7 @@ sub preprocess_bitfield {
         confess ("bitfields need either a name for their type, or an instance name " . Dumper($bitfield));
     }
 
-    my $name = exists $bitfield->{name} ? $bitfield->{name} : $bitfield->{instance_name};
+    my $name = $bitfield->{name} // $bitfield->{instance_name};
 
     $bitfield->{fields} = [map { preprocess_bitfield_member $_ } @{$bitfield->{fields}}];
 
