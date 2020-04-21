@@ -18,6 +18,7 @@
 use strict;
 use warnings;
 use List::Util qw( max );
+use Data::Dumper qw( Dumper );
 use Carp qw( confess );
 
 use CodeGen::Shared qw( ensure_number wrap_text );
@@ -33,15 +34,23 @@ use constant ENUM_CPP_STD_HEADER_INCLUDES => [
 use constant ENUM_CPP_HEADER_INCLUDES => [];
 
 sub preprocess_enum_option {
-    my ($opt) = @_;
+    my ($opt, $parent_enum_name) = @_;
 
     unless (exists $opt->{name}) {
-        confess "enum options need a name";
+        confess "enum option in enum $parent_enum_name doesn't have a name "
+                . Dumper $opt;
+    }
+
+    unless (exists $opt->{value}) {
+        confess "enum option in enum $parent_enum_name doesn't have a value "
+                . Dumper $opt;
     }
 
     $opt->{uc_name} = uc $opt->{name};
     # Replace all series of spaces with single underscores
     $opt->{uc_name} =~ s/ +/_/g;
+
+    $opt->{value} = ensure_number $opt->{value};
 
     return $opt;
 }
@@ -49,16 +58,11 @@ sub preprocess_enum_option {
 sub preprocess_enum {
     my ($enum) = @_;
 
-    $enum->{options} = [map { preprocess_enum_option $_ } @{$enum->{options}}];
+    unless (exists $enum->{name}) {
+        confess "enums need a name " . Dumper $enum;
+    }
 
-    # This makes it so each option where no value is given the value is 1 above
-    # the previous. 0 for the first if not given.
-    my $i = 0;
-    foreach my $opt (@{$enum->{options}}) {
-        $opt->{value} //= $i;
-        $opt->{value} = ensure_number $opt->{value};
-        $i = $opt->{value} + 1;
-    };
+    $enum->{options} = [map { preprocess_enum_option $_ , $enum->{name} } @{$enum->{options}}];
 
     return $enum;
 }

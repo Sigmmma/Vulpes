@@ -36,10 +36,11 @@ use constant BITFIELD_CPP_HEADER_INCLUDES => [
 ];
 
 sub preprocess_bitfield_member {
-    my ($opt) = @_;
+    my ($opt, $parent_bitfield_name) = @_;
 
     unless (exists $opt->{name}) {
-        confess "bitfield members need a name" . Dumper $opt;
+        confess "member in bitfield $parent_bitfield_name doesn't have a name"
+                . Dumper $opt;
     }
 
     $opt->{name} =~ s/ +/_/g;
@@ -51,12 +52,13 @@ sub preprocess_bitfield {
     my ($bitfield) = @_;
 
     unless (exists $bitfield->{name} or exists $bitfield->{instance_name}) {
-        confess ("bitfields need either a name for their type, or an instance name " . Dumper($bitfield));
+        confess ("bitfields need either a name for their type, or an instance name "
+                 . Dumper($bitfield));
     }
 
     my $name = $bitfield->{name} // $bitfield->{instance_name};
 
-    $bitfield->{fields} = [map { preprocess_bitfield_member $_ } @{$bitfield->{fields}}];
+    $bitfield->{fields} = [map { preprocess_bitfield_member $_ , $name } @{$bitfield->{fields}}];
 
     unless ($bitfield->{width} % 8 == 0) {
         confess "enum $name width is not multiple of 8";

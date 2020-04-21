@@ -37,20 +37,29 @@ use constant STRUCT_CPP_HEADER_INCLUDES => [
 ];
 
 sub preprocess_struct_member {
-    my ($mem) = @_;
+    my ($mem, $parent_struct_name) = @_;
 
     # Names can be left out for padding.
     if (exists $mem->{name}) {
         $mem->{name} =~ s/ +/_/g;
     }
 
-    my $name = exists $mem->{name} ? $mem->{name} : "<no name>";
+    my $name = $mem->{name} // "<no name>";
 
     unless (exists $mem->{type}) {
-        confess "struct member $name doesn't have a type" . Dumper $mem;
+        confess "struct member $name in $parent_struct_name doesn't have a type "
+                . Dumper $mem;
     }
 
-    if ($mem->{type} eq "pad" and not exists $mem->{size}) {confess "pad type need a size"};
+    if ($mem->{type} eq "pad" and not exists $mem->{size}) {
+        confess "Type pad field in $parent_struct_name doesn't have a size "
+                . Dumper $mem;;
+    };
+
+    if ((not $mem->{type} eq "pad") and not exists $mem->{name}) {
+        confess "Non pad field in $parent_struct_name doesn't have a name "
+                 . Dumper $mem;
+    };
 
     $mem->{array_size} = ensure_number $mem->{array_size} // 1;
 
@@ -72,7 +81,9 @@ sub preprocess_struct {
         confess ("Unamed structs can't have size asserts " . Dumper($struct));
     }
 
-    $struct->{fields} = [map { preprocess_struct_member $_ } @{$struct->{fields}}];
+    my $name = $struct->{name} // $struct->{instance_name};
+
+    $struct->{fields} = [map { preprocess_struct_member $_ , $name } @{$struct->{fields}}];
     if (exists $struct->{size}) {
         $struct->{size} = ensure_number $struct->{size};
     }
