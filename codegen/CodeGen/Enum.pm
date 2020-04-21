@@ -84,6 +84,8 @@ sub yaml_enum_to_cpp_definition {
     # Get the length for allignment.
     my $max_opt_len = max (map { length ($_->{uc_name}) } @{$enum->{options}});
 
+    # Unholy format string that alligns everything nicely.
+    # End result ex: "    %- 10s = %d,"
     my $opt_format_str = "    %- ".$max_opt_len."s = %d,";
 
     # Turn each option into a line with allignment.

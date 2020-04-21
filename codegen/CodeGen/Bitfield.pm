@@ -102,6 +102,7 @@ sub yaml_bitfield_to_cpp_definition {
     my $max_field_len = max (map { length ($_->{name}) } @{$bitfield->{fields}});
 
     # Unholy format string that alligns everything nicely.
+    # End result ex: "    %- 10s %- 10s : 1; // 0x%X"
     my $field_format_str = "    %- ".$max_type_len."s %- ".$max_field_len."s : 1; // 0x%X";
 
     # Turn each option into a set of lines with allignment.
