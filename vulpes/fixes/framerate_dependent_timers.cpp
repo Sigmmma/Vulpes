@@ -131,15 +131,17 @@ void revert_console_fix() {
 }
 
 /*
-    Contrails are updated each frame, they are updated based on how much time
-    has passed between this and the last frame. Sometimes it updates a little
-    finnicky though and the contrails have visible distortions.
+    In the stock game, contrails are updated every frame. They update based on
+    how much time has passed between the current frame and the previous frame.
+    This calculation was designed with the expectation that the game's frame
+    rate would match the tick rate (30 fps). Because of this, the contrails
+    can have visible distortions at higher frame rates (ex: the Banshee wing
+    contrails having little hiccups when they should be smooth curves).
 
-    Turns out that contrails look fine if you just only update them every tick.
-
-    When do this, we do supply the time that passes between two ticks as
-    one of the arguments to the function in our assembly. The same value
-    that would be supplied at 30fps, where the contrails function properly.
+    This issue does not happen if the contrails are updated every tick instead
+    of every frame. We can fix this by instead executing the contrail code
+    every tick and feeding it the time between two ticks instead of the
+    time between two frames.
 */
 
 static Patch(patch_contrail_framerate_dep, NULL, 5, NOP_PATCH, 0);
