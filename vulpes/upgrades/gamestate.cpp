@@ -99,6 +99,8 @@ extern "C" { // These are shared with the assembly.
 
 static uintptr_t used_extension_memory = 0;
 static const size_t ALLOCATED_UPGRADE_MEMORY = 10*1024*1024; // 10 MB
+// Not quite 4MB, but this size is fine.
+static const size_t UPGRADED_OBJECT_MEMORY_POOL_SIZE = 4000000;
 static void* gamestate_extension_buffer;
 static void* gamestate_extension_checkpoint_buffer;
 
@@ -362,6 +364,9 @@ static Patch(patch_copy_to_checkpoint_state_hook, NULL, 9,
 static Patch(patch_copy_checkpoint_file_hook, NULL, 6,
     JMP_PATCH, &gamestate_copy_checkpoint_file_wrapper);
 
+static Patch(patch_increase_object_memory_pool, NULL, 4,
+    INT_PATCH, UPGRADED_OBJECT_MEMORY_POOL_SIZE);
+
 static bool initialized = false;
 
 void init_gamestate_upgrades() {
@@ -401,6 +406,10 @@ void init_gamestate_upgrades() {
     patch_copy_checkpoint_file_hook.apply();
     gamestate_copy_checkpoint_file_continue_ptr = patch_copy_checkpoint_file_hook.return_address();
 
+    // Almost double the amount of memory objects have to work with.
+    patch_increase_object_memory_pool.build(sig_object_memory_pool_size());
+    patch_increase_object_memory_pool.apply();
+
     // This is the location the game stores its gamestate in.
     uintptr_t mem_map_loc = *sig_physical_memory_map_location();
 
@@ -435,6 +444,7 @@ void init_gamestate_upgrades() {
 void revert_gamestate_upgrades() {
     if (!initialized) return;
 
+    patch_increase_object_memory_pool.revert();
     patch_copy_checkpoint_file_hook.revert();
     patch_copy_to_checkpoint_state_hook.revert();
     patch_gamestate_write_to_files_hook.revert();
