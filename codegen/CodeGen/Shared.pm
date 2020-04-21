@@ -42,7 +42,7 @@ sub ensure_number {
     return $text;
 }
 
-# args { text => <string>, indents => <number of 4 space indents>, } 
+# args { text => <string>, indents => <number of 4 space indents>, }
 sub indent {
     my %args = @_;
 
