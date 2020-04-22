@@ -111,10 +111,6 @@ sub yaml_enum_to_cpp_definition {
 sub yaml_enums_to_cpp_definitions {
     my ($name, $enums) = @_;
 
-    my $std_header_includes = [
-        "#include <cstdint>",
-        ];
-
     my @enums = map { preprocess_enum($_) } @{$enums};
 
     my $defs = join("\n", map { yaml_enum_to_cpp_definition($_) } @enums);
