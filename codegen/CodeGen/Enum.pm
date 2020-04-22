@@ -50,7 +50,7 @@ sub preprocess_enum_option {
     # Replace all series of spaces with single underscores
     $opt->{uc_name} =~ s/ +/_/g;
 
-    $opt->{value} = ensure_number $opt->{value};
+    $opt->{value} = ensure_number($opt->{value});
 
     return $opt;
 }

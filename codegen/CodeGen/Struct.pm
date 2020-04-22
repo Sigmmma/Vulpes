@@ -61,7 +61,7 @@ sub preprocess_struct_member {
                  . Dumper $mem;
     };
 
-    $mem->{array_size} = ensure_number $mem->{array_size} // 1;
+    $mem->{array_size} = ensure_number($mem->{array_size} // 1);
 
     return $mem;
 }
@@ -85,10 +85,10 @@ sub preprocess_struct {
 
     $struct->{fields} = [map { preprocess_struct_member($_ , $name) } @{$struct->{fields}}];
     if (exists $struct->{size}) {
-        $struct->{size} = ensure_number $struct->{size};
+        $struct->{size} = ensure_number($struct->{size});
     }
 
-    $struct->{array_size} = ensure_number $struct->{array_size} // 1;
+    $struct->{array_size} = ensure_number($struct->{array_size} // 1);
 
     return $struct;
 }
