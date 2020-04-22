@@ -887,6 +887,33 @@ structs:
           - name: elevator_position
             type: Vec3d
 
+    - name: ObjectDeviceControl
+      parent: ObjectDevice
+      size: *SIZE_CONTROL
+      fields:
+          - name: device_control_flags
+            type: bitfield
+            width: 32
+            fields:
+                - name: usable_from_both_sides
+                  comment: The 4 bits after this are unused. But the next might not be.
+          - name: custom_name_id
+            type: int16_t
+          - type: pad
+            size: 2
+
+    - name: ObjectDeviceLightFixture
+      parent: ObjectDevice
+      size: *SIZE_LIGHT_FIXTURE
+      fields:
+          - name: light_fixture
+            type: RGBFloat
+          - name: light_intensity
+            type: float
+          - name: light_falloff_angle
+            type: float
+          - name: light_cutoff_angle
+            type: float
 
     - name: ObjectItem
       parent: Object
