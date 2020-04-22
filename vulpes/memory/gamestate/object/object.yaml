@@ -455,19 +455,6 @@ bitfields:
           - name: swap_weapon
 
 structs:
-    - name: ObjectNetwork
-      fields:
-          - name: role
-            type: ObjectNetworkRole
-          - name: _unknown
-            type: bool
-          - name: should_force_baseline_update
-            type: bool
-          - type: pad
-            size: 2
-          - name: existence_ticks
-            type: int32_t
-
     - name: ObjectNetworkDelta
       size: 0x44
       fields:
@@ -556,7 +543,7 @@ structs:
           - name: flags
             type: bitfield
             width: 16
-            fields: #
+            fields:
                 - name: health_damage_effect_applied
                   bit: 0
                 - name: shield_damage_effect_applied
@@ -608,6 +595,19 @@ structs:
       fields:
           - name: tag_definition
             type: MemRef
+          - name: base_network
+            type: struct
+            fields:
+                - name: role
+                  type: ObjectNetworkRole
+                - name: _unknown
+                  type: bool
+                - name: should_force_baseline_update
+                  type: bool
+                - type: pad
+                  size: 2
+                - name: existence_ticks
+                  type: int32_t
           - name: object_flags
             type: bitfield
             width: 32
@@ -1220,6 +1220,98 @@ structs:
           - name: ai_communication_info
             type: AiCommunicationPacket
 
+    - name: UnitAnimationData
+      size: 0x48
+      fields:
+          - name: flags
+            type: bitfields
+            width: 16
+            fields:
+                - name: animation_bit0_unknown
+                - name: animation_bit1_unknown
+                - name: animation_bit2_unknown
+                - name: animation_bit3_unknown
+
+          - name: _unknown_some_animation_index_maybe
+            comment: get the current values and scan the animation tags to see what they point to
+            type: int16_t
+          - name: _unknown_some_animation_index
+            type: int16_t
+          - type: pad
+            size: 2
+            comment: Only set on initialization, never read afterwards
+          - name: seat_id
+            type: int8_t
+          - name: seat_weapon_id
+            type: int8_t
+          - name: weapon_type_id
+            type: int8_t
+          - name: state
+            type: UnitAnimationState
+          - name: replacement_state
+            type: UnitReplacementAnimationState
+          - name: overlay_state
+            type: UnitOverlayAnimationState
+          - name: desired_state
+            type: UnitAnimationState
+          - name: base_seat
+            type: UnitBaseSeat
+          - name: emotion
+            type: int8_t
+          - name: replacement_animation
+            type: AnimationState
+          - name: overlay_state_animation
+            type: AnimationState
+          - name: weapon_ik
+            type: AnimationState
+          - name: update_look
+            type: bool
+            comment: Is set when bounds below change
+          - name: update_aim
+            type: bool
+          - name: looking_bounds
+            type: Rectangle2d
+          - name: aiming_bounds
+            type: Rectangle2d
+          - type: pad
+            size: 8
+
+    - name: UnitSpeechData
+      fields:
+          - name: current
+            type: UnitSpeech
+          - name: next
+            type: UnitSpeech
+          - name: unknown0
+            type: int16_t
+          - name: unknown1
+            type: int16_t
+          - name: unknown2
+            type: int16_t
+          - name: unknown3
+            type: int16_t
+          - name: unknown4
+            type: int32_t
+          - name: unknown5
+            type: bool
+          - name: unknown6
+            type: bool
+          - name: unknown7
+            type: bool
+          - type: pad
+            size: 1
+          - name: unknown8
+            type: int16_t
+          - name: unknown9
+            type: int16_t
+          - name: unknown10
+            type: int16_t
+          - name: unknown11
+            type: int16_t
+          - name: unknown12
+            type: int32_t
+
+
     - name: ObjectUnit
       parent: Object
       size: *SIZE_UNIT
@@ -1283,12 +1375,15 @@ structs:
             type: int8_t
           - name: base_seat_id
             type: int8_t
-          - name: persistent_control_ticks_remaining
-            type: int32_t
-          - name: persistent_control_bits
-            type: UnitControlBits
-          - type: pad
-            size: 2
+          - name: persistent_control
+            type: struct
+            fields:
+              - name: control_ticks_remaining
+                type: int32_t
+              - name: control_bits
+                type: UnitControlBits
+              - type: pad
+                size: 2
           - name: controller_player
             type: MemRef
           - name: ai_effect_type
@@ -1425,3 +1520,142 @@ structs:
                   type: float
                 - name: responsible_unit
                   type: MemRef
+          - name: object_flame_causer
+            type: MemRef
+            comment: Object that caused flaming death
+          - name: unknown23
+            type: float
+          - type: pad
+            size: 4
+            comment: Figure this one out
+          - name: died_at_tick
+            type: int32_t
+          - name: feign_death_timer
+            type: int16_t
+          - name: camo_regrowth
+            type: bool
+          - type: pad
+            size: 1
+          - name: stun
+            type: float
+          - name: stun_ticks
+            type: int16_t
+          - name: spree_count
+            type: int16_t
+          - name: spree_starting_time
+            type: int32_t
+          - name: recent_damage
+            type: struct
+            array_size: 4
+            fields:
+                - name: tick
+                  type: int32_t
+                - name: damage
+                  type: float
+                - name: responsible_unit
+                  type: MemRef
+                - name: responsible_player
+                  type: MemRef
+          - type: pad
+            size: 4
+          - type: pad
+            size: 2
+            comment: Unused network bools
+          - name: opensauce_zoom_level
+            type: uint8_t
+          - name: opensauce_desired_zoom_level
+            type: uint8_t
+          - name: control_data
+            type: UnitControlData
+          - name: last_completed_client_update_valid
+            type: bool
+          - type: pad
+            size: 3
+          - name: last_completed_client_update_id
+            type: int32_t
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+
+
+    - name: UnitBiped
+      parent: ObjectUnit
+      size: *SIZE_BIPED
+      fields:
+          - name: biped_flags
+            type: bitfield
+            width: 32
+            comment: There is definitely more flags here than documented.
+            fields:
+                - name: airborne
+                - name: slipping
+                - name: absolute_movement
+                - name: no_collision
+                - name: passes_through_other_bipeds
+                - name: limping2
+          - name: landing_timer
+            type: int8_t
+            comment: counts up whe biped lands, gets higher depending on height.
+          - name: landing_force
+            type: int8_t
+            comment: instantly changes when landing. Depends on how hard the fall was.
+          - name: movement_state
+            type: BipedMovementState
+          - type: pad
+            size: 1
+          - name: biped_unknown3
+            type: int32_t
+          - name: action_flags
+            type: uint32_t
+            comment:
+                Research!
+                Something to do with walking and jumping.
+                Maybe another set of control flags.
+          - name: biped_unknown4
+            type: int32_t
+          - name: biped_position
+            type: Vec3d
+          - name: walking_counter
+            type: int32_t
+            comment: \? Counts up when walking
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - name: bump_object
+            type: MemRef
+            comment: references the object that this biped last bumped into.
+          - name: ticks_since_last_bump
+            type: int8_t
+          - name: airborne_tick
+            type: int8_t
+          - name: slipping_ticks
+            type: int8_t
+          - name: digital_throttle
+            type: int8_t
+          - name: jump_ticks
+            type: int8_t
+          - name: melee_ticks
+            type: int8_t
+          - name: melee_inflict_ticks
+            type: int8_t
+          - type: pad
+            size: 1
+          - name: biped_unknown2
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: crouch_scale
+            type: float
+          - name: biped_unknown1
+            type: float
+          - name: biped_unknown_physics_related
+            type: Plane3d
+          - type: pad
+            size: 2
+            comment: two unknown signed bytes
