@@ -21,7 +21,7 @@ use warnings;
 
 # If you see a pull request that changes this system and it does not
 # have a change for this constant you should ready the firing squad.
-our $VERSION = '1.2.0';
+our $VERSION = '1.3.0';
 
 use Digest::SHA1 qw( sha1_base64 );
 use File::Basename qw( dirname basename fileparse );
@@ -29,9 +29,13 @@ use File::Slurper qw( read_text );
 use File::Spec::Functions qw( catfile );
 use File::Path qw( make_path );
 use YAML::XS qw( LoadFile Load Dump );
+use List::AllUtils qw( uniq );
 
 use lib dirname(__FILE__); # Include own directory
 use CodeGen::Signature qw( yaml_signatures_to_cpp_definitions );
+use CodeGen::Enum qw( yaml_enums_to_cpp_definitions );
+use CodeGen::Struct qw( yaml_structs_to_cpp_definitions );
+use CodeGen::Bitfield qw( yaml_bitfields_to_cpp_definitions );
 
 sub gen_header {
     my $name = shift;
@@ -120,20 +124,55 @@ foreach my $filepath (@ARGV) {
     print OUTPUT_SRC $license_header, "#include <$output_stem.hpp>\n";
     print OUTPUT_HEAD $license_header, "#pragma once\n";
 
-    # Writes all cpp data to the opened files.
-    # TODO: Update this when more types of things get written to these.
-    if (exists $file->{signatures}) {
-        my $output = yaml_signatures_to_cpp_definitions $name, $file->{signatures};
-        print OUTPUT_SRC join "\n", @{$output->{source}->{std_includes}}, "\n";
-        print OUTPUT_SRC join "\n", @{$output->{source}->{includes}}, "\n";
-        print OUTPUT_SRC $output->{source}->{defs};
-        print OUTPUT_SRC $output->{source}->{initializer};
+    my @src_std_includes;
+    my @src_includes;
+    my $src_defs = '';
+    my $src_inits = '';
 
-        print OUTPUT_HEAD join "\n", @{$output->{header}->{std_includes}}, "\n";
-        print OUTPUT_HEAD join "\n", @{$output->{header}->{includes}}, "\n";
-        print OUTPUT_HEAD $output->{header}->{defs};
-        print OUTPUT_HEAD $output->{header}->{initializer};
+    my @hdr_std_includes;
+    my @hdr_includes;
+    my $hdr_defs = '';
+    my $hdr_inits = '';
+
+    my @outputs;
+
+    if (exists $file->{enums}) {
+        push @outputs, yaml_enums_to_cpp_definitions $name, $file->{enums};
     }
+
+    if (exists $file->{bitfields}) {
+        push @outputs, yaml_bitfields_to_cpp_definitions $name, $file->{bitfields};
+    }
+
+    if (exists $file->{structs}) {
+        push @outputs, yaml_structs_to_cpp_definitions $name, $file->{structs};
+    }
+
+    if (exists $file->{signatures}) {
+        push @outputs, yaml_signatures_to_cpp_definitions $name, $file->{signatures};
+    }
+
+    foreach my $output (@outputs){
+        push @src_std_includes, @{$output->{source}->{std_includes}};
+        push @src_includes, @{$output->{source}->{includes}};
+        $src_defs .= $output->{source}->{defs};
+        $src_inits .= $output->{source}->{initializer};
+
+        push @hdr_std_includes, @{$output->{header}->{std_includes}};
+        push @hdr_includes, @{$output->{header}->{includes}};
+        $hdr_defs .= $output->{header}->{defs};
+        $hdr_inits .= $output->{header}->{initializer};
+    }
+
+    print OUTPUT_SRC join "\n", (uniq @src_std_includes), "\n";
+    print OUTPUT_SRC join "\n", (uniq @src_includes), "\n";
+    print OUTPUT_SRC $src_defs;
+    print OUTPUT_SRC $src_inits;
+
+    print OUTPUT_HEAD join "\n", (uniq @hdr_std_includes), "\n";
+    print OUTPUT_HEAD join "\n", (uniq @hdr_includes), "\n";
+    print OUTPUT_HEAD $hdr_defs;
+    print OUTPUT_HEAD $hdr_inits;
 
     close(OUTPUT_SRC);
     close(OUTPUT_HEAD);
