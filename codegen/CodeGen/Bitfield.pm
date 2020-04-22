@@ -58,7 +58,7 @@ sub preprocess_bitfield {
 
     my $name = $bitfield->{name} // $bitfield->{instance_name};
 
-    $bitfield->{fields} = [map { preprocess_bitfield_member $_ , $name } @{$bitfield->{fields}}];
+    $bitfield->{fields} = [map { preprocess_bitfield_member($_ , $name) } @{$bitfield->{fields}}];
 
     unless ($bitfield->{width} % 8 == 0) {
         confess "enum $name width is not multiple of 8";
@@ -144,7 +144,7 @@ sub yaml_bitfield_to_cpp_definition {
 sub yaml_bitfields_to_cpp_definitions {
     my ($name, $structs) = @_;
 
-    my @structs = map { preprocess_bitfield $_ } @{$structs};
+    my @structs = map { preprocess_bitfield($_) } @{$structs};
 
     my $defs = join("\n", map { yaml_bitfield_to_cpp_definition($_) } @structs);
 

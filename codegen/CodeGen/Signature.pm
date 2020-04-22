@@ -212,7 +212,7 @@ $validation_code
 };
 
     #### Header stuff
-    my $header_getters = join("", (map { yaml_sig_to_cpp_getter_header $_ } @sigs), "\n");
+    my $header_getters = join("", (map { yaml_sig_to_cpp_getter_header($_) } @sigs), "\n");
     my $header_initializer = "void init_$name\_signatures();\n";
 
     return {

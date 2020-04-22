@@ -83,7 +83,7 @@ sub preprocess_struct {
 
     my $name = $struct->{name} // $struct->{instance_name};
 
-    $struct->{fields} = [map { preprocess_struct_member $_ , $name } @{$struct->{fields}}];
+    $struct->{fields} = [map { preprocess_struct_member($_ , $name) } @{$struct->{fields}}];
     if (exists $struct->{size}) {
         $struct->{size} = ensure_number $struct->{size};
     }
@@ -173,9 +173,9 @@ sub yaml_struct_to_cpp_definition {
 sub yaml_structs_to_cpp_definitions {
     my ($name, $structs) = @_;
 
-    my @structs = map { preprocess_struct $_ } @{$structs};
+    my @structs = map { preprocess_struct($_) } @{$structs};
 
-    my $defs = join("\n", map { yaml_struct_to_cpp_definition $_ } @structs);
+    my $defs = join("\n", map { yaml_struct_to_cpp_definition($_) } @structs);
 
     $defs = join("\n", "#pragma pack(push, 1)\n", $defs, "#pragma pack(pop)\n");
 

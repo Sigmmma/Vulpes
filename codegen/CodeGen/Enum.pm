@@ -62,7 +62,7 @@ sub preprocess_enum {
         confess "enums need a name " . Dumper $enum;
     }
 
-    $enum->{options} = [map { preprocess_enum_option $_ , $enum->{name} } @{$enum->{options}}];
+    $enum->{options} = [map { preprocess_enum_option($_ , $enum->{name}) } @{$enum->{options}}];
 
     return $enum;
 }
@@ -115,9 +115,9 @@ sub yaml_enums_to_cpp_definitions {
         "#include <cstdint>",
         ];
 
-    my @enums = map { preprocess_enum $_ } @{$enums};
+    my @enums = map { preprocess_enum($_) } @{$enums};
 
-    my $defs = join("\n", map { yaml_enum_to_cpp_definition $_ } @enums);
+    my $defs = join("\n", map { yaml_enum_to_cpp_definition($_) } @enums);
 
     return {
         source => {
