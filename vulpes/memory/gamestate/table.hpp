@@ -65,4 +65,8 @@ public:
     void init(const char* name, uint16_t e_max, uint16_t e_size, uintptr_t array);
 };
 
+struct BaseTableEntry {
+    uint16_t salt_id;
+}; static_assert(sizeof(BaseTableEntry) == 2);
+
 #pragma pack(pop)

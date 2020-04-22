@@ -14,7 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
 #
-#
+
+includes:
+    - vulpes/memory/gamestate/table.hpp
+    - vulpes/memory/actor.hpp
+    - vulpes/memory/damage_effect.hpp
+
 enums:
     - name: Team
       type: int8_t
@@ -382,7 +387,7 @@ enums:
             value: 0
 
     - name: UnitSpeechPriority
-      type: int8_t
+      type: int16_t
       options:
           - name: NONE
             value: 0
@@ -408,7 +413,7 @@ enums:
             value: 10
 
     - name: UnitScreamType
-      type: int8_t
+      type: int16_t
       options:
           - name: FEAR
             value: 0
@@ -882,25 +887,6 @@ structs:
           - name: elevator_position
             type: Vec3d
 
-    - name: ObjectBspCollision
-      fields:
-          - name: surface_id
-            type: int16_t
-          - name: reference_id
-            type: int16_t
-
-    - name: ObjectObjectCollision
-      fields:
-          - name: object
-            type: MemRef
-          - name: object_position
-            type: Vec3d
-          - name: collision_location
-            type: Vec3d
-            comment: Unconfirmed
-          - name: collision_angle
-            type: Euler2d
-            comment: Unconfirmed
 
     - name: ObjectItem
       parent: Object
@@ -909,8 +895,16 @@ structs:
           - name: flags
             type: uint32_t
             comment: Research
+          - name: ticks_until_detonation
+            type: int16_t
           - name: bsp_collision
-            type: ObjectBspCollision
+            type: struct
+            fields:
+                - name: surface_id
+                  type: int16_t
+                - name: reference_id
+                  type: int16_t
+                  comment: bsp reference id
           - type: pad
             size: 2
           - name: dropped_by_unit
@@ -918,7 +912,18 @@ structs:
           - name: last_update_tick
             type: uint32_t
           - name: object_collision
-            type: ObjectObjectCollision
+            type: struct
+            fields:
+                - name: object
+                  type: MemRef
+                - name: object_position
+                  type: Vec3d
+                - name: collision_location
+                  type: Vec3d
+                  comment: Unconfirmed
+                - name: collision_angle
+                  type: Euler2d
+                  comment: Unconfirmed
 
     - name: ObjectGarbage
       parent: ObjectItem
@@ -1019,25 +1024,6 @@ structs:
           - name: age
             type: float
 
-    - name: WeaponNetwork
-      fields:
-          - name: baseline_valid
-            type: bool
-          - name: baseline_index
-            type: int8_t
-          - name: message_index
-            type: int8_t
-          - type: pad
-            size: 1
-          - name: update_baseline
-            type: WeaponNetworkData
-          - name: delta_valid
-            type: bool
-            comment: Maybe?
-          - type: pad
-            size: 3
-          - name: update_baseline
-            type: WeaponNetworkData
 
     - name: ObjectWeapon
       parent: ObjectItem
@@ -1088,7 +1074,25 @@ structs:
           - type: pad
             size: 4
           - name: network
-            type: WeaponNetwork
+            type: struct
+            fields:
+                - name: baseline_valid
+                  type: bool
+                - name: baseline_index
+                  type: int8_t
+                - name: message_index
+                  type: int8_t
+                - type: pad
+                  size: 1
+                - name: update_baseline
+                  type: WeaponNetworkData
+                - name: delta_valid
+                  type: bool
+                  comment: Maybe?
+                - type: pad
+                  size: 3
+                - name: update_delta
+                  type: WeaponNetworkData
 
     - name: ProjectileNetworkData
       size: 0x18
@@ -1224,7 +1228,7 @@ structs:
       size: 0x48
       fields:
           - name: flags
-            type: bitfields
+            type: bitfield
             width: 16
             fields:
                 - name: animation_bit0_unknown
@@ -1258,6 +1262,8 @@ structs:
             type: UnitBaseSeat
           - name: emotion
             type: int8_t
+          - type: pad
+            size: 1
           - name: replacement_animation
             type: AnimationState
           - name: overlay_state_animation
@@ -1343,27 +1349,27 @@ structs:
                 - name: berserking
                   bit: 7
                 - name: integrated_light_unknown
-                  bit: 18
-                - name: will_not_drop_items
                   bit: 19
+                - name: will_not_drop_items
+                  bit: 20
                 - name: can_blink
-                  bit: 21
-                - name: impervious
                   bit: 22
+                - name: impervious
+                  bit: 23
                   comment: prevents unit from being knocked around or playing ping animations
                 - name: suspended
-                  bit: 23
-                - name: blind
                   bit: 24
-                - name: integrated_light_recharging # double check this
+                - name: blind
                   bit: 25
+                - name: integrated_light_recharging # double check this
+                  bit: 26
                   comment: when this is on, the integrated NV power increases. rate is 2x the speed it leaks when on
                 - name: possessed
-                  bit: 26
-                - name: desires_flashlight_on
                   bit: 27
-                - name: desires_flashlight_off
+                - name: desires_flashlight_on
                   bit: 28
+                - name: desires_flashlight_off
+                  bit: 29
           - name: control_bits
             type: UnitControlBits
           - type: pad
@@ -1453,7 +1459,7 @@ structs:
             type: int16_t
           - type: pad
             size: 2
-          - name: Weapon
+          - name: weapon
             type: MemRef
             array_size: 4
           - name: weapon_ready_ticks
@@ -1462,8 +1468,12 @@ structs:
             comment: Actually surprising that there is one of these for every weapon
           - name: equipment_id
             type: MemRef
+          - name: current_grenade_id
+            type: int8_t
+          - name: next_grenade_id
+            type: int8_t
           - name: grenade_counts
-            type: unint8_t
+            type: uint8_t
             array_size: 2
           - name: zoom_level
             type: uint8_t
@@ -1493,7 +1503,9 @@ structs:
             type: float
             array_size: 2
           - name: integrated_light_power
-            type: integrated_light_toggle_power
+            type: float
+          - name: integrated_light_toggle_power
+            type: float
             comment: minimum power for a toggle?
           - name: integrated_night_vision_toggle_power
             type: float
@@ -1580,6 +1592,22 @@ structs:
           - type: pad
             size: 4
 
+    - name: BipedNetworkData
+      size: 0x10
+      fields:
+          - name: grenade_counts
+            array_size: 2
+            type: int8_t
+          - type: pad
+            size: 2
+          - name: body_vitality
+            type: float
+          - name: shield_vitality
+            type: float
+          - name: shield_stun_ticks_greater_than_zero
+            type: bool
+          - type: pad
+            size: 3
 
     - name: UnitBiped
       parent: ObjectUnit
@@ -1659,3 +1687,118 @@ structs:
           - type: pad
             size: 2
             comment: two unknown signed bytes
+          - name: network
+            type: struct
+            fields:
+                - name: baseline_valid
+                  type: bool
+                - name: baseline_id
+                  type: int8_t
+                - name: message_id
+                  type: int8_t
+                - type: pad
+                  size: 3
+                - name: update_baseline
+                  type: BipedNetworkData
+                - name: delta_valid
+                  type: bool
+                - type: pad
+                  size: 3
+                - name: update_delta
+                  type: BipedNetworkData
+
+    - name: VehicleNetworkData
+      size: 0x40
+      fields:
+          - name: at_rest
+            type: bool
+          - type: pad
+            size: 3
+          - name: position
+            type: Vec3d
+          - name: transitional_velocity
+            type: Vec3d
+          - name: angular_velocity
+            type: Vec3d
+          - name: forward
+            type: Vec3d
+          - name: up
+            type: Vec3d
+
+    - name: UnitVehicles
+      parent: ObjectUnit
+      size: *SIZE_VEHICLE
+      fields:
+          - name: vehicle_flags
+            type: bitfield
+            width: 16
+            fields:
+                - name: vehicle_unknown0
+                - name: hovering
+                - name: crouched
+                - name: jumping
+                - name: vehicle_unknown1
+                - name: vehicle_unknown2
+          - type: pad
+            size: 2
+            comment: unknown int16
+          - type: pad
+            size: 4
+            comment: unknown set of bytes
+          - name: speed
+            type: float
+          - name: slide
+            type: float
+          - name: turn
+            type: float
+          - name: tire_position
+            type: float
+          - name: thread_position_left
+            type: float
+          - name: thread_position_right
+            type: float
+          - name: hover
+            type: float
+          - name: thrust
+            type: float
+          - name: suspension_states
+            type: int8_t
+            array_size: 8
+          - name: hover_position
+            type: Vec3d
+          - name: vehicle_unknown3
+            type: Vec3d
+          - name: vehicle_unknown4
+            type: Vec3d
+          - name: vehicle_unknown5
+            type: int32_t
+          - name: network
+            type: struct
+            fields:
+              - name: time_valid
+                type: bool
+              - name: baseline_valid
+                type: bool
+              - name: baseline_id
+                type: int8_t
+              - name: message_id
+                type: int8_t
+              - name: update_baseline
+                type: VehicleNetworkData
+              - name: delta_valid
+                type: bool
+                comment: unused?
+              - type: pad
+                size: 3
+              - name: update_delta
+                type: VehicleNetworkData
+              - name: last_moved_at_tick
+                type: int32_t
+              - name: scenario_respawn_id
+                type: int16_t
+                comment: likely invalid for cheat_all_vehicles spawned vehicles
+              - type: pad
+                size: 2
+              - name: respawn_position
+                type: Vec3d
+                comment: Only used to check if the vehicle should respawn it seems.
