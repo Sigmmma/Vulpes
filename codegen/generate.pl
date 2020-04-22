@@ -153,6 +153,16 @@ foreach my $filepath (@ARGV) {
     my $hdr_defs = '';
     my $hdr_inits = '';
 
+    if (exists $file->{includes}) {
+        @src_includes = map {"#include <$_>"} @{$file->{includes}};
+        @hdr_includes = map {"#include <$_>"} @{$file->{includes}};
+    }
+
+    if (exists $file->{std_includes}) {
+        @src_std_includes = map {"#include <$_>"} @{$file->{includes}};
+        @hdr_std_includes = map {"#include <$_>"} @{$file->{includes}};
+    }
+
     my @outputs;
 
     if (exists $file->{enums}) {
