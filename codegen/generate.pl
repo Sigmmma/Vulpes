@@ -116,15 +116,20 @@ foreach my $filepath (@ARGV) {
     my $file = read_text $filepath;
 
     # Check if file is the same as the last time
-    my $sha = sha1_base64 $file;
-    my $old_sha = $info{hashes}{$filepath} // "";
-    if ($sha eq $old_sha and -e $output_src and -e $output_head) {
-        # Skip if the same and both output files exist.
-        print "skipped.\n";
-        next;
+    my $def_sha = sha1_base64 $file;
+    my $def_old_sha = $info{hashes}{$filepath} // "";
+    if ($def_sha eq $def_old_sha and -e $output_src and -e $output_head) {
+        if (
+            (sha1_base64(read_text $output_src)) eq ($info{hashes}{$output_src} // "") and
+            (sha1_base64(read_text $output_head)) eq ($info{hashes}{$output_head} // "")
+        ) {
+            # Skip if the same and both output files exist and are equal.
+            print "skipped.\n";
+            next;
+        }
     }
     # Overwrite old hash.
-    $info{hashes}{$filepath} = $sha;
+    $info{hashes}{$filepath} = $def_sha;
 
     # Actually load the yaml
     $file = Load $file;
@@ -190,6 +195,10 @@ foreach my $filepath (@ARGV) {
 
     close(OUTPUT_SRC);
     close(OUTPUT_HEAD);
+
+    # Write the hashes for the source and header files.
+    $info{hashes}{$output_src} = sha1_base64(read_text $output_src);
+    $info{hashes}{$output_head} = sha1_base64(read_text $output_head);
 
     print "done.\n";
 };
