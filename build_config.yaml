@@ -9,3 +9,4 @@ build_type: mods
 # These files will get generated into cpp and hpp files.
 yaml_files:
     - vulpes/memory/signatures.yaml
+    - vulpes/memory/gamestate/object/object.yaml
