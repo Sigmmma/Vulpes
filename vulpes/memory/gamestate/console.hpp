@@ -23,9 +23,8 @@
 
 #pragma pack(push, 1)
 
-class ConsoleOutput {
+class ConsoleOutput : public BaseTableEntry {
 public:
-    int16_t salt;
     PAD(2);
     MemRef previous;
     MemRef next;

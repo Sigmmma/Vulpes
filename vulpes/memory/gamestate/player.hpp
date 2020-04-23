@@ -128,9 +128,8 @@ typedef struct {
 static_assert(sizeof(PlayerNetworkUpdateData) == 0x114);*/
 #pragma pack(push, 1)
 
-class Player {
+class Player : public BaseTableEntry {
 public:
-    int16_t      _id;                       // 0
     int16_t      host;                      // 2
     int16_t      name[12];                  // 4
     MemRef        _unknown;                 // 1C

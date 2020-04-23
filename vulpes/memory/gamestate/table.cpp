@@ -51,10 +51,10 @@ size_t Table::count() {
         uint32_t offset = table->element_size * i;
 
         // The first two bytes of a table entry is always the salt.
-        uint16_t salt = *reinterpret_cast<uint16_t*>(array_start_address + offset);
+        auto entry = reinterpret_cast<BaseTableEntry*>(array_start_address + offset);
 
         // If the salt is non-zero that means the entry is occupied.
-        if (salt) count++;
+        if (entry->salt_id) count++;
     }
 
     return count;
