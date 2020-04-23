@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Update license header in generated files.
  - Output files are now hashed too.
+ - Add option self_include_header which defaults to true. if false it will make it so generated source files don't include their header
 
 ## [1.3.0]
 ### Added
