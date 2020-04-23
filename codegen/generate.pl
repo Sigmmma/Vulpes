@@ -140,7 +140,11 @@ foreach my $filepath (@ARGV) {
 
     my $license_header = gen_header basename($filepath);
 
-    print OUTPUT_SRC $license_header, "#include <$output_stem.hpp>\n";
+    print OUTPUT_SRC $license_header;
+    if ($file->{self_include_header} // 1) {
+        print OUTPUT_SRC "#include <$output_stem.hpp>\n";
+    }
+
     print OUTPUT_HEAD $license_header, "#pragma once\n";
 
     my @src_std_includes;
