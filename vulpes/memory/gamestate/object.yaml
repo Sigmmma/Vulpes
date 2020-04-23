@@ -416,14 +416,17 @@ structs:
             type: MemRef
           - name: _unknown_object_related
             type: MemRef
-          - name: next_object
-            type: MemRef
-          - name: first_object
-            type: MemRef
-          - name: parent_object
-            type: MemRef
-          - name: parent_attachment_node
-            type: int8_t
+          - name: hierarchy
+            type: struct
+            fields:
+              - name: next_object
+                type: MemRef
+              - name: first_object
+                type: MemRef
+              - name: parent_object
+                type: MemRef
+              - name: parent_attachment_node
+                type: int8_t
           - name: _unknown2
             type: int8_t
           - name: force_shield_update
