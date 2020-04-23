@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <vulpes/memory/gamestate/object/object.hpp>
+#include <vulpes/memory/gamestate/object.hpp>
 
 #include "table.hpp"
 

@@ -16,7 +16,7 @@
  */
 
 #include <vulpes/functions/messaging.hpp>
-#include <vulpes/memory/gamestate/object/object.hpp>
+#include <vulpes/memory/gamestate/object.hpp>
 #include <vulpes/memory/gamestate/effect.hpp>
 #include <vulpes/network/network_id.hpp>
 

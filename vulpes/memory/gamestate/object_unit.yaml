@@ -1,0 +1,900 @@
+#
+# This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
+# Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
+#
+# Vulpes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, version 3.
+#
+# Vulpes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
+#
+
+self_include_header: false
+
+includes:
+    - vulpes/memory/actor.hpp
+    - vulpes/memory/damage_effect.hpp
+
+enums:
+    - name: UnitAnimationState
+      type: int8_t
+      options:
+          - name: INVALID
+            value: -1
+          - name: IDLE
+            value: 0
+          - name: GESTURE
+            value: 1
+          - name: TURN_LEFT
+            value: 2
+          - name: TURN_RIGHT
+            value: 3
+          - name: MOVE_FRONT
+            value: 4
+          - name: MOVE_BACK
+            value: 5
+          - name: MOVE_LEFT
+            value: 6
+          - name: MOVE_RIGHT
+            value: 7
+          - name: STUNNED_FRONT
+            value: 8
+          - name: STUNNED_BACK
+            value: 9
+          - name: STUNNED_LEFT
+            value: 10
+          - name: STUNNED_RIGHT
+            value: 11
+          - name: SLIDE_FRONT
+            value: 12
+          - name: SLIDE_BACK
+            value: 13
+          - name: SLIDE_LEFT
+            value: 14
+          - name: SLIDE_RIGHT
+            value: 15
+          - name: READY
+            value: 16
+          - name: PUT_AWAY
+            value: 17
+          - name: AIM_STILL
+            value: 18
+          - name: AIM_MOVE
+            value: 19
+          - name: AIRBORNE
+            value: 20
+          - name: LAND_SOFT
+            value: 21
+          - name: LAND_HARD
+            value: 22
+          - name: UNKNOWN23
+            value: 23
+          - name: AIRBORNE_DEAD
+            value: 24
+          - name: LANDING_DEAD
+            value: 25
+          - name: SEAT_ENTER
+            value: 26
+          - name: SEAT_EXIT
+            value: 27
+          - name: CUSTOM_ANIMATION
+            value: 28
+          - name: IMPULSE
+            value: 29
+          - name: MELEE
+            value: 30
+          - name: MELEE_AIRBORNE
+            value: 31
+          - name: MELEE_CONTINUOUS
+            value: 32
+          - name: THROW_GRENADE
+            value: 33
+          - name: RESSURECT_FRONT
+            value: 34
+          - name: RESSURECT_BACK
+            value: 35
+          - name: FEEDING
+            value: 36
+          - name: SURPRISE_FRONT
+            value: 37
+          - name: SURPRISE_BACK
+            value: 38
+          - name: LEAP_START
+            value: 39
+          - name: LEAP_AIRBORNE
+            value: 40
+          - name: LEAP_MELEE
+            value: 41
+          - name: UNKNOWN42
+            value: 42
+          - name: BERSERK
+            value: 43
+          - name: YELO_SEAT_BOARDING
+            value: 44
+          - name: YELO_SEAT_EJECTING
+            value: 45
+          - name: YELO_MOUNTING
+            value: 46
+          - name: YELO_TRANSFORMING
+            value: 47
+
+    - name: UnitReplacementAnimationState
+      type: int8_t
+      options:
+          - name: NONE
+            value: 0
+          - name: DISARM
+            value: 1
+          - name: WEAPON_DROP
+            value: 2
+          - name: WEAPON_READY
+            value: 3
+          - name: WEAPON_PUT_AWAY
+            value: 4
+          - name: WEAPON_RELOAD1
+            value: 5
+          - name: WEAPON_RELOAD2
+            value: 6
+          - name: MELEE
+            value: 7
+          - name: THROW_GRENADE
+            value: 8
+
+    - name: UnitOverlayAnimationState
+      type: int8_t
+      options:
+          - name: NONE
+            value: 0
+          - name: FIRE1
+            value: 1
+          - name: FIRE2
+            value: 2
+          - name: CHARGED1
+            value: 3
+          - name: CHARGED2
+            value: 4
+          - name: CHAMBER1
+            value: 5
+          - name: CHAMBER2
+            value: 6
+
+    - name: UnitThrowingGrenadeState
+      type: int8_t
+      options:
+          - name: NONE
+            value: 0
+          - name: BEGIN
+            value: 1
+          - name: IN_HAND
+            value: 2
+          - name: RELEASED
+            value: 3
+
+    - name: UnitBaseSeat
+      type: int8_t
+      options:
+          - name: ASLEEP
+            value: 0
+          - name: ALERT
+            value: 1
+          - name: STAND
+            value: 2
+          - name: CROUCH
+            value: 3
+          - name: FLEE
+            value: 4
+          - name: FLAMING
+            value: 5
+
+    - name: UnitBaseWeapon
+      type: int8_t
+      options:
+          - name: UNARMED
+            value: 0
+
+    - name: UnitSpeechPriority
+      type: int16_t
+      options:
+          - name: NONE
+            value: 0
+          - name: IDLE
+            value: 1
+          - name: PAIN
+            value: 2
+          - name: TALK
+            value: 3
+          - name: COMMUNICATE
+            value: 4
+          - name: SHOUT
+            value: 5
+          - name: SCRIPT
+            value: 6
+          - name: INVOLUNTARY
+            value: 7
+          - name: EXCLAIM
+            value: 8
+          - name: SCREAM
+            value: 9
+          - name: DEATH
+            value: 10
+
+    - name: UnitScreamType
+      type: int16_t
+      options:
+          - name: FEAR
+            value: 0
+          - name: ENEMY_GRENADE
+            value: 1
+          - name: PAIN
+            value: 2
+          - name: MAIMED_LIMB
+            value: 3
+          - name: MAIMED_HEAD
+            value: 4
+          - name: RESSURECTION
+            value: 5
+
+    - name: BipedMovementState
+      type: int8_t
+      options:
+          - name: MOVING
+            value: 0
+          - name: IDLE
+            value: 1
+            comment: or turning
+          - name: GESTURING
+            value: 2
+
+bitfields:
+    - name: UnitControlBits
+      width: 16
+      fields:
+          - name: crouch
+          - name: jump
+          - name: user1
+          - name: user2
+          - name: light
+          - name: exact facing
+          - name: action
+          - name: melee
+          - name: look_dont_turn
+          - name: force_alert
+          - name: reload
+          - name: primary_trigger
+          - name: secondary_trigger
+          - name: grenade
+          - name: swap_weapon
+
+structs:
+    - name: UnitControlData
+      size: 0x40
+      fields:
+          - name: animation_state
+            type: UnitAnimationState
+          - name: aiming_speed
+            type: int8_t
+          - name: bits
+            type: UnitControlBits
+          - name: weapon_index
+            type: int16_t
+          - name: grenade_index
+            type: int16_t
+          - name: zoom_index
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: throttle
+            type: Vec3d
+          - name: primary_trigger
+            type: float
+          - name: facing_vector
+            type: Vec3d
+          - name: aiming_vector
+            type: Vec3d
+          - name: looking_vector
+            type: Vec3d
+
+    - name: AnimationState
+      size: 4
+      fields:
+          - name: animation_id
+            type: int16_t
+          - name: frame_id
+            type: int16_t
+
+    - name: UnitSpeech
+      size: 0x30
+      fields:
+          - name: priority
+            type: UnitSpeechPriority
+          - name: scream_type
+            type: UnitScreamType
+          - name: sound_tag
+            type: MemRef
+          - name: ticks
+            type: int16_t
+            comment: unknown what for, assumed to be ticks since started clip
+          - name: unknown
+            type: int16_t
+          - name: unknown2
+            type: int32_t
+          - name: ai_communication_info
+            type: AiCommunicationPacket
+
+    - name: UnitAnimationData
+      size: 0x48
+      fields:
+          - name: flags
+            type: bitfield
+            width: 16
+            fields:
+                - name: animation_bit0_unknown
+                - name: animation_bit1_unknown
+                - name: animation_bit2_unknown
+                - name: animation_bit3_unknown
+
+          - name: _unknown_some_animation_index_maybe
+            comment: get the current values and scan the animation tags to see what they point to
+            type: int16_t
+          - name: _unknown_some_animation_index
+            type: int16_t
+          - type: pad
+            size: 2
+            comment: Only set on initialization, never read afterwards
+          - name: seat_id
+            type: int8_t
+          - name: seat_weapon_id
+            type: int8_t
+          - name: weapon_type_id
+            type: int8_t
+          - name: state
+            type: UnitAnimationState
+          - name: replacement_state
+            type: UnitReplacementAnimationState
+          - name: overlay_state
+            type: UnitOverlayAnimationState
+          - name: desired_state
+            type: UnitAnimationState
+          - name: base_seat
+            type: UnitBaseSeat
+          - name: emotion
+            type: int8_t
+          - type: pad
+            size: 1
+          - name: replacement_animation
+            type: AnimationState
+          - name: overlay_state_animation
+            type: AnimationState
+          - name: weapon_ik
+            type: AnimationState
+          - name: update_look
+            type: bool
+            comment: Is set when bounds below change
+          - name: update_aim
+            type: bool
+          - name: looking_bounds
+            type: Rectangle2d
+          - name: aiming_bounds
+            type: Rectangle2d
+          - type: pad
+            size: 8
+
+    - name: UnitSpeechData
+      fields:
+          - name: current
+            type: UnitSpeech
+          - name: next
+            type: UnitSpeech
+          - name: unknown0
+            type: int16_t
+          - name: unknown1
+            type: int16_t
+          - name: unknown2
+            type: int16_t
+          - name: unknown3
+            type: int16_t
+          - name: unknown4
+            type: int32_t
+          - name: unknown5
+            type: bool
+          - name: unknown6
+            type: bool
+          - name: unknown7
+            type: bool
+          - type: pad
+            size: 1
+          - name: unknown8
+            type: int16_t
+          - name: unknown9
+            type: int16_t
+          - name: unknown10
+            type: int16_t
+          - name: unknown11
+            type: int16_t
+          - name: unknown12
+            type: int32_t
+
+    - name: ObjectUnitAttributes
+      fields:
+          - name: actor
+            type: MemRef
+          - name: swarm
+            type: struct
+            fields:
+                - name: actor
+                  type: MemRef
+                - name: next_unit
+                  type: MemRef
+                - name: previous_unit
+                  type: MemRef
+          - name: unit_flags
+            type: bitfield
+            width: 32
+            fields:
+                - name: biped_speech_unknown
+                  bit: 0
+                  comment: checked by biped_speech_update
+                - name: powerup_on
+                  bit: 4
+                - name: powerup_additional
+                  bit: 5
+                - name: controllable
+                  bit: 6
+                - name: berserking
+                  bit: 7
+                - name: integrated_light_unknown
+                  bit: 19
+                - name: will_not_drop_items
+                  bit: 20
+                - name: can_blink
+                  bit: 22
+                - name: impervious
+                  bit: 23
+                  comment: prevents unit from being knocked around or playing ping animations
+                - name: suspended
+                  bit: 24
+                - name: blind
+                  bit: 25
+                - name: integrated_light_recharging # double check this
+                  bit: 26
+                  comment: when this is on, the integrated NV power increases. rate is 2x the speed it leaks when on
+                - name: possessed
+                  bit: 27
+                - name: desires_flashlight_on
+                  bit: 28
+                - name: desires_flashlight_off
+                  bit: 29
+          - name: control_bits
+            type: UnitControlBits
+          - type: pad
+            size: 2
+            comment: Should research
+          - type: pad
+            size: 2
+          - name: shield_sapping
+            type: int8_t
+          - name: base_seat_id
+            type: int8_t
+          - name: persistent_control
+            type: struct
+            fields:
+              - name: control_ticks_remaining
+                type: int32_t
+              - name: control_bits
+                type: UnitControlBits
+              - type: pad
+                size: 2
+          - name: controller_player
+            type: MemRef
+          - name: ai_effect_type
+            type: int16_t
+            comment: enum, figure out values
+          - name: emotion_animation_id
+            type: int16_t
+          - name: next_ai_effect_tick
+            type: int32_t
+          - name: desired_facing_vector
+            type: Vec3d
+          - name: desired_aiming_vector
+            type: Vec3d
+          - name: aiming_vector
+            type: Vec3d
+          - name: aiming_velocity
+            type: Vec3d
+          - name: looking_angles
+            type: Euler3d
+          - name: looking_vector
+            type: Vec3d
+          - name: looking_velocity
+            type: Vec3d
+          - name: throttle
+            type: Vec3d
+          - name: primary_trigger
+            type: float
+          - name: aiming_speed
+            type: int8_t
+            comment: enum?
+          - name: melee_state
+            type: int8_t
+            comment: enum probably This is a guess
+          - name: melee_timer
+            type: int8_t
+            comment: This is a guess
+          - name: ticks_until_flame_to_death
+            type: int8_t
+          - name: ping_animation_ticks_left
+            type: int8_t
+          - name: grenade_state
+            type: UnitThrowingGrenadeState
+          - name: unknown20
+            type: int16_t
+          - name: unknown21
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: grenade_projectile
+            type: MemRef
+          - name: animation
+            type: UnitAnimationData
+          - name: ambient
+            type: float
+          - name: illumination
+            type: float
+          - name: mouth_factor
+            type: float
+          - type: pad
+            size: 4
+            comment: Padding is never just randomly 4 bytes. Research.
+          - name: vehicle_seat_id
+            type: int16_t
+          - name: current_weapon_id
+            type: int16_t
+          - name: next_weapon_id
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: weapon
+            type: MemRef
+            array_size: 4
+          - name: weapon_ready_ticks
+            type: int32_t
+            array_size: 4
+            comment: Actually surprising that there is one of these for every weapon
+          - name: equipment_id
+            type: MemRef
+          - name: current_grenade_id
+            type: int8_t
+          - name: next_grenade_id
+            type: int8_t
+          - name: grenade_counts
+            type: uint8_t
+            array_size: 2
+          - name: zoom_level
+            type: uint8_t
+            comment: Opensauce grenade count for type 3 (Union bs)
+          - name: desired_zoom_level
+            type: uint8_t
+            comment: Opensauce grenade count for type 4 (Union bs)
+          - name: ticks_since_last_vehicle_speech
+            type: int8_t
+          - name: aiming_change
+            type: uint8_t
+          - name: powered_seats_riders
+            type: MemRef
+            array_size: 2
+          - name: unknown_reference
+            type: MemRef
+            comment:
+                This one and the next are related.
+                Scan all tables for this id so we can figure out what's up
+          - name: some_tick_time
+            type: int32_t
+          - name: encounter_id
+            type: int16_t
+          - name: squad_id
+            type: int16_t
+          - name: powered_seats_power
+            type: float
+            array_size: 2
+          - name: integrated_light_power
+            type: float
+          - name: integrated_light_toggle_power
+            type: float
+            comment: minimum power for a toggle?
+          - name: integrated_night_vision_toggle_power
+            type: float
+          - name: seat_related
+            type: Vec3d
+            array_size: 4
+          - name: camo_power
+            type: float
+          - name: full_spectrum_vision_power
+            type: float
+            comment: gets updated, but not used.
+          - name: dialogue_definition
+            type: MemRef
+          - name: speech
+            type: UnitSpeechData
+          - name: damage_result
+            type: struct
+            fields:
+                - name: category
+                  type: DamageCategory
+                - name: ai_ticks_until_handle
+                  type: int16_t
+                - name: amount
+                  type: float
+                - name: responsible_unit
+                  type: MemRef
+          - name: object_flame_causer
+            type: MemRef
+            comment: Object that caused flaming death
+          - name: unknown23
+            type: float
+          - type: pad
+            size: 4
+            comment: Figure this one out
+          - name: died_at_tick
+            type: int32_t
+          - name: feign_death_timer
+            type: int16_t
+          - name: camo_regrowth
+            type: bool
+          - type: pad
+            size: 1
+          - name: stun
+            type: float
+          - name: stun_ticks
+            type: int16_t
+          - name: spree_count
+            type: int16_t
+          - name: spree_starting_time
+            type: int32_t
+          - name: recent_damage
+            type: struct
+            array_size: 4
+            fields:
+                - name: tick
+                  type: int32_t
+                - name: damage
+                  type: float
+                - name: responsible_unit
+                  type: MemRef
+                - name: responsible_player
+                  type: MemRef
+          - type: pad
+            size: 4
+          - type: pad
+            size: 2
+            comment: Unused network bools
+          - name: opensauce_zoom_level
+            type: uint8_t
+          - name: opensauce_desired_zoom_level
+            type: uint8_t
+          - name: control_data
+            type: UnitControlData
+          - name: last_completed_client_update_valid
+            type: bool
+          - type: pad
+            size: 3
+          - name: last_completed_client_update_id
+            type: int32_t
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+
+    - name: BipedNetworkData
+      size: 0x10
+      fields:
+          - name: grenade_counts
+            array_size: 2
+            type: int8_t
+          - type: pad
+            size: 2
+          - name: body_vitality
+            type: float
+          - name: shield_vitality
+            type: float
+          - name: shield_stun_ticks_greater_than_zero
+            type: bool
+          - type: pad
+            size: 3
+
+    - name: ObjectBipedAttributes
+      fields:
+          - name: biped_flags
+            type: bitfield
+            width: 32
+            comment: There is definitely more flags here than documented.
+            fields:
+                - name: airborne
+                - name: slipping
+                - name: absolute_movement
+                - name: no_collision
+                - name: passes_through_other_bipeds
+                - name: limping2
+          - name: landing_timer
+            type: int8_t
+            comment: counts up whe biped lands, gets higher depending on height.
+          - name: landing_force
+            type: int8_t
+            comment: instantly changes when landing. Depends on how hard the fall was.
+          - name: movement_state
+            type: BipedMovementState
+          - type: pad
+            size: 1
+          - name: biped_unknown3
+            type: int32_t
+          - name: action_flags
+            type: uint32_t
+            comment:
+                Research!
+                Something to do with walking and jumping.
+                Maybe another set of control flags.
+          - name: biped_unknown4
+            type: int32_t
+          - name: biped_position
+            type: Vec3d
+          - name: walking_counter
+            type: int32_t
+            comment: \? Counts up when walking
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - name: bump_object
+            type: MemRef
+            comment: references the object that this biped last bumped into.
+          - name: ticks_since_last_bump
+            type: int8_t
+          - name: airborne_tick
+            type: int8_t
+          - name: slipping_ticks
+            type: int8_t
+          - name: digital_throttle
+            type: int8_t
+          - name: jump_ticks
+            type: int8_t
+          - name: melee_ticks
+            type: int8_t
+          - name: melee_inflict_ticks
+            type: int8_t
+          - type: pad
+            size: 1
+          - name: biped_unknown2
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: crouch_scale
+            type: float
+          - name: biped_unknown1
+            type: float
+          - name: biped_unknown_physics_related
+            type: Plane3d
+          - type: pad
+            size: 2
+            comment: two unknown signed bytes
+          - name: network
+            type: struct
+            fields:
+                - name: baseline_valid
+                  type: bool
+                - name: baseline_id
+                  type: int8_t
+                - name: message_id
+                  type: int8_t
+                - type: pad
+                  size: 3
+                - name: update_baseline
+                  type: BipedNetworkData
+                - name: delta_valid
+                  type: bool
+                - type: pad
+                  size: 3
+                - name: update_delta
+                  type: BipedNetworkData
+
+    - name: VehicleNetworkData
+      size: 0x40
+      fields:
+          - name: at_rest
+            type: bool
+          - type: pad
+            size: 3
+          - name: position
+            type: Vec3d
+          - name: transitional_velocity
+            type: Vec3d
+          - name: angular_velocity
+            type: Vec3d
+          - name: forward
+            type: Vec3d
+          - name: up
+            type: Vec3d
+
+    - name: ObjectVehicleAttributes
+      fields:
+          - name: vehicle_flags
+            type: bitfield
+            width: 16
+            fields:
+                - name: vehicle_unknown0
+                - name: hovering
+                - name: crouched
+                - name: jumping
+                - name: vehicle_unknown1
+                - name: vehicle_unknown2
+          - type: pad
+            size: 2
+            comment: unknown int16
+          - type: pad
+            size: 4
+            comment: unknown set of bytes
+          - name: speed
+            type: float
+          - name: slide
+            type: float
+          - name: turn
+            type: float
+          - name: tire_position
+            type: float
+          - name: thread_position_left
+            type: float
+          - name: thread_position_right
+            type: float
+          - name: hover
+            type: float
+          - name: thrust
+            type: float
+          - name: suspension_states
+            type: int8_t
+            array_size: 8
+          - name: hover_position
+            type: Vec3d
+          - name: vehicle_unknown3
+            type: Vec3d
+          - name: vehicle_unknown4
+            type: Vec3d
+          - name: vehicle_unknown5
+            type: int32_t
+          - name: network
+            type: struct
+            fields:
+              - name: time_valid
+                type: bool
+              - name: baseline_valid
+                type: bool
+              - name: baseline_id
+                type: int8_t
+              - name: message_id
+                type: int8_t
+              - name: update_baseline
+                type: VehicleNetworkData
+              - name: delta_valid
+                type: bool
+                comment: unused?
+              - type: pad
+                size: 3
+              - name: update_delta
+                type: VehicleNetworkData
+              - name: last_moved_at_tick
+                type: int32_t
+              - name: scenario_respawn_id
+                type: int16_t
+                comment: likely invalid for cheat_all_vehicles spawned vehicles
+              - type: pad
+                size: 2
+              - name: respawn_position
+                type: Vec3d
+                comment: Only used to check if the vehicle should respawn it seems.

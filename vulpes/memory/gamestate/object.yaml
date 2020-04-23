@@ -1,0 +1,631 @@
+#
+# This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
+# Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
+#
+# Vulpes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, version 3.
+#
+# Vulpes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
+#
+
+self_include_header: false
+
+includes:
+    - vulpes/memory/gamestate/table.hpp
+
+enums:
+    - name: Team
+      type: int8_t
+      options:
+          - name: RED
+            value: 0
+          - name: BLUE
+            value: 1
+          - name: NONE
+            value: 0
+          - name: PLAYER
+            value: 1
+          - name: HUMAN
+            value: 2
+          - name: COVENANT
+            value: 3
+          - name: FLOOD
+            value: 4
+          - name: SENTINEL
+            value: 5
+          - name: UNUSED_6
+            value: 6
+          - name: UNUSED_7
+            value: 7
+
+    - name: ObjectType
+      type: int8_t
+      options:
+          - name: object
+            value: -4
+          - name: device
+            value: -3
+          - name: items
+            value: -2
+          - name: unit
+            value: -1
+          - name: biped
+            value: 0
+          - name: vehicle
+            value: 1
+          - name: weapon
+            value: 2
+          - name: equipment
+            value: 3
+          - name: garbage
+            value: 4
+          - name: projectile
+            value: 5
+          - name: scenery
+            value: 6
+          - name: machine
+            value: 7
+          - name: control
+            value: 8
+          - name: light_fixture
+            value: 9
+          - name: placeholder
+            value: 10
+          - name: sound_scenery
+            value: 11
+
+    - name: ObjectNetworkRole
+      type: uint32_t
+      options:
+          - name: master
+            value: 0
+          - name: puppet
+            value: 1
+          - name: locally_controlled_puppet
+            value: 2
+          - name: local_only
+            value: 3
+
+    - name: ObjectAttachmentType
+      type: int8_t
+      options:
+          - name: invalid
+            value: -1
+          - name: light
+            value: 0
+          - name: looping_sound
+            value: 1
+          - name: effect
+            value: 2
+          - name: contrail
+            value: 3
+          - name: particle
+            value: 4
+
+    - name: ObjectSizes
+      options:
+          - name: object
+            value: &SIZE_OBJECT 0x1F4
+          - name: scenery
+            value: &SIZE_SCENERY 0x1F8 # object (0x1F4) + 4
+          - name: placeholder
+            value: &SIZE_PLACEHOLDER 0x1FC # object (0x1F4) + 8
+          - name: sound_scenery
+            value: &SIZE_SOUND_SCENERY 0x1F8 # object (0x1F4) + 4
+
+          - name: device
+            value: &SIZE_DEVICE 0x214 # object (0x1F4) + 0x20
+          - name: machine
+            value: &SIZE_MACHINE 0x228 # device (0x214) + 4
+          - name: control
+            value: &SIZE_CONTROL 0x21C # device (0x214) + 8
+          - name: light_fixture
+            value: &SIZE_LIGHT_FIXTURE 0x22C # device (0x214) + 4
+
+          - name: item
+            value: &SIZE_ITEM 0x22C # object (0x1F4) + 0x38
+          - name: weapon
+            value: &SIZE_WEAPON 0x340 # item (0x22C) + 0x114
+          - name: equipment
+            value: &SIZE_EQUIPMENT 0x294 # item (0x22C) + 0x68
+          - name: garbage
+            value: &SIZE_GARBAGE 0x244 # item (0x22C) + 0x18
+          - name: projectile
+            value: &SIZE_PROJECTILE 0x2B0 # item (0x22C) + 0x84
+
+          - name: unit
+            value: &SIZE_UNIT 0x4CC # object (0x1F4) + 0x2D8
+          - name: biped
+            value: &SIZE_BIPED 0x550 # unit (0x4CC) + 0x84
+          - name: vehicle
+            value: &SIZE_VEHICLE 0x5C0 # unit (0x4CC) + 0xF4
+
+structs:
+    - name: ObjectNetworkDelta
+      size: 0x44
+      fields:
+          - name: valid_position
+            type: bool
+          - type: pad
+            size: 3
+          - name: position
+            type: Vec3d
+          - name: valid_forward_and_up
+            type: bool
+          - type: pad
+            size: 3
+          - name: forward
+            type: Euler3d
+          - name: up
+            type: Euler3d
+          - name: valid_transitional_velocity
+            type: bool
+          - type: pad
+            size: 3
+          - name: transitional_velocity
+            type: Vec3d
+          - name: valid_timestamp
+            type: bool
+          - type: pad
+            size: 3
+          - name: timestamp
+            type: int32_t
+
+    - name: ScenarioLocation
+      size: 8
+      fields:
+          - name: leaf_id
+            type: int32_t
+          - name: cluster_id
+            type: uint16_t
+          - type: pad
+            size: 2
+
+    - name: ObjectAnimationData
+      size: 0xC
+      fields:
+          - name: tag
+            type: MemRef
+          - name: id
+            type: int16_t
+          - name: frame
+            type: int16_t
+          - name: interpolation_frame
+            type: int16_t
+          - name: interpolation_frame_count
+            type: int16_t
+
+    - name: ObjectVitalityData
+      size: 0x30
+      fields:
+          - name: max_health
+            type: float
+          - name: max_shield
+            type: float
+          - name: health
+            type: float
+          - name: shield
+            type: float
+          - name: current_shield_damage
+            type: float
+          - name: current_health_damage
+            type: float
+          - name: entangled_object
+            type: MemRef
+            comment:
+                when this object is damaged, the 'entangled' object will also
+                get damaged. this is an immediate link, the entangled object's
+                parent chain or 'entangled' reference isn't walked
+          - name: recent_shield_damage
+            type: float
+          - name: recent_health_damage
+            type: float
+          - name: shield_damage_update_tick
+            type: int32_t
+          - name: health_damage_update_tick
+            type: int32_t
+          - name: shield_stun_ticks
+            type: int16_t
+          - name: flags
+            type: bitfield
+            width: 16
+            fields:
+                - name: health_damage_effect_applied
+                  bit: 0
+                - name: shield_damage_effect_applied
+                  bit: 1
+                - name: health_depleted
+                  bit: 2
+                - name: shield_depleted
+                  bit: 3
+                - name: shield_related
+                  bit: 4
+                - name: killed
+                  bit: 5
+                - name: killed_silent
+                  bit: 6
+                - name: cannot_melee_attack
+                  bit: 7
+                  comment: confirm if true
+                # Bits here are unknown
+                - name: cannot_take_damage
+                  bit: 11
+                - name: shield_recharging
+                  bit: 12
+                - name: killed_no_stats
+                  bit: 13
+                # The two bits after this are just padding
+
+    - name: ObjectAttachmentsData
+      size: 0x2C
+      fields:
+          - name: types
+            type: ObjectAttachmentType
+            array_size: 8
+          - name: attachments
+            type: MemRef
+            array_size: 8
+          - name: first_widget
+            type: MemRef
+
+    - name: ObjectHeaderBlockReference
+      size: 4
+      fields:
+          - name: size
+            type: uint16_t
+          - name: offset
+            type: uint16_t
+
+    - name: ObjectAttributes
+      fields:
+          - name: tag_definition
+            type: MemRef
+          - name: base_network
+            type: struct
+            fields:
+                - name: role
+                  type: ObjectNetworkRole
+                - name: _unknown
+                  type: bool
+                - name: should_force_baseline_update
+                  type: bool
+                - type: pad
+                  size: 2
+                - name: existence_ticks
+                  type: int32_t
+          - name: flags
+            type: bitfield
+            width: 32
+            fields:
+                - name: hidden
+                  bit: 0
+                - name: on_ground
+                  bit: 1
+                - name: ignore_gravity
+                  bit: 2
+                - name: in_water
+                  bit: 3
+                - name: at_rest
+                  bit: 5
+                - name: no_collision2
+                  bit: 7
+                  comment: confirm this
+                - name: has_sound_looping_attachment
+                  bit: 10
+                - name: connected_to_map
+                  bit: 11
+                - name: not_placed_automatically
+                  bit: 12
+                - name: is_device_machine
+                  bit: 13
+                - name: is_elevator
+                  bit: 14
+                - name: is_elevator2
+                  bit: 15
+                - name: not_garbage
+                  bit: 16
+                  comment: Prevents the object from being deleted by garbage collection
+                - name: does_not_cast_shadow
+                  bit: 18
+                - name: delete_at_deactivation
+                  bit: 19
+                - name: do_not_reactivate
+                  bit: 20
+                - name: out_of_bounds
+                  bit: 21
+                - name: beautify
+                  bit: 22
+                  comment: Force highest permutation
+                - name: limping
+                  bit: 23
+                - name: collideable
+                  bit: 24
+                - name: has_collision_model
+                  bit: 25
+                - name: unknown_message_delta
+                  bit: 26
+                  comment: message delta related. see object_type_should_force_baseline_update
+                - name: unknown_message_delta2
+                  bit: 27
+                  comment: message delta related. see *_process_update_delta
+                - name: opensauce_is_transforming_in
+                  bit: 28
+                - name: opensauce_is_transforming_out
+                  bit: 29
+
+          - name: object_marker_id
+            type: int32_t
+          - name: base_network_delta
+            type: ObjectNetworkDelta
+          - name: position
+            type: Vec3d
+          - name: transitional_velocity
+            type: Vec3d
+          - name: forward
+            type: Vec3d
+          - name: up
+            type: Vec3d
+          - name: angular_velocity
+            type: Vec3d
+          - name: scenario_location
+            type: ScenarioLocation
+          - name: bounding_center
+            type: Vec3d
+            comment: Used for bounding sphere
+          - name: bounding_radius
+            type: float
+            comment: Bounding sphere radius
+          - name: scale
+            type: float
+          - name: type
+            type: ObjectType
+          - type: pad
+            size: 3
+          - name: owner_team
+            type: Team
+          - type: pad
+            size: 1
+          - name: name_list_id
+            type: int16_t
+          - name: moving_time
+            type: int16_t
+            comment: Ticks not spent at_rest, only biped updates this.
+          - name: variant_id
+            type: int16_t
+            comment: for region permuations.
+          - name: player
+            type: MemRef
+          - name: owner_object
+            type: MemRef
+          - type: pad
+            size: 4
+          - name: animation
+            type: ObjectAnimationData
+          - name: vitals
+            type: ObjectVitalityData
+          - type: pad
+            size: 4
+          - name: cluster_partition
+            type: MemRef
+          - name: _unknown_object_related
+            type: MemRef
+          - name: next_object
+            type: MemRef
+          - name: first_object
+            type: MemRef
+          - name: parent_object
+            type: MemRef
+          - name: parent_attachment_node
+            type: int8_t
+          - name: _unknown2
+            type: int8_t
+          - name: force_shield_update
+            type: bool
+          - name: valid_outgoing_functions
+            type: bitfield
+            width: 8
+            fields:
+                - name: a
+                - name: b
+                - name: c
+                - name: d
+          - name: incoming_function_values
+            type: float
+            array_size: 4
+          - name: outgoing_function_values
+            type: float
+            array_size: 4
+          - name: attachment_data
+            type: ObjectAttachmentsData
+          - name: cached_render_state
+            type: MemRef
+          - name: region_destroyeds
+            type: bitfield
+            width: 8
+            fields:
+                - name: region_0
+                - name: region_1
+                - name: region_2
+                - name: region_3
+                - name: region_4
+                - name: region_5
+                - name: region_6
+                - name: region_7
+          - type: pad
+            size: 1
+          - name: shader_permutation
+            type: int16_t
+          - name: region_healths
+            type: uint8_t
+            array_size: 8
+          - name: region_permutation_ids
+            type: int8_t
+            array_size: 8
+          - name: change_colors_lower
+            type: RGBFloat
+            array_size: 4
+          - name: change_colors_upper
+            type: RGBFloat
+            array_size: 4
+          - name: node_orientations
+            type: ObjectHeaderBlockReference
+            array_size: 2
+          - name: node_matrices_block
+            type: ObjectHeaderBlockReference
+
+    - name: ObjectSceneryAttributes
+      fields:
+          - type: pad
+            size: 4
+
+    - name: ObjectPlaceholderAttributes
+      fields:
+          - type: pad
+            size: 8
+
+    - name: ObjectSoundSceneryAttributes
+      fields:
+          - type: pad
+            size: 4
+
+    - name: ObjectHeader
+      size: 0xC
+      parent: BaseTableEntry
+      fields:
+          - name: flags
+            type: bitfield
+            width: 8
+            fields:
+                - name: active
+                - name: visible
+                - name: newly_created
+                - name: flagged_for_deletion
+                - name: is_child
+                - name: is_connected_to_map
+                - name: automatic_deactivation_enabled
+          - name: type
+            type: ObjectType
+          - type: pad
+            size: 2
+          - name: data_size
+            type: uint16_t
+          - name: data
+            type: void*
+
+    - name: Object
+      size: *SIZE_OBJECT
+      fields:
+          - name: object
+            type: ObjectAttributes
+
+    - name: ObjectScenery
+      parent: Object
+      size: *SIZE_SCENERY
+      fields:
+          - name: scenery
+            type: ObjectSceneryAttributes
+
+    - name: ObjectPlaceholder
+      parent: Object
+      size: *SIZE_PLACEHOLDER
+      fields:
+          - name: placeholder
+            type: ObjectPlaceholderAttributes
+
+    - name: ObjectSoundScenery
+      parent: Object
+      size: *SIZE_SOUND_SCENERY
+      fields:
+          - name: placeholder
+            type: ObjectSoundSceneryAttributes
+
+    - name: ObjectDevice
+      parent: Object
+      size: *SIZE_DEVICE
+      fields:
+          - name: device
+            type: ObjectDeviceAttributes
+
+    - name: ObjectDeviceMachine
+      parent: ObjectDevice
+      size: *SIZE_MACHINE
+      fields:
+          - name: device_machine
+            type: ObjectDeviceMachineAttributes
+
+    - name: ObjectDeviceControl
+      parent: ObjectDevice
+      size: *SIZE_CONTROL
+      fields:
+          - name: device_control
+            type: ObjectDeviceControlAttributes
+
+    - name: ObjectLightFixtureControl
+      parent: ObjectDevice
+      size: *SIZE_LIGHT_FIXTURE
+      fields:
+          - name: light_fixture
+            type: ObjectDeviceLightFixtureAttributes
+
+    - name: ObjectItem
+      parent: Object
+      size: *SIZE_ITEM
+      fields:
+          - name: item
+            type: ObjectItemAttributes
+
+    - name: ObjectWeapon
+      parent: ObjectItem
+      size: *SIZE_WEAPON
+      fields:
+          - name: item
+            type: ObjectWeaponAttributes
+
+    - name: ObjectEquipment
+      parent: ObjectItem
+      size: *SIZE_EQUIPMENT
+      fields:
+          - name: equipment
+            type: ObjectEquipmentAttributes
+
+    - name: ObjectGarbage
+      parent: ObjectItem
+      size: *SIZE_GARBAGE
+      fields:
+          - name: garbage
+            type: ObjectGarbageAttributes
+
+    - name: ObjectProjectile
+      parent: ObjectItem
+      size: *SIZE_PROJECTILE
+      fields:
+          - name: projectile
+            type: ObjectProjectileAttributes
+
+    - name: ObjectUnit
+      parent: Object
+      size: *SIZE_UNIT
+      fields:
+          - name: unit
+            type: ObjectUnitAttributes
+
+    - name: ObjectBiped
+      parent: ObjectUnit
+      size: *SIZE_BIPED
+      fields:
+          - name: biped
+            type: ObjectBipedAttributes
+
+    - name: ObjectVehicle
+      parent: ObjectUnit
+      size: *SIZE_VEHICLE
+      fields:
+          - name: vehicle
+            type: ObjectVehicleAttributes

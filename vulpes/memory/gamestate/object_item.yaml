@@ -1,0 +1,392 @@
+#
+# This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
+# Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
+#
+# Vulpes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, version 3.
+#
+# Vulpes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
+#
+
+self_include_header: false
+
+enums:
+    - name: WeaponState
+      type: int8_t
+      options:
+          - name: idle
+            value: 0
+          - name: fire 1
+            value: 1
+          - name: fire 2
+            value: 2
+          - name: chamber 1
+            value: 3
+          - name: chamber 2
+            value: 4
+          - name: reload 1
+            value: 5
+          - name: reload 2
+            value: 6
+          - name: charged 1
+            value: 7
+          - name: charged 2
+            value: 8
+          - name: ready
+            value: 9
+          - name: put away
+            value: 10
+
+    - name: WeaponTriggerState
+      type: int8_t
+      options:
+          - name: idle
+            value: 0
+          - name: unknown 1
+            value: 1
+            comment: alternate shot/overload?
+          - name: charging
+            value: 2
+          - name: charged
+            value: 3
+          - name: unknown 4
+            value: 4
+            comment: locked related (tracking)
+          - name: unknown 5
+            value: 5
+            comment: tracking related
+          - name: spewing
+            value: 6
+          - name: frozen while triggered
+            value: 7
+          - name: frozen timed
+            value: 8
+
+    - name: WeaponMagazineState
+      type: int16_t
+      options:
+          - name: idle
+            value: 0
+          - name: chambering start
+            value: 1
+          - name: chambering finish
+            value: 2
+          - name: chambering
+            value: 3
+
+structs:
+    - name: ObjectItemAttributes
+      fields:
+          - name: flags
+            type: uint32_t
+            comment: Research
+          - name: ticks_until_detonation
+            type: int16_t
+          - name: bsp_collision
+            type: struct
+            fields:
+                - name: surface_id
+                  type: int16_t
+                - name: reference_id
+                  type: int16_t
+                  comment: bsp reference id
+          - type: pad
+            size: 2
+          - name: dropped_by_unit
+            type: MemRef
+          - name: last_update_tick
+            type: uint32_t
+          - name: object_collision
+            type: struct
+            fields:
+                - name: object
+                  type: MemRef
+                - name: object_position
+                  type: Vec3d
+                - name: collision_location
+                  type: Vec3d
+                  comment: Unconfirmed
+                - name: collision_angle
+                  type: Euler2d
+                  comment: Unconfirmed
+
+    - name: ObjectGarbageAttributes
+      fields:
+          - name: ticks_until_garbage_collection
+            type: int16_t
+          - type: pad
+            size: 2
+          - comment: These likely have some meaning, but I don't know.
+            type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+          - type: pad
+            size: 4
+
+    - name: WeaponTrigger
+      size: 0x28
+      fields:
+          - name: idle_time
+            type: int8_t
+          - name: state
+            type: WeaponTriggerState
+          - name: ticks
+            type: int16_t
+          - name: unknown_flags
+            type: uint32_t
+          - name: firing_effect_related
+            type: int16_t
+            array_size: 3
+          - name: rounds_since_last_tracer
+            type: int16_t
+          - name: rate_of_fire
+            type: float
+          - name: ejection_port_recovery_time
+            type: float
+          - name: illumination_recovery_time
+            type: float
+          - name: projectile_error_related
+            type: float
+          - name: charging_effect
+            type: MemRef
+          - name: network_delay_ticks
+            type: int8_t
+          - type: pad
+            size: 3
+
+    - name: WeaponMagazine
+      size: 0x10
+      fields:
+          - name: state
+            type: WeaponMagazineState
+          - name: reload_ticks_remaining
+            type: int16_t
+          - name: reload_ticks
+            type: int16_t
+          - name: rounds_unloaded
+            type: int16_t
+          - name: rounds_loaded
+            type: int16_t
+          - name: rounds_left_to_recharge
+            type: int16_t
+          - name: unknown 1
+            type: int16_t
+            comment: potentially an enum
+          - name: unknown 2
+            type: int16_t
+            comment: might just be padding
+
+    - name: WeaponReloadStartData
+      size: 8
+      fields:
+          - name: total_rounds
+            type: int16_t
+            array_size: 2
+          - name: loaded_rounds
+            type: int16_t
+            array_size: 2
+
+    - name: WeaponNetworkData
+      size: 0x2C
+      fields:
+          - name: position
+            type: Vec3d
+          - name: transitional_velocity
+            type: Vec3d
+          - name: angular_velocity
+            type: Vec3d
+            comment: unused
+          - name: magazine_rounds_total
+            type: int16_t
+            array_size: 2
+          - name: age
+            type: float
+
+
+    - name: ObjectWeaponAttributes
+      fields:
+          - name: flags
+            type: uint32_t
+          - name: owner_unit_flags
+            type: uint32_t
+          - name: primary_trigger
+            type: float
+          - name: weapon_state
+            type: WeaponState
+          - type: pad
+            size: 1
+          - name: ready_ticks
+            type: int16_t
+          - name: heat
+            type: float
+          - name: age
+            type: float
+          - name: illumination_fraction
+            type: float
+          - name: integrated_light_power
+            type: float
+          - type: pad
+            size: 4
+            comment: Very likely something meaningful
+          - name: tracked_object
+            type: MemRef
+          - type: pad
+            size: 8
+            comment: Investigate
+          - name: alt_shots_loaded
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: triggers
+            type: WeaponTrigger
+            array_size: 2
+          - name: magazines
+            type: WeaponMagazine
+            array_size: 2
+          - name: last_trigger_fire_tick
+            type: uint32_t
+          - name: reload_starting_states
+            type: WeaponReloadStartData
+          - type: pad
+            size: 4
+          - name: network
+            type: struct
+            fields:
+                - name: baseline_valid
+                  type: bool
+                - name: baseline_index
+                  type: int8_t
+                - name: message_index
+                  type: int8_t
+                - type: pad
+                  size: 1
+                - name: update_baseline
+                  type: WeaponNetworkData
+                - name: delta_valid
+                  type: bool
+                  comment: Maybe?
+                - type: pad
+                  size: 3
+                - name: update_delta
+                  type: WeaponNetworkData
+
+
+    - name: EquipmentNetworkData
+      size: 0x24
+      fields:
+          - name: position
+            type: Vec3d
+          - name: transitional_velocity
+            type: Vec3d
+          - name: angular_velocty
+            type: Vec3d
+
+    - name: ObjectEquipmentAttributes
+      fields:
+          - type: pad
+            size: 24
+          - name: network
+            type: struct
+            fields:
+                - name: baseline_valid
+                  type: bool
+                - name: baseline_index
+                  type: int8_t
+                - name: message_index
+                  type: int8_t
+                - type: pad
+                  size: 1
+                - name: update_baseline
+                  type: EquipmentNetworkData
+                - name: delta_valid
+                  type: bool
+                - type: pad
+                  size: 3
+                - name: update_delta
+                  type: EquipmentNetworkData
+
+
+    - name: ProjectileNetworkData
+      size: 0x18
+      fields:
+          - name: position
+            type: Vec3d
+          - name: transitional_velocity
+            type: Vec3d
+
+    - name: ProjectileNetwork
+      fields:
+          - name: unknown
+            type: bool
+          - name: baseline_valid
+            type: bool
+          - name: baseline_index
+            type: int8_t
+          - name: message_index
+            type: int8_t
+          - name: update_baseline
+            type: ProjectileNetworkData
+          - name: delta_valid
+            type: bool
+          - type: pad
+            size: 3
+          - name: update_delta
+            type: ProjectileNetworkData
+
+    - name: ObjectProjectileAttributes
+      fields:
+          - name: projectile_flags
+            type: bitfield
+            width: 32
+            fields:
+                - name: tracer
+                  bit: 0
+                - name: attached
+                  bit: 2
+          - name: action_enum
+            type: int16_t
+            comment: figure this one out
+          - name: material_id
+            type: int16_t
+            comment: unconfirmed
+          - name: source_unit
+            type: MemRef
+          - name: target_object
+            type: MemRef
+          - name: contrail_attachment_block_id
+            type: int32_t
+            comment: Figure this one out
+          - name: time_remaining
+            type: float
+            comment: To target or to 0.0, what?
+          - name: arming_rate
+            type: float
+            comment: related_to_detonation_rate
+          - name: unknown_projectile_float_1
+            type: float
+          - name: unknown_projectile_float_2
+            type: float
+          - name: distance_travelled
+            type: float
+          - name: transitional_velocity
+            type: Vec3d
+          - name: water_damage_upper_bound
+            type: float
+          - name: angular_velocity
+            type: Vec3d
+          - name: unknown_euler
+            type: Euler2d
+          - name: network
+            type: ProjectileNetwork

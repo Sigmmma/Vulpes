@@ -15,7 +15,6 @@
  * long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
  */
 
-#include <vulpes/memory/gamestate/object/object_unit.hpp>
 #include <vulpes/memory/signatures.hpp>
 
 #include "object_unit.hpp"

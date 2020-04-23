@@ -71,10 +71,7 @@ add_library(Vulpes SHARED
     vulpes/hooks/tick.S
     vulpes/hooks/save_load.cpp
 
-    vulpes/memory/gamestate/object/object.cpp
-    vulpes/memory/gamestate/object/object_device.cpp
-    vulpes/memory/gamestate/object/object_item.cpp
-    vulpes/memory/gamestate/object/object_unit.cpp
+    vulpes/memory/gamestate/object.cpp
     vulpes/memory/gamestate/server/game_variant.cpp
     vulpes/memory/gamestate/server/king.cpp
     vulpes/memory/gamestate/console.cpp

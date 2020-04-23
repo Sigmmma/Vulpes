@@ -15,4 +15,22 @@
  * long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
  */
 
-#include "object_item.hpp"
+#pragma once
+
+#include <cstddef>
+
+const size_t POSITIVE_OBJECT_TYPES = 12;
+const size_t VALID_OBJECT_TYPES = POSITIVE_OBJECT_TYPES;
+
+#include "generated/object_device.hpp"
+#include "generated/object_item.hpp"
+#include "generated/object_unit.hpp"
+#include "generated/object.hpp"
+
+class ObjectTable : public Table {
+public:
+    ObjectHeader* objects;
+};
+
+GenericTable* device_groups_table();
+ObjectTable* object_table();

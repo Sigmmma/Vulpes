@@ -22,7 +22,7 @@
 #include <hooker/hooker.hpp>
 
 #include <vulpes/memory/behavior_definition.hpp>
-#include <vulpes/memory/gamestate/object/object.hpp>
+#include <vulpes/memory/gamestate/object.hpp>
 #include <vulpes/memory/types.hpp>
 #include <vulpes/memory/signatures.hpp>
 

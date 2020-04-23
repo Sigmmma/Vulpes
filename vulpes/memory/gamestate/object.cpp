@@ -16,10 +16,21 @@
  */
 
 #include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/gamestate/effect.hpp>
 
-#include "object_device.hpp"
+#include "object.hpp"
+
+#include "generated/object_device.cpp"
+#include "generated/object_item.cpp"
+#include "generated/object_unit.cpp"
+#include "generated/object.cpp"
 
 GenericTable* device_groups_table() {
     return reinterpret_cast<GenericTable**>(
         sig_effect_table_refs())[8];
+}
+
+ObjectTable* object_table() {
+    return **reinterpret_cast<ObjectTable***>(
+        sig_object_table_ref());
 }

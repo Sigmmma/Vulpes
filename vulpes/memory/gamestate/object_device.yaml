@@ -1,0 +1,91 @@
+#
+# This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
+# Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
+#
+# Vulpes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, version 3.
+#
+# Vulpes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
+#
+
+self_include_header: false
+
+includes:
+    - vulpes/memory/gamestate/table.hpp
+
+structs:
+    - name: DeviceState
+      fields:
+          - name: device_group_id
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: value
+            type: float
+          - name: change
+            type: float
+
+    - name: ObjectDeviceAttributes
+      fields:
+          - name: device_flags
+            type: bitfield
+            width: 32
+            fields:
+                - name: position_reversed
+                - name: not_usable_from_any_side
+          - name: power
+            type: DeviceState
+          - name: position
+            type: DeviceState
+          - name: device_flags2
+            type: bitfield
+            width: 32
+            fields:
+                - name: one_sided
+                - name: operates_automatically
+
+    - name: ObjectDeviceMachineAttributes
+      fields:
+          - name: device_machine_flags
+            type: bitfield
+            width: 32
+            fields:
+                - name: does_not_operate_automatically
+                - name: one_sided
+                - name: never_appears_locked
+                - name: opened_by_melee_attack
+          - name: ticks_since_started_opening
+            type: uint32_t
+          - name: elevator_position
+            type: Vec3d
+
+    - name: ObjectDeviceControlAttributes
+      fields:
+          - name: device_control_flags
+            type: bitfield
+            width: 32
+            fields:
+                - name: usable_from_both_sides
+                  comment: The 4 bits after this are unused. But the next might not be.
+          - name: custom_name_id
+            type: int16_t
+          - type: pad
+            size: 2
+
+    - name: ObjectDeviceLightFixtureAttributes
+      fields:
+          - name: light_fixture
+            type: RGBFloat
+          - name: light_intensity
+            type: float
+          - name: light_falloff_angle
+            type: float
+          - name: light_cutoff_angle
+            type: float
