@@ -19,9 +19,40 @@ self_include_header: false
 
 includes:
     - vulpes/memory/gamestate/actor.hpp
-    - vulpes/memory/damage_effect.hpp
 
 enums:
+    # Move this to the damage effect header once we have tags in
+    - name: DamageCategory
+      type: int16_t
+      options:
+          - name: NONE
+            value: 0
+          - name: FALLING
+            value: 1
+          - name: BULLET
+            value: 2
+          - name: GRENADE
+            value: 3
+          - name: HIGH_EXPLOSIVE
+            value: 4
+          - name: SNIPER
+            value: 5
+          - name: MELEE
+            value: 6
+          - name: FLAME
+            value: 7
+          - name: MOUNTED_WEAPON
+            value: 8
+          - name: VEHICLE
+            value: 9
+          - name: PLASMA
+            value: 10
+          - name: NEEDLE
+            value: 11
+          - name: SHOTGUN
+            value: 12
+
+
     - name: UnitAnimationState
       type: int8_t
       options:
