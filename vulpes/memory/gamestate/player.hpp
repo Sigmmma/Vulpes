@@ -19,7 +19,7 @@
 
 #include <vulpes/memory/gamestate/object.hpp>
 
-#include "table.hpp"
+#include <vulpes/memory/table.hpp>
 
 enum class InteractionType : uint16_t {
     NONE                    = 0,

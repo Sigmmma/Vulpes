@@ -52,7 +52,7 @@
 #include <util/crc32.hpp>
 #include <vulpes/memory/global.hpp>
 #include <vulpes/memory/signatures.hpp>
-#include <vulpes/memory/gamestate/table.hpp>
+#include <vulpes/memory/table.hpp>
 
 #include "gamestate.hpp"
 

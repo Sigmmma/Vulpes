@@ -17,9 +17,6 @@
 
 self_include_header: false
 
-includes:
-    - vulpes/memory/gamestate/table.hpp
-
 structs:
     - name: DeviceState
       fields:

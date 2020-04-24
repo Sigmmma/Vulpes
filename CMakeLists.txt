@@ -76,7 +76,7 @@ add_library(Vulpes SHARED
     vulpes/memory/gamestate/effect.cpp
     vulpes/memory/gamestate/network.cpp
     vulpes/memory/gamestate/player.cpp
-    vulpes/memory/gamestate/table.cpp
+    vulpes/memory/table.cpp
     vulpes/memory/server/game_variant.cpp
     vulpes/memory/server/king.cpp
     vulpes/memory/behavior_definition.cpp

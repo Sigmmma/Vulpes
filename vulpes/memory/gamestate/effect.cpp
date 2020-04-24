@@ -18,7 +18,6 @@
 #include <vulpes/memory/signatures.hpp>
 
 #include "effect.hpp"
-#include "table.hpp"
 
 static GenericTable** effect_ptrs_lst;
 

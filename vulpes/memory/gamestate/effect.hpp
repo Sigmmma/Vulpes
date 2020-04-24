@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "table.hpp"
+#include <vulpes/memory/table.hpp>
 
 GenericTable* weather_particles_table();
 GenericTable* particle_table();
