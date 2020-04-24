@@ -18,6 +18,7 @@
 #include <vulpes/memory/signatures.hpp>
 
 #include "player.hpp"
+#include "generated/player.cpp"
 
 PlayerTable* player_table() {
     return **reinterpret_cast<PlayerTable***>(sig_player_table_ref());

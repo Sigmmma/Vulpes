@@ -1,0 +1,292 @@
+#
+# This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
+# Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
+#
+# Vulpes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, version 3.
+#
+# Vulpes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
+#
+
+includes:
+    - vulpes/memory/table.hpp
+    - vulpes/memory/gamestate/object.hpp
+
+enums:
+    - name: InteractionType
+      type: uint16_t
+      options:
+          - name: none
+            value: 0
+          - name: pickup powerup
+            value: 1
+          - name: swap powerup
+            value: 2
+          - name: exit seat
+            value: 3
+          - name: four
+            value: 4
+            comment: unknown
+          - name: swap equipment
+            value: 5
+          - name: swap weapon
+            value: 6
+          - name: pickup weapon
+            value: 7
+          - name: enter seat
+            value: 8
+          - name: force ai to exit seat
+            value: 9
+          - name: touch device
+            value: 10
+          - name: flip vehicle
+            value: 11
+
+    - name: NetworkColor
+      type: uint16_t
+      options:
+          - name: white
+            value: 0
+          - name: black
+            value: 1
+          - name: red
+            value: 2
+          - name: blue
+            value: 3
+          - name: gray
+            value: 4
+          - name: yellow
+            value: 5
+          - name: green
+            value: 6
+          - name: pink
+            value: 7
+          - name: purple
+            value: 8
+          - name: cyan
+            value: 9
+          - name: cobalt
+            value: 10
+          - name: orange
+            value: 11
+          - name: teal
+            value: 12
+          - name: sage
+            value: 13
+          - name: brown
+            value: 14
+          - name: tan
+            value: 15
+          - name: maroon
+            value: 16
+          - name: salmon
+            value: 17
+
+    - name: PlayerObjectiveMode
+      type: int32_t
+      options:
+          - name: race
+            value: 22
+          - name: hill
+            value: 34
+          - name: juggernaut
+            value: 35
+          - name: ball
+            value: 41
+          - name: none
+            value: -1
+
+structs:
+    - name: PlayerMultiplayerStatistics
+      union: true
+      size: 8
+      fields:
+          - type: pad
+            size: 8
+            comment: This is different for each gametype.
+          - name: ctf
+            type: struct
+            fields:
+                - name: flag_grabs
+                  type: int16_t
+                - name: flag_returns
+                  type: int16_t
+                - name: flag_scores
+                  type: int16_t
+          - name: slayer
+            type: struct
+            fields:
+                - type: pad
+                  size: 8
+          - name: oddball
+            type: struct
+            fields:
+                - name: unknown
+                  type: int16_t
+                - name: target_kills
+                  type: int16_t
+                - name: kills
+                  type: int16_t
+          - name: king
+            type: struct
+            fields:
+                - name: hill_score
+                  type: int16_t
+          - name: race
+            type: struct
+            fields:
+                - name: time
+                  type: int16_t
+                - name: laps
+                  type: int16_t
+                - name: best_time
+                  type: int16_t
+
+    - name: Player
+      size: 0x200
+      parent: BaseTableEntry
+      fields:
+          - name: host
+            type: int16_t
+          - name: name
+            array_size: 12
+            type: wchar_t
+          - name: unknown
+            type: MemRef
+          - name: team
+            type: Team
+          - type: pad
+            size: 3
+          - name: interaction_object
+            type: MemRef
+          - name: interaction_object_type
+            type: InteractionType
+          - name: interaction_object_seat
+            type: int16_t
+          - name: respawn_time
+            type: int32_t
+          - name: respawn_time_growth
+            type: int32_t
+          - name: object
+            type: MemRef
+          - name: previous_object
+            type: MemRef
+          - name: bsp_cluster_id
+            type: int16_t
+          - name: weapon_swap_result
+            type: bool
+          - type: pad
+            size: 1
+          - name: auto_aim_target_object
+            type: MemRef
+          - name: last_fired_tick
+            type: int32_t
+          - name: network_name
+            type: wchar_t
+            array_size: 12
+          - name: color
+            type: NetworkColor
+          - name: icon_id
+            type: int16_t
+          - name: machine_id
+            type: int8_t
+          - name: controller_id
+            type: int8_t
+          - name: team2
+            type: Team
+          - name: id
+            type: int8_t
+            comment: Needs a description
+          - name: camo_time_left
+            type: int16_t
+          - name: other_powerup_time_left
+            type: int16_t
+          - name: speed_multiplier
+            type: float
+          - name: source_teleporter_netgame_flag_id
+            type: int32_t
+          - name: objective_mode
+            type: PlayerObjectiveMode
+          - name: objective_player
+            type: MemRef
+          - name: target_player
+            type: MemRef
+          - name: target_player_time
+            type: int32_t
+          - name: last_death_tick
+            type: int32_t
+          - name: slayer_target_player
+            type: MemRef
+          - name: odd_man_out
+            type: bool
+          - type: pad
+            size: 3
+          - type: pad
+            size: 4
+          - type: pad
+            size: 2
+          - name: killstreak
+            type: int16_t
+          - name: multikill
+            type: int16_t
+          - name: last_kill_tick
+            type: int16_t
+          - name: kills
+            type: int16_t
+            array_size: 4
+          - name: assists
+            type: int16_t
+            array_size: 4
+          - name: betrayals
+            type: int16_t
+          - name: deaths
+            type: int16_t
+          - name: suicides
+            type: int16_t
+          - type: pad
+            size: 2
+          - type: pad
+            size: 12
+          - name: team_kills
+            type: int16_t
+          - type: pad
+            size: 2
+          - name: mp_stats
+            type: PlayerMultiplayerStatistics
+          - name: telefrag_ticks
+            type: int32_t
+          - name: quit_at_tick
+            type: int32_t
+          - name: telefrag_danger
+            type: bool
+          - name: quit
+            type: bool
+          - type: pad
+            size: 2
+          - type: pad
+            size: 4
+          - name: ping
+            type: int32_t
+          - name: team_kill_count
+            type: int32_t
+          - name: team_kill_ticks_since_last
+            type: int32_t
+          - name: network_data
+            type: int8_t
+            array_size: 0x118
+            comment:
+                We have references on what this all is. But it's not super
+                important right now.
+
+    - name: PlayerTable
+      parent: Table
+      fields:
+          - name: players
+            type: Player*
