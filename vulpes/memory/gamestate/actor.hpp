@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "types.hpp"
+#include <vulpes/memory/types.hpp>
 
 enum class AiCommunicationType : int16_t {
     DEATH = 0,

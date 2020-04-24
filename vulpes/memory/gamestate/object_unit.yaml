@@ -18,7 +18,7 @@
 self_include_header: false
 
 includes:
-    - vulpes/memory/actor.hpp
+    - vulpes/memory/gamestate/actor.hpp
     - vulpes/memory/damage_effect.hpp
 
 enums:
