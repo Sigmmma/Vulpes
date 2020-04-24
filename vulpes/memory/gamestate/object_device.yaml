@@ -34,7 +34,7 @@ structs:
 
     - name: ObjectDeviceAttributes
       fields:
-          - name: device_flags
+          - name: flags
             type: bitfield
             width: 32
             fields:
@@ -44,7 +44,7 @@ structs:
             type: DeviceState
           - name: position
             type: DeviceState
-          - name: device_flags2
+          - name: flags2
             type: bitfield
             width: 32
             fields:
@@ -53,7 +53,7 @@ structs:
 
     - name: ObjectDeviceMachineAttributes
       fields:
-          - name: device_machine_flags
+          - name: flags
             type: bitfield
             width: 32
             fields:
@@ -68,7 +68,7 @@ structs:
 
     - name: ObjectDeviceControlAttributes
       fields:
-          - name: device_control_flags
+          - name: flags
             type: bitfield
             width: 32
             fields:

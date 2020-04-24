@@ -326,28 +326,9 @@ structs:
           - name: transitional_velocity
             type: Vec3d
 
-    - name: ProjectileNetwork
-      fields:
-          - name: unknown
-            type: bool
-          - name: baseline_valid
-            type: bool
-          - name: baseline_index
-            type: int8_t
-          - name: message_index
-            type: int8_t
-          - name: update_baseline
-            type: ProjectileNetworkData
-          - name: delta_valid
-            type: bool
-          - type: pad
-            size: 3
-          - name: update_delta
-            type: ProjectileNetworkData
-
     - name: ObjectProjectileAttributes
       fields:
-          - name: projectile_flags
+          - name: flags
             type: bitfield
             width: 32
             fields:
@@ -389,4 +370,21 @@ structs:
           - name: unknown_euler
             type: Euler2d
           - name: network
-            type: ProjectileNetwork
+            type: struct
+            fields:
+                - name: unknown
+                  type: bool
+                - name: baseline_valid
+                  type: bool
+                - name: baseline_index
+                  type: int8_t
+                - name: message_index
+                  type: int8_t
+                - name: update_baseline
+                  type: ProjectileNetworkData
+                - name: delta_valid
+                  type: bool
+                - type: pad
+                  size: 3
+                - name: update_delta
+                  type: ProjectileNetworkData

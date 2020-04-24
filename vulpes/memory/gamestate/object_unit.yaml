@@ -433,7 +433,7 @@ structs:
                   type: MemRef
                 - name: previous_unit
                   type: MemRef
-          - name: unit_flags
+          - name: flags
             type: bitfield
             width: 32
             fields:
@@ -484,9 +484,9 @@ structs:
           - name: persistent_control
             type: struct
             fields:
-              - name: control_ticks_remaining
+              - name: ticks_remaining
                 type: int32_t
-              - name: control_bits
+              - name: bits
                 type: UnitControlBits
               - type: pad
                 size: 2
@@ -711,7 +711,7 @@ structs:
 
     - name: ObjectBipedAttributes
       fields:
-          - name: biped_flags
+          - name: flags
             type: bitfield
             width: 32
             comment: There is definitely more flags here than documented.
@@ -825,7 +825,7 @@ structs:
 
     - name: ObjectVehicleAttributes
       fields:
-          - name: vehicle_flags
+          - name: flags
             type: bitfield
             width: 16
             fields:
