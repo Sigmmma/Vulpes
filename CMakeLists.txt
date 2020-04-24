@@ -67,21 +67,21 @@ add_library(Vulpes SHARED
     vulpes/hooks/map.S
     vulpes/hooks/object.cpp
     vulpes/hooks/object.S
+    vulpes/hooks/save_load.cpp
     vulpes/hooks/tick.cpp
     vulpes/hooks/tick.S
-    vulpes/hooks/save_load.cpp
 
+    vulpes/memory/behavior_definition.cpp
     vulpes/memory/console.cpp
-    vulpes/memory/gamestate/object.cpp
     vulpes/memory/gamestate/effect.cpp
     vulpes/memory/gamestate/network.cpp
+    vulpes/memory/gamestate/object.cpp
     vulpes/memory/gamestate/player.cpp
-    vulpes/memory/table.cpp
-    vulpes/memory/server/game_variant.cpp
-    vulpes/memory/server/king.cpp
-    vulpes/memory/behavior_definition.cpp
     vulpes/memory/global.cpp
     vulpes/memory/global.S
+    vulpes/memory/server/game_variant.cpp
+    vulpes/memory/server/king.cpp
+    vulpes/memory/table.cpp
 
     vulpes/memory/types.cpp
 
