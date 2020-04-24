@@ -21,7 +21,7 @@ use warnings;
 
 # If you see a pull request that changes this system and it does not
 # have a change for this constant you should ready the firing squad.
-our $VERSION = '1.3.1';
+our $VERSION = '1.4.0';
 
 use Digest::SHA1 qw( sha1_base64 );
 use File::Basename qw( dirname basename fileparse );
