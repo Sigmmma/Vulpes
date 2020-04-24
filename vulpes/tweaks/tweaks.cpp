@@ -16,7 +16,7 @@
  */
 
 #include <vulpes/hooks/tick.hpp>
-#include <vulpes/memory/persistent/console.hpp>
+#include <vulpes/memory/global/console.hpp>
 
 #include "tweaks.hpp"
 

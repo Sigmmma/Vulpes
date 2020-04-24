@@ -108,7 +108,7 @@ void revert_upgrades() {
 
 // Memory
 
-#include "memory/persistent/global.hpp"
+#include "memory/global/global.hpp"
 void init_memory() {
     init_memory_global();
 }

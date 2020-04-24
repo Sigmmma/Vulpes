@@ -23,7 +23,7 @@
 
 #include <vulpes/memory/signatures/signatures.hpp>
 #include <vulpes/functions/messaging.hpp>
-#include <vulpes/memory/persistent/console.hpp>
+#include <vulpes/memory/global/console.hpp>
 
 #include "handler.hpp"
 
