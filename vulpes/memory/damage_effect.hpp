@@ -19,6 +19,8 @@
 
 #include <cstdint>
 
+// TODO: Move this into tag definition for damage effect
+
 enum class DamageCategory : int16_t {
     NONE = 0,
     FALLING,
