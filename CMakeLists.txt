@@ -71,8 +71,8 @@ add_library(Vulpes SHARED
     vulpes/hooks/tick.S
     vulpes/hooks/save_load.cpp
 
+    vulpes/memory/console.cpp
     vulpes/memory/gamestate/object.cpp
-    vulpes/memory/gamestate/console.cpp
     vulpes/memory/gamestate/effect.cpp
     vulpes/memory/gamestate/network.cpp
     vulpes/memory/gamestate/player.cpp

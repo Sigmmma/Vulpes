@@ -19,7 +19,7 @@
 #include <cstring>
 #include <string>
 
-#include <vulpes/memory/gamestate/console.hpp>
+#include <vulpes/memory/console.hpp>
 #include <vulpes/memory/signatures.hpp>
 
 #include "messaging.hpp"
