@@ -21,9 +21,9 @@
 #include <exception>
 #include <regex>
 
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 #include <vulpes/functions/messaging.hpp>
-#include <vulpes/memory/console.hpp>
+#include <vulpes/memory/persistent/console.hpp>
 
 #include "handler.hpp"
 

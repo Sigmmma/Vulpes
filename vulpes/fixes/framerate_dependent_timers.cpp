@@ -18,7 +18,7 @@
 #include <hooker/hooker.hpp>
 
 #include <vulpes/hooks/tick.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "framerate_dependent_timers.hpp"
 

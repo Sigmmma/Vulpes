@@ -19,8 +19,8 @@
 
 #include <vulpes/memory/tag/tag_types.hpp>
 
-#include "message_delta.hpp"
-#include "types.hpp"
+#include <vulpes/memory/network/message_delta.hpp>
+#include <vulpes/memory/types.hpp>
 
 
 // These are used to determine how to handle certain events for

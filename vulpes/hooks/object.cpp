@@ -21,10 +21,10 @@
 #include <hooker/function_pointer_safe.hpp>
 #include <hooker/hooker.hpp>
 
-#include <vulpes/memory/behavior_definition.hpp>
+#include <vulpes/memory/hook/behavior_definition.hpp>
 #include <vulpes/memory/gamestate/object.hpp>
 #include <vulpes/memory/types.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 
 // New behavior definitions, when initialized hooking into

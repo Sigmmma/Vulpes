@@ -16,7 +16,7 @@
 #include <string>
 
 #include <vulpes/functions/messaging.hpp>
-#include <vulpes/memory/global.hpp>
+#include <vulpes/memory/persistent/global.hpp>
 #include <vulpes/paths.hpp>
 
 #include "lua_helpers.hpp"

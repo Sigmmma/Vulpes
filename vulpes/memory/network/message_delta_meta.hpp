@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "types.hpp"
+#include <vulpes/memory/types.hpp>
 
 struct MessageDeltaHeader {
     //MessageDeltaDecodingInfo* decoding_information;

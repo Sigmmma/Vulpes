@@ -71,15 +71,15 @@ add_library(Vulpes SHARED
     vulpes/hooks/tick.cpp
     vulpes/hooks/tick.S
 
-    vulpes/memory/behavior_definition.cpp
-    vulpes/memory/console.cpp
+    vulpes/memory/hook/behavior_definition.cpp
+    vulpes/memory/persistent/console.cpp
     vulpes/memory/gamestate/actor.cpp
     vulpes/memory/gamestate/effect.cpp
-    vulpes/memory/gamestate/network.cpp
     vulpes/memory/gamestate/object.cpp
     vulpes/memory/gamestate/player.cpp
-    vulpes/memory/global.cpp
-    vulpes/memory/global.S
+    vulpes/memory/network/network.cpp
+    vulpes/memory/persistent/global.cpp
+    vulpes/memory/persistent/global.S
     vulpes/memory/server/game_variant.cpp
     vulpes/memory/server/king.cpp
     vulpes/memory/table.cpp
@@ -102,7 +102,7 @@ add_library(Vulpes SHARED
     vulpes/lua/lua_open.cpp
 
     # Generated files
-    vulpes/memory/signatures.cpp
+    vulpes/memory/signatures/signatures.cpp
 )
 
 add_library(VulpesLoader SHARED

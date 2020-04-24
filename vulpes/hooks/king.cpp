@@ -18,7 +18,7 @@
 #include <hooker/hooker.hpp>
 
 #include <vulpes/memory/server/king.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "king.hpp"
 

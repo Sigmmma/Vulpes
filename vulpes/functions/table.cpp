@@ -17,7 +17,7 @@
 
 #include <cstdint>
 
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "table.hpp"
 

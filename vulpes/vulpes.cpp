@@ -19,7 +19,7 @@
 #include <cstdio>
 #include <windows.h>
 
-#include "memory/gamestate/network.hpp"
+#include "memory/network/network.hpp"
 
 // Hooks
 
@@ -108,7 +108,7 @@ void revert_upgrades() {
 
 // Memory
 
-#include "memory/global.hpp"
+#include "memory/persistent/global.hpp"
 void init_memory() {
     init_memory_global();
 }
@@ -146,7 +146,7 @@ struct ImageSectionHeader {
     uint32_t bullshit2[4];
 };
 
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 void init_vulpes() {
     // Let our friend say hello <3

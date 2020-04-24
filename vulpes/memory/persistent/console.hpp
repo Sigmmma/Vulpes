@@ -18,8 +18,7 @@
 #pragma once
 
 #include <vulpes/memory/types.hpp>
-
-#include "table.hpp"
+#include <vulpes/memory/table.hpp>
 
 #pragma pack(push, 1)
 

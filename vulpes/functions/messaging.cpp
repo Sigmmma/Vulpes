@@ -19,8 +19,8 @@
 #include <cstring>
 #include <string>
 
-#include <vulpes/memory/console.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/persistent/console.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "messaging.hpp"
 

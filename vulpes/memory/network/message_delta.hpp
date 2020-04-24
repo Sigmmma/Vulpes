@@ -19,7 +19,7 @@
 
 #include <vulpes/memory/gamestate/player.hpp>
 
-#include "types.hpp"
+#include <vulpes/memory/types.hpp>
 
 enum MessageDeltaType : int8_t {
     NONE                               = -1,

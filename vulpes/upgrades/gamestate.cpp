@@ -50,8 +50,8 @@
 
 #include <hooker/hooker.hpp>
 #include <util/crc32.hpp>
-#include <vulpes/memory/global.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/persistent/global.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 #include <vulpes/memory/table.hpp>
 
 #include "gamestate.hpp"

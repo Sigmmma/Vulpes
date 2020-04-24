@@ -20,7 +20,7 @@
 #include <hooker/hooker.hpp>
 #include <hooker/function_pointer_safe.hpp>
 
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "save_load.hpp"
 

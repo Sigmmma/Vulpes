@@ -18,7 +18,7 @@
 #include <hooker/hooker.hpp>
 
 #include <vulpes/network/foxnet/vulpes_message.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "incoming_packets.hpp"
 

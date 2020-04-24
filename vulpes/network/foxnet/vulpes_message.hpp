@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <vulpes/memory/message_delta.hpp>
+#include <vulpes/memory/network/message_delta.hpp>
 
 void send_vulpes_message(VulpesMessage* msg);
 

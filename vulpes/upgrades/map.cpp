@@ -23,7 +23,7 @@
 #include <util/crc32.hpp>
 
 #include <vulpes/memory/types.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "map.hpp"
 

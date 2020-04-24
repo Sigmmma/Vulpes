@@ -15,7 +15,7 @@
  * long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
  */
 
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "network.hpp"
 
@@ -28,5 +28,5 @@ bool* allow_client_side_projectiles() {
 }
 
 bool game_is_server_executable() {
-    return sig_server() != 0;
+    return !!sig_server();
 }

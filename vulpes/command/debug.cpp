@@ -18,7 +18,7 @@
 #include <vulpes/hooks/tick.hpp>
 #include <vulpes/fixes/shdr_trans_zfighting.hpp>
 #include <vulpes/functions/messaging.hpp>
-#include <vulpes/memory/gamestate/network.hpp>
+#include <vulpes/memory/network/network.hpp>
 #include <vulpes/network/network_id.hpp>
 #include <vulpes/debug/budget.hpp>
 

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 const char* profile_path();
 const char* savegames_path();
 const wchar_t* active_profile_name();

@@ -17,7 +17,7 @@
 
 #include <hooker/hooker.hpp>
 
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "shdr_trans_zfighting.hpp"
 

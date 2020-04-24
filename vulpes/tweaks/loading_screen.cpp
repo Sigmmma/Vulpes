@@ -17,7 +17,7 @@
 
 #include <hooker/hooker.hpp>
 
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "loading_screen.hpp"
 

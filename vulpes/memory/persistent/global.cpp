@@ -15,8 +15,8 @@
  * long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
  */
 
-#include <vulpes/memory/gamestate/network.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/network/network.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 #include "global.hpp"
 

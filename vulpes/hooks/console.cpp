@@ -19,7 +19,7 @@
 
 #include <vulpes/command/handler.hpp>
 #include <vulpes/functions/messaging.hpp>
-#include <vulpes/memory/signatures.hpp>
+#include <vulpes/memory/signatures/signatures.hpp>
 
 extern "C" {
     uintptr_t console_hook__return_to_halo_con_in;

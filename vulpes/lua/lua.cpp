@@ -22,7 +22,7 @@
 #include <util/file_helpers.hpp>
 
 #include <vulpes/hooks/map.hpp>
-#include <vulpes/memory/global.hpp>
+#include <vulpes/memory/persistent/global.hpp>
 #include <vulpes/memory/types.hpp>
 #include <vulpes/paths.hpp>
 
