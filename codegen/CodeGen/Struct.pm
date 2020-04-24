@@ -88,6 +88,8 @@ sub preprocess_struct {
         $struct->{size} = ensure_number($struct->{size});
     }
 
+    $struct->{union} = $struct->{union} // 0;
+
     $struct->{array_size} = ensure_number($struct->{array_size} // 1);
 
     return $struct;
@@ -130,7 +132,7 @@ sub yaml_struct_to_cpp_definition {
     my ($struct) = @_;
 
     # Start definition.
-    my $string = "struct";
+    my $string = $struct->{union} ? "union" : "struct";
     if (exists $struct->{name}) {
         $string .= " $struct->{name}";
     }
