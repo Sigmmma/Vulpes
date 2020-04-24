@@ -15,6 +15,5 @@
  * long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
  */
 
-#pragma once
-
-#include "generated/actor.hpp"
+#include "actor.hpp"
+#include "generated/actor.cpp"

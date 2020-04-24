@@ -14,3 +14,4 @@ yaml_files:
     - vulpes/memory/gamestate/object_item.yaml
     - vulpes/memory/gamestate/object_unit.yaml
     - vulpes/memory/gamestate/player.yaml
+    - vulpes/memory/gamestate/actor.yaml

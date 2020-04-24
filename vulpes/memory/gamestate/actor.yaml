@@ -1,0 +1,150 @@
+#
+# This file is part of Vulpes, an extension of Halo Custom Edition's capabilities.
+# Copyright (C) 2019-2020 gbMichelle (Michelle van der Graaf)
+#
+# Vulpes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, version 3.
+#
+# Vulpes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# long with Vulpes.  If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
+#
+
+enums:
+    - name: AiCommunicationType
+      type: int16_t
+      options:
+              - name: DEATH
+                value: 0
+              - name: SPREE
+                value: 1
+              - name: HURT
+                value: 2
+              - name: DAMAGE
+                value: 3
+              - name: SIGHTED_ENEMY
+                value: 4
+              - name: FOUND_ENEMY
+                value: 5
+              - name: UNEXPECTED_ENEMY
+                value: 6
+              - name: FOUND_DEAD_FRIEND
+                value: 7
+              - name: ALLEGIANCE_CHANGED
+                value: 8
+              - name: GRENADE_THROWING
+                value: 9
+              - name: GRENADE_STARTLE
+                value: 10
+              - name: GRENADE_SIGHTED
+                value: 11
+              - name: GRENADE_DANGER
+                value: 12
+              - name: LOST_CONTACT
+                value: 13
+              - name: BLOCKED
+                value: 14
+              - name: ALERT_NONCOMBAT
+                value: 15
+              - name: SEARCH_START
+                value: 16
+              - name: SEARCH_QUERY
+                value: 17
+              - name: SEARCH_REPORT
+                value: 18
+              - name: SEARCH_ABANDON
+                value: 19
+              - name: SEARCH_GROUP_ABANDON
+                value: 20
+              - name: UNCOVER_START
+                value: 21
+              - name: ADVANCE
+                value: 22
+              - name: RETREAT
+                value: 23
+              - name: COVER
+                value: 24
+              - name: SIGHTED_FRIEND_PLAYER
+                value: 25
+              - name: SHOOTING
+                value: 26
+              - name: SHOOTING_VEHICLE
+                value: 27
+              - name: SHOOTING_BERSERK
+                value: 28
+              - name: SHOOTING_GROUP
+                value: 29
+              - name: SHOOTING_TRAITOR
+                value: 30
+              - name: FLEE
+                value: 31
+              - name: FLEE_LEADER_DIED
+                value: 32
+              - name: FLEE_IDLE
+                value: 33
+              - name: ATTEMPTED_FLEE
+                value: 34
+              - name: HIDING_FINISHED
+                value: 35
+              - name: VEHICLE_ENTRY
+                value: 36
+              - name: VEHICLE_EXIT
+                value: 37
+              - name: VEHICLE_WOOHOO
+                value: 38
+              - name: VEHICLE_SCARED
+                value: 39
+              - name: VEHICLE_FALLING
+                value: 40
+              - name: SURPRISE
+                value: 41
+              - name: BERSERK
+                value: 42
+              - name: MELEE
+                value: 43
+              - name: DIVE
+                value: 44
+              - name: UNCONVER_EXCLAMATION
+                value: 45
+              - name: FALLING
+                value: 46
+              - name: LEAP
+                value: 47
+              - name: POSTCOMBAT_ALONE
+                value: 48
+              - name: POSTCOMBAT_UNSCATHED
+                value: 49
+              - name: POSTCOMBAT_WOUNDED
+                value: 50
+              - name: POSTCOMBAT_MASSACRE
+                value: 51
+              - name: POSTCOMBAT_TRIUMPH
+                value: 52
+              - name: POSTCOMBAT_CHECK_ENEMY
+                value: 53
+              - name: POSTCOMBAT_CHECK_FRIEND
+                value: 54
+              - name: POSTCOMBAT_SHOOT_CORPSE
+                value: 55
+              - name: POSTCOMBAT_CELEBRATE
+                value: 56
+
+structs:
+    - name: AiCommunicationPacket
+      size: 0x20
+      fields:
+          - type: pad
+            size: 6
+          - name: type
+            type: AiCommunicationType
+          - type: pad
+            size: 20
+          - name: broken
+            type: bool
+          - type: pad
+            size: 3

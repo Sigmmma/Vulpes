@@ -73,6 +73,7 @@ add_library(Vulpes SHARED
 
     vulpes/memory/behavior_definition.cpp
     vulpes/memory/console.cpp
+    vulpes/memory/gamestate/actor.cpp
     vulpes/memory/gamestate/effect.cpp
     vulpes/memory/gamestate/network.cpp
     vulpes/memory/gamestate/object.cpp
