@@ -72,13 +72,13 @@ add_library(Vulpes SHARED
     vulpes/hooks/save_load.cpp
 
     vulpes/memory/gamestate/object.cpp
-    vulpes/memory/gamestate/server/game_variant.cpp
-    vulpes/memory/gamestate/server/king.cpp
     vulpes/memory/gamestate/console.cpp
     vulpes/memory/gamestate/effect.cpp
     vulpes/memory/gamestate/network.cpp
     vulpes/memory/gamestate/player.cpp
     vulpes/memory/gamestate/table.cpp
+    vulpes/memory/server/game_variant.cpp
+    vulpes/memory/server/king.cpp
     vulpes/memory/behavior_definition.cpp
     vulpes/memory/global.cpp
     vulpes/memory/global.S

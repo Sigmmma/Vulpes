@@ -18,7 +18,7 @@
 #include <vulpes/functions/message_delta.hpp>
 #include <vulpes/functions/messaging.hpp>
 #include <vulpes/memory/gamestate/network.hpp>
-#include <vulpes/memory/gamestate/server/king.hpp>
+#include <vulpes/memory/server/king.hpp>
 
 #include "handler.hpp"
 #include "server.hpp"
