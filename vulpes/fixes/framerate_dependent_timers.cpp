@@ -130,14 +130,57 @@ void revert_console_fix() {
     DEL_CALLBACK(EVENT_TICK, fade_console);
 }
 
+/*
+    In the stock game, contrails are updated every frame. They update based on
+    how much time has passed between the current frame and the previous frame.
+    This calculation was designed with the expectation that the game's frame
+    rate would match the tick rate (30 fps). Because of this, the contrails
+    can have visible distortions at higher frame rates (ex: the Banshee wing
+    contrails having little hiccups when they should be smooth curves).
+
+    This issue does not happen if the contrails are updated every tick instead
+    of every frame, while feeding it the time between two ticks instead of the
+    time between two frames.
+*/
+
+static Patch(patch_contrail_framerate_dep, NULL, 5, NOP_PATCH, 0);
+uintptr_t contrails_update_func = NULL;
+extern "C" void update_contrails_wrapper();
+
+void init_contrail_fix() {
+    // This is a render only bug, don't bother with server.
+    if (sig_server()) return;
+
+    contrails_update_func = sig_contrails_update();
+
+    if (patch_contrail_framerate_dep.build(sig_fix_contrails_framerate_dep())
+        && contrails_update_func) {
+
+        // NOP out the call to contrails_update in the game_frame update function.
+        patch_contrail_framerate_dep.apply();
+
+        // Add our wrapped version as a tick event.
+        ADD_CALLBACK(EVENT_TICK, update_contrails_wrapper);
+
+        // TODO: Potentially rebind contrail_update_points to frames.
+    }
+}
+
+void revert_contrail_fix() {
+    patch_contrail_framerate_dep.revert();
+    DEL_CALLBACK(EVENT_TICK, update_contrails_wrapper);
+}
+
 void init_framerate_dependent_timer_fixes() {
     init_checkpoint_revert_fix();
     init_scoreboard_fix();
     init_console_fix();
+    init_contrail_fix();
 }
 
 void revert_framerate_dependent_timer_fixes() {
-    revert_checkpoint_revert_fix();
-    revert_scoreboard_fix();
+    revert_contrail_fix();
     revert_console_fix();
+    revert_scoreboard_fix();
+    revert_checkpoint_revert_fix();
 }

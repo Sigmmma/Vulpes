@@ -47,6 +47,7 @@ add_library(Vulpes SHARED
     vulpes/fixes/cpu_usage.cpp
     vulpes/fixes/cpu_usage.S
     vulpes/fixes/framerate_dependent_timers.cpp
+    vulpes/fixes/framerate_dependent_timers.S
     vulpes/fixes/host_refusal.cpp
     vulpes/fixes/shdr_trans_zfighting.cpp
     vulpes/fixes/string_overflows.cpp
