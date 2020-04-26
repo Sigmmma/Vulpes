@@ -55,6 +55,12 @@ bool at_main_menu() {
     return *sig_at_main_menu();
 }
 
+uint8_t developer_mode_level() {
+    if (sig_developer_mode_level() && *sig_developer_mode_level())
+        return **sig_developer_mode_level();
+    return 0;
+}
+
 uintptr_t saved_game_file_get_path_to_enclosing_directory_ptr;
 
 void init_memory_global() {

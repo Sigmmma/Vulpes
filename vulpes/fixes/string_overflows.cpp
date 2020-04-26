@@ -18,6 +18,7 @@
 #include <hooker/hooker.hpp>
 
 #include <vulpes/memory/signatures/signatures.hpp>
+#include <vulpes/memory/global/global.hpp>
 #include <vulpes/functions/messaging.hpp>
 
 #include "string_overflows.hpp"
@@ -28,7 +29,7 @@
 
 __attribute__((fastcall))
 void hs_print_cleanser(char* string) {
-    if (sig_developer_mode_level() && *sig_developer_mode_level() >= 4)
+    if (developer_mode_level() >= 4)
         cprintf_info("%s", string);
 }
 

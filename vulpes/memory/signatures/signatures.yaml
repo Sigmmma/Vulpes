@@ -136,7 +136,7 @@ signatures:
   - name: developer_mode_level
     bytes: ?? ?? ?? ?? 04 72 ?? 8D 54 24 0C 52
     crucial: false
-    type: uint8_t*
+    type: uint8_t**
 
   # functions/message_delta
 

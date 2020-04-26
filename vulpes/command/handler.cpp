@@ -22,6 +22,7 @@
 #include <regex>
 
 #include <vulpes/memory/signatures/signatures.hpp>
+#include <vulpes/memory/global/global.hpp>
 #include <vulpes/functions/messaging.hpp>
 #include <vulpes/memory/global/console.hpp>
 
@@ -51,12 +52,6 @@ void auto_complete(char* buffer[], uint16_t* current_index) {
     if (input && input[0]) {
         string input_str(input);
 
-        uint8_t developer_mode = 0;
-        if (sig_developer_mode_level()){
-            developer_mode = *sig_developer_mode_level();
-        }
-
-
         int i = 0;
         int j = *current_index;
         while (i < commands.size() && *current_index < 256) {
@@ -64,7 +59,7 @@ void auto_complete(char* buffer[], uint16_t* current_index) {
             if (input_str.size() <= cmp_str.size()) {
                 cmp_str.resize(input_str.size());
                 if (input_str == cmp_str
-                && developer_mode >= commands[i]->get_dev_level()) {
+                && developer_mode_level() >= commands[i]->get_dev_level()) {
                     buffer[j] = commands[i]->get_name_chars();
                     j++;
                 }

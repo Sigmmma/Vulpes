@@ -26,6 +26,9 @@ const wchar_t* active_profile_name();
 int32_t active_profile_id();
 const char* map_name();
 bool at_main_menu();
+/* Returns the level of developer mode 0-255 */
+uint8_t developer_mode_level();
+
 
 extern "C" __attribute__((regparm(2)))
 /* Writes the path to the requested profile's save folder to the given pointer */
