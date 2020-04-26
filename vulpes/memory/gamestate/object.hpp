@@ -22,6 +22,9 @@
 const size_t POSITIVE_OBJECT_TYPES = 12;
 const size_t VALID_OBJECT_TYPES = POSITIVE_OBJECT_TYPES;
 
+#include <vulpes/memory/table.hpp>
+#include <vulpes/memory/gamestate/actor.hpp>
+
 #include "generated/object_device.hpp"
 #include "generated/object_item.hpp"
 #include "generated/object_unit.hpp"

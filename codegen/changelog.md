@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.0]
 ### Changed
- - Update license header in generated files.
+ - Doesn't self include files anymore.
  - Output files are now hashed too.
  - Add option self_include_header which defaults to true. if false it will make it so generated source files don't include their header
  - Add switch for structs to be output as unions.
