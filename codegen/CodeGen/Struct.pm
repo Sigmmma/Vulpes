@@ -88,7 +88,7 @@ sub preprocess_struct {
         $struct->{size} = ensure_number($struct->{size});
     }
 
-    $struct->{union} = $struct->{union} // 0;
+    $struct->{union} //= 0;
 
     $struct->{array_size} = ensure_number($struct->{array_size} // 1);
 
