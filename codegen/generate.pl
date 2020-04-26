@@ -159,8 +159,8 @@ foreach my $filepath (@ARGV) {
     }
 
     if (exists $file->{std_includes}) {
-        @src_std_includes = map {"#include <$_>"} @{$file->{includes}};
-        @hdr_std_includes = map {"#include <$_>"} @{$file->{includes}};
+        @src_std_includes = map {"#include <$_>"} @{$file->{std_includes}};
+        @hdr_std_includes = map {"#include <$_>"} @{$file->{std_includes}};
     }
 
     my @outputs;
